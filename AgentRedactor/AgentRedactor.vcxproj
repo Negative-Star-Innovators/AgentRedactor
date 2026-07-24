@@ -78,7 +78,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -92,7 +92,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
