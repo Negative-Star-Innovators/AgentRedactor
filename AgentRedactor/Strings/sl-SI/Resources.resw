@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Proxy zaščite osebnih podatkov v AI prometu</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Profili</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Odstrani</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Kako uporabljati Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Konfigurirajte svoj profil spodaj (ali uporabite privzeti)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Usmerite svojega LLM odjemalca (Claude Code, OpenClaw itd.) na lokalni URL, prikazan spodaj</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Smo med vašim odjemalcem in pravim API-jem. Vse ostane na vašem računalniku. Občutljivi podatki se lokalno uredijo, preden katera koli zahteva zapusti vaš računalnik, kar zagotavlja, da vaši podatki nikoli ne dosežejo našega strežnika</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API proxy</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Ime profila</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>npr., Delo OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Lokalni URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Naslov, na katerega kaže vaš LLM odjemalec</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Kopiraj</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Posreduj na</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>npr. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Pravi API končna točka, ki prejme vaše urejene zahteve</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API ključ</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Prikaži ključ</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Shrani vse nastavitve</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Vrata {0} so na voljo</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Vrata {0} so že v uporabi</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Vrata {0} že uporablja profil '{1}', izberite druga.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Regex vzorci</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Besedilo, ki se ujema s temi vzorci, bo urejeno pred pošiljanjem v API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Omogočeno</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex vzorec</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>npr. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Ključne besede</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Sporočila, ki vsebujejo te besede, bodo označena za urejanje</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Omogočeno</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Velike/male črke</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Ključna beseda</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>npr. geslo</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Razlikovanje velikih/malih črk</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>Model zaznave, poganjan z umetno inteligenco</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>Zaznava z umetno inteligenco teče lokalno kot dodatni obrambni sloj. Lahko spregleda podatke ali predobro uredi. Uporabite Regex vzorce in Ključne besede spodaj za deterministično urejanje.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Pričakujte nekoliko počasnejše odgovore, ko je omogočeno. Model pregleda vsako sporočilo lokalno.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Prag zaupanja (0,0–1,0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Številka računa</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Naslov</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Datum</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>E-pošta</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Oseba</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Skrivnost</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Finančno</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Kontakt in lokacija</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Osebno</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Digitalno in skrivnosti</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Geslo</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Zahtevaj geslo ob zagonu</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Spremeni geslo</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Statistika</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Počisti</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Zahteve</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Ključne besede</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Urejanja seje</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Počisti</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Dejanska urejanja zaznana v trenutni seji.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>V trenutni seji ni urejanj.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Dnevniki</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Podrobno beleženje</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Odpri dnevniško datoteko</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Odpri mapo</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Počisti</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Regex vzorci</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Vnesi regex vzorec...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Odstrani</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Ključne besede</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Vnesi ključno besedo...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Razlikovanje velikih/malih črk</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Odstrani</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Da</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Ne</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (občutljivo na velike/male črke)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(brez imena)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Privzeto</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Nov profil</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Nastavitve</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Nazaj</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Zaženi ob zagonu Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Glavno geslo</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Spremeni glavno geslo</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Podrobno beleženje</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Shrani nastavitve</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Jezik</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Sistemsko privzeto</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Angleščina</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Nemščina</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Opozorilo</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Podrobno beleženje omogočeno. Dnevniki lahko vsebujejo občutljive podatke, vključno z izvirnimi telesi zahtev.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Potrebno je glavno geslo</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Odkleni</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Izhod</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Vnesi geslo</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Napačno geslo</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Vneseno geslo je napačno. Poskusite znova.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Preveč poskusov</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Doseženo največje število poskusov. Aplikacija se bo zdaj zaprla.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Nastavi glavno geslo</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Nastavi geslo</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Geslo</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Potrdi geslo</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Geslo ne more biti prazno.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Gesli se ne ujemata.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Omogočanje glavnega gesla ni uspelo.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Onemogoči glavno geslo</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Onemogoči</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Trenutno geslo</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Napačno geslo.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Spremeni glavno geslo</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Spremeni</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Novo geslo</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Potrdi novo geslo</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Novo geslo ne more biti prazno.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Novi gesli se ne ujemata.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Uspeh</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Glavno geslo uspešno spremenjeno.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Sprememba gesla ni uspela. Prepričajte se, da je trenutno geslo pravilno.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Prekliči</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Odstrani</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Napaka pri preverjanju</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Varnostno opozorilo</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Uporabljate HTTP upstream URL (nešifriran). Vaš API ključ bo poslan v čistem besedilu preko omrežja.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Odstrani profil</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Ste prepričani? Ta operacija je trajna.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Izbriši vse dnevnike?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>To bo trajno izbrisalo trenutno dnevniško datoteko in vse arhivirane dnevnike sej. Tega ni mogoče razveljaviti.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Izbriši vse dnevnike</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Omogoči podrobno beleženje?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>To bo zapisalo zaznane občutljive vrednosti (imena, e-pošte, telefonske številke itd.) v dnevniško datoteko na disku. Ne omogočite, če imajo drugi dostop do tega računalnika. Nastavitev se ponastavi ob zaprtju aplikacije.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Omogoči</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Ste prepričani, da želite izstopiti?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Izhod</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Če izstopite, Agent Redactor ne bo več nadzoroval in urejal API prometa.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Vrata morajo biti med 1024 in 65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Vrata {0} že uporablja profil '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>URL za posredovanje ne more biti prazen.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>URL za posredovanje se mora začeti s http:// ali https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>URL za posredovanje ni veljaven URL.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Prag zaupanja mora biti med 0,0 in 1,0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Neveljavna regex sintaksa: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Neveljavna regex sintaksa.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Odpri Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Jezik</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Angleščina</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Nemščina</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Jezik spremenjen</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Ponovni zagon Agent Redactor za uveljavitev novega jezika.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Ta jezik je že aktiven.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Zaženi ob zagonu</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Izhod</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor — Zrušitev</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Prišlo je do usodne napake. Oglejte si debug.log za podrobnosti.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Napaka</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Inicializacija aplikacije ni uspela.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>PII ni zaznan</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 PII element urejen</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} PII elementov urejenih</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Ključna beseda</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Zahteva: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Ključne besede: {0}</value>
+  </data>
+</root>

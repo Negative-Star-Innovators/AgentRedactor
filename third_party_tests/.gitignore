@@ -1,0 +1,10 @@
+# Local environment variables (contains secrets)
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# pytest cache
+.pytest_cache/

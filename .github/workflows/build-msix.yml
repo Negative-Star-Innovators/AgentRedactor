@@ -1,0 +1,57 @@
+name: Build MSIX
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      # The vcxproj references vcpkg at ..\..\vcpkg relative to itself, so the
+      # repo is checked out into a subfolder and vcpkg sits next to it.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Clone vcpkg
+        shell: pwsh
+        run: git clone https://github.com/microsoft/vcpkg vcpkg
+
+      - name: Cache vcpkg artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            vcpkg/installed
+            vcpkg/downloads
+          key: vcpkg-${{ hashFiles('repo/AgentRedactor/vcpkg.json') }}
+          restore-keys: vcpkg-
+
+      - name: Install vcpkg dependencies (first run is slow, then cached)
+        shell: pwsh
+        run: |
+          vcpkg\bootstrap-vcpkg.bat -disableMetrics
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows cppwinrt:x64-windows
+
+      # The 1.6 GB model weights are not in the repo; they are a release asset
+      # (see README). Skipped automatically on forks/PRs without access.
+      - name: Download ONNX model weights
+        shell: pwsh
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release download models-v1 --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
+
+      - name: Build MSIX (build.ps1)
+        shell: pwsh
+        run: repo/AgentRedactor/build.ps1
+
+      - name: Upload MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-msix
+          path: repo/AgentRedactor/build/AgentRedactor.msix
+          retention-days: 30

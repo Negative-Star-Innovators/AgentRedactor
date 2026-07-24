@@ -1,0 +1,306 @@
+#include "settings_manager.h"
+#include "constants.h"
+#include "logging.h"
+#include <fstream>
+
+namespace AgentRedactor {
+
+SettingsManager::SettingsManager(const std::filesystem::path& configDir) {
+    if (configDir.empty()) {
+        configDir_ = Utils::GetAppDataPath();
+    } else {
+        configDir_ = configDir;
+    }
+    Utils::CreateDirectoryRecursive(configDir_);
+    settingsFile_ = configDir_ / SETTINGS_FILE;
+    LoadSettings();
+    if (!settings_.contains("start_on_boot")) {
+        settings_["start_on_boot"] = true;
+        SaveSettings();
+    }
+    if (settings_.contains("verbose_logging")) {
+        // Migrate legacy verbose_logging setting to logging_enabled.
+        if (!settings_.contains("logging_enabled")) {
+            settings_["logging_enabled"] = settings_["verbose_logging"];
+        }
+        settings_.erase("verbose_logging");
+        SaveSettings();
+    }
+    if (!settings_.contains("logging_enabled")) {
+        settings_["logging_enabled"] = false;
+        SaveSettings();
+    }
+    if (!settings_.contains("app_language")) {
+        settings_["app_language"] = "";
+        SaveSettings();
+    }
+}
+
+bool SettingsManager::IsStartOnBoot() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    if (settings_.contains("start_on_boot")) return settings_["start_on_boot"].get<bool>();
+    return true;
+}
+
+void SettingsManager::SetStartOnBoot(bool enabled) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    settings_["start_on_boot"] = enabled;
+    SaveSettings();
+}
+
+std::wstring SettingsManager::GetOnnxProvider() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    if (settings_.contains("onnx_provider")) return Utils::Utf8ToWide(settings_["onnx_provider"].get<std::string>());
+    return L"auto";
+}
+
+void SettingsManager::SetOnnxProvider(const std::wstring& provider) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    settings_["onnx_provider"] = Utils::WideToUtf8(provider);
+    SaveSettings();
+}
+
+bool SettingsManager::IsLoggingEnabled() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    if (settings_.contains("logging_enabled")) return settings_["logging_enabled"].get<bool>();
+    return false;
+}
+
+void SettingsManager::SetLoggingEnabled(bool enabled) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    settings_["logging_enabled"] = enabled;
+    SaveSettings();
+}
+
+std::wstring SettingsManager::GetAppLanguage() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    if (settings_.contains("app_language")) return Utils::Utf8ToWide(settings_["app_language"].get<std::string>());
+    return L"";
+}
+
+void SettingsManager::SetAppLanguage(const std::wstring& language) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    settings_["app_language"] = Utils::WideToUtf8(language);
+    SaveSettings();
+}
+
+std::vector<ApiKeyProfile> SettingsManager::GetProfiles() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    std::vector<ApiKeyProfile> profiles;
+    if (settings_.contains("profiles")) {
+        for (const auto& p : settings_["profiles"]) {
+            profiles.push_back(ApiKeyProfile::FromJson(p));
+        }
+    }
+    return profiles;
+}
+
+void SettingsManager::SetProfiles(const std::vector<ApiKeyProfile>& profiles) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    json arr = json::array();
+    for (const auto& p : profiles) {
+        json pj;
+        p.ToJson(pj);
+        arr.push_back(pj);
+    }
+    settings_["profiles"] = arr;
+    SaveSettings();
+}
+
+void SettingsManager::AddProfile(const ApiKeyProfile& profile) {
+    auto profiles = GetProfiles();
+    profiles.push_back(profile);
+    SetProfiles(profiles);
+}
+
+void SettingsManager::UpdateProfile(const ApiKeyProfile& profile) {
+    auto profiles = GetProfiles();
+    for (auto& p : profiles) {
+        if (p.id == profile.id) {
+            p = profile;
+            break;
+        }
+    }
+    SetProfiles(profiles);
+}
+
+void SettingsManager::RemoveProfile(const std::wstring& id) {
+    auto profiles = GetProfiles();
+    profiles.erase(std::remove_if(profiles.begin(), profiles.end(),
+        [&id](const ApiKeyProfile& p) { return p.id == id; }), profiles.end());
+    SetProfiles(profiles);
+}
+
+std::optional<ApiKeyProfile> SettingsManager::GetProfileById(const std::wstring& id) const {
+    auto profiles = GetProfiles();
+    for (const auto& p : profiles) {
+        if (p.id == id) return p;
+    }
+    return std::nullopt;
+}
+
+std::optional<ApiKeyProfile> SettingsManager::GetProfileByPort(int port) const {
+    auto profiles = GetProfiles();
+    for (const auto& p : profiles) {
+        if (p.port == port) return p;
+    }
+    return std::nullopt;
+}
+
+// ============================================================================
+// SecureStorage integration
+// ============================================================================
+
+bool SettingsManager::IsMasterPasswordEnabled() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return secureStorage_.IsMasterPasswordEnabled();
+}
+
+bool SettingsManager::IsUnlocked() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return secureStorage_.IsInitialized();
+}
+
+bool SettingsManager::UnlockWithPassword(const std::wstring& password) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.IsMasterPasswordEnabled()) return true;
+    bool ok = secureStorage_.Unlock(password);
+    if (ok) {
+        DecryptSensitiveFields();
+    }
+    return ok;
+}
+
+bool SettingsManager::EnableMasterPassword(const std::wstring& password) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.EnableMasterPassword(password)) return false;
+    settings_["master_password"] = secureStorage_.GetConfig();
+    SaveSettings();
+    return true;
+}
+
+bool SettingsManager::ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.ChangeMasterPassword(oldPassword, newPassword)) return false;
+    settings_["master_password"] = secureStorage_.GetConfig();
+    SaveSettings();
+    return true;
+}
+
+void SettingsManager::DisableMasterPassword() {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    secureStorage_.DisableMasterPassword();
+    settings_["master_password"] = secureStorage_.GetConfig();
+    SaveSettings();
+}
+
+// ============================================================================
+// Save / Load with encryption
+// ============================================================================
+
+void SettingsManager::EncryptSensitiveFields() {
+    if (!settings_.contains("profiles")) return;
+    for (auto& profile : settings_["profiles"]) {
+        if (profile.contains("api_key") && profile["api_key"].is_string()) {
+            auto& field = profile["api_key"];
+            std::wstring plaintext = Utils::Utf8ToWide(field.get<std::string>());
+            field = secureStorage_.Encrypt(plaintext);
+        }
+        if (profile.contains("keywords") && profile["keywords"].is_array()) {
+            auto& field = profile["keywords"];
+            std::wstring plaintext = Utils::Utf8ToWide(field.dump());
+            field = secureStorage_.Encrypt(plaintext);
+        }
+        if (profile.contains("regex_patterns") && profile["regex_patterns"].is_array()) {
+            auto& field = profile["regex_patterns"];
+            std::wstring plaintext = Utils::Utf8ToWide(field.dump());
+            field = secureStorage_.Encrypt(plaintext);
+        }
+    }
+}
+
+void SettingsManager::DecryptSensitiveFields() {
+    if (!settings_.contains("profiles")) return;
+    for (auto& profile : settings_["profiles"]) {
+        if (profile.contains("api_key") && profile["api_key"].is_object() && profile["api_key"].contains("_enc")) {
+            auto& field = profile["api_key"];
+            auto decrypted = secureStorage_.Decrypt(field);
+            if (decrypted) {
+                field = Utils::WideToUtf8(*decrypted);
+            }
+        }
+        if (profile.contains("keywords") && profile["keywords"].is_object() && profile["keywords"].contains("_enc")) {
+            auto& field = profile["keywords"];
+            auto decrypted = secureStorage_.Decrypt(field);
+            if (decrypted) {
+                try {
+                    field = json::parse(Utils::WideToUtf8(*decrypted));
+                } catch (...) {
+                    field = json::array();
+                }
+            }
+        }
+        if (profile.contains("regex_patterns") && profile["regex_patterns"].is_object() && profile["regex_patterns"].contains("_enc")) {
+            auto& field = profile["regex_patterns"];
+            auto decrypted = secureStorage_.Decrypt(field);
+            if (decrypted) {
+                try {
+                    field = json::parse(Utils::WideToUtf8(*decrypted));
+                } catch (...) {
+                    field = json::array();
+                }
+            }
+        }
+    }
+}
+
+void SettingsManager::SaveSettings() {
+    struct EncryptionGuard {
+        SettingsManager* sm;
+        EncryptionGuard(SettingsManager* s) : sm(s) { sm->EncryptSensitiveFields(); }
+        ~EncryptionGuard() { sm->DecryptSensitiveFields(); }
+    };
+
+    try {
+        EncryptionGuard guard(this);
+        std::ofstream file(settingsFile_);
+        if (file) {
+            file << settings_.dump(2);
+        }
+    } catch (const std::exception& e) {
+        LOGF_LIFECYCLE(L"[SettingsManager] Save error: %s", Utils::Utf8ToWide(e.what()).c_str());
+    }
+}
+
+void SettingsManager::LoadSettings() {
+    try {
+        if (!Utils::FileExists(settingsFile_)) {
+            settings_ = json::object();
+            secureStorage_.Initialize(json::object(), L"");
+            return;
+        }
+        std::ifstream file(settingsFile_);
+        if (file) {
+            file >> settings_;
+        }
+
+        // Initialize SecureStorage from master_password config
+        json mpConfig;
+        if (settings_.contains("master_password")) {
+            mpConfig = settings_["master_password"];
+        }
+        secureStorage_.Initialize(mpConfig, L"");
+
+        // If no master password is set, decrypt immediately with DPAPI
+        if (!secureStorage_.IsMasterPasswordEnabled()) {
+            DecryptSensitiveFields();
+        }
+        // If master password is enabled, decryption is deferred until UnlockWithPassword is called
+    } catch (const std::exception& e) {
+        LOGF_LIFECYCLE(L"[SettingsManager] Load error: %s", Utils::Utf8ToWide(e.what()).c_str());
+        settings_ = json::object();
+        secureStorage_.Initialize(json::object(), L"");
+    }
+}
+
+} // namespace AgentRedactor

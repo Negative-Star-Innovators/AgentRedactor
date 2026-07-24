@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Proxy ochrony danych osobowych dla ruchu AI</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Jak używać Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Skonfiguruj swój profil poniżej (lub użyj domyślnego)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Skieruj swojego klienta LLM (Claude Code, OpenClaw itp.) na lokalny URL pokazany poniżej</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Siedzimy między Twoim klientem a prawdziwym API. Wszystko pozostaje na Twojej maszynie. Wrażliwe dane są redagowane lokalnie, zanim jakiekolwiek żądanie opuści Twój komputer, co zapewnia, że Twoje dane nigdy nie dotkną naszego serwera</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>Proxy API</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Nazwa profilu</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>np., Praca OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Lokalny URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Adres, na który wskazuje Twój klient LLM</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Kopiuj</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Przekaż do</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>np. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Prawdziwy punkt końcowy API, który odbiera Twoje zredagowane żądania</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>Klucz API</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Pokaż klucz</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Zapisz wszystkie ustawienia</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Port {0} jest dostępny</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Port {0} jest już używany</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Port {0} jest już używany przez profil '{1}', wybierz inny.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Wzorce Regex</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Tekst pasujący do tych wzorców zostanie zredagowany przed wysłaniem do API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Włączone</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Wzorzec Regex</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>np. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Słowa kluczowe</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Wiadomości zawierające te słowa zostaną oznaczone do redagowania</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Włączone</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Wielkość liter</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Słowo kluczowe</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>np. hasło</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Rozróżniaj wielkość liter</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>Model detekcji zasilany przez AI</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>Detekcja oparta na AI działa lokalnie jako dodatkowa warstwa ochrony. Może przeoczyć dane lub nadmiernie redagować. Użyj poniższych Wzorców Regex i Słów kluczowych dla deterministycznego redagowania.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Spodziewaj się nieco wolniejszych odpowiedzi po włączeniu. Model skanuje każdą wiadomość lokalnie.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Próg pewności (0,0–1,0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Numer konta</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Osoba</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Sekret</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Finansowe</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Kontakt i lokalizacja</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Osobiste</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Cyfrowe i sekrety</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Wymagaj hasła przy uruchomieniu</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Zmień hasło</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Statystyki</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Wyczyść</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Żądania</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Słowa kluczowe</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Redakcje sesji</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Wyczyść</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Rzeczywiste redakcje wykryte w bieżącej sesji.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Brak redakcji w bieżącej sesji.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Dzienniki</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Szczegółowe logowanie</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Otwórz plik dziennika</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Otwórz folder</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Wyczyść</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Wzorce Regex</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Wprowadź wzorzec regex...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Słowa kluczowe</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Wprowadź słowo kluczowe...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Rozróżniaj wielkość liter</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Tak</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Nie</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (rozróżnia wielkość liter)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(bez nazwy)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Domyślny</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Nowy profil</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Ustawienia</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Wstecz</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Uruchom przy starcie Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Hasło główne</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Zmień hasło główne</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Szczegółowe logowanie</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Zapisz ustawienia</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Język</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Domyślny systemowy</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Angielski</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Niemiecki</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Ostrzeżenie</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Szczegółowe logowanie włączone. Dzienniki mogą zawierać wrażliwe dane, w tym oryginalne treści żądań.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Wymagane jest hasło główne</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Odblokuj</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Wyjdź</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Wprowadź hasło</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Nieprawidłowe hasło</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Zbyt wiele prób</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Osiągnięto maksymalną liczbę prób wprowadzenia hasła. Aplikacja zostanie teraz zamknięta.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Ustaw hasło główne</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Ustaw hasło</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Potwierdź hasło</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Hasło nie może być puste.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Hasła nie pasują do siebie.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Nie udało się włączyć hasła głównego.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Wyłącz hasło główne</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Wyłącz</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Aktualne hasło</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Nieprawidłowe hasło.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Zmień hasło główne</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Zmień</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Nowe hasło</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Potwierdź nowe hasło</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Nowe hasło nie może być puste.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Nowe hasła nie pasują do siebie.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Sukces</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Hasło główne zostało pomyślnie zmienione.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Nie udało się zmienić hasła. Upewnij się, że aktualne hasło jest prawidłowe.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Błąd walidacji</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Ostrzeżenie bezpieczeństwa</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Używasz HTTP upstream URL (nieszyfrowany). Twój klucz API zostanie wysłany jako zwykły tekst przez sieć.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Usuń profil</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Czy na pewno? Ta operacja jest nieodwracalna.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Usunąć wszystkie dzienniki?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>To trwale usunie bieżący plik dziennika i wszystkie zarchiwizowane dzienniki sesji. Tej operacji nie można cofnąć.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Usuń wszystkie dzienniki</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Włączyć szczegółowe logowanie?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>To zapisze wykryte wrażliwe wartości (imiona, e-maile, numery telefonów itp.) do pliku dziennika na dysku. Nie włączaj tego, jeśli inne osoby mają dostęp do tego komputera. Ustawienie resetuje się po zamknięciu aplikacji.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Włącz</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Czy na pewno chcesz zakończyć?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Zakończ</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Jeśli zakończysz, Agent Redactor nie będzie już monitorował i redagował ruchu API.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Port musi być z zakresu od 1024 do 65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Port {0} jest już używany przez profil '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>URL przekazywania nie może być pusty.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>URL przekazywania musi zaczynać się od http:// lub https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>URL przekazywania nie jest prawidłowym URL.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Próg pewności musi być z zakresu od 0,0 do 1,0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Nieprawidłowa składnia regex: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Nieprawidłowa składnia regex.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Otwórz Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Język</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Angielski</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Niemiecki</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Język został zmieniony</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Ponowne uruchamianie Agent Redactor w celu zastosowania nowego języka.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Ten język jest już aktywny.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Uruchom przy starcie systemu</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Zakończ</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor — Awaria</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Wystąpił błąd krytyczny. Szczegóły w pliku debug.log.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Nie udało się zainicjować aplikacji.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>Nie wykryto PII</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 element PII zredagowany</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} elementów PII zredagowanych</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Słowo kluczowe</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Żądanie: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Słowa kluczowe: {0}</value>
+  </data>
+</root>

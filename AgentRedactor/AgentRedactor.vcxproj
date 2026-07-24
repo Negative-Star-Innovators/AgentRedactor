@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VcpkgRoot>$(ProjectDir)..\..\vcpkg</VcpkgRoot>
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
+    <VcpkgEnableClassic>true</VcpkgEnableClassic>
+  </PropertyGroup>
+  <Import Project="..\vcpkg\scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('..\vcpkg\scripts\buildsystems\msbuild\vcpkg.props')" />
+  <Import Project="packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.props')" />
+  <Import Project="packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.props')" />
+  <PropertyGroup Label="Globals">
+    <CppWinRTRootNamespace>AgentRedactor</CppWinRTRootNamespace>
+    <CppWinRTOptimized>true</CppWinRTOptimized>
+    <CppWinRTGenerateWindowsMetadata>true</CppWinRTGenerateWindowsMetadata>
+    <MinimalCoreWin>true</MinimalCoreWin>
+    <ProjectGuid>{B2C3D4E5-F6A7-8901-2345-678901ABCDEF}</ProjectGuid>
+    <ProjectName>AgentRedactor</ProjectName>
+    <RootNamespace>AgentRedactor</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <DisableXamlGeneratedMain>true</DisableXamlGeneratedMain>
+    <EnablePriGenTooling>false</EnablePriGenTooling>
+    <EnableCoreMrtTooling>false</EnableCoreMrtTooling>
+    <BeforeClCompileTargets>$(BeforeClCompileTargets);MarkupCompilePass1;MarkupCompilePass2</BeforeClCompileTargets>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(ProjectDir)build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)build\$(Platform)\$(Configuration)\obj\</IntDir>
+    <TargetName>AgentRedactor</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)resources;$(IntDir);$(ProjectDir)..\..\vcpkg\installed\x64-windows\include;$(ProjectDir)..\..\vcpkg\installed\x64-windows\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)resources;$(IntDir);$(ProjectDir)..\..\vcpkg\installed\x64-windows\include;$(ProjectDir)..\..\vcpkg\installed\x64-windows\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="App.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="HomePage.h" />
+    <ClInclude Include="RegexPage.h" />
+    <ClInclude Include="KeywordsPage.h" />
+    <ClInclude Include="SettingsPage.h" />
+    <ClInclude Include="AppState.h" />
+
+    <ClInclude Include="include\pii_detector.h" />
+    <ClInclude Include="include\bpe_tokenizer.h" />
+    <ClInclude Include="include\redactor.h" />
+    <ClInclude Include="include\settings_manager.h" />
+    <ClInclude Include="include\system_tray.h" />
+    <ClInclude Include="include\utils.h" />
+    <ClInclude Include="include\constants.h" />
+    <ClInclude Include="include\localization.h" />
+    <ClInclude Include="include\logging.h" />
+    <ClInclude Include="include\api_key_profile.h" />
+    <ClInclude Include="include\log_manager.h" />
+    <ClInclude Include="include\http_server.h" />
+    <ClInclude Include="include\proxy_engine.h" />
+    <ClInclude Include="include\regex_engine.h" />
+    <ClInclude Include="include\keyword_engine.h" />
+    <ClInclude Include="include\secure_storage.h" />
+    <ClInclude Include="resources\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="HomePage.cpp" />
+    <ClCompile Include="RegexPage.cpp" />
+    <ClCompile Include="KeywordsPage.cpp" />
+    <ClCompile Include="SettingsPage.cpp" />
+    <ClCompile Include="AppState.cpp" />
+    <ClCompile Include="XamlMetaDataProvider.cpp" />
+    <ClCompile Include="src\pii_detector.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\bpe_tokenizer.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\redactor.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\settings_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\system_tray.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\utils.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\api_key_profile.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\log_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\http_server.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\localization.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\proxy_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\regex_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\keyword_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\secure_storage.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="$(IntDir)XamlTypeInfo.g.cpp" />
+    <ClCompile Include="$(IntDir)XamlTypeInfo.Impl.g.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Strings\en-US\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\de-DE\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\es-ES\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\fr-FR\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\pt-PT\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\it-IT\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\da-DK\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\nl-NL\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\sv-SE\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\lb-LU\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\nb-NO\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\fi-FI\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ru-RU\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\hr-HR\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\el-GR\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\sl-SI\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\sr-Latn-RS\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\uk-UA\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\sq-AL\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\lv-LV\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\hy-AM\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\cs-CZ\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\et-EE\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\sk-SK\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\bg-BG\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ka-GE\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\hu-HU\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\pl-PL\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ro-RO\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\lt-LT\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\is-IS\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\zh-CN\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\zh-TW\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ja-JP\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ko-KR\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\mt-MT\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\hi-IN\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ta-IN\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\vi-VN\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\sw-KE\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\af-ZA\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\he-IL\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\id-ID\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\fil-PH\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ig-NG\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\th-TH\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\tr-TR\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ur-PK\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ar-SA\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ms-MY\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\az-Latn-AZ\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\kk-KZ\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Strings\ha-Latn-NG\Resources.resw">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainWindow.xaml" />
+    <Page Include="HomePage.xaml" />
+    <Page Include="RegexPage.xaml" />
+    <Page Include="KeywordsPage.xaml" />
+    <Page Include="SettingsPage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="App.idl" />
+    <Midl Include="MainWindow.idl" />
+    <Midl Include="HomePage.idl" />
+    <Midl Include="RegexPage.idl" />
+    <Midl Include="KeywordsPage.idl" />
+    <Midl Include="SettingsPage.idl" />
+    <Midl Include="XamlMetaDataProvider.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <XamlReferencesToCompile Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0\Microsoft.UI.Xaml.winmd" />
+    <XamlReferencesToCompile Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0\Microsoft.UI.Text.winmd" />
+    <XamlReferencesToCompile Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0.18362\Microsoft.UI.winmd" />
+    <XamlReferencesToCompile Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0.18362\Microsoft.Foundation.winmd" />
+    <XamlReferencesToCompile Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0.18362\Microsoft.Graphics.winmd" />
+    <XamlReferencesToCompile Include="$(ProjectDir)packages\Microsoft.Web.WebView2.1.0.2651.64\lib\Microsoft.Web.WebView2.Core.winmd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.Web.WebView2.1.0.2651.64\lib\Microsoft.Web.WebView2.Core.winmd">
+      <IsSystemReference>True</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0\Microsoft.UI.Xaml.winmd">
+      <IsSystemReference>true</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0\Microsoft.UI.Text.winmd">
+      <IsSystemReference>true</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0\Microsoft.Windows.ApplicationModel.Resources.winmd">
+      <IsSystemReference>true</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0.18362\Microsoft.UI.winmd">
+      <IsSystemReference>true</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0.18362\Microsoft.Foundation.winmd">
+      <IsSystemReference>true</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <ReferencePath Include="$(ProjectDir)packages\Microsoft.WindowsAppSDK.1.6.250228001\lib\uap10.0.18362\Microsoft.Graphics.winmd">
+      <IsSystemReference>true</IsSystemReference>
+      <WinMDFile>true</WinMDFile>
+      <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+    </ReferencePath>
+    <None Include="packages.config" />
+    <None Include="vcpkg.json" />
+  </ItemGroup>
+  <Target Name="FixClCompilePreprocessorDefinitions" AfterTargets="CppWinRTComputeXamlGeneratedCompileInputs" BeforeTargets="WindowsAppSDKSelfContainedCompileTimeConstants;GenerateUndockedRegFreeWinRTCpp">
+    <ItemGroup>
+      <ClCompile Condition="'%(ClCompile.PreprocessorDefinitions)' == '' and '$(Configuration)' == 'Release'">
+        <PreprocessorDefinitions>NDEBUG;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      </ClCompile>
+      <ClCompile Condition="'%(ClCompile.PreprocessorDefinitions)' == '' and '$(Configuration)' == 'Debug'">
+        <PreprocessorDefinitions>_DEBUG;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      </ClCompile>
+    </ItemGroup>
+  </Target>
+  <Target Name="AddProcessedXamlFilesToCopyLocal" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\vcpkg\scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('..\vcpkg\scripts\buildsystems\msbuild\vcpkg.targets')" />
+  <Import Project="packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.targets')" />
+  <Import Project="packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.props'))" />
+    <Error Condition="!Exists('packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.props'))" />
+    <Error Condition="!Exists('packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.targets'))" />
+  </Target>
+</Project>

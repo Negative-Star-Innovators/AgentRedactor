@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Proksi Perlindungan PII Lalu Lintas AI</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Tambah</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Hapus</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Cara menggunakan Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Konfigurasikan profil Anda di bawah (atau gunakan default)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Arahkan klien LLM Anda (Claude Code, OpenClaw, dll.) ke URL Lokal yang ditampilkan di bawah</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Kami berada di antara klien Anda dan API yang sebenarnya. Semuanya tetap di mesin Anda. Data sensitif disunting secara lokal sebelum permintaan apa pun meninggalkan komputer Anda, memastikan data Anda tidak pernah menyentuh server kami</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>Proksi API</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Nama Profil</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>mis., OpenAI Kerja</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>URL Lokal</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Alamat yang dituju klien LLM Anda</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Salin</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Teruskan Ke</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>mis. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Endpoint API sungguhan yang menerima permintaan tersunting Anda</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>Kunci API</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Tampilkan kunci</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Simpan Semua Pengaturan</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Port {0} tersedia</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Port {0} sudah digunakan</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Port {0} sudah digunakan oleh profil '{1}', pilih yang lain.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Pola Regex</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Teks yang cocok dengan pola ini akan disunting sebelum dikirim ke API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Aktif</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Pola Regex</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>mis. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Tambah</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Kata Kunci</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Pesan yang mengandung kata-kata ini akan ditandai untuk disunting</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Aktif</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Kapitalisasi</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Kata Kunci</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>mis. password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Tambah</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Sensitif huruf besar/kecil</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>Model Deteksi Berbasis AI</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>Deteksi berbasis AI berjalan secara lokal sebagai lapisan pertahanan tambahan. Dapat melewatkan data atau menyunting berlebihan. Gunakan Pola Regex dan Kata Kunci di bawah untuk penyuntingan deterministik.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Harapkan respons yang sedikit lebih lambat saat diaktifkan. Model memindai setiap pesan secara lokal.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Ambang kepercayaan (0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Nomor rekening</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Alamat</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Tanggal</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Orang</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telepon</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Rahasia</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Keuangan</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Kontak &amp; Lokasi</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Pribadi</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Digital &amp; Rahasia</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Kata sandi</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Wajibkan kata sandi saat mulai</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Ubah kata sandi</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Statistik</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Bersihkan</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Permintaan</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Kata Kunci</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Penyuntingan Sesi</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Bersihkan</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Penyuntingan aktual yang terdeteksi dalam sesi saat ini.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Tidak ada penyuntingan dalam sesi saat ini.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Logging rinci</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Buka file log</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Buka folder</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Bersihkan</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Pola Regex</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Masukkan pola regex...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Tambah</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Hapus</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Kata Kunci</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Masukkan kata kunci...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Sensitif huruf besar/kecil</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Tambah</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Hapus</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Ya</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Tidak</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (sensitif huruf besar/kecil)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(tanpa nama)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Profil Baru</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Pengaturan</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Kembali</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Mulai saat boot Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Kata Sandi Utama</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Ubah Kata Sandi Utama</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Logging Rinci</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Simpan Pengaturan</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Bahasa</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Default sistem</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Bahasa Inggris</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Bahasa Jerman</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Peringatan</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Logging rinci diaktifkan. Log dapat berisi data sensitif, termasuk isi permintaan asli.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Kata Sandi Utama Diperlukan</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Buka Kunci</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Keluar</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Masukkan kata sandi</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Kata Sandi Salah</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Kata sandi yang Anda masukkan salah. Silakan coba lagi.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Terlalu Banyak Percobaan</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Batas maksimum percobaan kata sandi tercapai. Aplikasi akan keluar sekarang.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Atur Kata Sandi Utama</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Atur Kata Sandi</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Kata sandi</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Konfirmasi kata sandi</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Kata sandi tidak boleh kosong.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Kata sandi tidak cocok.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Gagal mengaktifkan kata sandi utama.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Nonaktifkan Kata Sandi Utama</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Nonaktifkan</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Kata sandi saat ini</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Kata sandi salah.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Ubah Kata Sandi Utama</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Ubah</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Kata sandi baru</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Konfirmasi kata sandi baru</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Kata sandi baru tidak boleh kosong.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Kata sandi baru tidak cocok.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Berhasil</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Kata sandi utama berhasil diubah.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Gagal mengubah kata sandi. Pastikan kata sandi saat ini Anda benar.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Batal</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Hapus</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Kesalahan Validasi</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Peringatan Keamanan</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Anda menggunakan URL upstream HTTP (tidak terenkripsi). Kunci API Anda akan dikirim dalam teks biasa melalui jaringan.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Hapus Profil</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Anda yakin? Operasi ini permanen.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Hapus semua log?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Tindakan ini akan menghapus file log saat ini dan semua log sesi yang diarsipkan secara permanen. Tidak dapat dibatalkan.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Hapus semua log</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Aktifkan Logging Rinci?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Tindakan ini akan menulis nilai sensitif yang terdeteksi (nama, email, nomor telepon, dll.) ke file log di disk Anda. Jangan aktifkan jika orang lain memiliki akses ke komputer ini. Pengaturan akan direset saat Anda menutup aplikasi.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Aktifkan</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Anda yakin ingin keluar?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Keluar</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Jika Anda keluar, Agent Redactor tidak akan lagi memantau dan menyunting lalu lintas API.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Port harus antara 1024 dan 65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Port {0} sudah digunakan oleh profil '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>URL Teruskan Ke tidak boleh kosong.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>URL Teruskan Ke harus dimulai dengan http:// atau https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>URL Teruskan Ke bukan URL yang valid.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Ambang kepercayaan harus antara 0.0 dan 1.0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Sintaks regex tidak valid: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Sintaks regex tidak valid.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Buka Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Bahasa</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Bahasa Inggris</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Bahasa Jerman</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Bahasa Diubah</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Memulai ulang Agent Redactor untuk menerapkan bahasa baru.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Bahasa ini sudah aktif.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Mulai saat Boot</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Keluar</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - Crash</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Terjadi kesalahan fatal. Lihat debug.log untuk detail.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Kesalahan</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Gagal menginisialisasi aplikasi.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>Tidak ada PII terdeteksi</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 item PII disunting</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} item PII disunting</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Kata Kunci</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Permintaan: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Kata Kunci: {0}</value>
+  </data>
+</root>

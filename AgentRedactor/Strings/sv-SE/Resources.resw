@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>PII-skyddsproxy för AI-trafik</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Profiler</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Lägg till</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Ta bort</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Så här använder du Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Konfigurera din profil nedan (eller använd standardprofilen)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. peka din LLM-klient (Claude Code, OpenClaw, etc.) mot den lokala URL som visas nedan</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Vi sitter mellan din klient och det riktiga API:et. Allt stannar på din maskin. Känsliga data redigeras lokalt innan någon begäran lämnar din dator, vilket säkerställer att dina data aldrig når vår server</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API-proxy</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Profilnamn</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>t.ex., Arbete OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Lokal URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Adressen som din LLM-klient pekar på</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Kopiera</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Vidarebefordra till</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>t.ex. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Den riktiga API-slutpunkten som tar emot dina redigerade begäranden</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API-nyckel</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Visa nyckel</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Spara alla inställningar</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Port {0} är tillgänglig</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Port {0} används redan</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Port {0} används redan av profilen '{1}', välj en annan.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Regex-mönster</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Text som matchar dessa mönster redigeras innan den skickas till API:et</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Aktiverad</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex-mönster</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>t.ex. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Lägg till</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Nyckelord</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Meddelanden som innehåller dessa ord markeras för redigering</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Aktiverad</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Skiftläge</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Nyckelord</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>t.ex. lösenord</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Lägg till</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Skiftlägeskänslig</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>AI-driven detektionsmodell</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>AI-driven detektion körs lokalt som ett extra försvarsskikt. Den kan missa data eller redigera för mycket. Använd Regex-mönster och Nyckelord nedan för deterministisk redigering.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Förvänta dig något långsammare svar när aktiverad. Modellen skannar varje meddelande lokalt.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Konfidensgräns (0,0–1,0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Kontonummer</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Adress</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Datum</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>E-post</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Person</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Hemlighet</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Finansiell</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Kontakt och plats</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Personlig</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Digitalt och hemligheter</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Lösenord</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Kräv lösenord vid uppstart</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Byt lösenord</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Statistik</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Rensa</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Begäranden</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Nyckelord</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Sessionsredigeringar</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Rensa</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Faktiska redigeringar upptäckta i den aktuella sessionen.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Inga redigeringar i den aktuella sessionen.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Loggar</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Utförlig loggning</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Öppna loggfil</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Öppna mapp</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Rensa</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Regex-mönster</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Ange regex-mönster...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Lägg till</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Ta bort</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Nyckelord</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Ange nyckelord...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Skiftlägeskänslig</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Lägg till</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Ta bort</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Nej</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (skiftlägeskänsligt)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(namnlös)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Ny profil</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Inställningar</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Tillbaka</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Starta med Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Huvudlösenord</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Byt huvudlösenord</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Utförlig loggning</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Spara inställningar</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Systemstandard</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Engelska</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Tyska</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Varning</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Utförlig loggning aktiverad. Loggar kan innehålla känsliga data, inklusive ursprungliga begärandekroppar.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Huvudlösenord krävs</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Lås upp</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Avsluta</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Ange lösenord</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Felaktigt lösenord</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Lösenordet du angav är felaktigt. Försök igen.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>För många försök</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Maximalt antal försök nått. Programmet avslutas nu.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Ange huvudlösenord</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Ange lösenord</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Lösenord</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Bekräfta lösenord</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Lösenordet får inte vara tomt.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Lösenorden matchar inte.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Det gick inte att aktivera huvudlösenordet.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Inaktivera huvudlösenord</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Inaktivera</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Nuvarande lösenord</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Felaktigt lösenord.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Byt huvudlösenord</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Ändra</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Nytt lösenord</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Bekräfta nytt lösenord</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Det nya lösenordet får inte vara tomt.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>De nya lösenorden matchar inte.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Klart</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Huvudlösenordet har ändrats.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Det gick inte att byta lösenord. Se till att ditt nuvarande lösenord är korrekt.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Ta bort</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Valideringsfel</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Säkerhetsvarning</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Du använder en HTTP-upstream-URL (okrypterad). Din API-nyckel skickas i klartext över nätverket.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Ta bort profil</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Är du säker? Denna åtgärd kan inte ångras.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Ta bort alla loggar?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Detta tar permanent bort den aktuella loggfilen och alla arkiverade sessionsloggar. Detta kan inte ångras.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Ta bort alla loggar</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Aktivera utförlig loggning?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Detta skriver upptäckta känsliga värden (namn, e-postadresser, telefonnummer, etc.) till din loggfil på disken. Aktivera inte detta om andra har tillgång till denna dator. Inställningen återställs när du stänger appen.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Aktivera</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Är du säker på att du vill avsluta?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Avsluta</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Om du avslutar kommer Agent Redactor inte längre att övervaka och redigera API-trafik.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Porten måste vara mellan 1024 och 65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Port {0} används redan av profilen '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>Vidarebefordrings-URL får inte vara tom.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>Vidarebefordrings-URL måste börja med http:// eller https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>Vidarebefordrings-URL är inte en giltig URL.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Konfidensgränsen måste vara mellan 0,0 och 1,0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Ogiltig regex-syntax: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Ogiltig regex-syntax.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Öppna Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Engelska</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Tyska</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Språk ändrat</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Startar om Agent Redactor för att tillämpa det nya språket.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Detta språk är redan aktivt.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Starta vid uppstart</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Avsluta</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - Krasch</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Ett allvarligt fel inträffade. Se debug.log för detaljer.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Fel</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Det gick inte att initiera programmet.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>Ingen PII upptäckt</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 PII-objekt redigerat</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} PII-objekt redigerade</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Nyckelord</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Begäran: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Nyckelord: {0}</value>
+  </data>
+</root>

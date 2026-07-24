@@ -1,0 +1,75 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\hughb\\Documents\\Projects\\Agent Protection Layer First ExploreV2\\tests\\gui\\windows\\FlaUIHelper\\FlaUIHelper.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\hughb\\Documents\\Projects\\Agent Protection Layer First ExploreV2\\tests\\gui\\windows\\FlaUIHelper\\FlaUIHelper.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\hughb\\Documents\\Projects\\Agent Protection Layer First ExploreV2\\tests\\gui\\windows\\FlaUIHelper\\FlaUIHelper.csproj",
+        "projectName": "FlaUIHelper",
+        "projectPath": "C:\\Users\\hughb\\Documents\\Projects\\Agent Protection Layer First ExploreV2\\tests\\gui\\windows\\FlaUIHelper\\FlaUIHelper.csproj",
+        "packagesPath": "C:\\Users\\hughb\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\hughb\\Documents\\Projects\\Agent Protection Layer First ExploreV2\\tests\\gui\\windows\\FlaUIHelper\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "UsingMicrosoftNETSdk": false,
+        "configFilePaths": [
+          "C:\\Users\\hughb\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net48"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net48": {
+            "framework": "net48",
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net48": {
+          "framework": "net48",
+          "dependencies": {
+            "FlaUI.Core": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "FlaUI.UIA3": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "Microsoft.NETFramework.ReferenceAssemblies.net48": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.3, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-arm64": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

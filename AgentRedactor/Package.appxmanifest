@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="mp uap desktop rescap">
+  <Identity Name="AgentRedactor" Publisher="CN=AgentRedactor" Version="1.0.0.0" ProcessorArchitecture="x64"/>
+  <mp:PhoneIdentity PhoneProductId="00000000-0000-0000-0000-000000000000" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <Properties>
+    <DisplayName>ms-resource:AppDisplayName</DisplayName>
+    <PublisherDisplayName>ms-resource:AppPublisherDisplayName</PublisherDisplayName>
+    <Logo>resources/assets/StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22000.0"/>
+  </Dependencies>
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+  <Applications>
+    <Application Id="AgentRedactor" Executable="AgentRedactor.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="ms-resource:AppDisplayName" Description="ms-resource:AppDescription" BackgroundColor="transparent" Square150x150Logo="resources/assets/Square150x150Logo.png" Square44x44Logo="resources/assets/Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="resources/assets/Wide310x150Logo.png"/>
+      </uap:VisualElements>
+      <Extensions>
+        <desktop:Extension Category="windows.startupTask" Executable="AgentRedactor.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="AgentRedactorStartup" Enabled="true" DisplayName="ms-resource:AppStartupTaskName"/>
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient"/>
+    <rescap:Capability Name="runFullTrust"/>
+  </Capabilities>
+</Package>

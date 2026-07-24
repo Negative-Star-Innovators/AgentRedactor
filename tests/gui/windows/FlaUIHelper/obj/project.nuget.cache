@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "ppoCANtxeEw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\hughb\\Documents\\Projects\\Agent Protection Layer First ExploreV2\\tests\\gui\\windows\\FlaUIHelper\\FlaUIHelper.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\hughb\\.nuget\\packages\\flaui.core\\4.0.0\\flaui.core.4.0.0.nupkg.sha512",
+    "C:\\Users\\hughb\\.nuget\\packages\\flaui.uia3\\4.0.0\\flaui.uia3.4.0.0.nupkg.sha512",
+    "C:\\Users\\hughb\\.nuget\\packages\\interop.uiautomationclient\\10.19041.0\\interop.uiautomationclient.10.19041.0.nupkg.sha512",
+    "C:\\Users\\hughb\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net48\\1.0.3\\microsoft.netframework.referenceassemblies.net48.1.0.3.nupkg.sha512",
+    "C:\\Users\\hughb\\.nuget\\packages\\system.management\\5.0.0\\system.management.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

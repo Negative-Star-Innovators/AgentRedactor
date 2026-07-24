@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>AI 트래픽 PII 보호 프록시</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>프로필</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Agent Redactor 사용 방법</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. 아래에서 프로필을 구성하세요(또는 기본값 사용)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. LLM 클라이언트(Claude Code, OpenClaw 등)를 아래에 표시된 로컬 URL로 지정하세요</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. 클라이언트와 실제 API 사이에 위치합니다. 모든 것은 사용자의 컴퓨터에 그대로 있습니다. 민감한 데이터는 요청이 컴퓨터를 떠나기 전에 로컬에서 삭제되어 데이터가 당사 서버에 닿지 않습니다</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API 프록시</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>프로필 이름</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>예: 업무용 OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>로컬 URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>LLM 클라이언트가 가리키는 주소</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>복사</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>전달 대상</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>예: https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>삭제된 요청을 받는 실제 API 엔드포인트</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API 키</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>키 표시</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>모든 설정 저장</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>포트 {0} 사용 가능</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>포트 {0}이(가) 이미 사용 중입니다</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>포트 {0}은(는) '{1}' 프로필에서 이미 사용 중입니다. 다른 포트를 선택하세요.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>정규식 패턴</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>이러한 패턴과 일치하는 텍스트는 API로 전송되기 전에 삭제됩니다</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>사용</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>정규식 패턴</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>예: sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>키워드</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>이러한 단어가 포함된 메시지는 삭제 대상으로 표시됩니다</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>사용</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>대소문자</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>키워드</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>예: password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>대소문자 구분</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>AI 기반 검출 모델</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>AI 기반 검출은 추가 방어 계층으로 로컬에서 실행됩니다. 데이터를 놓치거나 과도하게 삭제할 수 있습니다. 결정론적 삭제를 위해 아래의 정규식 패턴과 키워드를 사용하세요.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>사용 시 응답이 약간 느려질 수 있습니다. 모델은 모든 메시지를 로컬에서 검사합니다.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>신뢰도 임계값(0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>계좌 번호</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>주소</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>날짜</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>이메일</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>사람</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>전화</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>비밀</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>금융</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>연락처 및 위치</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>개인</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>디지털 및 비밀</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>암호</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>시작 시 암호 필요</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>암호 변경</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>통계</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>요청</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>키워드</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>세션 삭제</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>현재 세션에서 감지된 실제 삭제 항목입니다.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>현재 세션에 삭제 항목이 없습니다.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>로그</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>자세한 로깅</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>로그 파일 열기</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>폴더 열기</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>정규식 패턴</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>정규식 패턴 입력...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>키워드</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>키워드 입력...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>대소문자 구분</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>예</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>아니요</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value>(대소문자 구분)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(이름 없음)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>기본값</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>새 프로필</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>뒤로</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Windows 시작 시 실행</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>마스터 암호</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>마스터 암호 변경</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>자세한 로깅</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>설정 저장</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>언어</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>시스템 기본값</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>영어</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>독일어</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>경고</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>자세한 로깅이 사용 설정되었습니다. 로그에는 원본 요청 본문을 포함한 민감한 데이터가 포함될 수 있습니다.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>마스터 암호 필요</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>잠금 해제</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>종료</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>암호 입력</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>잘못된 암호</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>입력한 암호가 올바르지 않습니다. 다시 시도하세요.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>시도 횟수 초과</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>최대 암호 시도 횟수에 도달했습니다. 애플리케이션을 종료합니다.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>마스터 암호 설정</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>암호 설정</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>암호</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>암호 확인</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>암호는 비워둘 수 없습니다.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>암호가 일치하지 않습니다.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>마스터 암호를 사용 설정하지 못했습니다.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>마스터 암호 사용 안 함</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>사용 안 함</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>현재 암호</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>암호가 올바르지 않습니다.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>마스터 암호 변경</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>변경</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>새 암호</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>새 암호 확인</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>새 암호는 비워둘 수 없습니다.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>새 암호가 일치하지 않습니다.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>성공</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>마스터 암호가 성공적으로 변경되었습니다.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>암호를 변경하지 못했습니다. 현재 암호가 올바른지 확인하세요.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>유효성 검사 오류</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>보안 경고</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>HTTP(암호화되지 않은) 업스트림 URL을 사용하고 있습니다. API 키가 네트워크를 통해 일반 텍스트로 전송됩니다.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>프로필 제거</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>계속하시겠습니까? 이 작업은 되돌릴 수 없습니다.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>모든 로그를 삭제하시겠습니까?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>현재 로그 파일과 모든 보관된 세션 로그가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>모든 로그 삭제</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>자세한 로깅을 사용 설정하시겠습니까?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>감지된 민감한 값(이름, 이메일, 전화번호 등)이 디스크의 로그 파일에 기록됩니다. 다른 사람이 이 컴퓨터에 액세스할 수 있는 경우 사용 설정하지 마세요. 앱을 닫으면 설정이 재설정됩니다.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>사용 설정</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>종료하시겠습니까?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>종료</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>종료하면 Agent Redactor가 API 트래픽을 더 이상 모니터링하고 삭제하지 않습니다.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>포트는 1024에서 65535 사이여야 합니다.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>포트 {0}은(는) '{1}' 프로필에서 이미 사용 중입니다.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>전달 대상 URL은 비워둘 수 없습니다.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>전달 대상 URL은 http:// 또는 https://로 시작해야 합니다.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>전달 대상 URL이 유효한 URL이 아닙니다.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>신뢰도 임계값은 0.0에서 1.0 사이여야 합니다.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>정규식 구문이 잘못되었습니다: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>정규식 구문이 잘못되었습니다.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Agent Redactor 열기</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>언어</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>영어</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>독일어</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>언어가 변경되었습니다</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>새 언어를 적용하기 위해 Agent Redactor를 다시 시작합니다.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>이 언어는 이미 활성화되어 있습니다.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>시작 시 실행</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>종료</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - 충돌</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>치명적인 오류가 발생했습니다. 자세한 내용은 debug.log를 참조하세요.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>애플리케이션을 초기화하지 못했습니다.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>PII가 감지되지 않았습니다</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>PII 항목 1개가 삭제되었습니다</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>PII 항목 {0}개가 삭제되었습니다</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>키워드</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>요청: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>키워드: {0}</value>
+  </data>
+</root>

@@ -1,0 +1,658 @@
+﻿#pragma code_page(65001)
+#include <windows.h>
+#include "resource.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI Traffic PII Protection Proxy"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040704B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-Schutzproxy für KI-Datenverkehr"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "0C0A04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy de protección de PII para tráfico de IA"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040C04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy de protection des données personnelles pour le trafic IA"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "081604B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy de proteção de PII para tráfego de IA"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041004B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy di protezione PII per traffico AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040604B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-beskyttelsesproxy til AI-trafik"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041304B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-beschermingsproxy voor AI-verkeer"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041D04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-skyddsproxy för AI-trafik"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "046E04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-Schutzproxy fir AI-Datenverkéier"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041404B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-beskyttelsesproxy for AI-trafikk"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040B04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-suojavälityspalvelin tekoälyliikenteelle"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041904B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Прокси для защиты персональных данных в ИИ-трафике"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041A04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy zaštite osobnih podataka u AI prometu"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040804B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Διαμεσολαβητής προστασίας Προσωπικών Δεδομένων για κυκλοφορία AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042404B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy zaščite osebnih podatkov v AI prometu"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "241A04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy zaštite ličnih podataka u AI saobraćaju"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042204B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Проксі для захисту персональних даних у ШІ-трафіку"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041C04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy mbrojtjeje e të dhënave personale për trafikun e IA-së"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042604B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII aizsardzības starpniekserveris AI datu plūsmai"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042B04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - ԱԻ երթևեկության ԱՀՄ պաշտպանության պրոքսի"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040504B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy pro ochranu osobních údajů v AI provozu"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042504B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI-liikluse isikuandmete kaitse puhverserver"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041B04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy na ochranu osobných údajov v AI prevádzke"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040204B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Прокси за защита на лични данни при AI трафик"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "043704B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI ტრაფიკის პირადი მონაცემების დაცვის პროქსი"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040E04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI forgalom személyes adatvédelmi proxyja"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041504B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy ochrony danych osobowych dla ruchu AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041804B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy de protecție a datelor personale pentru traficul AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042704B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI srauto asmens duomenų apsaugos proxy"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040F04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Persónuverndarmilliþjónn fyrir AI umferð"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI 流量 PII 保护代理"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040404B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI 流量 PII 保護代理"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041104B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI トラフィック PII 保護プロキシ"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041204B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI 트래픽 PII 보호 프록시"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "043A04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy għall-Protezzjoni tal-PII fit-Traffiku tal-AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "043904B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI ट्रैफ़िक PII सुरक्षा प्रॉक्सी"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "044904B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI போக்குவரத்து PII பாதுகாப்பு ப்ராக்ஸி"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042A04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy bảo vệ PII lưu lượng AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "044104B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy ya Ulinzi wa PII kwa Trafiki ya AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "043604B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - PII-beskermingsprossie vir AI-verkeer"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040D04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - פרוקסי הגנת PII לתעבורת AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042104B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proksi Perlindungan PII Lalu Lintas AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "046404B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI Traffic PII Protection Proxy"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "047004B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy Nchebe PII maka AI Traffic"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041E04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - พร็อกซีป้องกัน PII สำหรับการรับส่งข้อมูล AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "041F04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI Trafik PII Koruma Proxy"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042004B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI ٹریفک PII تحفظ پراکسی"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "040104B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - وكيل حماية PII لحركة مرور AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "043E04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proksi Perlindungan PII Trafik AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "042C04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI Trafiki üçün PII Müdafiə Proksisi"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "043F04B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - AI трафигі үшін PII қорғау проксисі"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+        BLOCK "046804B0"
+        BEGIN
+            VALUE "CompanyName",      "Agent Redactor"
+            VALUE "FileDescription",  "Agent Redactor - Proxy na Kare PII na Traffics AI"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "AgentRedactor"
+            VALUE "LegalCopyright",   "Agent Redactor"
+            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "ProductName",      "Agent Redactor"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x407, 1200
+        VALUE "Translation", 0xC0A, 1200
+        VALUE "Translation", 0x40C, 1200
+        VALUE "Translation", 0x816, 1200
+        VALUE "Translation", 0x410, 1200
+        VALUE "Translation", 0x406, 1200
+        VALUE "Translation", 0x413, 1200
+        VALUE "Translation", 0x41D, 1200
+        VALUE "Translation", 0x46E, 1200
+        VALUE "Translation", 0x414, 1200
+        VALUE "Translation", 0x40B, 1200
+        VALUE "Translation", 0x419, 1200
+        VALUE "Translation", 0x41A, 1200
+        VALUE "Translation", 0x408, 1200
+        VALUE "Translation", 0x424, 1200
+        VALUE "Translation", 0x241A, 1200
+        VALUE "Translation", 0x422, 1200
+        VALUE "Translation", 0x41C, 1200
+        VALUE "Translation", 0x426, 1200
+        VALUE "Translation", 0x42B, 1200
+        VALUE "Translation", 0x405, 1200
+        VALUE "Translation", 0x425, 1200
+        VALUE "Translation", 0x41B, 1200
+        VALUE "Translation", 0x402, 1200
+        VALUE "Translation", 0x437, 1200
+        VALUE "Translation", 0x40E, 1200
+        VALUE "Translation", 0x415, 1200
+        VALUE "Translation", 0x418, 1200
+        VALUE "Translation", 0x427, 1200
+        VALUE "Translation", 0x40F, 1200
+        VALUE "Translation", 0x804, 1200
+        VALUE "Translation", 0x404, 1200
+        VALUE "Translation", 0x411, 1200
+        VALUE "Translation", 0x412, 1200
+        VALUE "Translation", 0x43A, 1200
+        VALUE "Translation", 0x439, 1200
+        VALUE "Translation", 0x449, 1200
+        VALUE "Translation", 0x42A, 1200
+        VALUE "Translation", 0x441, 1200
+        VALUE "Translation", 0x436, 1200
+        VALUE "Translation", 0x40D, 1200
+        VALUE "Translation", 0x421, 1200
+        VALUE "Translation", 0x464, 1200
+        VALUE "Translation", 0x470, 1200
+        VALUE "Translation", 0x41E, 1200
+        VALUE "Translation", 0x41F, 1200
+        VALUE "Translation", 0x420, 1200
+        VALUE "Translation", 0x401, 1200
+        VALUE "Translation", 0x43E, 1200
+        VALUE "Translation", 0x42C, 1200
+        VALUE "Translation", 0x43F, 1200
+        VALUE "Translation", 0x468, 1200
+    END
+END
+
+IDI_APP_ICON ICON "app.ico"

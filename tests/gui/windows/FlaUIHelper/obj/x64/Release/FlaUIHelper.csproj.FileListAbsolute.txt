@@ -1,0 +1,12 @@
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\obj\x64\Release\FlaUIHelper.csproj.AssemblyReference.cache
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\obj\x64\Release\FlaUIHelper.csproj.CoreCompileInputs.cache
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\bin\x64\Release\FlaUIHelper.exe.config
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\bin\x64\Release\FlaUIHelper.exe
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\bin\x64\Release\FlaUIHelper.pdb
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\bin\x64\Release\FlaUI.Core.dll
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\bin\x64\Release\FlaUI.UIA3.dll
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\bin\x64\Release\Interop.UIAutomationClient.dll
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\obj\x64\Release\FlaUIHel.7162A973.Up2Date
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\obj\x64\Release\FlaUIHelper.exe
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\obj\x64\Release\FlaUIHelper.pdb
+C:\Users\hughb\Documents\Projects\Agent Protection Layer First ExploreV2\tests\gui\windows\FlaUIHelper\obj\x64\Release\FlaUIHelper.exe.config

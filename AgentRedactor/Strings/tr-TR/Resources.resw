@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>AI Trafik PII Koruma Proxy</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Profiller</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Agent Redactor Nasıl Kullanılır</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Profilinizi aşağıdan yapılandırın (veya varsayılanı kullanın)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. LLM istemcinizi (Claude Code, OpenClaw vb.) aşağıda gösterilen Yerel URL'ye yönlendirin</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. İstemciniz ile gerçek API arasında yer alıyoruz. Her şey makinenizde kalıyor. Hassas veriler, herhangi bir istek bilgisayarınızdan ayrılmadan önce yerel olarak düzenlenir; böylece verileriniz asla sunucularımıza ulaşmaz</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API Proxy</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Profil Adı</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>örn., İş OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Yerel URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>LLM istemcinizin işaret ettiği adres</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Kopyala</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Yönlendir</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>örn. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Düzenlenmiş isteklerinizi alan gerçek API uç noktası</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API Anahtarı</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Anahtarı göster</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Tüm Ayarları Kaydet</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Port {0} kullanılabilir</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Port {0} zaten kullanımda</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Port {0} zaten '{1}' profili tarafından kullanılıyor, başka bir port seçin.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Regex Desenleri</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Bu desenlerle eşleşen metin, API'ye gönderilmeden önce düzenlenecek</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Etkin</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex Deseni</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>örn. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Anahtar Kelimeler</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Bu kelimeleri içeren mesajlar düzenleme için işaretlenecek</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Etkin</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Büyük/Küçük Harf</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Anahtar Kelime</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>örn. password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Büyük/küçük harf duyarlı</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>AI Destekli Algılama Modeli</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>AI destekli algılama, ek bir savunma katmanı olarak yerel olarak çalışır. Verileri atlayabilir veya aşırı düzenleyebilir. Belirleyici düzenleme için aşağıdaki Regex Desenleri ve Anahtar Kelimeleri kullanın.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Etkinleştirildiğinde yanıtların biraz daha yavaş olmasını bekleyin. Model her mesajı yerel olarak tarar.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Güven eşiği (0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Hesap numarası</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Tarih</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Kişi</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Gizli</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Finansal</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>İletişim ve Konum</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Kişisel</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Dijital ve Gizlilikler</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Başlangıçta parola iste</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Parola değiştir</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>İstatistikler</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Temizle</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>İstekler</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Anahtar Kelimeler</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Oturum Düzenlemeleri</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Temizle</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Geçerli oturumda tespit edilen gerçek düzenlemeler.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Geçerli oturumda düzenleme yok.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Günlükler</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Ayrıntılı günlük</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Günlük dosyasını aç</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Klasörü aç</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Temizle</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Regex Desenleri</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Regex deseni girin...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Anahtar Kelimeler</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Anahtar kelime girin...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Büyük/küçük harf duyarlı</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Evet</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Hayır</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (büyük/küçük harf duyarlı)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(adsız)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Varsayılan</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Yeni Profil</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Geri</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Windows başlangıcında başlat</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Ana Parola</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Ana Parolayı Değiştir</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Ayrıntılı Günlük</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Ayarları Kaydet</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Sistem varsayılanı</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>İngilizce</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Almanca</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Uyarı</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Ayrıntılı günlük etkin. Günlükler, orijinal istek gövdeleri dahil olmak üzere hassas veriler içerebilir.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Ana Parola Gerekli</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Kilidi Aç</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Çıkış</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Parola girin</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Yanlış Parola</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Girdiğiniz parola yanlış. Lütfen tekrar deneyin.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Çok Fazla Deneme</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Maksimum parola deneme sayısına ulaşıldı. Uygulama şimdi kapanacak.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Ana Parola Belirle</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Parola Belirle</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Parolayı onayla</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Parola boş olamaz.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Parolalar eşleşmiyor.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Ana parola etkinleştirilemedi.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Ana Parolayı Devre Dışı Bırak</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Devre dışı bırak</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Mevcut parola</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Yanlış parola.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Ana Parolayı Değiştir</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Değiştir</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Yeni parola</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Yeni parolayı onayla</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Yeni parola boş olamaz.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Yeni parolalar eşleşmiyor.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Başarılı</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Ana parola başarıyla değiştirildi.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Parola değiştirilemedi. Mevcut parolanızın doğru olduğundan emin olun.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Doğrulama Hatası</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Güvenlik Uyarısı</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>HTTP (şifrelenmemiş) upstream URL kullanıyorsunuz. API anahtarınız ağ üzerinden düz metin olarak gönderilecek.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Profili Kaldır</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Emin misiniz? Bu işlem kalıcıdır.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Tüm günlükler silinsin mi?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Bu işlem mevcut günlük dosyasını ve tüm arşivlenmiş oturum günlüklerini kalıcı olarak silecektir. Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Tüm günlükleri sil</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Ayrıntılı Günlük Etkinleştirilsin mi?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Bu işlem, algılanan hassas değerleri (isimler, e-postalar, telefon numaraları vb.) diskteki günlük dosyanıza yazar. Başkaları bu bilgisayara erişebiliyorsa etkinleştirmeyin. Uygulamayı kapattığınızda ayar sıfırlanır.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Etkinleştir</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Çıkmak istediğinizden emin misiniz?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Çık</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Çıkarsanız Agent Redactor artık API trafiğini izlemeyecek ve düzenlemeyecektir.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Port 1024 ile 65535 arasında olmalıdır.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Port {0} zaten '{1}' profili tarafından kullanılıyor.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>Yönlendirme URL'si boş olamaz.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>Yönlendirme URL'si http:// veya https:// ile başlamalıdır.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>Yönlendirme URL'si geçerli bir URL değil.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Güven eşiği 0.0 ile 1.0 arasında olmalıdır.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Geçersiz regex sözdizimi: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Geçersiz regex sözdizimi.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Agent Redactor'ı Aç</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>İngilizce</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Almanca</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Dil Değiştirildi</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Yeni dili uygulamak için Agent Redactor yeniden başlatılıyor.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Bu dil zaten etkin.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Başlangıçta Başlat</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Çık</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - Çökme</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Önemli bir hata oluştu. Ayrıntılar için debug.log dosyasına bakın.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Uygulama başlatılamadı.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>PII tespit edilmedi</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 PII öğesi düzenlendi</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} PII öğesi düzenlendi</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Anahtar Kelime</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>İstek: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Anahtar Kelimeler: {0}</value>
+  </data>
+</root>

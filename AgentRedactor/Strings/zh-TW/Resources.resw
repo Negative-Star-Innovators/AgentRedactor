@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>AI 流量 PII 保護代理</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>設定檔</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>如何使用 Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. 在下方設定您的設定檔（或使用預設設定）</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. 將您的 LLM 用戶端（Claude Code、OpenClaw 等）指向下方顯示的本機 URL</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. 我們位於您的用戶端與真實 API 之間。所有內容都保留在您的裝置上。敏感資料會在任何要求離開您的電腦之前於本機去識別化，確保您的資料絕不會到達我們的伺服器</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API 代理</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>設定檔名稱</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>例如，工作 OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>本機 URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>您的 LLM 用戶端指向的位址</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>轉送至</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>例如 https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>接收您去識別化後要求的真實 API 端點</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API 金鑰</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>顯示金鑰</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>儲存所有設定</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>連接埠 {0} 可用</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>連接埠 {0} 已被使用</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>連接埠 {0} 已被設定檔「{1}」使用，請選擇其他連接埠。</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>規則運算式模式</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>與這些模式相符的文字將在傳送至 API 之前去識別化</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>規則運算式模式</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>例如 sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>關鍵字</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>包含這些詞彙的訊息將被標記為去識別化</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>大小寫</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>關鍵字</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>例如 password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>區分大小寫</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>AI 驅動偵測模型</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>AI 驅動偵測在本機執行，作為額外防禦層。可能會遺漏資料或過度去識別化。請使用下方的規則運算式模式和關鍵字進行確定性去識別化。</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>啟用後回應速度可能會稍慢。模型會在本機掃描每則訊息。</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>信賴度閾值（0.0–1.0）：</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>帳號</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>地址</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>日期</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>電子郵件</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>人物</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>電話</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>機密</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>財務</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>聯絡與位置</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>個人</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>數位與機密</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>啟動時要求輸入密碼</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>變更密碼</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>統計資料</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>要求</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>關鍵字</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>工作階段去識別化</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>目前工作階段中偵測到的實際去識別化。</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>目前工作階段中無去識別化。</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>記錄</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>詳細資訊記錄</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>開啟記錄檔</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>開啟資料夾</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>規則運算式模式</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>輸入規則運算式模式...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>關鍵字</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>輸入關鍵字...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>區分大小寫</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value>（區分大小寫）</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>（未命名）</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>預設</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>新增設定檔</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>返回</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>開機時啟動</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>主密碼</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>變更主密碼</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>詳細資訊記錄</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>儲存設定</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>系統預設</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>英文</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>德文</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>詳細資訊記錄已啟用。記錄可能包含敏感資料，包括原始要求主體。</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>需要主密碼</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>解除鎖定</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>結束</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>輸入密碼</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>密碼錯誤</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>您輸入的密碼不正確。請再試一次。</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>嘗試次數過多</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>已達到最大密碼嘗試次數。應用程式即將結束。</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>設定主密碼</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>設定密碼</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>確認密碼</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>密碼不能空白。</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>密碼不符。</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>啟用主密碼失敗。</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>停用主密碼</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>停用</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>目前密碼</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>密碼不正確。</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>變更主密碼</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>變更</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>新密碼</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>確認新密碼</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>新密碼不能空白。</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>新密碼不符。</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>主密碼變更成功。</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>變更密碼失敗。請確定目前密碼正確。</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>驗證錯誤</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>安全性警告</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>您正在使用 HTTP（未加密）上游 URL。您的 API 金鑰將以明文形式透過網路傳送。</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>移除設定檔</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>是否確定？此操作無法復原。</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>刪除所有記錄？</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>這將永久刪除目前記錄檔和所有已封存的作業記錄。無法復原。</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>刪除所有記錄</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>是否啟用詳細資訊記錄？</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>這會將偵測到的敏感值（姓名、電子郵件、電話號碼等）寫入磁碟上的記錄檔。如果其他人可以存取這部電腦，請勿啟用。關閉應用程式後此設定將重設。</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>啟用</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>是否確定要結束？</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>結束</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>如果結束，Agent Redactor 將不再監控和去識別化 API 流量。</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>連接埠必須介於 1024 與 65535 之間。</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>連接埠 {0} 已被設定檔「{1}」使用。</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>轉送 URL 不能空白。</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>轉送 URL 必須以 http:// 或 https:// 開頭。</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>轉送 URL 不是有效的 URL。</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>信賴度閾值必須介於 0.0 與 1.0 之間。</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>規則運算式語法無效：{0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>規則運算式語法無效。</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>開啟 Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>英文</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>德文</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>語言已變更</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>正在重新啟動 Agent Redactor 以套用新語言。</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>此語言已處於作用中狀態。</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>開機時啟動</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>結束</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - 當機</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>發生致命錯誤。詳細資訊請參閱 debug.log。</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>初始化應用程式失敗。</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>未偵測到 PII</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>已去識別化 1 項 PII</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>已去識別化 {0} 項 PII</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>關鍵字</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>要求：{0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>關鍵字：{0}</value>
+  </data>
+</root>

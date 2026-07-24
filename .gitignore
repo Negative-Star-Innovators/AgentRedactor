@@ -1,0 +1,14 @@
+# Build outputs
+AgentRedactor/build/
+AgentRedactor/packages/
+
+# Large ONNX model weights (distributed via GitHub Release asset, see README)
+AgentRedactor/models/onnx/model_quantized.onnx_data
+
+# Test artifacts
+third_party_tests/.logs/
+third_party_tests/.env
+third_party_tests/out.txt
+__pycache__/
+*.pyc
+.pytest_cache/

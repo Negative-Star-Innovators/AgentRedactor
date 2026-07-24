@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Proxy ng Proteksyon ng PII sa Trapiko ng AI</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Mga Profile</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Idagdag</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Alisin</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Paano gamitin ang Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. I-configure ang iyong profile sa ibaba (o gamitin ang default)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Ituro ang iyong LLM client (Claude Code, OpenClaw, atbp.) sa Local URL na ipinapakita sa ibaba</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Nasa pagitan kami ng iyong client at ng tunay na API. Lahat ay nananatili sa iyong makina. Ang sensitibong data ay nire-redact nang lokal bago ang anumang request ay umalis sa iyong computer, na tinitiyak na ang iyong data ay hindi kailanman makakaabot sa aming server</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API Proxy</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Pangalan ng Profile</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>hal., OpenAI sa Trabaho</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Lokal na URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Ang address na tinuturo ng iyong LLM client</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Kopyahin</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>I-forward Sa</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>hal. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Ang tunay na API endpoint na tumatanggap ng iyong nire-redact na mga request</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API Key</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Ipakita ang key</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>I-save Lahat ng Settings</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Ang port {0} ay available</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Ang port {0} ay ginagamit na</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Ang port {0} ay ginagamit na ng profile '{1}', pumili ng iba.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Mga Regex Pattern</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Ang text na tumutugma sa mga pattern na ito ay ire-redact bago ipadala sa API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Naka-enable</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex Pattern</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>hal. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Idagdag</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Mga Keyword</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Ang mga mensaheng naglalaman ng mga salitang ito ay mamarkahan para sa redaction</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Naka-enable</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Case</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Keyword</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>hal. password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Idagdag</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Case sensitive</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>AI Powered Detection Model</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>Ang AI-powered detection ay tumatakbo nang lokal bilang karagdagang layer ng depensa. Maaaring makaligtaan ang data o sobrang mag-redact. Gamitin ang mga Regex Pattern at Keyword sa ibaba para sa deterministic redaction.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Asahan ang bahagyang mas mabagal na mga tugon kapag naka-enable. Sinusuri ng model ang bawat mensahe nang lokal.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Confidence threshold (0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Account number</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Petsa</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Tao</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telepono</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Sekreto</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Pinanansyal</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Contact at Lokasyon</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Personal</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Digital at mga Sekreto</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Kailanganin ang password sa startup</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Baguhin ang password</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Estadistika</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>I-clear</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Mga Request</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Mga Keyword</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Mga Session Redaction</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>I-clear</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Mga aktwal na redaction na nakita sa kasalukuyang session.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Walang redaction sa kasalukuyang session.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Mga Log</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Verbose logging</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Buksan ang log file</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Buksan ang folder</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>I-clear</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Mga Regex Pattern</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Ilagay ang regex pattern...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Idagdag</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Alisin</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Mga Keyword</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Ilagay ang keyword...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Case sensitive</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Idagdag</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Alisin</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Oo</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Hindi</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (case-sensitive)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(walang pangalan)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Bagong Profile</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Bumalik</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Simulan sa Windows boot</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Master Password</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Baguhin ang Master Password</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Verbose Logging</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>I-save ang Settings</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Wika</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>System default</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Ingles</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Aleman</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Babala</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Naka-enable ang verbose logging. Ang mga log ay maaaring maglaman ng sensitibong data, kabilang ang orihinal na request bodies.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Kailangan ang Master Password</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>I-unlock</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Lumabas</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Ilagay ang password</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Maling Password</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Ang password na inilagay mo ay mali. Pakiulit.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Napakaraming Pagtatangka</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Naabot na ang maximum na pagtatangka sa password. Lalabas na ang application.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Itakda ang Master Password</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Itakda ang Password</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Kumpirmahin ang password</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Ang password ay hindi maaaring walang laman.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Hindi tumutugma ang mga password.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Nabigo sa pag-enable ng master password.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>I-disable ang Master Password</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>I-disable</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Kasalukuyang password</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Maling password.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Baguhin ang Master Password</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Baguhin</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Bagong password</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Kumpirmahin ang bagong password</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Ang bagong password ay hindi maaaring walang laman.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Hindi tumutugma ang mga bagong password.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Tagumpay</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Matagumpay na nabago ang master password.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Nabigo sa pagbabago ng password. Siguraduhing tama ang iyong kasalukuyang password.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Kanselahin</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Alisin</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Validation Error</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Babala sa Seguridad</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Gumagamit ka ng HTTP (hindi naka-encrypt) na upstream URL. Ang iyong API key ay ipapadala nang plaintext sa network.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Alisin ang Profile</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Sigurado ka ba? Permanenteng operasyon ito.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Burahin lahat ng logs?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Permanente nitong buburahin ang kasalukuyang log file at lahat ng naka-archive na session logs. Hindi ito maibabalik.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Burahin lahat ng logs</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>I-enable ang Verbose Logging?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Isusulat nito ang mga nakitang sensitibong value (mga pangalan, email, numero ng telepono, atbp.) sa iyong log file sa disk. Huwag i-enable kung may iba pang may access sa computer na ito. Ire-reset ang setting kapag isinara mo ang app.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>I-enable</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Sigurado ka bang gusto mong lumabas?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Lumabas</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Kung lalabas ka, hindi na mamomonitor at ire-redact ng Agent Redactor ang API traffic.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Ang port ay dapat nasa pagitan ng 1024 at 65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Ang port {0} ay ginagamit na ng profile '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>Ang Forward To URL ay hindi maaaring walang laman.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>Ang Forward To URL ay dapat magsimula sa http:// o https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>Ang Forward To URL ay hindi wastong URL.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Ang confidence threshold ay dapat nasa pagitan ng 0.0 at 1.0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Di-wastong regex syntax: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Di-wastong regex syntax.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Buksan ang Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Wika</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Ingles</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Aleman</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Nabago ang Wika</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Inire-restart ang Agent Redactor para ilapat ang bagong wika.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Aktibo na ang wikang ito.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Simulan sa Boot</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Lumabas</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - Crash</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>May naganap na fatal error. Tingnan ang debug.log para sa mga detalye.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Nabigo sa pag-initialize ng application.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>Walang PII na nakita</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 item ng PII ang nire-redact</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} item ng PII ang nire-redact</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Keyword</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Request: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Keywords: {0}</value>
+  </data>
+</root>

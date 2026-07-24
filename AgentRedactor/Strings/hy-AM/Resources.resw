@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>ԱԻ երթևեկության ԱՀՄ պաշտպանության պրոքսի</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Պրոֆիլներ</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Ավելացնել</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Հեռացնել</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Ինչպես օգտագործել Agent Redactor-ը</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Կազմաձևեք ձեր պրոֆիլը ստորև (կամ օգտագործեք լռելյայնը)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Ուղղորդեք ձեր LLM հաճախորդը (Claude Code, OpenClaw և այլն) ստորև ցուցադրված տեղական URL-ին</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Մենք գտնվում ենք ձեր հաճախորդի և իրական API-ի միջև: Ամեն ինչ մնում է ձեր սարքում: Զգայուն տվյալները ջնջվում են տեղում՝ յուրաքանչյուր հարցում ձեր համակարգիչը լքելուց առաջ, երաշխավորելով, որ ձեր տվյալները երբևէ չեն հասնի մեր սերվերին</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API Proxy</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Պրոֆիլի անուն</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>օր., Աշխատանք OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Տեղական URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Հասցեն, որն ուղղորդում է ձեր LLM հաճախորդը</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Պատճենել</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Փոխանցել</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>օր. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Իրական API կետը, որը ստանում է ձեր ջնջված հարցումները</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API բանալի</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Ցուցադրել բանալին</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Պահպանել բոլոր կարգավորումները</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Պորտ {0}-ը հասանելի է</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>Պորտ {0}-ն արդեն օգտագործվում է</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Պորտ {0}-ն արդեն օգտագործում է '{1}' պրոֆիլը, ընտրեք մեկ այլ:</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Regex նմուշներ</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Այս նմուշներին համապատասխանող տեքստը կջնջվի API-ին ուղարկելուց առաջ</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Միացված է</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex նմուշ</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>օր. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Ավելացնել</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Բանալի բառեր</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Այս բառերը պարունակող հաղորդագրությունները կնշվեն ջնջման համար</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Միացված է</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Տառատեսակի ռեգիստր</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Բանալի բառ</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>օր. գաղտնաբառ</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Ավելացնել</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Հաշվի առնել ռեգիստրը</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>Արհեստական բանականությամբ աշխատող հայտնաբերման մոդել</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>Արհեստական բանականությամբ հայտնաբերումը աշխատում է տեղում որպես պաշտպանության լրացուցիչ շերտ: Այն կարող է բաց թողնել տվյալներ կամ ավելորդ ջնջել: Օգտագործեք ստորև Regex նմուշները և բանալի բառերը դետերմինիստական ջնջման համար:</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Միացված ժամանակ ակնկալեք մի փոքր ավելի դանդաղ պատասխաններ: Մոդելը տեղում սկանավորում է յուրաքանչյուր հաղորդագրություն:</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Վստահության շեմ (0,0–1,0).</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Հաշվի համարը</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Հասցե</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Ամսաթիվ</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>Էլ. փոստ</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Անձ</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Հեռախոս</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Գաղտնիք</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Ֆինանսական</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Կոնտակտ և գտնվելու վայր</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Անձնական</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Թվային և գաղտնիքներ</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Գաղտնաբառ</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Պահանջել գաղտնաբառը գործարկման ժամանակ</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Փոխել գաղտնաբառը</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Վիճակագրություն</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Մաքրել</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Հարցումներ</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Բանալի բառեր</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Նստաշրջանի ջնջումներ</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Մաքրել</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>Ընթացիկ նստաշրջանում հայտնաբերված իրական ջնջումներ:</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Ընթացիկ նստաշրջանում ջնջումներ չկան:</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Մատյաններ</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Մանրամասն մատյանագրում</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Բացել մատյանի ֆայլը</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Բացել պանակը</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Մաքրել</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Regex նմուշներ</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Մուտքագրեք regex նմուշ...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Ավելացնել</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Հեռացնել</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Բանալի բառեր</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Մուտքագրեք բանալի բառ...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Հաշվի առնել ռեգիստրը</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Ավելացնել</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Հեռացնել</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Այո</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Ոչ</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (ռեգիստրի զգայուն)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(անանուն)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Լռելյայն</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Նոր պրոֆիլ</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Կարգավորումներ</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Հետ</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Միացնել Windows-ի բեռնման ժամանակ</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Հիմնական գաղտնաբառ</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Փոխել հիմնական գաղտնաբառը</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Մանրամասն մատյանագրում</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Պահպանել կարգավորումները</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Լեզու</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Համակարգային լռելյայն</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Անգլերեն</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Գերմաներեն</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Զգուշացում</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>Մանրամասն մատյանագրումը միացված է: Մատյանները կարող են պարունակել զգայուն տվյալներ, ներառյալ՝ բնօրինակ հարցման մարմինները:</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Պահանջվում է հիմնական գաղտնաբառ</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Արգելափակել</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Ելք</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Մուտքագրեք գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Սխալ գաղտնաբառ</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Ձեր մուտքագրած գաղտնաբառը սխալ է: Խնդրում ենք կրկին փորձել:</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Չափազանց շատ փորձեր</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Հասանելի է գաղտնաբառի մուտքագրելու առավելագույն քանակը: Ծրագիրն այժմ կփակվի:</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Սահմանել հիմնական գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Սահմանել գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Գաղտնաբառ</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Հաստատել գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Գաղտնաբառը չի կարող դատարկ լինել:</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Գաղտնաբառերը չեն համընկնում:</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>Հիմնական գաղտնաբառի միացումը ձախողվեց:</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Անջատել հիմնական գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Անջատել</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Ընթացիկ գաղտնաբառ</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Սխալ գաղտնաբառ:</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Փոխել հիմնական գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Փոխել</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Նոր գաղտնաբառ</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Հաստատել նոր գաղտնաբառը</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Նոր գաղտնաբառը չի կարող դատարկ լինել:</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Նոր գաղտնաբառերը չեն համընկնում:</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Հաջողություն</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Հիմնական գաղտնաբառը հաջողությամբ փոխվեց:</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>Գաղտնաբառի փոփոխությունը ձախողվեց: Խնդրում ենք համոզվել, որ ձեր ընթացիկ գաղտնաբառը ճիշտ է:</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Չեղարկել</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Հեռացնել</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Վավերացման սխալ</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Անվտանգության զգուշացում</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Դուք օգտագործում եք HTTP upstream URL (գաղտնագրված չէ): Ձեր API բանալին ցանցով կուղարկվի որպես պարզ տեքստ:</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Հեռացնել պրոֆիլը</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Համոզված եք? Այս գործողությունը անդառնալի է:</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Ջնջել բոլոր մատյանները?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Այն մշտապես կջնջի ընթացիկ մատյանի ֆայլը և բոլոր արխիվացված նստաշրջանների մատյանները: Այն հնարավոր չէ հետարկել:</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Ջնջել բոլոր մատյանները</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Միացնե՞լ մանրամասն մատյանագրումը:</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Այն ձեր սկավառակի մատյանային ֆայլում կգրի հայտնաբերված զգայուն արժեքները (անուններ, էլ. հասցեներ, հեռախոսահամարներ և այլն): Մի միացրեք, եթե այլ մարդիկ մուտք ունեն այս համակարգիչ: Կարգավորումը վերակայվում է, երբ փակում եք հավելվածը:</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Միացնել</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Համոզված եք, որ ցանկանում եք դուրս գալ?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Դուրս գալ</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Եթե դուրս գաք, Agent Redactor-ը այլևս չի հսկի և չի ջնջի API տրաֆիկը:</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Պորտը պետք է լինի 1024-65535 միջակայքում:</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>{0} պորտն արդեն օգտագործվում է '{1}' պրոֆիլի կողմից:</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>Փոխանցման URL-ը չի կարող դատարկ լինել:</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>Փոխանցման URL-ը պետք է սկսվի http:// կամ https://-ով:</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>Փոխանցման URL-ը վավեր URL չէ:</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Վստահության շեմը պետք է լինի 0,0-1,0 միջակայքում:</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Անվավեր regex շարահյուսություն՝ {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Անվավեր regex շարահյուսություն:</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Բացել Agent Redactor-ը</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Լեզու</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Անգլերեն</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Գերմաներեն</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Լեզուն փոխվել է</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Agent Redactor-ը վերագործարկվում է նոր լեզուն կիրառելու համար:</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Այս լեզուն արդեն ակտիվ է:</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Միացնել բեռնման ժամանակ</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Դուրս գալ</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor — Վթար</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Առաջացել է կրիտիկական սխալ: Մանրամասների համար դիտեք debug.log:</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Սխալ</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Հավելվածի նախապատրաստումը ձախողվեց:</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>PII չի հայտնաբերվել</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 PII տարր է ջնջվել</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} PII տարր է ջնջվել</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Բանալի բառ</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Հարցում՝ {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Բանալի բառեր՝ {0}</value>
+  </data>
+</root>

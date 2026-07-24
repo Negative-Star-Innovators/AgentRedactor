@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>وكيل حماية حركة المرور بالذكاء الاصطناعي (PII).</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>الملفات الشخصية</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>يضيف</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>يزيل</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>كيفية استخدام وكيل Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. قم بتكوين ملف التعريف الخاص بك أدناه (أو استخدم الإعداد الافتراضي)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. قم بتوجيه عميل LLM الخاص بك (Claude Code، OpenClaw، وما إلى ذلك) إلى عنوان URL المحلي الموضح أدناه</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. نحن نجلس بين عميلك وواجهة برمجة التطبيقات الحقيقية. كل شيء يبقى على جهازك. يتم تنقيح البيانات الحساسة محليًا قبل أن يغادر أي طلب جهاز الكمبيوتر الخاص بك لضمان عدم ملامسة بياناتك لخادمنا أبدًا</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>وكيل واجهة برمجة التطبيقات</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>اسم الملف الشخصي</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>على سبيل المثال، العمل OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>عنوان URL المحلي</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>العنوان الذي يشير إليه عميل LLM الخاص بك</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>ينسخ</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>إلى الأمام إلى</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>على سبيل المثال https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>نقطة نهاية واجهة برمجة التطبيقات الحقيقية التي تتلقى طلباتك المنقحة</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>مفتاح واجهة برمجة التطبيقات</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>إظهار المفتاح</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>حفظ كافة الإعدادات</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>المنفذ {0} متاح</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>المنفذ {0} قيد الاستخدام بالفعل</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>المنفذ {0} مستخدم بالفعل بواسطة ملف التعريف '{1}'، اختر منفذًا آخر.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>أنماط ريكس</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>سيتم تنقيح النص المطابق لهذه الأنماط قبل إرساله إلى واجهة برمجة التطبيقات</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>ممكّن</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>نمط ريكس</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>على سبيل المثال س-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>يضيف</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>الكلمات الرئيسية</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>سيتم وضع علامة على الرسائل التي تحتوي على هذه الكلمات لتنقيحها</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>ممكّن</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>قضية</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>الكلمة الرئيسية</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>على سبيل المثال كلمة المرور</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>يضيف</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>حساسية الموضوع</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>نموذج الكشف المدعوم بالذكاء الاصطناعي</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>يعمل الكشف المدعوم بالذكاء الاصطناعي محليًا كطبقة إضافية من الدفاع. قد تفوت البيانات أو تبالغ في تنقيحها. استخدم أنماط Regex والكلمات الرئيسية أدناه للتنقيح الحتمي.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>توقع استجابات أبطأ قليلاً عند التمكين. يقوم النموذج بمسح كل رسالة محليًا.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>عتبة الثقة (0.0-1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>رقم الحساب</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>عنوان</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>تاريخ</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>بريد إلكتروني</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>شخص</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>هاتف</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>سر</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>مالي</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>الاتصال والموقع</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>شخصي</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>الرقمية والأسرار</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>كلمة المرور</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>تتطلب كلمة المرور عند بدء التشغيل</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>تغيير كلمة المرور</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>إحصائيات</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>واضح</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>الطلبات</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>الكلمات الرئيسية</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>تنقيح الجلسة</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>واضح</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>تم الكشف عن التنقيحات الفعلية في الجلسة الحالية.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>لا توجد تنقيحات في الجلسة الحالية.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>سجلات</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>تسجيل مطول</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>فتح ملف السجل</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>افتح المجلد</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>واضح</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>أنماط ريكس</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>أدخل نمط التعبير العادي...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>يضيف</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>يزيل</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>الكلمات الرئيسية</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>أدخل الكلمة الأساسية...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>حساسية الموضوع</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>يضيف</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>يزيل</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>نعم</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>لا</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value>(حساسية الموضوع)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(غير مسمى)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>تقصير</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>ملف تعريف جديد</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>إعدادات</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>خلف</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>ابدأ عند تشغيل Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>كلمة المرور الرئيسية</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>تغيير كلمة المرور الرئيسية</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>تسجيل مطول</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>حفظ الإعدادات</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>لغة</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>الافتراضي للنظام</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>إنجليزي</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>الألمانية</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>تحذير</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>تم تمكين التسجيل المطول. قد تحتوي السجلات على بيانات حساسة بما في ذلك نصوص الطلبات الأصلية.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>كلمة المرور الرئيسية مطلوبة</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>فتح</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>مخرج</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>أدخل كلمة المرور</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>كلمة المرور غير صحيحة</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>كلمة المرور التي أدخلتها غير صحيحة. يرجى المحاولة مرة أخرى.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>محاولات كثيرة جدًا</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>تم الوصول إلى الحد الأقصى لمحاولات كلمة المرور. سيتم الآن الخروج من التطبيق.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>تعيين كلمة المرور الرئيسية</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>تعيين كلمة المرور</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>كلمة المرور</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>تأكيد كلمة المرور</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>لا يمكن أن تكون كلمة المرور فارغة.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>كلمات المرور غير متطابقة.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>فشل في تمكين كلمة المرور الرئيسية.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>تعطيل كلمة المرور الرئيسية</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>إبطال</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>كلمة المرور الحالية</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>كلمة مرور غير صحيحة.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>تغيير كلمة المرور الرئيسية</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>يتغير</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>كلمة المرور الجديدة</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>تأكيد كلمة المرور الجديدة</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>لا يمكن أن تكون كلمة المرور الجديدة فارغة.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>كلمات المرور الجديدة غير متطابقة.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>نجاح</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>تم تغيير كلمة المرور الرئيسية بنجاح.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>فشل في تغيير كلمة المرور. تأكد من صحة كلمة المرور الحالية.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>يلغي</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>يزيل</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>خطأ في التحقق</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>تحذير أمني</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>أنت تستخدم عنوان URL الرئيسي لـ HTTP (غير مشفر). سيتم إرسال مفتاح API الخاص بك بنص عادي عبر الشبكة.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>إزالة الملف الشخصي</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>هل أنت متأكد؟ هذه العملية دائمة.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>هل تريد حذف كافة السجلات؟</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>سيؤدي هذا إلى حذف ملف السجل الحالي وجميع سجلات الجلسة المؤرشفة نهائيًا. لا يمكن التراجع عن هذا.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>حذف كافة السجلات</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>تمكين التسجيل المطول؟</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>سيؤدي هذا إلى كتابة القيم الحساسة المكتشفة (الأسماء ورسائل البريد الإلكتروني وأرقام الهواتف وما إلى ذلك) إلى ملف السجل الخاص بك على القرص. لا تقم بتمكين هذا إذا كان لدى الآخرين حق الوصول إلى هذا الكمبيوتر. تتم إعادة ضبط الإعداد عند إغلاق التطبيق.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>يُمكَِن</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>هل أنت متأكد أنك تريد الإقلاع عن التدخين؟</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>يترك</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>إذا قمت بالخروج، فلن يقوم Agent Redactor بمراقبة حركة مرور واجهة برمجة التطبيقات (API) وتنقيحها بعد ذلك.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>يجب أن يكون المنفذ بين 1024 و65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>المنفذ {0} مستخدم بالفعل بواسطة ملف التعريف '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>لا يمكن أن يكون حقل إعادة التوجيه إلى عنوان URL فارغًا.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>يجب أن يبدأ عنوان URL لإعادة التوجيه بـ http:// أو https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>إعادة التوجيه إلى URL ليس عنوان URL صالحًا.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>يجب أن تتراوح عتبة الثقة بين 0.0 و1.0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>صيغة التعبير العادي غير صالحة: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>بناء جملة التعبير العادي غير صالح.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>فتح وكيل المحرر</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>لغة</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>إنجليزي</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>الألمانية</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>تم تغيير اللغة</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>إعادة تشغيل Agent Redactor لتطبيق اللغة الجديدة.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>هذه اللغة نشطة بالفعل.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>البدء في التمهيد</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>يترك</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>وكيل Redactor - تحطم</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>حدث خطأ فادح. راجع debug.log للحصول على التفاصيل.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>فشل في تهيئة التطبيق.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>لم يتم اكتشاف أي معلومات تحديد هوية شخصية (PII).</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>تم تنقيح عنصر واحد من معلومات تحديد الهوية الشخصية (PII).</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} تم تنقيح عناصر معلومات تحديد الهوية الشخصية (PII).</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>الكلمة الرئيسية</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>الطلب: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>الكلمات الرئيسية: {0}</value>
+  </data>
+</root>
