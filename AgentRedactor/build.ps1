@@ -38,6 +38,14 @@ $msbuild = Find-Tool "msbuild.exe" @(
     "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe",
     "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
 )
+if (-not $msbuild) {
+    # Fall back to vswhere (present on all machines with any VS install,
+    # including GitHub Actions runners where MSBuild is not on PATH)
+    $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+    if (Test-Path $vswhere) {
+        $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1
+    }
+}
 if (-not $msbuild) { throw "Could not find msbuild.exe" }
 Write-Host "Found MSBuild: $msbuild" -ForegroundColor Green
 
