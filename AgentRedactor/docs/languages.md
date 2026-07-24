@@ -8,56 +8,56 @@ The Settings page language `ComboBox` and the system-tray **Language** submenu a
 
 | Tag | Native name | Direction | Script family |
 |-----|-------------|-----------|---------------|
-| `af-ZA` | Afrikaans | LTR | Latin |
-| `ar-SA` | العربية | **RTL** | Arabic |
-| `az-Latn-AZ` | Azərbaycan dili | LTR | Latin |
-| `bg-BG` | Български | LTR | Cyrillic |
-| `cs-CZ` | Čeština | LTR | Latin |
-| `da-DK` | Dansk | LTR | Latin |
-| `de-DE` | Deutsch | LTR | Latin |
-| `el-GR` | Ελληνικά | LTR | Greek |
-| `en-US` | English | LTR | Latin |
-| `es-ES` | Español | LTR | Latin |
-| `et-EE` | Eesti | LTR | Latin |
-| `fil-PH` | Filipino | LTR | Latin |
-| `fi-FI` | Suomi | LTR | Latin |
-| `fr-FR` | Français | LTR | Latin |
-| `ha-Latn-NG` | Hausa | LTR | Latin |
-| `he-IL` | עברית | **RTL** | Hebrew |
-| `hi-IN` | हिन्दी | LTR | Devanagari |
-| `hr-HR` | Hrvatski | LTR | Latin |
-| `hu-HU` | Magyar | LTR | Latin |
-| `hy-AM` | Հայերեն | LTR | Armenian |
-| `id-ID` | Bahasa Indonesia | LTR | Latin |
-| `ig-NG` | Igbo | LTR | Latin |
-| `is-IS` | Íslenska | LTR | Latin |
-| `it-IT` | Italiano | LTR | Latin |
-| `ja-JP` | 日本語 | LTR | Japanese (CJK) |
-| `ka-GE` | ქართული | LTR | Georgian |
-| `kk-KZ` | Қазақ тілі | LTR | Cyrillic |
-| `ko-KR` | 한국어 | LTR | Korean (Hangul) |
-| `lb-LU` | Lëtzebuergesch | LTR | Latin |
-| `lt-LT` | Lietuvių | LTR | Latin |
-| `lv-LV` | Latviešu | LTR | Latin |
-| `ms-MY` | Bahasa Melayu | LTR | Latin |
-| `mt-MT` | Malti | LTR | Latin |
-| `nb-NO` | Norsk bokmål | LTR | Latin |
-| `nl-NL` | Nederlands | LTR | Latin |
-| `pl-PL` | Polski | LTR | Latin |
-| `pt-PT` | Português | LTR | Latin |
-| `ro-RO` | Română | LTR | Latin |
-| `ru-RU` | Русский | LTR | Cyrillic |
-| `sk-SK` | Slovenčina | LTR | Latin |
-| `sl-SI` | Slovenščina | LTR | Latin |
-| `sr-Latn-RS` | Srpski | LTR | Latin |
-| `sv-SE` | Svenska | LTR | Latin |
-| `sw-KE` | Kiswahili | LTR | Latin |
-| `ta-IN` | தமிழ் | LTR | Tamil |
-| `th-TH` | ไทย | LTR | Thai |
-| `tr-TR` | Türkçe | LTR | Latin |
-| `uk-UA` | Українська | LTR | Cyrillic |
-| `ur-PK` | اردو | **RTL** | Arabic |
-| `vi-VN` | Tiếng Việt | LTR | Latin |
+| `af` | Afrikaans | LTR | Latin |
+| `ar` | العربية | **RTL** | Arabic |
+| `az-Latn` | Azərbaycan dili | LTR | Latin |
+| `bg` | Български | LTR | Cyrillic |
+| `cs` | Čeština | LTR | Latin |
+| `da` | Dansk | LTR | Latin |
+| `de` | Deutsch | LTR | Latin |
+| `el` | Ελληνικά | LTR | Greek |
+| `en` | English | LTR | Latin |
+| `es` | Español | LTR | Latin |
+| `et` | Eesti | LTR | Latin |
+| `fil` | Filipino | LTR | Latin |
+| `fi` | Suomi | LTR | Latin |
+| `fr` | Français | LTR | Latin |
+| `ha-Latn` | Hausa | LTR | Latin |
+| `he` | עברית | **RTL** | Hebrew |
+| `hi` | हिन्दी | LTR | Devanagari |
+| `hr` | Hrvatski | LTR | Latin |
+| `hu` | Magyar | LTR | Latin |
+| `hy` | Հայերեն | LTR | Armenian |
+| `id` | Bahasa Indonesia | LTR | Latin |
+| `ig` | Igbo | LTR | Latin |
+| `is` | Íslenska | LTR | Latin |
+| `it` | Italiano | LTR | Latin |
+| `ja` | 日本語 | LTR | Japanese (CJK) |
+| `ka` | ქართული | LTR | Georgian |
+| `kk` | Қазақ тілі | LTR | Cyrillic |
+| `ko` | 한국어 | LTR | Korean (Hangul) |
+| `lb` | Lëtzebuergesch | LTR | Latin |
+| `lt` | Lietuvių | LTR | Latin |
+| `lv` | Latviešu | LTR | Latin |
+| `ms` | Bahasa Melayu | LTR | Latin |
+| `mt` | Malti | LTR | Latin |
+| `nb` | Norsk bokmål | LTR | Latin |
+| `nl` | Nederlands | LTR | Latin |
+| `pl` | Polski | LTR | Latin |
+| `pt` | Português | LTR | Latin |
+| `ro` | Română | LTR | Latin |
+| `ru` | Русский | LTR | Cyrillic |
+| `sk` | Slovenčina | LTR | Latin |
+| `sl` | Slovenščina | LTR | Latin |
+| `sr-Latn` | Srpski | LTR | Latin |
+| `sv` | Svenska | LTR | Latin |
+| `sw` | Kiswahili | LTR | Latin |
+| `ta` | தமிழ் | LTR | Tamil |
+| `th` | ไทย | LTR | Thai |
+| `tr` | Türkçe | LTR | Latin |
+| `uk` | Українська | LTR | Cyrillic |
+| `ur` | اردو | **RTL** | Arabic |
+| `vi` | Tiếng Việt | LTR | Latin |
 | `zh-CN` | 简体中文 | LTR | Chinese (Simplified) |
 | `zh-TW` | 繁體中文 | LTR | Chinese (Traditional) |
 
@@ -67,9 +67,9 @@ Only three supported languages are laid out right-to-left:
 
 | Tag | Native name |
 |-----|-------------|
-| `ar-SA` | العربية |
-| `he-IL` | עברית |
-| `ur-PK` | اردو |
+| `ar` | العربية |
+| `he` | עברית |
+| `ur` | اردو |
 
 When one of these is selected, the app sets `FlowDirection="RightToLeft"` on the main window frame and on the current page.
 

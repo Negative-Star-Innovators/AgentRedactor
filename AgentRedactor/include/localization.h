@@ -21,7 +21,7 @@ std::wstring LocFormat(std::wstring_view key, std::initializer_list<std::wstring
 // Returns true if the override was applied. A restart is required for full UI update.
 bool SetLanguageOverride(const std::wstring& language);
 
-// Get the current effective language (e.g., "en-US" or "de-DE").
+// Get the current effective language (e.g., "en" or "de-DE").
 std::wstring GetCurrentLanguage();
 
 // Get the BCP-47 language tag stored in settings, or empty if using system default.

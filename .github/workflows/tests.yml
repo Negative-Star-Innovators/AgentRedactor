@@ -27,7 +27,7 @@ jobs:
         shell: pwsh
         run: |
           if (-not (Test-Path vcpkg\vcpkg.exe)) { vcpkg\bootstrap-vcpkg.bat -disableMetrics }
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows cppwinrt:x64-windows
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
 
       - name: Download ONNX model weights
         shell: pwsh
@@ -74,7 +74,7 @@ jobs:
         shell: pwsh
         run: |
           if (-not (Test-Path vcpkg\vcpkg.exe)) { vcpkg\bootstrap-vcpkg.bat -disableMetrics }
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows cppwinrt:x64-windows
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
 
       - name: Download ONNX model weights
         shell: pwsh

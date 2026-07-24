@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Negative Star Innovators</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>AI forgalom személyes adatvédelmi proxyja</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Profilok</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Hozzáadás</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Eltávolítás</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Hogyan használja az Agent Redactor-t</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Konfigurálja alább a profilját (vagy használja az alapértelmezettet)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Irányítsa az LLM kliensét (Claude Code, OpenClaw stb.) az alább megjelenített helyi URL-re</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Mi az Ön kliense és a valódi API között helyezkedünk el. Minden az Ön gépén marad. Az érzékeny adatok helyben anonimizálásra kerülnek, mielőtt bármely kérés elhagyná a számítógépét, így az Ön adatai soha nem érik el a mi szerverünket</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API proxy</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Profilnév</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>pl., Munka OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>Helyi URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Az az cím, amelyre az LLM kliense mutat</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Másolás</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Továbbítás ide</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>pl. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>A valódi API végpont, amely fogadja az Ön anonimizált kéréseit</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API kulcs</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Kulcs megjelenítése</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Összes beállítás mentése</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>A(z) {0} port elérhető</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>A(z) {0} port már használatban van</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>A(z) {0} portot már használja a(z) '{1}' profil, válasszon másikat.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Regex minták</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Az ezeknek a mintáknak megfelelő szöveget anonimizáljuk az API-nak való elküldés előtt</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>Engedélyezve</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex minta</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>pl. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Hozzáadás</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Kulcsszavak</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Az ezeket a szavakat tartalmazó üzeneteket anonimizálásra jelöljük</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>Engedélyezve</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Kis- és nagybetű</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Kulcsszó</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>pl. jelszó</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Hozzáadás</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Kis- és nagybetűérzékeny</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>Mesterséges intelligenciával működő észlelési modell</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>A mesterséges intelligenciával működő észlelés helyben fut további védelmi rétegként. Előfordulhat, hogy adatokat mulaszt el, vagy túl sokat anonimizál. A determinisztikus anonimizáláshoz használja az alábbi Regex mintákat és Kulcsszavakat.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Bekapcsolás esetén kissé lassabb válaszokra számítson. A modell minden üzenetet helyben szkennel.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Bizalmi küszöb (0,0–1,0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Számlaszám</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Cím</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Dátum</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Személy</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Titok</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Pénzügyi</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Elérhetőség és helyszín</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Személyes</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Digitális és titkok</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Jelszó</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Jelszó megkövetelése indításkor</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Jelszó módosítása</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Statisztika</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Kérések</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Kulcsszavak</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Munkamenet-anonimizálások</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>A jelenlegi munkamenetben észlelt tényleges anonimizálások.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Nincs anonimizálás a jelenlegi munkamenetben.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Naplók</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Részletes naplózás</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Naplófájl megnyitása</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Mappa megnyitása</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Regex minták</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Regex minta megadása...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Hozzáadás</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Eltávolítás</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Kulcsszavak</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Kulcsszó megadása...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Kis- és nagybetűérzékeny</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Hozzáadás</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Eltávolítás</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Igen</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>Nem</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (kis- és nagybetűérzékeny)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(névtelen)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Alapértelmezett</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Új profil</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Beállítások</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Vissza</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Indítás Windows indulásakor</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Mesterjelszó</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Mesterjelszó módosítása</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Részletes naplózás</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Beállítások mentése</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Nyelv</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Rendszer alapértelmezett</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Angol</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Német</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Figyelmeztetés</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>A részletes naplózás engedélyezve van. A naplók érzékeny adatokat tartalmazhatnak, beleértve az eredeti kérések törzsét is.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Mesterjelszó szükséges</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Feloldás</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Kilépés</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Adja meg a jelszót</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Hibás jelszó</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>A megadott jelszó hibás. Kérjük, próbálja újra.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Túl sok próbálkozás</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Elérte a jelszó-próbálkozások maximális számát. Az alkalmazás most kilép.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Mesterjelszó beállítása</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Jelszó beállítása</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Jelszó</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Jelszó megerősítése</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>A jelszó nem lehet üres.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>A jelszavak nem egyeznek.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>A mesterjelszó engedélyezése nem sikerült.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Mesterjelszó letiltása</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>Letiltás</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Jelenlegi jelszó</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Hibás jelszó.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Mesterjelszó módosítása</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Módosítás</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Új jelszó</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Új jelszó megerősítése</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Az új jelszó nem lehet üres.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Az új jelszavak nem egyeznek.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Siker</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>A mesterjelszó sikeresen módosítva.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>A jelszó módosítása nem sikerült. Győződjön meg róla, hogy a jelenlegi jelszó helyes.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Mégse</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Eltávolítás</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Érvényesítési hiba</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Biztonsági figyelmeztetés</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>HTTP upstream URL-t használ (titkosítatlan). Az API kulcsa egyszerű szövegként kerül elküldésre a hálózaton.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Profil eltávolítása</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Biztos benne? Ez a művelet végleges.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Törli az összes naplót?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Ez véglegesen törli az aktuális naplófájlt és az összes archivált munkamenet-naplót. Ez nem vonható vissza.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Összes napló törlése</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Engedélyezi a részletes naplózást?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Ez az érzékelt érzékeny értékeket (nevek, e-mailek, telefonszámok stb.) a lemezen lévő naplófájljába írja. Ne engedélyezze, ha mások is hozzáférnek ehhez a számítógéphez. A beállítás az alkalmazás bezárásakor visszaáll.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Engedélyezés</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Biztosan ki szeretne lépni?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Kilépés</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Ha kilép, az Agent Redactor többé nem figyeli és nem anonimizálja az API-forgalmat.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>A portnak 1024 és 65535 között kell lennie.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>A(z) {0} portot már használja a(z) '{1}' profil.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>A továbbítási URL nem lehet üres.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>A továbbítási URL-nek http:// vagy https://-sal kell kezdődnie.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>A továbbítási URL nem érvényes URL.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>A bizalmi küszöbnek 0,0 és 1,0 között kell lennie.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Érvénytelen regex szintaxis: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Érvénytelen regex szintaxis.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Agent Redactor megnyitása</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Nyelv</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Angol</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Német</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>A nyelv megváltozott</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Az Agent Redactor újraindítása az új nyelv alkalmazásához.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Ez a nyelv már aktív.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Indítás rendszerindításkor</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Kilépés</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor — Összeomlás</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Végzetes hiba történt. Részletekért lásd a debug.log fájlt.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Hiba</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>Az alkalmazás inicializálása nem sikerült.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>Nem észlelhető PII</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 PII elem anonimizálva</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} PII elem anonimizálva</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Kulcsszó</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>Kérés: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Kulcsszavak: {0}</value>
+  </data>
+</root>

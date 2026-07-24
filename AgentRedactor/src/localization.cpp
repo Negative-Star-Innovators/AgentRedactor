@@ -131,7 +131,7 @@ std::wstring GetCurrentLanguage()
         }
     } catch (...) {
     }
-    return L"en-US";
+    return L"en";
 }
 
 std::wstring GetLanguageOverride()

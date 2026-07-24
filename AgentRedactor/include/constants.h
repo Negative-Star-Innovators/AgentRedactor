@@ -57,59 +57,59 @@ struct SupportedLanguage {
 // Supported UI languages (displayed in Settings and the tray menu).
 // Keep this list in sync with the Strings/<tag>/Resources.resw files.
 inline const std::vector<SupportedLanguage> SUPPORTED_LANGUAGES = {
-    {L"en-US", L"English"},
-    {L"de-DE", L"Deutsch"},
-    {L"es-ES", L"Espa\u00F1ol"},
-    {L"fr-FR", L"Fran\u00E7ais"},
-    {L"pt-PT", L"Portugu\u00EAs"},
-    {L"it-IT", L"Italiano"},
-    {L"da-DK", L"Dansk"},
-    {L"nl-NL", L"Nederlands"},
-    {L"sv-SE", L"Svenska"},
-    {L"lb-LU", L"L\u00EBtzebuergesch"},
-    {L"nb-NO", L"Norsk bokm\u00E5l"},
-    {L"fi-FI", L"Suomi"},
-    {L"ru-RU", L"\u0420\u0443\u0441\u0441\u043A\u0438\u0439"},
-    {L"hr-HR", L"Hrvatski"},
-    {L"el-GR", L"\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC"},
-    {L"sl-SI", L"Sloven\u0161\u010Dina"},
-    {L"sr-Latn-RS", L"Srpski"},
-    {L"uk-UA", L"\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430"},
-    {L"sq-AL", L"Shqip"},
-    {L"lv-LV", L"Latvie\u0161u"},
-    {L"hy-AM", L"\u0540\u0561\u0575\u0565\u0580\u0565\u0576"},
-    {L"cs-CZ", L"\u010Ce\u0161tina"},
-    {L"et-EE", L"Eesti"},
-    {L"sk-SK", L"Sloven\u010Dina"},
-    {L"bg-BG", L"\u0411\u044A\u043B\u0433\u0430\u0440\u0441\u043A\u0438"},
-    {L"ka-GE", L"\u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8"},
-    {L"hu-HU", L"Magyar"},
-    {L"pl-PL", L"Polski"},
-    {L"ro-RO", L"Rom\u00E2n\u0103"},
-    {L"lt-LT", L"Lietuvi\u0173"},
-    {L"is-IS", L"\u00CDslenska"},
+    {L"en", L"English"},
+    {L"de", L"Deutsch"},
+    {L"es", L"Espa\u00F1ol"},
+    {L"fr", L"Fran\u00E7ais"},
+    {L"pt", L"Portugu\u00EAs"},
+    {L"it", L"Italiano"},
+    {L"da", L"Dansk"},
+    {L"nl", L"Nederlands"},
+    {L"sv", L"Svenska"},
+    {L"lb", L"L\u00EBtzebuergesch"},
+    {L"nb", L"Norsk bokm\u00E5l"},
+    {L"fi", L"Suomi"},
+    {L"ru", L"\u0420\u0443\u0441\u0441\u043A\u0438\u0439"},
+    {L"hr", L"Hrvatski"},
+    {L"el", L"\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC"},
+    {L"sl", L"Sloven\u0161\u010Dina"},
+    {L"sr-Latn", L"Srpski"},
+    {L"uk", L"\u0423\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430"},
+    {L"sq", L"Shqip"},
+    {L"lv", L"Latvie\u0161u"},
+    {L"hy", L"\u0540\u0561\u0575\u0565\u0580\u0565\u0576"},
+    {L"cs", L"\u010Ce\u0161tina"},
+    {L"et", L"Eesti"},
+    {L"sk", L"Sloven\u010Dina"},
+    {L"bg", L"\u0411\u044A\u043B\u0433\u0430\u0440\u0441\u043A\u0438"},
+    {L"ka", L"\u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8"},
+    {L"hu", L"Magyar"},
+    {L"pl", L"Polski"},
+    {L"ro", L"Rom\u00E2n\u0103"},
+    {L"lt", L"Lietuvi\u0173"},
+    {L"is", L"\u00CDslenska"},
     {L"zh-CN", L"\u7B80\u4F53\u4E2D\u6587"},
     {L"zh-TW", L"\u7E41\u9AD4\u4E2D\u6587"},
-    {L"ja-JP", L"\u65E5\u672C\u8A9E"},
-    {L"ko-KR", L"\uD55C\uAD6D\uC5B4"},
-    {L"mt-MT", L"Malti"},
-    {L"hi-IN", L"\u0939\u093F\u0928\u094D\u0926\u0940"},
-    {L"ta-IN", L"\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD"},
-    {L"vi-VN", L"Ti\u1EBFng Vi\u1EC7t"},
-    {L"sw-KE", L"Kiswahili"},
-    {L"af-ZA", L"Afrikaans"},
-    {L"he-IL", L"\u05E2\u05D1\u05E8\u05D9\u05EA"},
-    {L"id-ID", L"Bahasa Indonesia"},
-    {L"fil-PH", L"Filipino"},
-    {L"ig-NG", L"Igbo"},
-    {L"th-TH", L"\u0E44\u0E17\u0E22"},
-    {L"tr-TR", L"T\u00FCrk\u00E7e"},
-    {L"ur-PK", L"\u0627\u0631\u062F\u0648"},
-    {L"ar-SA", L"\u0627\u0644\u0639\u0631\u0628\u064A\u0629"},
-    {L"ms-MY", L"Bahasa Melayu"},
-    {L"az-Latn-AZ", L"Az\u0259rbaycan dili"},
-    {L"kk-KZ", L"\u049A\u0430\u0437\u0430\u049B \u0442\u0456\u043B\u0456"},
-    {L"ha-Latn-NG", L"Hausa"},
+    {L"ja", L"\u65E5\u672C\u8A9E"},
+    {L"ko", L"\uD55C\uAD6D\uC5B4"},
+    {L"mt", L"Malti"},
+    {L"hi", L"\u0939\u093F\u0928\u094D\u0926\u0940"},
+    {L"ta", L"\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD"},
+    {L"vi", L"Ti\u1EBFng Vi\u1EC7t"},
+    {L"sw", L"Kiswahili"},
+    {L"af", L"Afrikaans"},
+    {L"he", L"\u05E2\u05D1\u05E8\u05D9\u05EA"},
+    {L"id", L"Bahasa Indonesia"},
+    {L"fil", L"Filipino"},
+    {L"ig", L"Igbo"},
+    {L"th", L"\u0E44\u0E17\u0E22"},
+    {L"tr", L"T\u00FCrk\u00E7e"},
+    {L"ur", L"\u0627\u0631\u062F\u0648"},
+    {L"ar", L"\u0627\u0644\u0639\u0631\u0628\u064A\u0629"},
+    {L"ms", L"Bahasa Melayu"},
+    {L"az-Latn", L"Az\u0259rbaycan dili"},
+    {L"kk", L"\u049A\u0430\u0437\u0430\u049B \u0442\u0456\u043B\u0456"},
+    {L"ha-Latn", L"Hausa"},
 };
 
 // Right-to-left language tags (primary subtag matching).
@@ -128,12 +128,17 @@ inline bool IsLanguageRtl(const std::wstring& languageTag) {
     return false;
 }
 
-// Returns true if `current` matches `supportedTag` exactly or by its
-// primary language subtag (e.g. "de-DE" matches "de").
+// Returns true if `current` matches `supportedTag` exactly or when one tag is
+// a more specific variant of the other (e.g. "de-DE" matches "de", and
+// "de" matches "de-DE").
 inline bool LanguageMatches(const std::wstring& current, const std::wstring& supportedTag) {
     if (current == supportedTag) return true;
-    size_t dash = supportedTag.find(L'-');
-    if (dash != std::wstring::npos && current == supportedTag.substr(0, dash)) return true;
+    if (current.size() > supportedTag.size() &&
+        current.compare(0, supportedTag.size(), supportedTag) == 0 &&
+        current[supportedTag.size()] == L'-') return true;
+    if (supportedTag.size() > current.size() &&
+        supportedTag.compare(0, current.size(), current) == 0 &&
+        supportedTag[current.size()] == L'-') return true;
     return false;
 }
 

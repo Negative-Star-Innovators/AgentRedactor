@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Negative Star Innovators</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Proxy na Kare PII na Traffics AI</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>Bayanan martaba</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>Ƙara</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>Cire</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Yadda ake amfani da Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. Sanya bayanin martabarku a ƙasa (ko amfani da tsoho)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. Nuna abokin ciniki na LLM (Lambar Claude, OpenClaw, da sauransu) a URL na gida da aka nuna a ƙasa</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. Mun zauna tsakanin abokin ciniki da ainihin API. Komai yana kan injin ku. Ana sake gyara bayanai masu mahimmanci a cikin gida kafin kowace buƙata ta bar kwamfutarka don tabbatar da cewa bayananku ba su taɓa sabar mu ba</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API ɗin Wakili</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>Sunan Bayani</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>misali, Aiki OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>URL na gida</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>Adireshin abokin ciniki na LLM yana nunawa a</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>Kwafi</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>Gaba Zuwa</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>misali https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>Haƙiƙanin ƙarshen API wanda ke karɓar buƙatun ku da aka gyara</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>Maɓallin API</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>Nuna maɓalli</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>Ajiye Duk Saituna</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>Port {0} yana samuwa</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>An riga an fara amfani da tashar jiragen ruwa {0}</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>Port {0} an riga an yi amfani da shi ta hanyar bayanan martaba '{1}', zaɓi wani.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Tsarin Regex</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>Za a sake gyara rubutun da ya dace da waɗannan alamu kafin aikawa zuwa API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>An kunna</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Tsarin Regex</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>misali sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>Ƙara</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>Mahimman kalmomi</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>Saƙonnin da ke ɗauke da waɗannan kalmomi za a yi alama don sake gyarawa</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>An kunna</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>Harka</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>Mabuɗin kalma</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>misali kalmar sirri</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>Ƙara</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Harka m</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>Samfurin Gano Mai ƙarfi AI</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>Gano mai ƙarfin AI yana gudana a cikin gida azaman ƙarin tsarin tsaro. Maiyuwa rasa bayanai ko wuce gona da iri. Yi amfani da Tsarin Regex da Keywords da ke ƙasa don ƙayyadaddun gyarawa.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>Yi tsammanin martani a hankali lokacin da aka kunna. Samfurin yana duba kowane saƙo a cikin gida.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>Ƙofar amincewa (0.0-1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>Lambar akant</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>Adireshi</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>Kwanan wata</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>Imel</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>Mutum</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>Waya</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>Sirrin</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>Kuɗi</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>Tuntuɓi &amp; Wuri</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>Na sirri</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>Digital &amp; Asirin</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>Kalmar wucewa</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>Bukatar kalmar sirri a farawa</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Canza kalmar shiga</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>Kididdiga</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>Bukatu</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>Mahimman kalmomi</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>Matsalolin Zama</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>An gano ainihin gyare-gyare a cikin zaman na yanzu.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>Babu raguwa a cikin zaman na yanzu.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>Shiga cikin magana</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>Buɗe fayil ɗin log</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>Bude babban fayil</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Tsarin Regex</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Shigar da tsarin regex...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>Ƙara</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>Cire</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>Mahimman kalmomi</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Shigar da keyword...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>Harka m</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>Ƙara</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>Cire</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Ee</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>A'a</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value>(mai hankali)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(ba a ambaci suna ba)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>Sabuwar Fayil</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>Saituna</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>Baya</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Fara a kan Windows boot</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>Babbar kalmar sirri</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>Canza Kalmar wucewa ta Jagora</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>Shigar Verbose</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>Ajiye Saituna</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>Harshe</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>Tsohuwar tsarin</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>Turanci</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>Gargadi</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>An kunna shigar da kalmar verbose. Logs na iya ƙunsar mahimman bayanai gami da ƙungiyoyin buƙatun asali.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>Ana Bukata Babban Kalmar wucewa</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>Buɗe</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Fita</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>Shigar da kalmar wucewa</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>Kalmar sirri mara daidai</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>Kalmar sirri da kuka shigar ba daidai ba ne. Da fatan za a sake gwadawa.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>Ƙoƙari da yawa</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>Matsakaicin yunƙurin kalmar wucewa. Yanzu aikace-aikacen zai fita.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>Saita Babban Kalmar wucewa</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>Saita Kalmar wucewa</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>Kalmar wucewa</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>Tabbata kalmar shiga</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>Kalmar wucewa ba za ta iya zama fanko ba.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>Kalmomin sirri ba su daidaita ba.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>An kasa kunna babban kalmar sirri.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>Kashe Babban Kalmar wucewa</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>A kashe</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>Kalmar shiga na halin yanzu</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>Kalmar sirri mara daidai.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>Canza Kalmar wucewa ta Jagora</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>Canza</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>Sabuwar kalmar sirri</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>Tabbatar da sabon kalmar sirri</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>Sabuwar kalmar sirri ba za ta iya zama fanko ba.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>Sabbin kalmomin shiga ba su daidaita ba.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>Nasara</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>Babban kalmar sirri ta canza cikin nasara.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>An kasa canza kalmar sirri. Tabbatar kalmar sirri na yanzu daidai ne.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>Soke</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>Cire</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>Kuskuren Tabbatarwa</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>Gargadin Tsaro</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>Kuna amfani da URL na sama (mara ɓoye) HTTP. Za'a aika maɓallin API ɗinku a bayyane akan hanyar sadarwar.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>Cire Bayanan martaba</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>Ka tabbata? Wannan aiki na dindindin ne.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>Share duk rajistan ayyukan?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>Wannan zai share fayil ɗin log ɗin na yanzu da duk bayanan zaman da aka adana har abada. Ba za a iya soke wannan ba.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>Share duk rajistan ayyukan</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>Kunna Shiga Verbose?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>Wannan zai rubuta ƙididdiga masu mahimmanci (sunaye, imel, lambobin waya, da sauransu) zuwa fayil ɗin log ɗin ku akan faifai. Kar a kunna wannan idan wasu suna da damar shiga wannan kwamfutar. Saitin yana sake saitawa lokacin da ka rufe ƙa'idar.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>Kunna</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>Ka tabbata kana so ka daina?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>Dakata</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>Idan kun daina, Agent Redactor ba zai ƙara saka idanu da rage zirga-zirgar API ba.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Dole ne tashar jiragen ruwa ta kasance tsakanin 1024 da 65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>Port {0} an riga an yi amfani da shi ta hanyar bayanan martaba '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>Gaba zuwa URL ba zai zama fanko ba.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>Gaba zuwa URL dole ne a fara da http:// ko https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>Gaba Zuwa URL ba ingantaccen URL bane.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>Ƙofar amincewa dole ne ya kasance tsakanin 0.0 da 1.0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>Regex syntax mara inganci: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>Rubutun regex mara inganci.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Buɗe Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>Harshe</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>Turanci</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>Canjin Harshe</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>Sake kunna Wakilin Redactor don amfani da sabon harshe.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>Wannan yaren ya riga ya fara aiki.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>Fara a kan Boot</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>Dakata</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - Crash</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>Kuskure mai kisa ya faru. Duba debug.log don cikakkun bayanai.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>Kuskure</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>An kasa fara aikace-aikacen.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>Babu PII da aka gano</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>An sake gyara abu 1 PII</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} Abubuwan PII sun rage</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>Mabuɗin kalma</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>nema: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>Mahimman kalmomi: {0}</value>
+  </data>
+</root>

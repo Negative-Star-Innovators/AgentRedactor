@@ -81,14 +81,14 @@ Write-Host "Generating resources.pri..." -ForegroundColor Cyan
 if (-not (Test-Path "$outDir\Strings")) {
     New-Item -ItemType Directory -Force -Path "$outDir\Strings" | Out-Null
 }
-robocopy "$root\Strings" "$outDir\Strings" /E /R:3 /W:1 | Out-Null
+robocopy "$root\Strings" "$outDir\Strings" /MIR /R:3 /W:1 | Out-Null
 $priStage = "$outDir\pri_staging"
 if (Test-Path $priStage) { Remove-Item -Recurse -Force $priStage }
 New-Item -ItemType Directory -Force -Path "$priStage\Strings" | Out-Null
 robocopy "$outDir\Strings" "$priStage\Strings" /E /R:3 /W:1 | Out-Null
 Copy-Item "$root\Package.appxmanifest" "$priStage\AppxManifest.xml" -Force
 $priConfig = "$priStage\priconfig.xml"
-$langs = @('en-US','de-DE','es-ES','fr-FR','pt-PT','it-IT','da-DK','nl-NL','sv-SE','lb-LU','nb-NO','fi-FI','ru-RU','hr-HR','el-GR','sl-SI','sr-Latn-RS','uk-UA','sq-AL','lv-LV','hy-AM','cs-CZ','et-EE','sk-SK','bg-BG','ka-GE','hu-HU','pl-PL','ro-RO','lt-LT','is-IS','zh-CN','zh-TW','ja-JP','ko-KR','mt-MT','hi-IN','ta-IN','vi-VN','sw-KE','af-ZA','he-IL','id-ID','fil-PH','ig-NG','th-TH','tr-TR','ur-PK','ar-SA','ms-MY','az-Latn-AZ','kk-KZ','ha-Latn-NG')
+$langs = @('en','de','es','fr','pt','it','da','nl','sv','lb','nb','fi','ru','hr','el','sl','sr-Latn','uk','sq','lv','hy','cs','et','sk','bg','ka','hu','pl','ro','lt','is','zh-CN','zh-TW','ja','ko','mt','hi','ta','vi','sw','af','he','id','fil','ig','th','tr','ur','ar','ms','az-Latn','kk','ha-Latn')
 & $makepri createconfig /cf $priConfig /dq ($langs -join '_') /pv 10.0.0 /o
 if ($LASTEXITCODE -ne 0) { throw "makepri createconfig failed" }
 & $makepri new /pr $priStage /cf $priConfig /of "$outDir\resources.pri" /o

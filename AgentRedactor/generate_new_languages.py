@@ -5,7 +5,7 @@ Run from the repository root with the project venv active:
     .transvenv/Scripts/python AgentRedactor/generate_new_languages.py <tag> <gt-code> ...
 
 Example (adds Arabic and Malay blocks to new_language_blocks.py):
-    .transvenv/Scripts/python AgentRedactor/generate_new_languages.py ar-SA ar ms-MY ms
+    .transvenv/Scripts/python AgentRedactor/generate_new_languages.py ar ar ms ms
 
 Output is appended to new_language_blocks.py in the repo root. Review the
 blocks before copying them into AgentRedactor/generate_localizations.py.
@@ -108,11 +108,11 @@ def main() -> None:
     args = sys.argv[1:]
     if len(args) < 2 or len(args) % 2 != 0:
         print("Usage: generate_new_languages.py <tag1> <gt-code1> [<tag2> <gt-code2> ...]")
-        print("Example: generate_new_languages.py ar-SA ar ms-MY ms")
+        print("Example: generate_new_languages.py ar ar ms ms")
         sys.exit(1)
 
     repo_root = Path(__file__).resolve().parent.parent
-    en_resw_path = repo_root / "AgentRedactor" / "Strings" / "en-US" / "Resources.resw"
+    en_resw_path = repo_root / "AgentRedactor" / "Strings" / "en" / "Resources.resw"
     en_data = parse_resw(en_resw_path)
     unique_english = sorted(set(en_data.values()) - COPY_AS_IS)
     print(f"Found {len(en_data)} resw entries, {len(unique_english)} unique translatable strings", flush=True)

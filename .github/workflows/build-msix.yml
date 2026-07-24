@@ -34,7 +34,7 @@ jobs:
         shell: pwsh
         run: |
           vcpkg\bootstrap-vcpkg.bat -disableMetrics
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows cppwinrt:x64-windows
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
 
       # The 1.6 GB model weights are not in the repo; they are a release asset
       # (see README). Skipped automatically on forks/PRs without access.

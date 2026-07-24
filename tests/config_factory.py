@@ -106,7 +106,7 @@ def create_settings_with_profiles(
     settings = {
         "start_on_boot": False,
         "logging_enabled": logging_enabled,
-        "app_language": "en-US",
+        "app_language": "en",
         "onnx_provider": "cpu",
         "profiles": profiles,
     }

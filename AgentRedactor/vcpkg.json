@@ -4,7 +4,6 @@
   "dependencies": [
     "onnxruntime",
     "nlohmann-json",
-    "wil",
-    "cppwinrt"
+    "wil"
   ]
 }

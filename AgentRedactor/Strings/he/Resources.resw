@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Negative Star Innovators</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>פרוקסי הגנת PII לתעבורת AI</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>פרופילים</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>הוסף</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>הסר</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>איך להשתמש ב-Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. הגדר את הפרופיל שלך למטה (או השתמש בברירת המחדל)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. הפנה את לקוח ה-LLM שלך (Claude Code, OpenClaw וכו') אל כתובת ה-URL המקומית המוצגת למטה</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. אנחנו יושבים בין הלקוח שלך לבין ה-API האמיתי. הכל נשאר על המחשב שלך. נתונים רגישים מוסרים מקומית לפני שבקשה כלשהי יוצאת מהמחשב שלך, כך שהנתונים שלך לעולם לא יגיעו לשרתים שלנו</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>פרוקסי API</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>שם פרופיל</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>למשל, OpenAI עבודה</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>URL מקומי</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>הכתובת שאליה לקוח ה-LLM שלך מצביע</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>העתק</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>העבר אל</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>למשל https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>נקודת הקצה האמיתית של ה-API שמקבלת את הבקשות המעודכנות שלך</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>מפתח API</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>הצג מפתח</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>שמור את כל ההגדרות</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>פורט {0} זמין</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>פורט {0} כבר בשימוש</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>פורט {0} כבר נמצא בשימוש על ידי הפרופיל '{1}', בחר אחר.</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>תבניות Regex</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>טקסט התואם לתבניות אלה יוסר לפני השליחה ל-API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>מופעל</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>תבנית Regex</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>למשל sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>הוסף</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>מילות מפתח</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>הודעות המכילות מילים אלה יסומנו להסרה</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>מופעל</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>רישיות</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>מילת מפתח</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>למשל password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>הוסף</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>רישיות תווים</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>מודל זיהוי מונע AI</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>זיהוי מונע AI פועל מקומית כשכבת הגנה נוספת. ייתכן שיפספס נתונים או יסיר יתר על המידה. השתמש בתבניות ה-Regex ובמילות המפתח שלמטה להסרה דטרמיניסטית.</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>צפה לתגובות מעט אטיות יותר כאשר מופעל. המודל סורק כל הודעה מקומית.</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>סף ביטחון (0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>מספר חשבון</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>כתובת</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>תאריך</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>דוא"ל</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>אדם</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>טלפון</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>סוד</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>פיננסי</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>יצירת קשר ומיקום</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>אישי</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>דיגיטלי וסודות</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>סיסמה</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>דרוש סיסמה בעת ההפעלה</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>שנה סיסמה</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>סטטיסטיקה</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>נקה</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>בקשות</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>מילות מפתח</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>הסרות הפעלה</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>נקה</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>הסרות בפועל שזוהו בהפעלה הנוכחית.</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>אין הסרות בהפעלה הנוכחית.</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>יומנים</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>רישום מפורט</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>פתח קובץ יומן</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>פתח תיקייה</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>נקה</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>תבניות Regex</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>הזן תבנית regex...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>הוסף</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>הסר</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>מילות מפתח</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>הזן מילת מפתח...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>רישיות תווים</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>הוסף</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>הסר</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>כן</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>לא</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (רישיות)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(ללא שם)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>ברירת מחדל</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>פרופיל חדש</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>הגדרות</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>חזור</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>הפעל עם ההפעלה של Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>סיסמת מנהל</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>שנה סיסמת מנהל</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>רישום מפורט</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>שמור הגדרות</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>שפה</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>ברירת מחדל של המערכת</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>אנגלית</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>גרמנית</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>אזהרה</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>רישום מפורט מופעל. יומנים עשויים להכיל נתונים רגישים, כולל גופי בקשות מקוריים.</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>נדרשת סיסמת מנהל</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>בטל נעילה</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>יציאה</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>הזן סיסמה</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>סיסמה שגויה</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>הסיסמה שהזנת שגויה. נסה שוב.</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>יותר מדי ניסיונות</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>הגעת למספר הניסיונות המרבי לסיסמה. האפליקציה תיסגר עכשיו.</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>הגדר סיסמת מנהל</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>הגדר סיסמה</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>סיסמה</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>אשר סיסמה</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>הסיסמה אינה יכולה להיות ריקה.</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>הסיסמאות אינן תואמות.</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>הפעלת סיסמת מנהל נכשלה.</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>השבת סיסמת מנהל</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>השבת</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>סיסמה נוכחית</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>סיסמה שגויה.</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>שנה סיסמת מנהל</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>שנה</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>סיסמה חדשה</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>אשר סיסמה חדשה</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>הסיסמה החדשה אינה יכולה להיות ריקה.</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>הסיסמאות החדשות אינן תואמות.</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>הצלחה</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>סיסמת המנהל שונתה בהצלחה.</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>שינוי הסיסמה נכשל. ודא שהסיסמה הנוכחית שלך נכונה.</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>ביטול</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>הסר</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>שגיאת אימות</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>אזהרת אבטחה</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>אתה משתמש ב-URL upstream של HTTP (לא מוצפן). מפתח ה-API שלך יישלח כטקסט פשוט דרך הרשת.</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>הסר פרופיל</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>האם אתה בטוח? פעולה זו היא קבועה.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>למחוק את כל היומנים?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>פעולה זו תמחק לצמיתות את קובץ היומן הנוכחי ואת כל יומני ההפעלה המאוחסנים. לא ניתן לבטל זאת.</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>מחק את כל היומנים</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>להפעיל רישום מפורט?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>פעולה זו תכתוב ערכים רגישים שזוהו (שמות, כתובות דוא"ל, מספרי טלפון וכו') לקובץ היומן בדיסק שלך. אל תפעיל אם לאחרים יש גישה למחשב זה. ההגדרה תאופס כאשר תסגור את האפליקציה.</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>הפעל</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>האם אתה בטוח שברצונך לצאת?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>צא</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>אם תצא, Agent Redactor לא ימשיך לפקח ולערוך את תעבורת ה-API.</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>הפורט חייב להיות בין 1024 ל-65535.</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>פורט {0} כבר נמצא בשימוש על ידי הפרופיל '{1}'.</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>כתובת ה-URL להעברה אליה אינה יכולה להיות ריקה.</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>כתובת ה-URL להעברה אליה חייבת להתחיל ב-http:// או https://.</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>כתובת ה-URL להעברה אליה אינה חוקית.</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>סף הביטחון חייב להיות בין 0.0 ל-1.0.</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>תחביר regex לא חוקי: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>תחביר regex לא חוקי.</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>פתח את Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>שפה</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>אנגלית</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>גרמנית</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>השפה שונתה</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>מפעיל מחדש את Agent Redactor כדי להחיל את השפה החדשה.</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>השפה כבר פעילה.</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>הפעל עם ההפעלה</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>צא</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - קריסה</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>אירעה שגיאה חמורה. ראה debug.log לפרטים.</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>שגיאה</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>אתחול האפליקציה נכשל.</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>לא זוהה PII</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>פריט PII אחד הוסר</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} פריטי PII הוסרו</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>מילת מפתח</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>בקשה: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>מילות מפתח: {0}</value>
+  </data>
+</root>

@@ -31,11 +31,11 @@ and un-redacting the responses coming back.
   ```powershell
   git clone https://github.com/microsoft/vcpkg ..\vcpkg
   ..\vcpkg\bootstrap-vcpkg.bat
-  ..\vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows cppwinrt:x64-windows
+  ..\vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
   ```
 - The ONNX model weights. `model_quantized.onnx_data` (~1.6 GB) is **not in the
   repo**; download it from the
-  [Releases](https://github.com/<your-username>/AgentRedactor/releases) page and
+  [Releases](https://github.com/Negative-Star-Innovators/AgentRedactor/releases) page and
   place it in `AgentRedactor\models\onnx\`.
 
 ## Building

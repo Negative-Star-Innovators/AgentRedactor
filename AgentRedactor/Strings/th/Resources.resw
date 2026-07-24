@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Negative Star Innovators</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>พร็อกซีป้องกัน PII สำหรับการรับส่งข้อมูล AI</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>โปรไฟล์</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>เพิ่ม</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>วิธีใช้ Agent Redactor</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. กำหนดค่าโปรไฟล์ของคุณด้านล่าง (หรือใช้ค่าเริ่มต้น)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. ชี้ไคลเอ็นต์ LLM ของคุณ (Claude Code, OpenClaw เป็นต้น) ไปยัง URL ภายในเครื่องที่แสดงด้านล่าง</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. เราอยู่ระหว่างไคลเอ็นต์ของคุณกับ API จริง ทุกอย่างอยู่บนเครื่องของคุณ ข้อมูลที่ละเอียดอ่อนจะถูกลบบางส่วนในเครื่องก่อนที่คำขอใด ๆ จะออกจากคอมพิวเตอร์ของคุณ เพื่อให้มั่นใจว่าข้อมูลของคุณจะไม่ถึงเซิร์ฟเวอร์ของเรา</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>พร็อกซี API</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>ชื่อโปรไฟล์</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>เช่น OpenAI สำหรับงาน</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>URL ภายในเครื่อง</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>ที่อยู่ที่ไคลเอ็นต์ LLM ของคุณชี้ไป</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>คัดลอก</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>ส่งต่อไปยัง</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>เช่น https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>จุดสิ้นสุด API จริงที่รับคำขอที่ถูกลดความละเอียดของคุณ</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>คีย์ API</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>แสดงคีย์</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>บันทึกการตั้งค่าทั้งหมด</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>พอร์ต {0} พร้อมใช้งาน</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>พอร์ต {0} ถูกใช้งานแล้ว</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>พอร์ต {0} ถูกใช้โดยโปรไฟล์ '{1}' แล้ว โปรดเลือกพอร์ตอื่น</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>รูปแบบ Regex</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>ข้อความที่ตรงกับรูปแบบเหล่านี้จะถูกลดความละเอียดก่อนส่งไปยัง API</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>เปิดใช้งาน</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>รูปแบบ Regex</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>เช่น sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>เพิ่ม</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>คำสำคัญ</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>ข้อความที่มีคำเหล่านี้จะถูกทำเครื่องหมายเพื่อลดความละเอียด</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>เปิดใช้งาน</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>ตัวพิมพ์</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>คำสำคัญ</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>เช่น password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>เพิ่ม</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>แยกแยะตัวพิมพ์เล็ก/ใหญ่</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>โมเดลตรวจจับที่ขับเคลื่อนด้วย AI</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>การตรวจจับที่ขับเคลื่อนด้วย AI ทำงานในเครื่องเป็นชั้นการป้องกันเพิ่มเติม อาจพลาดข้อมูลหรือลบมากเกินไป ใช้รูปแบบ Regex และคำสำคัญด้านล่างเพื่อการลดความละเอียดแบบกำหนดได้</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>เมื่อเปิดใช้งาน อาจได้รับการตอบสนองช้าลงเล็กน้อย โมเดลจะสแกนข้อความทุกข้อความในเครื่อง</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>เกณฑ์ความเชื่อมั่น (0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>หมายเลขบัญชี</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>ที่อยู่</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>วันที่</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>อีเมล</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>บุคคล</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>โทรศัพท์</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>ความลับ</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>การเงิน</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>ติดต่อและตำแหน่งที่ตั้ง</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>ส่วนบุคคล</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>ดิจิทัลและความลับ</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>รหัสผ่าน</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>ต้องการรหัสผ่านเมื่อเริ่มต้น</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>เปลี่ยนรหัสผ่าน</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>สถิติ</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>ล้าง</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>คำขอ</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>คำสำคัญ</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>การลดความละเอียดในเซสชัน</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>ล้าง</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>การลดความละเอียดจริงที่ตรวจพบในเซสชันปัจจุบัน</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>ไม่มีการลดความละเอียดในเซสชันปัจจุบัน</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>บันทึก</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>การบันทึกแบบละเอียด</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>เปิดไฟล์บันทึก</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>เปิดโฟลเดอร์</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>ล้าง</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>รูปแบบ Regex</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>ป้อนรูปแบบ Regex...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>เพิ่ม</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>คำสำคัญ</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>ป้อนคำสำคัญ...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>แยกแยะตัวพิมพ์เล็ก/ใหญ่</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>เพิ่ม</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>ใช่</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>ไม่</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (แยกตัวพิมพ์เล็ก/ใหญ่)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(ไม่มีชื่อ)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>ค่าเริ่มต้น</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>โปรไฟล์ใหม่</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>การตั้งค่า</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>กลับ</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>เริ่มต้นเมื่อบูต Windows</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>รหัสผ่านหลัก</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>เปลี่ยนรหัสผ่านหลัก</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>การบันทึกแบบละเอียด</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>บันทึกการตั้งค่า</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>ภาษา</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>ค่าเริ่มต้นของระบบ</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>อังกฤษ</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>เยอรมัน</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>คำเตือน</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>เปิดใช้งานการบันทึกแบบละเอียดแล้ว บันทึกอาจมีข้อมูลที่ละเอียดอ่อน รวมถึงเนื้อหาคำขอดั้งเดิม</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>ต้องการรหัสผ่านหลัก</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>ปลดล็อก</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>ออก</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>ป้อนรหัสผ่าน</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>รหัสผ่านไม่ถูกต้อง</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>รหัสผ่านที่คุณป้อนไม่ถูกต้อง โปรดลองอีกครั้ง</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>พยายามมากเกินไป</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>ถึงจำนวนครั้งสูงสุดในการป้อนรหัสผ่านแล้ว แอปพลิเคชันจะปิดตัวลง</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>ตั้งรหัสผ่านหลัก</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>ตั้งรหัสผ่าน</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>รหัสผ่าน</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>ยืนยันรหัสผ่าน</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>รหัสผ่านต้องไม่ว่างเปล่า</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>รหัสผ่านไม่ตรงกัน</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>ไม่สามารถเปิดใช้งานรหัสผ่านหลักได้</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>ปิดใช้งานรหัสผ่านหลัก</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>ปิดใช้งาน</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>รหัสผ่านปัจจุบัน</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>รหัสผ่านไม่ถูกต้อง</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>เปลี่ยนรหัสผ่านหลัก</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>เปลี่ยน</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>รหัสผ่านใหม่</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>ยืนยันรหัสผ่านใหม่</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>รหัสผ่านใหม่ต้องไม่ว่างเปล่า</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>รหัสผ่านใหม่ไม่ตรงกัน</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>สำเร็จ</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>เปลี่ยนรหัสผ่านหลักสำเร็จ</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>ไม่สามารถเปลี่ยนรหัสผ่านได้ โปรดตรวจสอบว่ารหัสผ่านปัจจุบันของคุณถูกต้อง</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>ยกเลิก</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>ข้อผิดพลาดในการตรวจสอบ</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>คำเตือนด้านความปลอดภัย</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>คุณกำลังใช้ URL อัปสตรีม HTTP (ไม่ได้เข้ารหัส) คีย์ API ของคุณจะถูกส่งเป็นข้อความธรรมดาผ่านเครือข่าย</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>ลบโปรไฟล์</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>คุณแน่ใจหรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>ลบบันทึกทั้งหมด?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>การดำเนินการนี้จะลบไฟล์บันทึกปัจจุบันและบันทึกเซสชันที่เก็บถาวรทั้งหมดอย่างถาวร ไม่สามารถย้อนกลับได้</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>ลบบันทึกทั้งหมด</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>เปิดใช้งานการบันทึกแบบละเอียด?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>การดำเนินการนี้จะเขียนค่าที่ละเอียดอ่อนที่ตรวจพบ (ชื่อ อีเมล หมายเลขโทรศัพท์ เป็นต้น) ลงในไฟล์บันทึกบนดิสก์ของคุณ อย่าเปิดใช้งานหากผู้อื่นสามารถเข้าถึงคอมพิวเตอร์เครื่องนี้ได้ การตั้งค่าจะรีเซ็ตเมื่อคุณปิดแอป</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>เปิดใช้งาน</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>คุณแน่ใจหรือไม่ว่าต้องการออก?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>ออก</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>หากคุณออก Agent Redactor จะไม่ตรวจสอบและลดความละเอียดของการรับส่งข้อมูล API อีกต่อไป</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>พอร์ตต้องอยู่ระหว่าง 1024 และ 65535</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>พอร์ต {0} ถูกใช้โดยโปรไฟล์ '{1}' แล้ว</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>URL ส่งต่อไปยังต้องไม่ว่างเปล่า</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>URL ส่งต่อไปยังต้องขึ้นต้นด้วย http:// หรือ https://</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>URL ส่งต่อไปยังไม่ใช่ URL ที่ถูกต้อง</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>เกณฑ์ความเชื่อมั่นต้องอยู่ระหว่าง 0.0 และ 1.0</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>รูปแบบ Regex ไม่ถูกต้อง: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>รูปแบบ Regex ไม่ถูกต้อง</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>เปิด Agent Redactor</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>ภาษา</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>อังกฤษ</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>เยอรมัน</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>เปลี่ยนภาษาแล้ว</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>กำลังเริ่มต้น Agent Redactor ใหม่เพื่อใช้ภาษาใหม่</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>ภาษานี้เปิดใช้งานอยู่แล้ว</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>เริ่มต้นเมื่อบูต</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>ออก</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - ข้อผิดพลาดร้ายแรง</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>เกิดข้อผิดพลาดร้ายแรง ดูรายละเอียดใน debug.log</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>ไม่สามารถเริ่มต้นแอปพลิเคชันได้</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>ไม่พบ PII</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>ลดความละเอียด PII 1 รายการ</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>ลดความละเอียด PII {0} รายการ</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>คำสำคัญ</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>คำขอ: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>คำสำคัญ: {0}</value>
+  </data>
+</root>

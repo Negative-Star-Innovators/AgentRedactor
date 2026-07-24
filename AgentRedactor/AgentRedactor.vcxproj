@@ -16,7 +16,7 @@
     <ProjectGuid>{B2C3D4E5-F6A7-8901-2345-678901ABCDEF}</ProjectGuid>
     <ProjectName>AgentRedactor</ProjectName>
     <RootNamespace>AgentRedactor</RootNamespace>
-    <DefaultLanguage>en-US</DefaultLanguage>
+    <DefaultLanguage>en</DefaultLanguage>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
@@ -156,97 +156,97 @@
     <ResourceCompile Include="resources\app.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Strings\en-US\Resources.resw">
+    <Content Include="Strings\en\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\de-DE\Resources.resw">
+    <Content Include="Strings\de\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\es-ES\Resources.resw">
+    <Content Include="Strings\es\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\fr-FR\Resources.resw">
+    <Content Include="Strings\fr\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\pt-PT\Resources.resw">
+    <Content Include="Strings\pt\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\it-IT\Resources.resw">
+    <Content Include="Strings\it\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\da-DK\Resources.resw">
+    <Content Include="Strings\da\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\nl-NL\Resources.resw">
+    <Content Include="Strings\nl\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\sv-SE\Resources.resw">
+    <Content Include="Strings\sv\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\lb-LU\Resources.resw">
+    <Content Include="Strings\lb\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\nb-NO\Resources.resw">
+    <Content Include="Strings\nb\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\fi-FI\Resources.resw">
+    <Content Include="Strings\fi\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ru-RU\Resources.resw">
+    <Content Include="Strings\ru\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\hr-HR\Resources.resw">
+    <Content Include="Strings\hr\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\el-GR\Resources.resw">
+    <Content Include="Strings\el\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\sl-SI\Resources.resw">
+    <Content Include="Strings\sl\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\sr-Latn-RS\Resources.resw">
+    <Content Include="Strings\sr-Latn\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\uk-UA\Resources.resw">
+    <Content Include="Strings\uk\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\sq-AL\Resources.resw">
+    <Content Include="Strings\sq\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\lv-LV\Resources.resw">
+    <Content Include="Strings\lv\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\hy-AM\Resources.resw">
+    <Content Include="Strings\hy\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\cs-CZ\Resources.resw">
+    <Content Include="Strings\cs\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\et-EE\Resources.resw">
+    <Content Include="Strings\et\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\sk-SK\Resources.resw">
+    <Content Include="Strings\sk\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\bg-BG\Resources.resw">
+    <Content Include="Strings\bg\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ka-GE\Resources.resw">
+    <Content Include="Strings\ka\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\hu-HU\Resources.resw">
+    <Content Include="Strings\hu\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\pl-PL\Resources.resw">
+    <Content Include="Strings\pl\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ro-RO\Resources.resw">
+    <Content Include="Strings\ro\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\lt-LT\Resources.resw">
+    <Content Include="Strings\lt\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\is-IS\Resources.resw">
+    <Content Include="Strings\is\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Strings\zh-CN\Resources.resw">
@@ -255,64 +255,64 @@
     <Content Include="Strings\zh-TW\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ja-JP\Resources.resw">
+    <Content Include="Strings\ja\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ko-KR\Resources.resw">
+    <Content Include="Strings\ko\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\mt-MT\Resources.resw">
+    <Content Include="Strings\mt\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\hi-IN\Resources.resw">
+    <Content Include="Strings\hi\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ta-IN\Resources.resw">
+    <Content Include="Strings\ta\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\vi-VN\Resources.resw">
+    <Content Include="Strings\vi\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\sw-KE\Resources.resw">
+    <Content Include="Strings\sw\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\af-ZA\Resources.resw">
+    <Content Include="Strings\af\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\he-IL\Resources.resw">
+    <Content Include="Strings\he\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\id-ID\Resources.resw">
+    <Content Include="Strings\id\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\fil-PH\Resources.resw">
+    <Content Include="Strings\fil\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ig-NG\Resources.resw">
+    <Content Include="Strings\ig\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\th-TH\Resources.resw">
+    <Content Include="Strings\th\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\tr-TR\Resources.resw">
+    <Content Include="Strings\tr\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ur-PK\Resources.resw">
+    <Content Include="Strings\ur\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ar-SA\Resources.resw">
+    <Content Include="Strings\ar\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ms-MY\Resources.resw">
+    <Content Include="Strings\ms\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\az-Latn-AZ\Resources.resw">
+    <Content Include="Strings\az-Latn\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\kk-KZ\Resources.resw">
+    <Content Include="Strings\kk\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ha-Latn-NG\Resources.resw">
+    <Content Include="Strings\ha-Latn\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

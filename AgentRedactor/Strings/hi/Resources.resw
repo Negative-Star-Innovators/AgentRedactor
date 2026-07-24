@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="AppPublisherDisplayName" xml:space="preserve">
+    <value>Negative Star Innovators</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>AI ट्रैफ़िक PII सुरक्षा प्रॉक्सी</value>
+  </data>
+  <data name="AppStartupTaskName" xml:space="preserve">
+    <value>Agent Redactor</value>
+  </data>
+  <data name="HomePage_ProfilesHeader.Text" xml:space="preserve">
+    <value>प्रोफ़ाइल</value>
+  </data>
+  <data name="HomePage_AddButton.Content" xml:space="preserve">
+    <value>जोड़ें</value>
+  </data>
+  <data name="HomePage_RemoveButton.Content" xml:space="preserve">
+    <value>हटाएँ</value>
+  </data>
+  <data name="HomePage_QuickStart_Title.Text" xml:space="preserve">
+    <value>Agent Redactor का उपयोग कैसे करें</value>
+  </data>
+  <data name="HomePage_QuickStart_Step1.Text" xml:space="preserve">
+    <value>1. नीचे अपनी प्रोफ़ाइल कॉन्फ़िगर करें (या डिफ़ॉल्ट का उपयोग करें)</value>
+  </data>
+  <data name="HomePage_QuickStart_Step2.Text" xml:space="preserve">
+    <value>2. अपने LLM क्लाइंट (Claude Code, OpenClaw आदि) को नीचे दिखाए गए लोकल URL पर निर्देशित करें</value>
+  </data>
+  <data name="HomePage_QuickStart_Step3.Text" xml:space="preserve">
+    <value>3. हम आपके क्लाइंट और असली API के बीच में हैं। सब कुछ आपकी मशीन पर ही रहता है। संवेदनशील डेटा को किसी भी अनुरोध के आपके कंप्यूटर से बाहर जाने से पहले स्थानीय रूप से रिडैक्ट किया जाता है, जिससे यह सुनिश्चित होता है कि आपका डेटा कभी भी हमारे सर्वर तक नहीं पहुँचता</value>
+  </data>
+  <data name="HomePage_ApiProxy_Title.Text" xml:space="preserve">
+    <value>API प्रॉक्सी</value>
+  </data>
+  <data name="HomePage_ProfileName_Label.Text" xml:space="preserve">
+    <value>प्रोफ़ाइल का नाम</value>
+  </data>
+  <data name="HomePage_ProfileName_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>उदा., कार्य OpenAI</value>
+  </data>
+  <data name="HomePage_LocalUrl_Label.Text" xml:space="preserve">
+    <value>लोकल URL</value>
+  </data>
+  <data name="HomePage_LocalUrl_Hint.Text" xml:space="preserve">
+    <value>वह पता जिस पर आपका LLM क्लाइंट इंगित करता है</value>
+  </data>
+  <data name="HomePage_CopyButton.Content" xml:space="preserve">
+    <value>कॉपी करें</value>
+  </data>
+  <data name="HomePage_ForwardTo_Label.Text" xml:space="preserve">
+    <value>फ़ॉरवर्ड करें</value>
+  </data>
+  <data name="HomePage_ForwardTo_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>उदा. https://openrouter.ai/api/v1</value>
+  </data>
+  <data name="HomePage_ForwardTo_Hint.Text" xml:space="preserve">
+    <value>वह असली API एंडपॉइंट जो आपके रिडैक्ट किए गए अनुरोधों को प्राप्त करता है</value>
+  </data>
+  <data name="HomePage_ApiKey_Label.Text" xml:space="preserve">
+    <value>API कुंजी</value>
+  </data>
+  <data name="HomePage_ShowKeyCheck.Content" xml:space="preserve">
+    <value>कुंजी दिखाएँ</value>
+  </data>  <data name="HomePage_SaveAllSettingsButton.Content" xml:space="preserve">
+    <value>सभी सेटिंग्स सहेजें</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortAvailable" xml:space="preserve">
+    <value>पोर्ट {0} उपलब्ध है</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortInUse" xml:space="preserve">
+    <value>पोर्ट {0} पहले से ही उपयोग में है</value>
+  </data>
+  <data name="HomePage_ProxyStatus_PortUsedByProfile" xml:space="preserve">
+    <value>पोर्ट {0} पहले से ही '{1}' प्रोफ़ाइल द्वारा उपयोग में है, कृपया कोई अन्य चुनें।</value>
+  </data>
+  <data name="HomePage_Regex_Title.Text" xml:space="preserve">
+    <value>Regex पैटर्न</value>
+  </data>
+  <data name="HomePage_Regex_Description.Text" xml:space="preserve">
+    <value>इन पैटर्न से मेल खाने वाला टेक्स्ट API पर भेजने से पहले रिडैक्ट किया जाएगा</value>
+  </data>
+  <data name="HomePage_Regex_EnabledHeader.Text" xml:space="preserve">
+    <value>सक्षम</value>
+  </data>
+  <data name="HomePage_Regex_PatternHeader.Text" xml:space="preserve">
+    <value>Regex पैटर्न</value>
+  </data>
+  <data name="HomePage_Regex_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>उदा. sk-[a-zA-Z0-9]{20,}</value>
+  </data>
+  <data name="HomePage_Regex_AddButton.Content" xml:space="preserve">
+    <value>जोड़ें</value>
+  </data>
+  <data name="HomePage_Keywords_Title.Text" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="HomePage_Keywords_Description.Text" xml:space="preserve">
+    <value>इन शब्दों को शामिल करने वाले संदेशों को रिडैक्शन के लिए चिह्नित किया जाएगा</value>
+  </data>
+  <data name="HomePage_Keywords_EnabledHeader.Text" xml:space="preserve">
+    <value>सक्षम</value>
+  </data>
+  <data name="HomePage_Keywords_CaseHeader.Text" xml:space="preserve">
+    <value>केस</value>
+  </data>
+  <data name="HomePage_Keywords_KeywordHeader.Text" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="HomePage_Keywords_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>उदा. password</value>
+  </data>
+  <data name="HomePage_Keywords_AddButton.Content" xml:space="preserve">
+    <value>जोड़ें</value>
+  </data>
+  <data name="HomePage_Keywords_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>केस संवेदनशील</value>
+  </data>
+  <data name="HomePage_Detection_Title.Text" xml:space="preserve">
+    <value>AI-संचालित पहचान मॉडल</value>
+  </data>
+  <data name="HomePage_Detection_Description.Text" xml:space="preserve">
+    <value>AI-संचालित पहचान एक अतिरिक्त सुरक्षा परत के रूप में स्थानीय रूप से चलती है। यह डेटा छोड़ सकता है या अधिक रिडैक्ट कर सकता है। निर्धारात्मक रिडैक्शन के लिए नीचे दिए गए Regex पैटर्न और कीवर्ड का उपयोग करें।</value>
+  </data>
+  <data name="HomePage_Detection_SlowWarning.Text" xml:space="preserve">
+    <value>सक्षम होने पर प्रतिक्रियाएँ थोड़ी धीमी हो सकती हैं। मॉडल प्रत्येक संदेश को स्थानीय रूप से स्कैन करता है।</value>
+  </data>
+  <data name="HomePage_Detection_ConfidenceLabel.Text" xml:space="preserve">
+    <value>विश्वास सीमा (0.0–1.0):</value>
+  </data>
+  <data name="PII_Type_account_number" xml:space="preserve">
+    <value>खाता संख्या</value>
+  </data>
+  <data name="PII_Type_private_address" xml:space="preserve">
+    <value>पता</value>
+  </data>
+  <data name="PII_Type_private_date" xml:space="preserve">
+    <value>तारीख</value>
+  </data>
+  <data name="PII_Type_private_email" xml:space="preserve">
+    <value>ईमेल</value>
+  </data>
+  <data name="PII_Type_private_person" xml:space="preserve">
+    <value>व्यक्ति</value>
+  </data>
+  <data name="PII_Type_private_phone" xml:space="preserve">
+    <value>फ़ोन</value>
+  </data>
+  <data name="PII_Type_private_url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="PII_Type_secret" xml:space="preserve">
+    <value>गुप्त</value>
+  </data>
+  <data name="PII_Category_Financial" xml:space="preserve">
+    <value>वित्तीय</value>
+  </data>
+  <data name="PII_Category_Contact" xml:space="preserve">
+    <value>संपर्क और स्थान</value>
+  </data>
+  <data name="PII_Category_Personal" xml:space="preserve">
+    <value>व्यक्तिगत</value>
+  </data>
+  <data name="PII_Category_Digital" xml:space="preserve">
+    <value>डिजिटल और गुप्त</value>
+  </data>
+  <data name="HomePage_Password_Title.Text" xml:space="preserve">
+    <value>पासवर्ड</value>
+  </data>
+  <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
+    <value>स्टार्टअप पर पासवर्ड आवश्यक करें</value>
+  </data>
+  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>पासवर्ड बदलें</value>
+  </data>
+  <data name="HomePage_Statistics_Title.Text" xml:space="preserve">
+    <value>आंकड़े</value>
+  </data>
+  <data name="HomePage_Statistics_ClearButton.Content" xml:space="preserve">
+    <value>साफ़ करें</value>
+  </data>
+  <data name="Stats_Requests" xml:space="preserve">
+    <value>अनुरोध</value>
+  </data>
+  <data name="Stats_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="Stats_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="Stats_Keywords" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Title.Text" xml:space="preserve">
+    <value>सत्र रिडैक्शन</value>
+  </data>
+  <data name="HomePage_SessionRedactions_ClearButton.Content" xml:space="preserve">
+    <value>साफ़ करें</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Description.Text" xml:space="preserve">
+    <value>वर्तमान सत्र में पाए गए वास्तविक रिडैक्शन।</value>
+  </data>
+  <data name="HomePage_SessionRedactions_Empty" xml:space="preserve">
+    <value>वर्तमान सत्र में कोई रिडैक्शन नहीं।</value>
+  </data>
+  <data name="HomePage_Logs_Title.Text" xml:space="preserve">
+    <value>लॉग</value>
+  </data>
+  <data name="HomePage_Logs_VerboseCheck.Content" xml:space="preserve">
+    <value>विस्तृत लॉगिंग</value>
+  </data>
+  <data name="HomePage_Logs_OpenLogButton.Content" xml:space="preserve">
+    <value>लॉग फ़ाइल खोलें</value>
+  </data>
+  <data name="HomePage_Logs_OpenFolderButton.Content" xml:space="preserve">
+    <value>फ़ोल्डर खोलें</value>
+  </data>
+  <data name="HomePage_Logs_ClearButton.Content" xml:space="preserve">
+    <value>साफ़ करें</value>
+  </data>
+  <data name="RegexPage_Title.Text" xml:space="preserve">
+    <value>Regex पैटर्न</value>
+  </data>
+  <data name="RegexPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Regex पैटर्न दर्ज करें...</value>
+  </data>
+  <data name="RegexPage_AddButton.Content" xml:space="preserve">
+    <value>जोड़ें</value>
+  </data>
+  <data name="RegexPage_RemoveButton.Content" xml:space="preserve">
+    <value>हटाएँ</value>
+  </data>
+  <data name="KeywordsPage_Title.Text" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="KeywordsPage_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>कीवर्ड दर्ज करें...</value>
+  </data>
+  <data name="KeywordsPage_CaseSensitiveCheck.Content" xml:space="preserve">
+    <value>केस संवेदनशील</value>
+  </data>
+  <data name="KeywordsPage_AddButton.Content" xml:space="preserve">
+    <value>जोड़ें</value>
+  </data>
+  <data name="KeywordsPage_RemoveButton.Content" xml:space="preserve">
+    <value>हटाएँ</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>हाँ</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>नहीं</value>
+  </data>
+  <data name="Keyword_CaseSensitiveSuffix" xml:space="preserve">
+    <value> (केस-संवेदनशील)</value>
+  </data>
+  <data name="Profile_Unnamed" xml:space="preserve">
+    <value>(नामहीन)</value>
+  </data>
+  <data name="Profile_DefaultName" xml:space="preserve">
+    <value>डिफ़ॉल्ट</value>
+  </data>
+  <data name="Profile_NewName" xml:space="preserve">
+    <value>नई प्रोफ़ाइल</value>
+  </data>
+  <data name="SettingsPage_Title.Text" xml:space="preserve">
+    <value>सेटिंग्स</value>
+  </data>
+  <data name="SettingsPage_BackButton.Content" xml:space="preserve">
+    <value>पीछे</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_Header.Header" xml:space="preserve">
+    <value>ONNX Runtime Provider</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CPU.Content" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_CUDA.Content" xml:space="preserve">
+    <value>CUDA</value>
+  </data>
+  <data name="SettingsPage_OnnxProvider_DirectML.Content" xml:space="preserve">
+    <value>DirectML</value>
+  </data>
+  <data name="SettingsPage_StartOnBoot_Header.Header" xml:space="preserve">
+    <value>Windows बूट पर प्रारंभ करें</value>
+  </data>
+  <data name="SettingsPage_MasterPassword_Header.Header" xml:space="preserve">
+    <value>मास्टर पासवर्ड</value>
+  </data>
+  <data name="SettingsPage_ChangePasswordButton.Content" xml:space="preserve">
+    <value>मास्टर पासवर्ड बदलें</value>
+  </data>
+  <data name="SettingsPage_VerboseLogging_Header.Header" xml:space="preserve">
+    <value>विस्तृत लॉगिंग</value>
+  </data>
+  <data name="SettingsPage_SaveButton.Content" xml:space="preserve">
+    <value>सेटिंग्स सहेजें</value>
+  </data>
+  <data name="SettingsPage_Language_Header.Header" xml:space="preserve">
+    <value>भाषा</value>
+  </data>
+  <data name="SettingsPage_Language_SystemDefault" xml:space="preserve">
+    <value>सिस्टम डिफ़ॉल्ट</value>
+  </data>
+  <data name="SettingsPage_Language_English" xml:space="preserve">
+    <value>अंग्रेज़ी</value>
+  </data>
+  <data name="SettingsPage_Language_German" xml:space="preserve">
+    <value>जर्मन</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Title" xml:space="preserve">
+    <value>चेतावनी</value>
+  </data>
+  <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
+    <value>विस्तृत लॉगिंग सक्षम है। लॉग में संवेदनशील डेटा शामिल हो सकता है, जिसमें मूल अनुरोध बॉडी भी शामिल है।</value>
+  </data>
+  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
+    <value>मास्टर पासवर्ड आवश्यक</value>
+  </data>
+  <data name="Dialog_UnlockButton" xml:space="preserve">
+    <value>अनलॉक करें</value>
+  </data>
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>बाहर निकलें</value>
+  </data>
+  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
+    <value>पासवर्ड दर्ज करें</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
+    <value>गलत पासवर्ड</value>
+  </data>
+  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
+    <value>आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
+    <value>बहुत अधिक प्रयास</value>
+  </data>
+  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
+    <value>पासवर्ड प्रयासों की अधिकतम सीमा पहुँच गई है। एप्लिकेशन अब बंद होगा।</value>
+  </data>
+  <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
+    <value>मास्टर पासवर्ड सेट करें</value>
+  </data>
+  <data name="Dialog_SetPasswordButton" xml:space="preserve">
+    <value>पासवर्ड सेट करें</value>
+  </data>
+  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
+    <value>पासवर्ड</value>
+  </data>
+  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
+    <value>पासवर्ड की पुष्टि करें</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
+    <value>पासवर्ड खाली नहीं हो सकता।</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
+    <value>पासवर्ड मेल नहीं खाते।</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
+    <value>मास्टर पासवर्ड सक्षम करने में विफल।</value>
+  </data>
+  <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
+    <value>मास्टर पासवर्ड अक्षम करें</value>
+  </data>
+  <data name="Dialog_DisableButton" xml:space="preserve">
+    <value>अक्षम करें</value>
+  </data>
+  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
+    <value>वर्तमान पासवर्ड</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
+    <value>गलत पासवर्ड।</value>
+  </data>
+  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
+    <value>मास्टर पासवर्ड बदलें</value>
+  </data>
+  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
+    <value>बदलें</value>
+  </data>
+  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
+    <value>नया पासवर्ड</value>
+  </data>
+  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
+    <value>नए पासवर्ड की पुष्टि करें</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
+    <value>नया पासवर्ड खाली नहीं हो सकता।</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
+    <value>नए पासवर्ड मेल नहीं खाते।</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
+    <value>सफल</value>
+  </data>
+  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
+    <value>मास्टर पासवर्ड सफलतापूर्वक बदल दिया गया।</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
+    <value>पासवर्ड बदलने में विफल। सुनिश्चित करें कि आपका वर्तमान पासवर्ड सही है।</value>
+  </data>
+  <data name="Dialog_OKButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelButton" xml:space="preserve">
+    <value>रद्द करें</value>
+  </data>
+  <data name="Dialog_RemoveButton" xml:space="preserve">
+    <value>हटाएँ</value>
+  </data>
+  <data name="Dialog_Error_Title" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="Dialog_ValidationError_Title" xml:space="preserve">
+    <value>मान्यता त्रुटि</value>
+  </data>
+  <data name="Dialog_SecurityWarning_Title" xml:space="preserve">
+    <value>सुरक्षा चेतावनी</value>
+  </data>
+  <data name="Dialog_HttpWarning_Message" xml:space="preserve">
+    <value>आप एक HTTP (अएन्क्रिप्टेड) अपस्ट्रीम URL का उपयोग कर रहे हैं। आपकी API कुंजी नेटवर्क पर प्लेनटेक्स्ट में भेजी जाएगी।</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Title" xml:space="preserve">
+    <value>प्रोफ़ाइल हटाएँ</value>
+  </data>
+  <data name="Dialog_RemoveProfile_Message" xml:space="preserve">
+    <value>क्या आप निश्चित हैं? यह कार्रवाई स्थायी है।</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Title" xml:space="preserve">
+    <value>सभी लॉग हटाएँ?</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Message" xml:space="preserve">
+    <value>यह वर्तमान लॉग फ़ाइल और सभी संग्रहीत सत्र लॉग को स्थायी रूप से हटा देगा। इसे पूर्ववत नहीं किया जा सकता।</value>
+  </data>
+  <data name="Dialog_DeleteAllLogs_Button" xml:space="preserve">
+    <value>सभी लॉग हटाएँ</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Title" xml:space="preserve">
+    <value>विस्तृत लॉगिंग सक्षम करें?</value>
+  </data>
+  <data name="Dialog_EnableVerboseLogging_Message" xml:space="preserve">
+    <value>यह पहचाने गए संवेदनशील मानों (नाम, ईमेल, फ़ोन नंबर आदि) को आपकी डिस्क पर लॉग फ़ाइल में लिखेगा। यदि अन्य लोगों के पास इस कंप्यूटर तक पहुँच है तो इसे सक्षम न करें। ऐप बंद करने पर यह सेटिंग रीसेट हो जाएगी।</value>
+  </data>
+  <data name="Dialog_EnableButton" xml:space="preserve">
+    <value>सक्षम करें</value>
+  </data>
+  <data name="Dialog_Quit_Title" xml:space="preserve">
+    <value>क्या आप निश्चित रूप से बाहर निकलना चाहते हैं?</value>
+  </data>
+  <data name="Dialog_QuitButton" xml:space="preserve">
+    <value>बाहर निकलें</value>
+  </data>
+  <data name="Dialog_Quit_Message" xml:space="preserve">
+    <value>यदि आप बाहर निकलते हैं, तो Agent Redactor API ट्रैफ़िक की निगरानी और रिडैक्शन नहीं करेगा।</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>पोर्ट 1024 और 65535 के बीच होना चाहिए।</value>
+  </data>
+  <data name="Validation_PortUsed" xml:space="preserve">
+    <value>पोर्ट {0} पहले से ही '{1}' प्रोफ़ाइल द्वारा उपयोग में है।</value>
+  </data>
+  <data name="Validation_UrlEmpty" xml:space="preserve">
+    <value>Forward To URL खाली नहीं हो सकता।</value>
+  </data>
+  <data name="Validation_UrlProtocol" xml:space="preserve">
+    <value>Forward To URL को http:// या https:// से शुरू होना चाहिए।</value>
+  </data>
+  <data name="Validation_UrlInvalid" xml:space="preserve">
+    <value>Forward To URL एक मान्य URL नहीं है।</value>
+  </data>
+  <data name="Validation_ConfidenceRange" xml:space="preserve">
+    <value>विश्वास सीमा 0.0 और 1.0 के बीच होनी चाहिए।</value>
+  </data>
+  <data name="Validation_InvalidRegex" xml:space="preserve">
+    <value>अमान्य regex सिंटैक्स: {0}</value>
+  </data>
+  <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
+    <value>अमान्य regex सिंटैक्स।</value>
+  </data>
+  <data name="TrayMenu_Open" xml:space="preserve">
+    <value>Agent Redactor खोलें</value>
+  </data>
+  <data name="TrayMenu_Language" xml:space="preserve">
+    <value>भाषा</value>
+  </data>
+  <data name="TrayMenu_Language_English" xml:space="preserve">
+    <value>अंग्रेज़ी</value>
+  </data>
+  <data name="TrayMenu_Language_German" xml:space="preserve">
+    <value>जर्मन</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Title" xml:space="preserve">
+    <value>भाषा बदल गई</value>
+  </data>
+  <data name="TrayMenu_LanguageChanged_Message" xml:space="preserve">
+    <value>नई भाषा लागू करने के लिए Agent Redactor को पुनरारंभ किया जा रहा है।</value>
+  </data>
+  <data name="TrayMenu_LanguageSame_Message" xml:space="preserve">
+    <value>यह भाषा पहले से ही सक्रिय है।</value>
+  </data>
+  <data name="TrayMenu_StartOnBoot" xml:space="preserve">
+    <value>बूट पर प्रारंभ करें</value>
+  </data>
+  <data name="TrayMenu_Quit" xml:space="preserve">
+    <value>बाहर निकलें</value>
+  </data>
+  <data name="FatalError_Caption" xml:space="preserve">
+    <value>Agent Redactor - क्रैश</value>
+  </data>
+  <data name="FatalError_Message" xml:space="preserve">
+    <value>घातक त्रुटि हुई। विवरण के लिए debug.log देखें।</value>
+  </data>
+  <data name="InitializeFailed_Caption" xml:space="preserve">
+    <value>त्रुटि</value>
+  </data>
+  <data name="InitializeFailed_Message" xml:space="preserve">
+    <value>एप्लिकेशन प्रारंभ करने में विफल।</value>
+  </data>
+  <data name="Redactor_NoPIIDetected" xml:space="preserve">
+    <value>कोई PII नहीं मिला</value>
+  </data>
+  <data name="Redactor_OnePIIItem" xml:space="preserve">
+    <value>1 PII आइटम रिडैक्ट किया गया</value>
+  </data>
+  <data name="Redactor_ManyPIIItems" xml:space="preserve">
+    <value>{0} PII आइटम रिडैक्ट किए गए</value>
+  </data>
+  <data name="MatchType_PII" xml:space="preserve">
+    <value>PII</value>
+  </data>
+  <data name="MatchType_Regex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="MatchType_Keyword" xml:space="preserve">
+    <value>कीवर्ड</value>
+  </data>
+  <data name="ProxyLog_Request" xml:space="preserve">
+    <value>अनुरोध: {0} {1}</value>
+  </data>
+  <data name="ProxyLog_PII" xml:space="preserve">
+    <value>PII: {0}</value>
+  </data>
+  <data name="ProxyLog_Regex" xml:space="preserve">
+    <value>Regex: {0}</value>
+  </data>
+  <data name="ProxyLog_Keywords" xml:space="preserve">
+    <value>कीवर्ड: {0}</value>
+  </data>
+</root>

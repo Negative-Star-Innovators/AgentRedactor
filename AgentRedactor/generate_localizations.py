@@ -27,63 +27,63 @@ from typing import Dict, List, Tuple
 # suffix: resource key suffix used for SettingsPage_Language_* and TrayMenu_Language_*
 # native: native-language name shown in the UI
 LANGUAGES: List[Dict[str, object]] = [
-    {"tag": "es-ES", "lcid": 3082, "suffix": "Spanish", "native": "Español"},
-    {"tag": "fr-FR", "lcid": 1036, "suffix": "French", "native": "Français"},
-    {"tag": "pt-PT", "lcid": 2070, "suffix": "Portuguese", "native": "Português"},
-    {"tag": "it-IT", "lcid": 1040, "suffix": "Italian", "native": "Italiano"},
-    {"tag": "da-DK", "lcid": 1030, "suffix": "Danish", "native": "Dansk"},
-    {"tag": "nl-NL", "lcid": 1043, "suffix": "Dutch", "native": "Nederlands"},
-    {"tag": "sv-SE", "lcid": 1053, "suffix": "Swedish", "native": "Svenska"},
-    {"tag": "lb-LU", "lcid": 1134, "suffix": "Luxembourgish", "native": "Lëtzebuergesch"},
-    {"tag": "nb-NO", "lcid": 1044, "suffix": "Norwegian", "native": "Norsk bokmål"},
-    {"tag": "fi-FI", "lcid": 1035, "suffix": "Finnish", "native": "Suomi"},
-    {"tag": "ru-RU", "lcid": 1049, "suffix": "Russian", "native": "Русский"},
-    {"tag": "hr-HR", "lcid": 1050, "suffix": "Croatian", "native": "Hrvatski"},
-    {"tag": "el-GR", "lcid": 1032, "suffix": "Greek", "native": "Ελληνικά"},
-    {"tag": "sl-SI", "lcid": 1060, "suffix": "Slovenian", "native": "Slovenščina"},
-    {"tag": "sr-Latn-RS", "lcid": 9246, "suffix": "Serbian", "native": "Srpski"},
-    {"tag": "uk-UA", "lcid": 1058, "suffix": "Ukrainian", "native": "Українська"},
-    {"tag": "sq-AL", "lcid": 1052, "suffix": "Albanian", "native": "Shqip"},
-    {"tag": "lv-LV", "lcid": 1062, "suffix": "Latvian", "native": "Latviešu"},
-    {"tag": "hy-AM", "lcid": 1067, "suffix": "Armenian", "native": "Հայերեն"},
-    {"tag": "cs-CZ", "lcid": 1029, "suffix": "Czech", "native": "Čeština"},
-    {"tag": "et-EE", "lcid": 1061, "suffix": "Estonian", "native": "Eesti"},
-    {"tag": "sk-SK", "lcid": 1051, "suffix": "Slovak", "native": "Slovenčina"},
-    {"tag": "bg-BG", "lcid": 1026, "suffix": "Bulgarian", "native": "Български"},
-    {"tag": "ka-GE", "lcid": 1079, "suffix": "Georgian", "native": "ქართული"},
-    {"tag": "hu-HU", "lcid": 1038, "suffix": "Hungarian", "native": "Magyar"},
-    {"tag": "pl-PL", "lcid": 1045, "suffix": "Polish", "native": "Polski"},
-    {"tag": "ro-RO", "lcid": 1048, "suffix": "Romanian", "native": "Română"},
-    {"tag": "lt-LT", "lcid": 1063, "suffix": "Lithuanian", "native": "Lietuvių"},
-    {"tag": "is-IS", "lcid": 1039, "suffix": "Icelandic", "native": "Íslenska"},
+    {"tag": "es", "lcid": 3082, "suffix": "Spanish", "native": "Español"},
+    {"tag": "fr", "lcid": 1036, "suffix": "French", "native": "Français"},
+    {"tag": "pt", "lcid": 2070, "suffix": "Portuguese", "native": "Português"},
+    {"tag": "it", "lcid": 1040, "suffix": "Italian", "native": "Italiano"},
+    {"tag": "da", "lcid": 1030, "suffix": "Danish", "native": "Dansk"},
+    {"tag": "nl", "lcid": 1043, "suffix": "Dutch", "native": "Nederlands"},
+    {"tag": "sv", "lcid": 1053, "suffix": "Swedish", "native": "Svenska"},
+    {"tag": "lb", "lcid": 1134, "suffix": "Luxembourgish", "native": "Lëtzebuergesch"},
+    {"tag": "nb", "lcid": 1044, "suffix": "Norwegian", "native": "Norsk bokmål"},
+    {"tag": "fi", "lcid": 1035, "suffix": "Finnish", "native": "Suomi"},
+    {"tag": "ru", "lcid": 1049, "suffix": "Russian", "native": "Русский"},
+    {"tag": "hr", "lcid": 1050, "suffix": "Croatian", "native": "Hrvatski"},
+    {"tag": "el", "lcid": 1032, "suffix": "Greek", "native": "Ελληνικά"},
+    {"tag": "sl", "lcid": 1060, "suffix": "Slovenian", "native": "Slovenščina"},
+    {"tag": "sr-Latn", "lcid": 9246, "suffix": "Serbian", "native": "Srpski"},
+    {"tag": "uk", "lcid": 1058, "suffix": "Ukrainian", "native": "Українська"},
+    {"tag": "sq", "lcid": 1052, "suffix": "Albanian", "native": "Shqip"},
+    {"tag": "lv", "lcid": 1062, "suffix": "Latvian", "native": "Latviešu"},
+    {"tag": "hy", "lcid": 1067, "suffix": "Armenian", "native": "Հայերեն"},
+    {"tag": "cs", "lcid": 1029, "suffix": "Czech", "native": "Čeština"},
+    {"tag": "et", "lcid": 1061, "suffix": "Estonian", "native": "Eesti"},
+    {"tag": "sk", "lcid": 1051, "suffix": "Slovak", "native": "Slovenčina"},
+    {"tag": "bg", "lcid": 1026, "suffix": "Bulgarian", "native": "Български"},
+    {"tag": "ka", "lcid": 1079, "suffix": "Georgian", "native": "ქართული"},
+    {"tag": "hu", "lcid": 1038, "suffix": "Hungarian", "native": "Magyar"},
+    {"tag": "pl", "lcid": 1045, "suffix": "Polish", "native": "Polski"},
+    {"tag": "ro", "lcid": 1048, "suffix": "Romanian", "native": "Română"},
+    {"tag": "lt", "lcid": 1063, "suffix": "Lithuanian", "native": "Lietuvių"},
+    {"tag": "is", "lcid": 1039, "suffix": "Icelandic", "native": "Íslenska"},
     {"tag": "zh-CN", "lcid": 2052, "suffix": "ChineseSimplified", "native": "简体中文"},
     {"tag": "zh-TW", "lcid": 1028, "suffix": "ChineseTraditional", "native": "繁體中文"},
-    {"tag": "ja-JP", "lcid": 1041, "suffix": "Japanese", "native": "日本語"},
-    {"tag": "ko-KR", "lcid": 1042, "suffix": "Korean", "native": "한국어"},
-    {"tag": "mt-MT", "lcid": 1082, "suffix": "Maltese", "native": "Malti"},
-    {"tag": "hi-IN", "lcid": 1081, "suffix": "Hindi", "native": "हिन्दी"},
-    {"tag": "ta-IN", "lcid": 1097, "suffix": "Tamil", "native": "தமிழ்"},
-    {"tag": "vi-VN", "lcid": 1066, "suffix": "Vietnamese", "native": "Tiếng Việt"},
-    {"tag": "sw-KE", "lcid": 1089, "suffix": "Kiswahili", "native": "Kiswahili"},
-    {"tag": "af-ZA", "lcid": 1078, "suffix": "Afrikaans", "native": "Afrikaans"},
-    {"tag": "he-IL", "lcid": 1037, "suffix": "Hebrew", "native": "עברית"},
-    {"tag": "id-ID", "lcid": 1057, "suffix": "Indonesian", "native": "Bahasa Indonesia"},
-    {"tag": "fil-PH", "lcid": 1124, "suffix": "Filipino", "native": "Filipino"},
-    {"tag": "ig-NG", "lcid": 1136, "suffix": "Igbo", "native": "Igbo"},
-    {"tag": "th-TH", "lcid": 1054, "suffix": "Thai", "native": "ไทย"},
-    {"tag": "tr-TR", "lcid": 1055, "suffix": "Turkish", "native": "Türkçe"},
-    {"tag": "ur-PK", "lcid": 1056, "suffix": "Urdu", "native": "اردو"},
-    {"tag": "ar-SA", "lcid": 1025, "suffix": "Arabic", "native": "العربية"},
-    {"tag": "ms-MY", "lcid": 1086, "suffix": "Malay", "native": "Bahasa Melayu"},
-    {"tag": "az-Latn-AZ", "lcid": 1068, "suffix": "Azerbaijani", "native": "Azərbaycan dili"},
-    {"tag": "kk-KZ", "lcid": 1087, "suffix": "Kazakh", "native": "Қазақ тілі"},
-    {"tag": "ha-Latn-NG", "lcid": 1128, "suffix": "Hausa", "native": "Hausa"},
+    {"tag": "ja", "lcid": 1041, "suffix": "Japanese", "native": "日本語"},
+    {"tag": "ko", "lcid": 1042, "suffix": "Korean", "native": "한국어"},
+    {"tag": "mt", "lcid": 1082, "suffix": "Maltese", "native": "Malti"},
+    {"tag": "hi", "lcid": 1081, "suffix": "Hindi", "native": "हिन्दी"},
+    {"tag": "ta", "lcid": 1097, "suffix": "Tamil", "native": "தமிழ்"},
+    {"tag": "vi", "lcid": 1066, "suffix": "Vietnamese", "native": "Tiếng Việt"},
+    {"tag": "sw", "lcid": 1089, "suffix": "Kiswahili", "native": "Kiswahili"},
+    {"tag": "af", "lcid": 1078, "suffix": "Afrikaans", "native": "Afrikaans"},
+    {"tag": "he", "lcid": 1037, "suffix": "Hebrew", "native": "עברית"},
+    {"tag": "id", "lcid": 1057, "suffix": "Indonesian", "native": "Bahasa Indonesia"},
+    {"tag": "fil", "lcid": 1124, "suffix": "Filipino", "native": "Filipino"},
+    {"tag": "ig", "lcid": 1136, "suffix": "Igbo", "native": "Igbo"},
+    {"tag": "th", "lcid": 1054, "suffix": "Thai", "native": "ไทย"},
+    {"tag": "tr", "lcid": 1055, "suffix": "Turkish", "native": "Türkçe"},
+    {"tag": "ur", "lcid": 1056, "suffix": "Urdu", "native": "اردو"},
+    {"tag": "ar", "lcid": 1025, "suffix": "Arabic", "native": "العربية"},
+    {"tag": "ms", "lcid": 1086, "suffix": "Malay", "native": "Bahasa Melayu"},
+    {"tag": "az-Latn", "lcid": 1068, "suffix": "Azerbaijani", "native": "Azərbaycan dili"},
+    {"tag": "kk", "lcid": 1087, "suffix": "Kazakh", "native": "Қазақ тілі"},
+    {"tag": "ha-Latn", "lcid": 1128, "suffix": "Hausa", "native": "Hausa"},
 
 ]
 
-# Existing German is regenerated from the current de-DE Resources.resw so it
+# Existing German is regenerated from the current de Resources.resw so it
 # stays in sync with the master English file.
-GERMAN_TAG = "de-DE"
+GERMAN_TAG = "de"
 GERMAN_LCID = 1031
 
 
@@ -179,8 +179,8 @@ COPY_AS_IS = {
 LANG_TRANSLATIONS: Dict[str, Dict[str, str]] = {}
 
 
-# Spanish (es-ES)
-LANG_TRANSLATIONS["es-ES"] = {
+# Spanish (es)
+LANG_TRANSLATIONS["es"] = {
     "Profiles": "Perfiles",
     "Add": "Agregar",
     "Remove": "Eliminar",
@@ -335,8 +335,8 @@ LANG_TRANSLATIONS["es-ES"] = {
     "Port {0} is already used by profile '{1}'.": "El puerto {0} ya lo utiliza el perfil '{1}'.",
 }
 
-# French (fr-FR)
-LANG_TRANSLATIONS["fr-FR"] = {
+# French (fr)
+LANG_TRANSLATIONS["fr"] = {
     "Profiles": "Profils",
     "Add": "Ajouter",
     "Remove": "Supprimer",
@@ -491,8 +491,8 @@ LANG_TRANSLATIONS["fr-FR"] = {
     "Port {0} is already used by profile '{1}'.": "Le port {0} est déjà utilisé par le profil '{1}'.",
 }
 
-# Portuguese (pt-PT)
-LANG_TRANSLATIONS["pt-PT"] = {
+# Portuguese (pt)
+LANG_TRANSLATIONS["pt"] = {
     "Profiles": "Perfis",
     "Add": "Adicionar",
     "Remove": "Remover",
@@ -647,8 +647,8 @@ LANG_TRANSLATIONS["pt-PT"] = {
     "Port {0} is already used by profile '{1}'.": "A porta {0} já está a ser utilizada pelo perfil '{1}'.",
 }
 
-# Italian (it-IT)
-LANG_TRANSLATIONS["it-IT"] = {
+# Italian (it)
+LANG_TRANSLATIONS["it"] = {
     "Profiles": "Profili",
     "Add": "Aggiungi",
     "Remove": "Rimuovi",
@@ -803,8 +803,8 @@ LANG_TRANSLATIONS["it-IT"] = {
     "Port {0} is already used by profile '{1}'.": "La porta {0} è già utilizzata dal profilo '{1}'.",
 }
 
-# Danish (da-DK)
-LANG_TRANSLATIONS["da-DK"] = {
+# Danish (da)
+LANG_TRANSLATIONS["da"] = {
     "Profiles": "Profiler",
     "Add": "Tilføj",
     "Remove": "Fjern",
@@ -959,8 +959,8 @@ LANG_TRANSLATIONS["da-DK"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} bruges allerede af profilen '{1}'.",
 }
 
-# Dutch (nl-NL)
-LANG_TRANSLATIONS["nl-NL"] = {
+# Dutch (nl)
+LANG_TRANSLATIONS["nl"] = {
     "Profiles": "Profielen",
     "Add": "Toevoegen",
     "Remove": "Verwijderen",
@@ -1115,8 +1115,8 @@ LANG_TRANSLATIONS["nl-NL"] = {
     "Port {0} is already used by profile '{1}'.": "Poort {0} wordt al gebruikt door profiel '{1}'.",
 }
 
-# Swedish (sv-SE)
-LANG_TRANSLATIONS["sv-SE"] = {
+# Swedish (sv)
+LANG_TRANSLATIONS["sv"] = {
     "Profiles": "Profiler",
     "Add": "Lägg till",
     "Remove": "Ta bort",
@@ -1271,8 +1271,8 @@ LANG_TRANSLATIONS["sv-SE"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} används redan av profilen '{1}'.",
 }
 
-# Luxembourgish (lb-LU)
-LANG_TRANSLATIONS["lb-LU"] = {
+# Luxembourgish (lb)
+LANG_TRANSLATIONS["lb"] = {
     "Profiles": "Profiller",
     "Add": "Dobäisetzen",
     "Remove": "Ewechhuelen",
@@ -1427,8 +1427,8 @@ LANG_TRANSLATIONS["lb-LU"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} gëtt scho vum Profil '{1}' benotzt.",
 }
 
-# Norwegian Bokmål (nb-NO)
-LANG_TRANSLATIONS["nb-NO"] = {
+# Norwegian Bokmål (nb)
+LANG_TRANSLATIONS["nb"] = {
     "Profiles": "Profiler",
     "Add": "Legg til",
     "Remove": "Fjern",
@@ -1583,8 +1583,8 @@ LANG_TRANSLATIONS["nb-NO"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} er allerede i bruk av profilen '{1}'.",
 }
 
-# Finnish (fi-FI)
-LANG_TRANSLATIONS["fi-FI"] = {
+# Finnish (fi)
+LANG_TRANSLATIONS["fi"] = {
     "Profiles": "Profiilit",
     "Add": "Lisää",
     "Remove": "Poista",
@@ -1739,8 +1739,8 @@ LANG_TRANSLATIONS["fi-FI"] = {
     "Port {0} is already used by profile '{1}'.": "Portti {0} on jo profiilin '{1}' käytössä.",
 }
 
-# Russian (ru-RU)
-LANG_TRANSLATIONS["ru-RU"] = {
+# Russian (ru)
+LANG_TRANSLATIONS["ru"] = {
     "Profiles": "Профили",
     "Add": "Добавить",
     "Remove": "Удалить",
@@ -1895,8 +1895,8 @@ LANG_TRANSLATIONS["ru-RU"] = {
     "Port {0} is already used by profile '{1}'.": "Порт {0} уже используется профилем '{1}'.",
 }
 
-# Ukrainian (uk-UA)
-LANG_TRANSLATIONS["uk-UA"] = {
+# Ukrainian (uk)
+LANG_TRANSLATIONS["uk"] = {
     "Profiles": "Профілі",
     "Add": "Додати",
     "Remove": "Видалити",
@@ -2051,8 +2051,8 @@ LANG_TRANSLATIONS["uk-UA"] = {
     "Port {0} is already used by profile '{1}'.": "Порт {0} уже використовується профілем '{1}'.",
 }
 
-# Bulgarian (bg-BG)
-LANG_TRANSLATIONS["bg-BG"] = {
+# Bulgarian (bg)
+LANG_TRANSLATIONS["bg"] = {
     "Profiles": "Профили",
     "Add": "Добавяне",
     "Remove": "Премахване",
@@ -2207,8 +2207,8 @@ LANG_TRANSLATIONS["bg-BG"] = {
     "Port {0} is already used by profile '{1}'.": "Порт {0} вече се използва от профил '{1}'.",
 }
 
-# Serbian Latin (sr-Latn-RS)
-LANG_TRANSLATIONS["sr-Latn-RS"] = {
+# Serbian Latin (sr-Latn)
+LANG_TRANSLATIONS["sr-Latn"] = {
     "Profiles": "Profili",
     "Add": "Dodaj",
     "Remove": "Ukloni",
@@ -2363,8 +2363,8 @@ LANG_TRANSLATIONS["sr-Latn-RS"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} već koristi profil '{1}'.",
 }
 
-# Croatian (hr-HR)
-LANG_TRANSLATIONS["hr-HR"] = {
+# Croatian (hr)
+LANG_TRANSLATIONS["hr"] = {
     "Profiles": "Profili",
     "Add": "Dodaj",
     "Remove": "Ukloni",
@@ -2519,8 +2519,8 @@ LANG_TRANSLATIONS["hr-HR"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} već koristi profil '{1}'.",
 }
 
-# Slovenian (sl-SI)
-LANG_TRANSLATIONS["sl-SI"] = {
+# Slovenian (sl)
+LANG_TRANSLATIONS["sl"] = {
     "Profiles": "Profili",
     "Add": "Dodaj",
     "Remove": "Odstrani",
@@ -2675,8 +2675,8 @@ LANG_TRANSLATIONS["sl-SI"] = {
     "Port {0} is already used by profile '{1}'.": "Vrata {0} že uporablja profil '{1}'.",
 }
 
-# Greek (el-GR)
-LANG_TRANSLATIONS["el-GR"] = {
+# Greek (el)
+LANG_TRANSLATIONS["el"] = {
     "Profiles": "Προφίλ",
     "Add": "Προσθήκη",
     "Remove": "Αφαίρεση",
@@ -2831,8 +2831,8 @@ LANG_TRANSLATIONS["el-GR"] = {
     "Port {0} is already used by profile '{1}'.": "Η θύρα {0} χρησιμοποιείται ήδη από το προφίλ '{1}'.",
 }
 
-# Albanian (sq-AL)
-LANG_TRANSLATIONS["sq-AL"] = {
+# Albanian (sq)
+LANG_TRANSLATIONS["sq"] = {
     "Profiles": "Profilet",
     "Add": "Shto",
     "Remove": "Hiq",
@@ -2987,8 +2987,8 @@ LANG_TRANSLATIONS["sq-AL"] = {
     "Port {0} is already used by profile '{1}'.": "Porti {0} është tashmë në përdorim nga profili '{1}'.",
 }
 
-# Latvian (lv-LV)
-LANG_TRANSLATIONS["lv-LV"] = {
+# Latvian (lv)
+LANG_TRANSLATIONS["lv"] = {
     "Profiles": "Profili",
     "Add": "Pievienot",
     "Remove": "Noņemt",
@@ -3143,8 +3143,8 @@ LANG_TRANSLATIONS["lv-LV"] = {
     "Port {0} is already used by profile '{1}'.": "Ports {0} jau izmanto profils '{1}'.",
 }
 
-# Armenian (hy-AM)
-LANG_TRANSLATIONS["hy-AM"] = {
+# Armenian (hy)
+LANG_TRANSLATIONS["hy"] = {
     "Profiles": "Պրոֆիլներ",
     "Add": "Ավելացնել",
     "Remove": "Հեռացնել",
@@ -3299,8 +3299,8 @@ LANG_TRANSLATIONS["hy-AM"] = {
     "Port {0} is already used by profile '{1}'.": "{0} պորտն արդեն օգտագործվում է '{1}' պրոֆիլի կողմից:",
 }
 
-# Czech (cs-CZ)
-LANG_TRANSLATIONS["cs-CZ"] = {
+# Czech (cs)
+LANG_TRANSLATIONS["cs"] = {
     "Profiles": "Profily",
     "Add": "Přidat",
     "Remove": "Odebrat",
@@ -3455,8 +3455,8 @@ LANG_TRANSLATIONS["cs-CZ"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} již používá profil '{1}'.",
 }
 
-# Estonian (et-EE)
-LANG_TRANSLATIONS["et-EE"] = {
+# Estonian (et)
+LANG_TRANSLATIONS["et"] = {
     "Profiles": "Profiilid",
     "Add": "Lisa",
     "Remove": "Eemalda",
@@ -3611,8 +3611,8 @@ LANG_TRANSLATIONS["et-EE"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} on juba profiili '{1}' kasutuses.",
 }
 
-# Slovak (sk-SK)
-LANG_TRANSLATIONS["sk-SK"] = {
+# Slovak (sk)
+LANG_TRANSLATIONS["sk"] = {
     "Profiles": "Profily",
     "Add": "Pridať",
     "Remove": "Odstrániť",
@@ -3767,8 +3767,8 @@ LANG_TRANSLATIONS["sk-SK"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} už používa profil '{1}'.",
 }
 
-# Georgian (ka-GE)
-LANG_TRANSLATIONS["ka-GE"] = {
+# Georgian (ka)
+LANG_TRANSLATIONS["ka"] = {
     "Profiles": "პროფილები",
     "Add": "დამატება",
     "Remove": "წაშლა",
@@ -3923,8 +3923,8 @@ LANG_TRANSLATIONS["ka-GE"] = {
     "Port {0} is already used by profile '{1}'.": "პორტი {0} უკვე გამოიყენება პროფილის მიერ '{1}'.",
 }
 
-# Hungarian (hu-HU)
-LANG_TRANSLATIONS["hu-HU"] = {
+# Hungarian (hu)
+LANG_TRANSLATIONS["hu"] = {
     "Profiles": "Profilok",
     "Add": "Hozzáadás",
     "Remove": "Eltávolítás",
@@ -4079,8 +4079,8 @@ LANG_TRANSLATIONS["hu-HU"] = {
     "Port {0} is already used by profile '{1}'.": "A(z) {0} portot már használja a(z) '{1}' profil.",
 }
 
-# Polish (pl-PL)
-LANG_TRANSLATIONS["pl-PL"] = {
+# Polish (pl)
+LANG_TRANSLATIONS["pl"] = {
     "Profiles": "Profile",
     "Add": "Dodaj",
     "Remove": "Usuń",
@@ -4235,8 +4235,8 @@ LANG_TRANSLATIONS["pl-PL"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} jest już używany przez profil '{1}'.",
 }
 
-# Romanian (ro-RO)
-LANG_TRANSLATIONS["ro-RO"] = {
+# Romanian (ro)
+LANG_TRANSLATIONS["ro"] = {
     "Profiles": "Profiluri",
     "Add": "Adaugă",
     "Remove": "Elimină",
@@ -4391,8 +4391,8 @@ LANG_TRANSLATIONS["ro-RO"] = {
     "Port {0} is already used by profile '{1}'.": "Portul {0} este deja utilizat de profilul '{1}'.",
 }
 
-# Lithuanian (lt-LT)
-LANG_TRANSLATIONS["lt-LT"] = {
+# Lithuanian (lt)
+LANG_TRANSLATIONS["lt"] = {
     "Profiles": "Profiliai",
     "Add": "Pridėti",
     "Remove": "Pašalinti",
@@ -4547,8 +4547,8 @@ LANG_TRANSLATIONS["lt-LT"] = {
     "Port {0} is already used by profile '{1}'.": "Jungtis {0} jau naudojama profilio '{1}'.",
 }
 
-# Icelandic (is-IS)
-LANG_TRANSLATIONS["is-IS"] = {
+# Icelandic (is)
+LANG_TRANSLATIONS["is"] = {
     "Profiles": "Prófílar",
     "Add": "Bæta við",
     "Remove": "Fjarlægja",
@@ -4707,7 +4707,7 @@ LANG_TRANSLATIONS["is-IS"] = {
 # Review before inserting.
 
 
-LANG_TRANSLATIONS["ar-SA"] = {
+LANG_TRANSLATIONS["ar"] = {
     " (case-sensitive)": "(حساسية الموضوع)",
     "(unnamed)": "(غير مسمى)",
     "1 PII item redacted": "تم تنقيح عنصر واحد من معلومات تحديد الهوية الشخصية (PII).",
@@ -4861,7 +4861,7 @@ LANG_TRANSLATIONS["ar-SA"] = {
 }
 
 
-LANG_TRANSLATIONS["ms-MY"] = {
+LANG_TRANSLATIONS["ms"] = {
     " (case-sensitive)": "(sensitif huruf besar-kecil)",
     "(unnamed)": "(tidak bernama)",
     "1 PII item redacted": "1 item PII disunting",
@@ -5015,7 +5015,7 @@ LANG_TRANSLATIONS["ms-MY"] = {
 }
 
 
-LANG_TRANSLATIONS["az-Latn-AZ"] = {
+LANG_TRANSLATIONS["az-Latn"] = {
     " (case-sensitive)": "(həssas hərf)",
     "(unnamed)": "(adsız)",
     "1 PII item redacted": "1 PII elementi redaktə edildi",
@@ -5169,7 +5169,7 @@ LANG_TRANSLATIONS["az-Latn-AZ"] = {
 }
 
 
-LANG_TRANSLATIONS["kk-KZ"] = {
+LANG_TRANSLATIONS["kk"] = {
     " (case-sensitive)": "(регистрді ескеретін)",
     "(unnamed)": "(аты жоқ)",
     "1 PII item redacted": "1 PII элементі түзетілді",
@@ -5323,7 +5323,7 @@ LANG_TRANSLATIONS["kk-KZ"] = {
 }
 
 
-LANG_TRANSLATIONS["ha-Latn-NG"] = {
+LANG_TRANSLATIONS["ha-Latn"] = {
     " (case-sensitive)": "(mai hankali)",
     "(unnamed)": "(ba a ambaci suna ba)",
     "1 PII item redacted": "An sake gyara abu 1 PII",
@@ -5809,8 +5809,8 @@ LANG_TRANSLATIONS["zh-TW"] = {
     "Port {0} is already used by profile '{1}'.": "連接埠 {0} 已被設定檔「{1}」使用。",
 }
 
-# Japanese (ja-JP)
-LANG_TRANSLATIONS["ja-JP"] = {
+# Japanese (ja)
+LANG_TRANSLATIONS["ja"] = {
     "Profiles": "プロファイル",
     "Add": "追加",
     "Remove": "削除",
@@ -5963,8 +5963,8 @@ LANG_TRANSLATIONS["ja-JP"] = {
     "Port {0} is already used by profile '{1}'.": "ポート {0} はプロファイル「{1}」によって使用されています。",
 }
 
-# Korean (ko-KR)
-LANG_TRANSLATIONS["ko-KR"] = {
+# Korean (ko)
+LANG_TRANSLATIONS["ko"] = {
     "Profiles": "프로필",
     "Add": "추가",
     "Remove": "제거",
@@ -6117,8 +6117,8 @@ LANG_TRANSLATIONS["ko-KR"] = {
     "Port {0} is already used by profile '{1}'.": "포트 {0}은(는) '{1}' 프로필에서 이미 사용 중입니다.",
 }
 
-# Maltese (mt-MT)
-LANG_TRANSLATIONS["mt-MT"] = {
+# Maltese (mt)
+LANG_TRANSLATIONS["mt"] = {
     "Profiles": "Profili",
     "Add": "Żid",
     "Remove": "Neħħi",
@@ -6271,8 +6271,8 @@ LANG_TRANSLATIONS["mt-MT"] = {
     "Port {0} is already used by profile '{1}'.": "Il-port {0} diġà qed jintuża mill-profil '{1}'.",
 }
 
-# Hindi (hi-IN)
-LANG_TRANSLATIONS["hi-IN"] = {
+# Hindi (hi)
+LANG_TRANSLATIONS["hi"] = {
     "Profiles": "प्रोफ़ाइल",
     "Add": "जोड़ें",
     "Remove": "हटाएँ",
@@ -6425,8 +6425,8 @@ LANG_TRANSLATIONS["hi-IN"] = {
     "Port {0} is already used by profile '{1}'.": "पोर्ट {0} पहले से ही '{1}' प्रोफ़ाइल द्वारा उपयोग में है।",
 }
 
-# Tamil (ta-IN)
-LANG_TRANSLATIONS["ta-IN"] = {
+# Tamil (ta)
+LANG_TRANSLATIONS["ta"] = {
     "Profiles": "சுயவிவரங்கள்",
     "Add": "சேர்",
     "Remove": "அகற்று",
@@ -6579,8 +6579,8 @@ LANG_TRANSLATIONS["ta-IN"] = {
     "Port {0} is already used by profile '{1}'.": "போர்ட் {0} ஏற்கனவே '{1}' சுயவிவரத்தால் பயன்படுத்தப்படுகிறது.",
 }
 
-# Vietnamese (vi-VN)
-LANG_TRANSLATIONS["vi-VN"] = {
+# Vietnamese (vi)
+LANG_TRANSLATIONS["vi"] = {
     "Profiles": "Hồ sơ",
     "Add": "Thêm",
     "Remove": "Xóa",
@@ -6733,8 +6733,8 @@ LANG_TRANSLATIONS["vi-VN"] = {
     "Port {0} is already used by profile '{1}'.": "Cổng {0} đã được hồ sơ '{1}' sử dụng.",
 }
 
-# Kiswahili (sw-KE)
-LANG_TRANSLATIONS["sw-KE"] = {
+# Kiswahili (sw)
+LANG_TRANSLATIONS["sw"] = {
     "Profiles": "Wasifu",
     "Add": "Ongeza",
     "Remove": "Ondoa",
@@ -6887,8 +6887,8 @@ LANG_TRANSLATIONS["sw-KE"] = {
     "Port {0} is already used by profile '{1}'.": "Bandari {0} tayari inatumika na wasifu '{1}'.",
 }
 
-# Afrikaans (af-ZA)
-LANG_TRANSLATIONS["af-ZA"] = {
+# Afrikaans (af)
+LANG_TRANSLATIONS["af"] = {
     "Profiles": "Profiele",
     "Add": "Voeg by",
     "Remove": "Verwyder",
@@ -7041,8 +7041,8 @@ LANG_TRANSLATIONS["af-ZA"] = {
     "Port {0} is already used by profile '{1}'.": "Poort {0} word reeds deur profiel '{1}' gebruik.",
 }
 
-# Hebrew (he-IL)
-LANG_TRANSLATIONS["he-IL"] = {
+# Hebrew (he)
+LANG_TRANSLATIONS["he"] = {
     "Profiles": "פרופילים",
     "Add": "הוסף",
     "Remove": "הסר",
@@ -7195,8 +7195,8 @@ LANG_TRANSLATIONS["he-IL"] = {
     "Port {0} is already used by profile '{1}'.": "פורט {0} כבר נמצא בשימוש על ידי הפרופיל '{1}'.",
 }
 
-# Indonesian (id-ID)
-LANG_TRANSLATIONS["id-ID"] = {
+# Indonesian (id)
+LANG_TRANSLATIONS["id"] = {
     "Profiles": "Profil",
     "Add": "Tambah",
     "Remove": "Hapus",
@@ -7349,8 +7349,8 @@ LANG_TRANSLATIONS["id-ID"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} sudah digunakan oleh profil '{1}'.",
 }
 
-# Filipino (fil-PH)
-LANG_TRANSLATIONS["fil-PH"] = {
+# Filipino (fil)
+LANG_TRANSLATIONS["fil"] = {
     "Profiles": "Mga Profile",
     "Add": "Idagdag",
     "Remove": "Alisin",
@@ -7503,8 +7503,8 @@ LANG_TRANSLATIONS["fil-PH"] = {
     "Port {0} is already used by profile '{1}'.": "Ang port {0} ay ginagamit na ng profile '{1}'.",
 }
 
-# Igbo (ig-NG)
-LANG_TRANSLATIONS["ig-NG"] = {
+# Igbo (ig)
+LANG_TRANSLATIONS["ig"] = {
     "Profiles": "Profaịlụ",
     "Add": "Tinye",
     "Remove": "Wepụ",
@@ -7657,8 +7657,8 @@ LANG_TRANSLATIONS["ig-NG"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} ọ na-arụ ọrụ site na profaịlụ '{1}'.",
 }
 
-# Thai (th-TH)
-LANG_TRANSLATIONS["th-TH"] = {
+# Thai (th)
+LANG_TRANSLATIONS["th"] = {
     "Profiles": "โปรไฟล์",
     "Add": "เพิ่ม",
     "Remove": "ลบ",
@@ -7811,8 +7811,8 @@ LANG_TRANSLATIONS["th-TH"] = {
     "Port {0} is already used by profile '{1}'.": "พอร์ต {0} ถูกใช้โดยโปรไฟล์ '{1}' แล้ว",
 }
 
-# Turkish (tr-TR)
-LANG_TRANSLATIONS["tr-TR"] = {
+# Turkish (tr)
+LANG_TRANSLATIONS["tr"] = {
     "Profiles": "Profiller",
     "Add": "Ekle",
     "Remove": "Kaldır",
@@ -7965,8 +7965,8 @@ LANG_TRANSLATIONS["tr-TR"] = {
     "Port {0} is already used by profile '{1}'.": "Port {0} zaten '{1}' profili tarafından kullanılıyor.",
 }
 
-# Urdu (ur-PK)
-LANG_TRANSLATIONS["ur-PK"] = {
+# Urdu (ur)
+LANG_TRANSLATIONS["ur"] = {
     "Profiles": "پروفائلز",
     "Add": "شامل کریں",
     "Remove": "ہٹائیں",
@@ -8195,91 +8195,91 @@ def generate_wxl(
 
 # Installer-only string translations (not present in .resw files).
 WXL_TRANSLATIONS: Dict[str, Dict[str, str]] = {
-    "es-ES": {
+    "es": {
         "A newer version of [ProductName] is already installed.": "Ya está instalada una versión más reciente de [ProductName].",
     },
-    "fr-FR": {
+    "fr": {
         "A newer version of [ProductName] is already installed.": "Une version plus récente de [ProductName] est déjà installée.",
     },
-    "pt-PT": {
+    "pt": {
         "A newer version of [ProductName] is already installed.": "Já está instalada uma versão mais recente do [ProductName].",
     },
-    "it-IT": {
+    "it": {
         "A newer version of [ProductName] is already installed.": "È già installata una versione più recente di [ProductName].",
     },
-    "da-DK": {
+    "da": {
         "A newer version of [ProductName] is already installed.": "En nyere version af [ProductName] er allerede installeret.",
     },
-    "nl-NL": {
+    "nl": {
         "A newer version of [ProductName] is already installed.": "Een nieuwere versie van [ProductName] is al geïnstalleerd.",
     },
-    "sv-SE": {
+    "sv": {
         "A newer version of [ProductName] is already installed.": "En nyare version av [ProductName] är redan installerad.",
     },
-    "lb-LU": {
+    "lb": {
         "A newer version of [ProductName] is already installed.": "Eng méi rezent Versioun vu [ProductName] ass scho installéiert.",
     },
-    "nb-NO": {
+    "nb": {
         "A newer version of [ProductName] is already installed.": "En nyere versjon av [ProductName] er allerede installert.",
     },
-    "fi-FI": {
+    "fi": {
         "A newer version of [ProductName] is already installed.": "Uudempi versio [ProductName]-sovelluksesta on jo asennettu.",
     },
-    "ru-RU": {
+    "ru": {
         "A newer version of [ProductName] is already installed.": "Более новая версия [ProductName] уже установлена.",
     },
-    "hr-HR": {
+    "hr": {
         "A newer version of [ProductName] is already installed.": "Novija verzija [ProductName] je već instalirana.",
     },
-    "el-GR": {
+    "el": {
         "A newer version of [ProductName] is already installed.": "Μια νεότερη έκδοση του [ProductName] είναι ήδη εγκατεστημένη.",
     },
-    "sl-SI": {
+    "sl": {
         "A newer version of [ProductName] is already installed.": "Novejša različica [ProductName] je že nameščena.",
     },
-    "sr-Latn-RS": {
+    "sr-Latn": {
         "A newer version of [ProductName] is already installed.": "Novija verzija [ProductName] je već instalirana.",
     },
-    "uk-UA": {
+    "uk": {
         "A newer version of [ProductName] is already installed.": "Новіша версія [ProductName] уже встановлена.",
     },
-    "sq-AL": {
+    "sq": {
         "A newer version of [ProductName] is already installed.": "Një version më i ri i [ProductName] është tashmë i instaluar.",
     },
-    "lv-LV": {
+    "lv": {
         "A newer version of [ProductName] is already installed.": "Jaunāka [ProductName] versija jau ir instalēta.",
     },
-    "hy-AM": {
+    "hy": {
         "A newer version of [ProductName] is already installed.": "[ProductName]-ի ավելի նոր տարբերակը արդեն տեղադրված է:",
     },
-    "cs-CZ": {
+    "cs": {
         "A newer version of [ProductName] is already installed.": "Je již nainstalována novější verze [ProductName].",
     },
-    "et-EE": {
+    "et": {
         "A newer version of [ProductName] is already installed.": "Uuem versioon [ProductName]-st on juba installitud.",
     },
-    "sk-SK": {
+    "sk": {
         "A newer version of [ProductName] is already installed.": "Novšia verzia [ProductName] je už nainštalovaná.",
     },
-    "bg-BG": {
+    "bg": {
         "A newer version of [ProductName] is already installed.": "Вече е инсталирана по-нова версия на [ProductName].",
     },
-    "ka-GE": {
+    "ka": {
         "A newer version of [ProductName] is already installed.": "[ProductName]-ის უფრო ახალი ვერსია უკვე დაყენებულია.",
     },
-    "hu-HU": {
+    "hu": {
         "A newer version of [ProductName] is already installed.": "A [ProductName] újabb verziója már telepítve van.",
     },
-    "pl-PL": {
+    "pl": {
         "A newer version of [ProductName] is already installed.": "Nowsza wersja [ProductName] jest już zainstalowana.",
     },
-    "ro-RO": {
+    "ro": {
         "A newer version of [ProductName] is already installed.": "O versiune mai nouă de [ProductName] este deja instalată.",
     },
-    "lt-LT": {
+    "lt": {
         "A newer version of [ProductName] is already installed.": "Naujesnė [ProductName] versija jau įdiegta.",
     },
-    "is-IS": {
+    "is": {
         "A newer version of [ProductName] is already installed.": "Nýrri útgáfu af [ProductName] er þegar uppsett.",
     },
 }
@@ -8290,74 +8290,74 @@ WXL_TRANSLATIONS["zh-CN"] = {
 WXL_TRANSLATIONS["zh-TW"] = {
     "A newer version of [ProductName] is already installed.": "已經安裝較新版本的 [ProductName]。",
 }
-WXL_TRANSLATIONS["ja-JP"] = {
+WXL_TRANSLATIONS["ja"] = {
     "A newer version of [ProductName] is already installed.": "より新しいバージョンの [ProductName] が既にインストールされています。",
 }
-WXL_TRANSLATIONS["ko-KR"] = {
+WXL_TRANSLATIONS["ko"] = {
     "A newer version of [ProductName] is already installed.": "더 새로운 버전의 [ProductName]이(가) 이미 설치되어 있습니다.",
 }
-WXL_TRANSLATIONS["mt-MT"] = {
+WXL_TRANSLATIONS["mt"] = {
     "A newer version of [ProductName] is already installed.": "Verżjoni aktar reċenti ta' [ProductName] diġà installata.",
 }
-WXL_TRANSLATIONS["hi-IN"] = {
+WXL_TRANSLATIONS["hi"] = {
     "A newer version of [ProductName] is already installed.": "[ProductName] का एक नया संस्करण पहले से ही स्थापित है।",
 }
-WXL_TRANSLATIONS["ta-IN"] = {
+WXL_TRANSLATIONS["ta"] = {
     "A newer version of [ProductName] is already installed.": "[ProductName] இன் புதிய பதிப்பு ஏற்கனவே நிறுவப்பட்டுள்ளது.",
 }
-WXL_TRANSLATIONS["vi-VN"] = {
+WXL_TRANSLATIONS["vi"] = {
     "A newer version of [ProductName] is already installed.": "Đã cài đặt phiên bản mới hơn của [ProductName].",
 }
-WXL_TRANSLATIONS["sw-KE"] = {
+WXL_TRANSLATIONS["sw"] = {
     "A newer version of [ProductName] is already installed.": "Toleo jipya zaidi la [ProductName] tayari limekusanikwa.",
 }
-WXL_TRANSLATIONS["af-ZA"] = {
+WXL_TRANSLATIONS["af"] = {
     "A newer version of [ProductName] is already installed.": "'n Nuwer weergawe van [ProductName] is reeds geïnstalleer.",
 }
-WXL_TRANSLATIONS["he-IL"] = {
+WXL_TRANSLATIONS["he"] = {
     "A newer version of [ProductName] is already installed.": "גרסה חדשה יותר של [ProductName] כבר מותקנת.",
 }
-WXL_TRANSLATIONS["id-ID"] = {
+WXL_TRANSLATIONS["id"] = {
     "A newer version of [ProductName] is already installed.": "Versi yang lebih baru dari [ProductName] sudah terinstal.",
 }
-WXL_TRANSLATIONS["fil-PH"] = {
+WXL_TRANSLATIONS["fil"] = {
     "A newer version of [ProductName] is already installed.": "Ang bagong bersyon ng [ProductName] ay naka-install na.",
 }
-WXL_TRANSLATIONS["ig-NG"] = {
+WXL_TRANSLATIONS["ig"] = {
     "A newer version of [ProductName] is already installed.": "A kwụsịrị usoro ọhụrụ nke [ProductName].",
 }
-WXL_TRANSLATIONS["th-TH"] = {
+WXL_TRANSLATIONS["th"] = {
     "A newer version of [ProductName] is already installed.": "ติดตั้ง [ProductName] รุ่นที่ใหม่กว่าแล้ว",
 }
-WXL_TRANSLATIONS["tr-TR"] = {
+WXL_TRANSLATIONS["tr"] = {
     "A newer version of [ProductName] is already installed.": "[ProductName] için daha yeni bir sürüm zaten yüklü.",
 }
-WXL_TRANSLATIONS["ur-PK"] = {
+WXL_TRANSLATIONS["ur"] = {
     "A newer version of [ProductName] is already installed.": "[ProductName] کا ایک نیا ورژن پہلے ہی انسٹال ہے۔",
 }
-WXL_TRANSLATIONS["ar-SA"] = {
+WXL_TRANSLATIONS["ar"] = {
     "A newer version of [ProductName] is already installed.": "تم بالفعل تثبيت إصدار أحدث من [ProductName].",
 }
 
-WXL_TRANSLATIONS["ms-MY"] = {
+WXL_TRANSLATIONS["ms"] = {
     "A newer version of [ProductName] is already installed.": "Versi [ProductName] yang lebih baharu telah pun dipasang.",
 }
 
-WXL_TRANSLATIONS["az-Latn-AZ"] = {
+WXL_TRANSLATIONS["az-Latn"] = {
     "A newer version of [ProductName] is already installed.": "[ProductName] məhsulunun daha yeni versiyası artıq quraşdırılıb.",
 }
 
-WXL_TRANSLATIONS["kk-KZ"] = {
+WXL_TRANSLATIONS["kk"] = {
     "A newer version of [ProductName] is already installed.": "[ProductName] жаңарақ нұсқасы әлдеқашан орнатылған.",
 }
 
-WXL_TRANSLATIONS["ha-Latn-NG"] = {
+WXL_TRANSLATIONS["ha-Latn"] = {
     "A newer version of [ProductName] is already installed.": "An riga an shigar da sabon sigar [ProductName].",
 }
 
 
 # German downgrade message from the existing .wxl file.
-WXL_TRANSLATIONS["de-DE"] = {
+WXL_TRANSLATIONS["de"] = {
     "A newer version of [ProductName] is already installed.": "Eine neuere Version von [ProductName] ist bereits installiert.",
 }
 
@@ -8366,9 +8366,9 @@ def main() -> None:
     script_dir = Path(__file__).resolve().parent
     repo_root = script_dir.parent
 
-    en_resw_path = repo_root / "AgentRedactor" / "Strings" / "en-US" / "Resources.resw"
-    de_resw_path = repo_root / "AgentRedactor" / "Strings" / "de-DE" / "Resources.resw"
-    en_wxl_path = repo_root / "AgentRedactor" / "packaging" / "AgentRedactor.en-US.wxl"
+    en_resw_path = repo_root / "AgentRedactor" / "Strings" / "en" / "Resources.resw"
+    de_resw_path = repo_root / "AgentRedactor" / "Strings" / "de" / "Resources.resw"
+    en_wxl_path = repo_root / "AgentRedactor" / "packaging" / "AgentRedactor.en.wxl"
     strings_dir = repo_root / "AgentRedactor" / "Strings"
     packaging_dir = repo_root / "AgentRedactor" / "packaging"
 
@@ -8422,10 +8422,10 @@ def main() -> None:
         generate_wxl(en_wxl_tree, tag, lcid, translated_app_description, translated_downgrade, wxl_path)
         generated_wxl.append(wxl_path)
 
-    # Regenerate German from the existing de-DE file so it stays in sync.
+    # Regenerate German from the existing de file so it stays in sync.
     # Language display names are sourced from constants.h, so no extra keys here.
     german_extra: Dict[str, str] = {}
-    # For German we reuse existing translations from de-DE/Resources.resw directly,
+    # For German we reuse existing translations from de/Resources.resw directly,
     # falling back to English only if a key is missing.
     german_translations: Dict[str, str] = {}
     for name, english in en_data.items():
