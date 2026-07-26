@@ -1,9 +1,16 @@
 name: Tests
 
 # The tests drive the real application UI with FlaUI, so they need an
-# interactive Windows desktop session. GitHub-hosted runners run headless and
-# CANNOT run them — this workflow targets a self-hosted Windows runner that is
-# logged in to an interactive session. See "CI / tests" in the README.
+# interactive Windows desktop session. There are two variants of the GUI test
+# job:
+#
+#   gui-tests-hosted    GitHub-hosted windows-latest. Hosted Windows runners
+#                       auto-logon to an interactive desktop session, so UI
+#                       automation generally works there. Free for public
+#                       repos.
+#   gui-tests           Self-hosted Windows runner logged in to an interactive
+#                       session. Kept as a fallback in case the hosted job
+#                       turns out to be flaky for this app.
 #
 # Trigger manually with: Actions -> Tests -> Run workflow.
 
@@ -11,6 +18,72 @@ on:
   workflow_dispatch:
 
 jobs:
+  gui-tests-hosted:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      # Cache the whole vcpkg tree (including installed packages) so the
+      # onnxruntime/json/wil install only happens once. Bump v1 to invalidate.
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: vcpkg
+          key: vcpkg-onnxruntime-nlohmann-json-wil-v1
+
+      - name: Clone vcpkg
+        shell: pwsh
+        run: if (-not (Test-Path vcpkg)) { git clone https://github.com/microsoft/vcpkg vcpkg }
+
+      - name: Install vcpkg dependencies
+        shell: pwsh
+        run: |
+          if (-not (Test-Path vcpkg\vcpkg.exe)) { vcpkg\bootstrap-vcpkg.bat -disableMetrics }
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
+
+      # The ONNX weights are ~1.6 GB; cache them across runs. Bump v1 to
+      # invalidate. Restored cache makes the download step below a no-op.
+      - name: Cache ONNX model weights
+        uses: actions/cache@v4
+        with:
+          path: repo/AgentRedactor/models/onnx
+          key: onnx-models-v1
+
+      - name: Download ONNX model weights
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if (-not (Test-Path repo/AgentRedactor/models/onnx/model_quantized.onnx_data)) {
+            gh release download models-v1 --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
+          }
+
+      - name: Build app (buildquick.ps1)
+        shell: pwsh
+        run: repo/AgentRedactor/buildquick.ps1 -Configuration Release
+
+      - name: Build FlaUI helper
+        shell: pwsh
+        run: repo/tests/gui/windows/build.ps1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        shell: pwsh
+        run: pip install -r repo/tests/requirements.txt
+
+      - name: Run GUI tests
+        shell: pwsh
+        run: |
+          cd repo/tests
+          pytest -v gui/
+
   gui-tests:
     runs-on: [self-hosted, windows]
     steps:
