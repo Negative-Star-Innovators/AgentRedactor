@@ -58,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if (-not (Test-Path repo/AgentRedactor/models/onnx/model_quantized.onnx_data)) {
-            gh release download models-v1 --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
+            gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
           }
 
       - name: Build app (buildquick.ps1)
