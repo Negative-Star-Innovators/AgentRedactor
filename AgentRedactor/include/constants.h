@@ -101,7 +101,7 @@ inline const std::vector<SupportedLanguage> SUPPORTED_LANGUAGES = {
     {L"he", L"\u05E2\u05D1\u05E8\u05D9\u05EA"},
     {L"id", L"Bahasa Indonesia"},
     {L"fil", L"Filipino"},
-    {L"ig", L"Igbo"},
+    {L"ig-NG", L"Igbo"},
     {L"th", L"\u0E44\u0E17\u0E22"},
     {L"tr", L"T\u00FCrk\u00E7e"},
     {L"ur", L"\u0627\u0631\u062F\u0648"},

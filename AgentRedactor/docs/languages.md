@@ -29,7 +29,7 @@ The Settings page language `ComboBox` and the system-tray **Language** submenu a
 | `hu` | Magyar | LTR | Latin |
 | `hy` | Հայերեն | LTR | Armenian |
 | `id` | Bahasa Indonesia | LTR | Latin |
-| `ig` | Igbo | LTR | Latin |
+| `ig-NG` | Igbo | LTR | Latin |
 | `is` | Íslenska | LTR | Latin |
 | `it` | Italiano | LTR | Latin |
 | `ja` | 日本語 | LTR | Japanese (CJK) |

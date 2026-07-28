@@ -91,7 +91,9 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         wchar_t path[MAX_PATH];
         GetModuleFileNameW(nullptr, path, MAX_PATH);
         auto logPath = std::filesystem::path(path).parent_path() / L"debug.log";
-        std::filesystem::remove(logPath);
+        // When installed as MSIX the install directory is read-only; never throw here.
+        std::error_code ec;
+        std::filesystem::remove(logPath, ec);
     }
     DbgLog(L"wWinMain: started");
 

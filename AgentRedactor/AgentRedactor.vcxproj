@@ -288,7 +288,7 @@
     <Content Include="Strings\fil\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Strings\ig\Resources.resw">
+    <Content Include="Strings\ig-NG\Resources.resw">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Strings\th\Resources.resw">

@@ -165,7 +165,7 @@ robocopy "$outDir\Strings" "$priStage\Strings" /E /R:3 /W:1 | Out-Null
 Copy-Item "$root\Package.appxmanifest" "$priStage\AppxManifest.xml" -Force
 
 $priConfig = "$priStage\priconfig.xml"
-$langs = @('en','de','es','fr','pt','it','da','nl','sv','lb','nb','fi','ru','hr','el','sl','sr-Latn','uk','sq','lv','hy','cs','et','sk','bg','ka','hu','pl','ro','lt','is','zh-CN','zh-TW','ja','ko','mt','hi','ta','vi','sw','af','he','id','fil','ig','th','tr','ur','ar','ms','az-Latn','kk','ha-Latn')
+$langs = @('en','de','es','fr','pt','it','da','nl','sv','lb','nb','fi','ru','hr','el','sl','sr-Latn','uk','sq','lv','hy','cs','et','sk','bg','ka','hu','pl','ro','lt','is','zh-CN','zh-TW','ja','ko','mt','hi','ta','vi','sw','af','he','id','fil','ig-NG','th','tr','ur','ar','ms','az-Latn','kk','ha-Latn')
 & $makepri createconfig /cf $priConfig /dq ($langs -join '_') /pv 10.0.0 /o
 if ($LASTEXITCODE -ne 0) { throw "makepri createconfig failed" }
 
@@ -193,6 +193,10 @@ New-Item -ItemType Directory -Force -Path $msixStage | Out-Null
 
 # Copy build output
 robocopy $outDir $msixStage /E /R:3 /W:1 | Out-Null
+
+# Never ship stale runtime logs inside the package (a packaged debug.log in the
+# read-only install folder crashes wWinMain on startup)
+Remove-Item "$msixStage\debug.log", "$msixStage\startup_debug.log" -Force -ErrorAction SilentlyContinue
 
 # Copy manifest and assets
 # Replace x-generate with actual languages because MakeAppx.exe does not expand it.

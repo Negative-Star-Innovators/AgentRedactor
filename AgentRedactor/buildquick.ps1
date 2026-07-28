@@ -119,7 +119,7 @@ New-Item -ItemType Directory -Force -Path "$priStage\Strings" | Out-Null
 robocopy "$outDir\Strings" "$priStage\Strings" /E /R:3 /W:1 | Out-Null
 Copy-Item "$root\Package.appxmanifest" "$priStage\AppxManifest.xml" -Force
 $priConfig = "$priStage\priconfig.xml"
-$langs = @('en','de','es','fr','pt','it','da','nl','sv','lb','nb','fi','ru','hr','el','sl','sr-Latn','uk','sq','lv','hy','cs','et','sk','bg','ka','hu','pl','ro','lt','is','zh-CN','zh-TW','ja','ko','mt','hi','ta','vi','sw','af','he','id','fil','ig','th','tr','ur','ar','ms','az-Latn','kk','ha-Latn')
+$langs = @('en','de','es','fr','pt','it','da','nl','sv','lb','nb','fi','ru','hr','el','sl','sr-Latn','uk','sq','lv','hy','cs','et','sk','bg','ka','hu','pl','ro','lt','is','zh-CN','zh-TW','ja','ko','mt','hi','ta','vi','sw','af','he','id','fil','ig-NG','th','tr','ur','ar','ms','az-Latn','kk','ha-Latn')
 & $makepri createconfig /cf $priConfig /dq ($langs -join '_') /pv 10.0.0 /o
 if ($LASTEXITCODE -ne 0) { throw "makepri createconfig failed" }
 & $makepri new /pr $priStage /cf $priConfig /of "$outDir\resources.pri" /o

@@ -69,7 +69,7 @@ LANGUAGES: List[Dict[str, object]] = [
     {"tag": "he", "lcid": 1037, "suffix": "Hebrew", "native": "עברית"},
     {"tag": "id", "lcid": 1057, "suffix": "Indonesian", "native": "Bahasa Indonesia"},
     {"tag": "fil", "lcid": 1124, "suffix": "Filipino", "native": "Filipino"},
-    {"tag": "ig", "lcid": 1136, "suffix": "Igbo", "native": "Igbo"},
+    {"tag": "ig-NG", "lcid": 1136, "suffix": "Igbo", "native": "Igbo"},
     {"tag": "th", "lcid": 1054, "suffix": "Thai", "native": "ไทย"},
     {"tag": "tr", "lcid": 1055, "suffix": "Turkish", "native": "Türkçe"},
     {"tag": "ur", "lcid": 1056, "suffix": "Urdu", "native": "اردو"},
@@ -7503,8 +7503,8 @@ LANG_TRANSLATIONS["fil"] = {
     "Port {0} is already used by profile '{1}'.": "Ang port {0} ay ginagamit na ng profile '{1}'.",
 }
 
-# Igbo (ig)
-LANG_TRANSLATIONS["ig"] = {
+# Igbo (ig-NG)
+LANG_TRANSLATIONS["ig-NG"] = {
     "Profiles": "Profaịlụ",
     "Add": "Tinye",
     "Remove": "Wepụ",
@@ -8323,7 +8323,7 @@ WXL_TRANSLATIONS["id"] = {
 WXL_TRANSLATIONS["fil"] = {
     "A newer version of [ProductName] is already installed.": "Ang bagong bersyon ng [ProductName] ay naka-install na.",
 }
-WXL_TRANSLATIONS["ig"] = {
+WXL_TRANSLATIONS["ig-NG"] = {
     "A newer version of [ProductName] is already installed.": "A kwụsịrị usoro ọhụrụ nke [ProductName].",
 }
 WXL_TRANSLATIONS["th"] = {
