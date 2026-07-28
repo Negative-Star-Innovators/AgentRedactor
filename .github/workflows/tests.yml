@@ -2,7 +2,8 @@ name: Tests
 
 # The tests drive the real application UI with FlaUI, so they need an
 # interactive Windows desktop session. There are two variants of the GUI test
-# job:
+# job (both run only the tests in tests/gui/; the third-party integration
+# tests in third_party_tests/ are run locally, not in CI):
 #
 #   gui-tests-hosted    GitHub-hosted windows-latest. Hosted Windows runners
 #                       auto-logon to an interactive desktop session, so UI
@@ -130,56 +131,3 @@ jobs:
         run: |
           cd repo/tests
           pytest -v gui/
-
-  third-party-tests:
-    runs-on: [self-hosted, windows]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: repo
-
-      - name: Clone vcpkg
-        shell: pwsh
-        run: if (-not (Test-Path vcpkg)) { git clone https://github.com/microsoft/vcpkg vcpkg }
-
-      - name: Install vcpkg dependencies
-        shell: pwsh
-        run: |
-          if (-not (Test-Path vcpkg\vcpkg.exe)) { vcpkg\bootstrap-vcpkg.bat -disableMetrics }
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
-
-      - name: Download ONNX model weights
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release download models-v1 --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
-
-      - name: Build app (buildquick.ps1)
-        shell: pwsh
-        run: repo/AgentRedactor/buildquick.ps1 -Configuration Release
-
-      - name: Build FlaUI helper
-        shell: pwsh
-        run: repo/tests/gui/windows/build.ps1
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install test dependencies
-        shell: pwsh
-        run: pip install -r repo/third_party_tests/requirements.txt
-
-      # Requires an OPENROUTER_API_KEY secret configured on the repo, and the
-      # third-party CLIs (openclaw, hermes, opencode, codex, claude) installed
-      # on the runner machine.
-      - name: Run third-party integration tests
-        shell: pwsh
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          "OPENROUTER_API_KEY=$env:OPENROUTER_API_KEY" | Out-File -Encoding ascii repo/third_party_tests/.env
-          cd repo/third_party_tests
-          pytest -v

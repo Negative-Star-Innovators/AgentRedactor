@@ -35,8 +35,39 @@ $msbuild = Find-Tool "msbuild.exe" @(
     "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe",
     "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
 )
+if (-not $msbuild) {
+    # Fall back to vswhere (present on all machines with any VS install,
+    # including GitHub Actions runners where MSBuild is not on PATH)
+    $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+    if (Test-Path $vswhere) {
+        $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1
+    }
+}
 if (-not $msbuild) { throw "Could not find msbuild.exe" }
 Write-Host "Found MSBuild: $msbuild" -ForegroundColor Green
+
+$nuget = Find-Tool "nuget.exe" @(
+    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\NuGet.exe",
+    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\NuGet.exe",
+    "${env:ProgramFiles}\NuGet\nuget.exe"
+)
+if (-not $nuget) {
+    # Download nuget if not found. tests/gui/windows/build.ps1 expects it at
+    # this path, so keep the location in sync with build.ps1.
+    $nuget = "$root\build\tools\nuget.exe"
+    if (-not (Test-Path $nuget)) {
+        New-Item -ItemType Directory -Force -Path "$root\build\tools" | Out-Null
+        Write-Host "Downloading NuGet..." -ForegroundColor Cyan
+        Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nuget
+    }
+}
+Write-Host "Found NuGet: $nuget" -ForegroundColor Green
+
+# Restore NuGet packages (packages/ is not committed, so a fresh CI checkout
+# has none; a no-op when they are already restored)
+Write-Host "Restoring NuGet packages..." -ForegroundColor Cyan
+& $nuget restore "$root\AgentRedactor.vcxproj" -PackagesDirectory "$root\packages"
+if ($LASTEXITCODE -ne 0) { throw "NuGet restore failed" }
 
 $makepri = Find-Tool "makepri.exe" @(
     "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.26100.0\x64\makepri.exe",

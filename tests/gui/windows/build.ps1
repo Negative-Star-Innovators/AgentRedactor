@@ -34,6 +34,14 @@ if (-not $msbuild) {
     $msbuild = (Get-Command msbuild.exe -ErrorAction SilentlyContinue).Source
 }
 if (-not $msbuild) {
+    # Fall back to vswhere (present on GitHub Actions runners where MSBuild
+    # is not on PATH)
+    $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+    if (Test-Path $vswhere) {
+        $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1
+    }
+}
+if (-not $msbuild) {
     throw "msbuild.exe not found"
 }
 
