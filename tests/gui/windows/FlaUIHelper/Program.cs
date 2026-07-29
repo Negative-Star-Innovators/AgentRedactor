@@ -51,6 +51,30 @@ namespace FlaUIHelper
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder text, int count);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit, uint dwDesiredAccess);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool GetUserObjectInformation(IntPtr hObj, int nIndex, System.Text.StringBuilder pvInfo, int nLength, out uint lpnLengthNeeded);
+
+        [DllImport("user32.dll")]
+        private static extern bool CloseDesktop(IntPtr hDesktop);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
         private const int SW_RESTORE = 9;
 
         private static int Main(string[] args)
@@ -1934,6 +1958,8 @@ namespace FlaUIHelper
             // master password dialog cannot be found. Prints structure only
             // (control types, names, ids) — never field values, so no password
             // content can leak.
+            DumpEnvironmentState(automation, window);
+
             const int maxLines = 300;
             int lines = 0;
 
@@ -1993,6 +2019,103 @@ namespace FlaUIHelper
                 {
                     DumpDescendants(top, 1, 3, ref lines, maxLines);
                 }
+            }
+        }
+
+        private static void DumpEnvironmentState(UIA3Automation automation, Window window)
+        {
+            // Distinguish the three ARM64 failure hypotheses: (a) the app
+            // crashed/exited, (b) an OOBE/SCOOBE desktop took over the input
+            // desktop, (c) the app window is hidden but the process is alive.
+
+            // (a) Process state.
+            try
+            {
+                var processes = Process.GetProcessesByName("AgentRedactor");
+                if (processes.Length == 0)
+                    Console.WriteLine("DIAG AgentRedactor processes: 0 (app exited or crashed)");
+                else
+                    Console.WriteLine($"DIAG AgentRedactor processes: {processes.Length}");
+                foreach (var p in processes)
+                {
+                    try
+                    {
+                        string title = "";
+                        try { title = p.MainWindowTitle ?? ""; } catch { }
+                        string exited = "";
+                        try { if (p.HasExited) exited = $" ExitCode={p.ExitCode}"; } catch { }
+                        Console.WriteLine($"DIAG process Id={p.Id} Responding={p.Responding} MainWindowHandle=0x{p.MainWindowHandle.ToInt64():X} Title='{title}'{exited}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"DIAG process <unreadable: {ex.Message}>");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG process enumeration failed: {ex.Message}");
+            }
+
+            // (b) Foreground window and input desktop name: an OOBE/SCOOBE
+            // takeover would show a foreign foreground window and/or a
+            // non-"Default" input desktop.
+            try
+            {
+                var foreground = GetForegroundWindow();
+                string foregroundTitle = "";
+                if (foreground != IntPtr.Zero)
+                {
+                    var sb = new System.Text.StringBuilder(512);
+                    if (GetWindowText(foreground, sb, sb.Capacity) > 0)
+                        foregroundTitle = sb.ToString();
+                }
+                Console.WriteLine($"DIAG ForegroundWindow=0x{foreground.ToInt64():X} Title='{foregroundTitle}'");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG foreground window read failed: {ex.Message}");
+            }
+
+            try
+            {
+                const uint GENERIC_READ = 0x80000000;
+                var inputDesktop = OpenInputDesktop(0, false, GENERIC_READ);
+                if (inputDesktop == IntPtr.Zero)
+                {
+                    Console.WriteLine("DIAG input desktop: OpenInputDesktop failed");
+                }
+                else
+                {
+                    try
+                    {
+                        var name = new System.Text.StringBuilder(256);
+                        string desktopName = GetUserObjectInformation(inputDesktop, 2 /* UOI_NAME */, name, name.Capacity * 2, out _)
+                            ? name.ToString()
+                            : "<unreadable>";
+                        Console.WriteLine($"DIAG input desktop name='{desktopName}'");
+                    }
+                    finally
+                    {
+                        CloseDesktop(inputDesktop);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG input desktop read failed: {ex.Message}");
+            }
+
+            // (c) Win32 truth about the stored app window handle: UIA may stop
+            // enumerating a window that Win32 still sees.
+            try
+            {
+                var hwnd = window.Properties.NativeWindowHandle.ValueOrDefault;
+                Console.WriteLine($"DIAG app hwnd=0x{hwnd.ToInt64():X} IsWindow={IsWindow(hwnd)} IsWindowVisible={IsWindowVisible(hwnd)} IsIconic={IsIconic(hwnd)}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG app window Win32 state read failed: {ex.Message}");
             }
         }
 
