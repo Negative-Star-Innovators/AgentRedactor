@@ -473,9 +473,32 @@ namespace FlaUIHelper
 
         private static void SetTextBoxValue(TextBox textBox, string value)
         {
-            textBox.Focus();
-            textBox.Enter(value);
+            // Prefer the UIA Value pattern: it needs no keyboard focus, so it works
+            // on runners where the app window never receives real keyboard focus.
+            // Fall back to simulated typing if the pattern is unsupported or the
+            // read-back does not match.
+            if (!TrySetValuePattern(textBox, value))
+            {
+                textBox.Focus();
+                textBox.Enter(value);
+            }
             Thread.Sleep(TypeDelayMs);
+        }
+
+        private static bool TrySetValuePattern(TextBox textBox, string value)
+        {
+            try
+            {
+                if (!textBox.Patterns.Value.IsSupported)
+                    return false;
+                textBox.Patterns.Value.Pattern.SetValue(value);
+                Thread.Sleep(TypeDelayMs);
+                return textBox.Patterns.Value.Pattern.Value == value;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static void SetPasswordBoxValue(TextBox passwordBox, string value)
@@ -498,24 +521,53 @@ namespace FlaUIHelper
             }
 
             var window = PrepareWindow(automation);
-            var keywordBox = FindByAutomationId(window, "NewKeywordBox").AsTextBox();
 
-            SetTextBoxValue(keywordBox, text);
-            Console.WriteLine("Entered keyword; pausing for observation...");
-            Thread.Sleep(ObservationDelayMs);
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                // Re-find the box each attempt; the element can go stale after the
+                // list updates on a slow machine.
+                var keywordBox = FindByAutomationId(window, "NewKeywordBox").AsTextBox();
 
-            SetCaseSensitive(window, caseSensitive);
+                SetTextBoxValue(keywordBox, text);
+                Console.WriteLine("Entered keyword; pausing for observation...");
+                Thread.Sleep(ObservationDelayMs);
 
-            keywordBox.Focus();
-            Thread.Sleep(50);
-            Keyboard.Press(VirtualKeyShort.RETURN);
+                SetCaseSensitive(window, caseSensitive);
 
-            Thread.Sleep(ListUpdateDelayMs + ObservationDelayMs);
-            Console.WriteLine("Keyword added; pausing for observation...");
-            Thread.Sleep(ObservationDelayMs);
+                // Invoke the Add button instead of pressing RETURN: UIA invocation
+                // works even when the window has no real keyboard focus, and it
+                // runs the same Click handler as the KeyDown-Enter path.
+                var addBtn = FindByAutomationId(window, "AddKeywordBtn").AsButton();
+                InvokeElement(addBtn);
 
-            Console.WriteLine("OK");
-            return 0;
+                Thread.Sleep(ListUpdateDelayMs + ObservationDelayMs);
+                Console.WriteLine("Keyword added; pausing for observation...");
+
+                if (WaitForKeywordRow(window, text, 5000))
+                {
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+                Console.WriteLine($"Keyword row did not appear after attempt {attempt + 1}; retrying...");
+            }
+
+            Console.Error.WriteLine($"ERROR: keyword '{text}' did not appear in the keyword list after 3 attempts.");
+            return 1;
+        }
+
+        private static bool WaitForKeywordRow(Window window, string text, int timeoutMs)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            do
+            {
+                foreach (var (idx, textBox) in FindKeywordTextBoxes(window))
+                {
+                    if (ExtractKeywordText(textBox, idx).Equals(text, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+                Thread.Sleep(250);
+            } while (DateTime.UtcNow < deadline);
+            return false;
         }
 
         private static List<(int Index, AutomationElement TextBox)> FindKeywordTextBoxes(Window window)
@@ -710,18 +762,19 @@ namespace FlaUIHelper
             }
 
             // Edit the existing keyword text box in-place like a user: click,
-            // select all, type the replacement text, then click another field so
-            // the TextBox loses focus and the app's LostFocus handler commits it.
+            // set the replacement text (Value pattern, keyboard fallback), then
+            // click another field so the TextBox loses focus and the app's
+            // LostFocus handler commits it.
             textBox.Click();
             Thread.Sleep(ClickDelayMs);
             Console.WriteLine($"Before: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
-            using (Keyboard.Pressing(VirtualKeyShort.CONTROL))
+            if (!TrySetValuePattern(textBox, newText))
             {
-                Keyboard.Press(VirtualKeyShort.KEY_A);
+                SelectAllText(textBox);
+                Thread.Sleep(TypeDelayMs);
+                Keyboard.Type(newText);
+                Thread.Sleep(TypeDelayMs);
             }
-            Thread.Sleep(TypeDelayMs);
-            Keyboard.Type(newText);
-            Thread.Sleep(TypeDelayMs);
             Console.WriteLine($"After type: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
             var newKeywordBox = FindByAutomationId(window, "NewKeywordBox");
             Console.WriteLine($"NewKeywordBox found: {newKeywordBox != null}");
@@ -920,10 +973,13 @@ namespace FlaUIHelper
             textBox.Click();
             Thread.Sleep(ClickDelayMs);
             Console.WriteLine($"Before: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
-            SelectAllText(textBox);
-            Thread.Sleep(TypeDelayMs);
-            Keyboard.Type(newText);
-            Thread.Sleep(TypeDelayMs);
+            if (!TrySetValuePattern(textBox, newText))
+            {
+                SelectAllText(textBox);
+                Thread.Sleep(TypeDelayMs);
+                Keyboard.Type(newText);
+                Thread.Sleep(TypeDelayMs);
+            }
             Console.WriteLine($"After type: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
             var newRegexBox = FindByAutomationId(window, "NewRegexBox");
             Console.WriteLine($"NewRegexBox found: {newRegexBox != null}");
@@ -959,9 +1015,11 @@ namespace FlaUIHelper
                 Console.WriteLine("Entered regex; pausing for observation...");
                 Thread.Sleep(ObservationDelayMs);
 
-                regexBox.Focus();
-                Thread.Sleep(50);
-                Keyboard.Press(VirtualKeyShort.RETURN);
+                // Invoke the Add button instead of pressing RETURN: UIA invocation
+                // works even when the window has no real keyboard focus, and it
+                // runs the same Click handler as the KeyDown-Enter path.
+                var addBtn = FindByAutomationId(window, "AddRegexBtn").AsButton();
+                InvokeElement(addBtn);
 
                 Thread.Sleep(ListUpdateDelayMs + ObservationDelayMs);
                 Console.WriteLine("Regex added; pausing for observation...");
