@@ -761,11 +761,12 @@ namespace FlaUIHelper
                 throw new InvalidOperationException($"Text box not found for keyword '{oldText}'.");
             }
 
-            // Edit the existing keyword text box in-place like a user: click,
-            // set the replacement text (Value pattern, keyboard fallback), then
-            // click another field so the TextBox loses focus and the app's
-            // LostFocus handler commits it.
-            textBox.Click();
+            // Edit the existing keyword text box in-place: focus it via UIA
+            // SetFocus (no clickable point needed, unlike a mouse Click), set
+            // the replacement text (Value pattern, keyboard fallback), then
+            // move focus to another field so the TextBox loses focus and the
+            // app's LostFocus handler commits it (HomePage.cpp KeywordLostFocus).
+            FocusElement(textBox);
             Thread.Sleep(ClickDelayMs);
             Console.WriteLine($"Before: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
             if (!TrySetValuePattern(textBox, newText))
@@ -780,7 +781,7 @@ namespace FlaUIHelper
             Console.WriteLine($"NewKeywordBox found: {newKeywordBox != null}");
             if (newKeywordBox != null)
             {
-                newKeywordBox.Click();
+                FocusElement(newKeywordBox);
                 Thread.Sleep(UnfocusDelayMs + ObservationDelayMs);
             }
             Console.WriteLine($"After unfocus: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
@@ -818,6 +819,20 @@ namespace FlaUIHelper
                     Keyboard.Press(VirtualKeyShort.END);
                 }
             }
+        }
+
+        private static void FocusElement(AutomationElement element)
+        {
+            // Prefer UIA SetFocus: it needs no clickable point and works even
+            // when the window has no real keyboard focus. Fall back to a mouse
+            // click only if SetFocus is unavailable.
+            try
+            {
+                element.Focus();
+                return;
+            }
+            catch { }
+            element.Click();
         }
 
         // -------------------------------------------------------------------------
@@ -970,7 +985,11 @@ namespace FlaUIHelper
                 throw new InvalidOperationException($"Text box not found for regex '{oldText}'.");
             }
 
-            textBox.Click();
+            // Focus the row text box via UIA SetFocus (no clickable point
+            // needed, unlike a mouse Click), set the replacement text, then
+            // move focus to another field so the app's LostFocus handler
+            // commits the edit (HomePage.cpp RegexLostFocus).
+            FocusElement(textBox);
             Thread.Sleep(ClickDelayMs);
             Console.WriteLine($"Before: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
             if (!TrySetValuePattern(textBox, newText))
@@ -985,7 +1004,7 @@ namespace FlaUIHelper
             Console.WriteLine($"NewRegexBox found: {newRegexBox != null}");
             if (newRegexBox != null)
             {
-                newRegexBox.Click();
+                FocusElement(newRegexBox);
                 Thread.Sleep(UnfocusDelayMs + ObservationDelayMs);
             }
             Console.WriteLine($"After unfocus: '{textBox.Text}' Focus={textBox.Properties.HasKeyboardFocus.ValueOrDefault}");
@@ -1081,8 +1100,33 @@ namespace FlaUIHelper
 
             var window = PrepareWindow(automation);
             var keyBox = FindByAutomationId(window, "ApiKeyBox").AsTextBox();
-            SetPasswordBoxValue(keyBox, key);
-            Console.WriteLine("Set API key; pausing for observation...");
+            var showCheck = FindByAutomationId(window, "ShowKeyCheck").AsCheckBox();
+            bool wasChecked = showCheck.IsChecked.HasValue && showCheck.IsChecked.Value;
+
+            // ApiKeyBox is a PasswordBox (HomePage.xaml): it only exposes the UIA
+            // Value pattern while its reveal mode is Visible (ShowKeyCheck toggles
+            // PasswordRevealMode in HomePage.cpp ShowKey_Toggled). Temporarily
+            // reveal it so the key can be set without keyboard input, then
+            // restore the checkbox to its previous state.
+            if (!wasChecked)
+            {
+                InvokeElement(showCheck);
+                Thread.Sleep(SettleDelayMs);
+            }
+
+            bool usedValuePattern = TrySetValuePattern(keyBox, key);
+            if (!usedValuePattern)
+            {
+                SetPasswordBoxValue(keyBox, key);
+            }
+
+            if (!wasChecked)
+            {
+                InvokeElement(showCheck);
+                Thread.Sleep(SettleDelayMs);
+            }
+
+            Console.WriteLine($"Set API key (value pattern: {usedValuePattern}); pausing for observation...");
             Thread.Sleep(ObservationDelayMs);
 
             Console.WriteLine("OK");
@@ -1153,21 +1197,57 @@ namespace FlaUIHelper
 
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
-            var check = FindByAutomationId(window, "EnableLoggingCheck").AsCheckBox();
-            bool currentlyChecked = check.IsChecked.HasValue && check.IsChecked.Value;
-            if (enabled != currentlyChecked)
+
+            for (int attempt = 0; attempt < 3; attempt++)
             {
-                // The app attaches to the CheckBox Click event; a real click toggles the
-                // state and raises Click, whereas the Toggle pattern only changes state.
-                check.Click();
-                Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+                var check = FindByAutomationId(window, "EnableLoggingCheck").AsCheckBox();
+                bool currentlyChecked = check.IsChecked.HasValue && check.IsChecked.Value;
+                if (enabled != currentlyChecked)
+                {
+                    // Invoke raises the app's Click handler, which synchronously
+                    // updates ShowSensitiveCheck().IsEnabled (HomePage.cpp
+                    // EnableLogging_Click); a mouse Click is unreliable on
+                    // runners where the window has no real focus.
+                    InvokeElement(check);
+                    Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+                }
+
+                if (WaitForEnableLoggingState(window, enabled, 5000))
+                {
+                    Console.WriteLine("Enable logging set; pausing for observation...");
+                    Thread.Sleep(ObservationDelayMs);
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+                Console.WriteLine($"Enable logging state did not settle after attempt {attempt + 1}; retrying...");
             }
 
-            Console.WriteLine("Enable logging set; pausing for observation...");
-            Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+            Console.Error.WriteLine($"ERROR: Enable logging did not reach {(enabled ? "enabled" : "disabled")} after 3 attempts.");
+            return 1;
+        }
 
-            Console.WriteLine("OK");
-            return 0;
+        private static bool WaitForEnableLoggingState(Window window, bool expectedEnabled, int timeoutMs)
+        {
+            // The setting has landed when the checkbox matches and the app's
+            // Click handler has run, which flips ShowSensitiveCheck.IsEnabled.
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            do
+            {
+                try
+                {
+                    var check = FindByAutomationId(window, "EnableLoggingCheck")?.AsCheckBox();
+                    var sensitive = FindByAutomationId(window, "ShowSensitiveCheck")?.AsCheckBox();
+                    if (check != null && sensitive != null)
+                    {
+                        bool isChecked = check.IsChecked.HasValue && check.IsChecked.Value;
+                        if (isChecked == expectedEnabled && sensitive.IsEnabled == expectedEnabled)
+                            return true;
+                    }
+                }
+                catch { }
+                Thread.Sleep(250);
+            } while (DateTime.UtcNow < deadline);
+            return false;
         }
 
         private static int SetShowSensitive(UIA3Automation automation, string[] args)
@@ -1181,28 +1261,60 @@ namespace FlaUIHelper
 
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
-            var check = FindByAutomationId(window, "ShowSensitiveCheck").AsCheckBox();
-            bool currentlyChecked = check.IsChecked.HasValue && check.IsChecked.Value;
-            if (enabled && !currentlyChecked)
+
+            for (int attempt = 0; attempt < 3; attempt++)
             {
-                // The app attaches to the CheckBox Click event; a real click toggles the
-                // state and raises Click, whereas the Toggle pattern only changes state.
-                check.Click();
-                Thread.Sleep(SettleDelayMs + ObservationDelayMs);
-                // Confirm the show-sensitive dialog (English primary button is "Enable").
-                HandleContentDialog(window, "Enable");
-            }
-            else if (!enabled && currentlyChecked)
-            {
-                check.Click();
-                Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+                var check = FindByAutomationId(window, "ShowSensitiveCheck").AsCheckBox();
+                bool currentlyChecked = check.IsChecked.HasValue && check.IsChecked.Value;
+                if (enabled && !currentlyChecked)
+                {
+                    // Invoke raises the app's Click handler, which opens the
+                    // confirmation ContentDialog; the setting only applies if
+                    // Primary is clicked (HomePage.cpp ShowSensitive_Click).
+                    InvokeElement(check);
+                    Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+                    // Confirm the show-sensitive dialog (English primary button is "Enable").
+                    HandleContentDialog(window, "Enable");
+                }
+                else if (!enabled && currentlyChecked)
+                {
+                    InvokeElement(check);
+                    Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+                }
+
+                if (WaitForCheckBoxState(window, "ShowSensitiveCheck", enabled, 5000))
+                {
+                    Console.WriteLine("Show sensitive set; pausing for observation...");
+                    Thread.Sleep(ObservationDelayMs);
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+                Console.WriteLine($"Show sensitive state did not settle after attempt {attempt + 1}; retrying...");
             }
 
-            Console.WriteLine("Show sensitive set; pausing for observation...");
-            Thread.Sleep(SettleDelayMs + ObservationDelayMs);
+            Console.Error.WriteLine($"ERROR: Show sensitive did not reach {(enabled ? "enabled" : "disabled")} after 3 attempts.");
+            return 1;
+        }
 
-            Console.WriteLine("OK");
-            return 0;
+        private static bool WaitForCheckBoxState(Window window, string automationId, bool expectedChecked, int timeoutMs)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            do
+            {
+                try
+                {
+                    var check = FindByAutomationId(window, automationId)?.AsCheckBox();
+                    if (check != null)
+                    {
+                        bool isChecked = check.IsChecked.HasValue && check.IsChecked.Value;
+                        if (isChecked == expectedChecked)
+                            return true;
+                    }
+                }
+                catch { }
+                Thread.Sleep(250);
+            } while (DateTime.UtcNow < deadline);
+            return false;
         }
 
         private static int GetIsEnabled(UIA3Automation automation, string[] args)
@@ -1695,47 +1807,60 @@ namespace FlaUIHelper
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
 
+            bool tookAction = false;
             for (int attempt = 0; attempt < 3; attempt++)
             {
-                var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
-                bool currentlyEnabled = check.IsChecked.HasValue && check.IsChecked.Value;
-
-                if (enabled == currentlyEnabled)
+                // The app reverts RequirePasswordCheck while the dialog is open
+                // (HomePage.cpp RequirePassword_Click), so the checkbox state is
+                // not a reliable progress signal; check the Change password
+                // button, which is enabled exactly when a master password is set.
+                if (WaitForChangePasswordButtonState(window, enabled, attempt == 0 ? 1000 : 500))
                 {
-                    if (attempt == 0)
+                    if (!tookAction)
                         Console.WriteLine($"Master password already {(enabled ? "enabled" : "disabled")}.");
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+
+                // Reuse a dialog left open by a previous attempt instead of
+                // toggling the checkbox again.
+                string editName = enabled ? "Password" : "Current password";
+                string buttonName = enabled ? "Set Password" : "Disable";
+                var passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(1));
+                if (passEdit == null)
+                {
+                    var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
+                    InvokeElement(check);
+
+                    // Poll for the dialog's password boxes; on slow runners the
+                    // ContentDialog can take seconds to appear and may render as
+                    // a popup outside the main window.
+                    passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(15));
+                }
+                tookAction = true;
+
+                if (enabled)
+                {
+                    var confirmEdit = FindDialogEditByName(automation, window, "Confirm password", TimeSpan.FromSeconds(10));
+                    if (passEdit == null || confirmEdit == null)
+                        throw new InvalidOperationException("Set master password password boxes not found.");
+                    SetEditValue(passEdit, password);
+                    SetEditValue(confirmEdit, confirm);
                 }
                 else
                 {
-                    InvokeElement(check);
-                    Thread.Sleep(SettleDelayMs);
-
-                    if (enabled)
-                    {
-                        var passEdit = FindWindowEditByName(window, "Password", TimeSpan.FromSeconds(10));
-                        var confirmEdit = FindWindowEditByName(window, "Confirm password", TimeSpan.FromSeconds(10));
-                        if (passEdit == null || confirmEdit == null)
-                            throw new InvalidOperationException("Set master password password boxes not found.");
-                        SetEditValue(passEdit, password);
-                        SetEditValue(confirmEdit, confirm);
-                        var btn = FindWindowButtonByName(window, "Set Password", TimeSpan.FromSeconds(5));
-                        InvokeElement(btn);
-                    }
-                    else
-                    {
-                        var passEdit = FindWindowEditByName(window, "Current password", TimeSpan.FromSeconds(10));
-                        if (passEdit == null)
-                            throw new InvalidOperationException("Disable master password password box not found.");
-                        SetEditValue(passEdit, password);
-                        var btn = FindWindowButtonByName(window, "Disable", TimeSpan.FromSeconds(5));
-                        InvokeElement(btn);
-                    }
-
-                    Thread.Sleep(SettleDelayMs);
+                    if (passEdit == null)
+                        throw new InvalidOperationException("Disable master password password box not found.");
+                    SetEditValue(passEdit, password);
                 }
 
-                // Verify the action took effect: the Change password button should
-                // be enabled exactly when a master password is set.
+                var btn = FindDialogButtonByName(automation, window, buttonName, TimeSpan.FromSeconds(10));
+                if (btn == null)
+                    throw new InvalidOperationException($"Master password dialog button '{buttonName}' not found.");
+                InvokeElement(btn);
+
+                Thread.Sleep(SettleDelayMs);
+
                 if (WaitForChangePasswordButtonState(window, enabled, 5000))
                 {
                     Console.WriteLine("OK");
@@ -1746,6 +1871,30 @@ namespace FlaUIHelper
 
             Console.Error.WriteLine($"ERROR: Change password button did not become {(enabled ? "enabled" : "disabled")} after 3 attempts.");
             return 1;
+        }
+
+        private static AutomationElement FindDialogEditByName(UIA3Automation automation, Window window, string name, TimeSpan timeout)
+        {
+            // ContentDialogs may render as a popup that is not a descendant of
+            // the main window, so fall back to a desktop-wide search.
+            var desktop = automation.GetDesktop();
+            return Retry.WhileNull(() =>
+            {
+                var el = window.FindFirstDescendant(x => x.ByControlType(ControlType.Edit).And(x.ByName(name)));
+                if (el != null) return el;
+                return desktop.FindFirstDescendant(x => x.ByControlType(ControlType.Edit).And(x.ByName(name)));
+            }, timeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
+        }
+
+        private static AutomationElement FindDialogButtonByName(UIA3Automation automation, Window window, string name, TimeSpan timeout)
+        {
+            var desktop = automation.GetDesktop();
+            return Retry.WhileNull(() =>
+            {
+                var el = window.FindFirstDescendant(x => x.ByName(name));
+                if (el != null) return el;
+                return desktop.FindFirstDescendant(x => x.ByName(name));
+            }, timeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
         }
 
         private static bool WaitForChangePasswordButtonState(Window window, bool expectedEnabled, int timeoutMs)
