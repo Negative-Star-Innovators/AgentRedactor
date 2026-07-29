@@ -3,13 +3,17 @@
 
 param(
     [string]$Version = "1.0.0",
+    [ValidateSet("x64", "ARM64")]
+    [string]$Platform = "x64",
     [switch]$Clean
 )
 
 $ErrorActionPreference = "Stop"
+$Platform = if ($Platform -ieq "ARM64") { "ARM64" } else { "x64" }
 $root = $PSScriptRoot
 $buildDir = "$root\build"
-$outDir = "$buildDir\x64\Release"
+$outDir = "$buildDir\$Platform\Release"
+$archLower = $Platform.ToLower()
 
 # Stop any running instance
 $proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
@@ -123,9 +127,9 @@ if ($LASTEXITCODE -ne 0) { throw "NuGet restore failed" }
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Building AgentRedactor (Release|x64)..." -ForegroundColor Cyan
+Write-Host "Building AgentRedactor (Release|$Platform)..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-& $msbuild "$root\AgentRedactor.vcxproj" -p:Configuration=Release -p:Platform=x64 -p:RestorePackages=false
+& $msbuild "$root\AgentRedactor.vcxproj" -p:Configuration=Release -p:Platform=$Platform -p:RestorePackages=false
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
 # Copy models and resources
@@ -187,7 +191,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Creating MSIX package..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
-$msixStage = "$buildDir\msix_stage"
+$msixStage = "$buildDir\msix_stage_$archLower"
 if (Test-Path $msixStage) { Remove-Item -Recurse -Force $msixStage }
 New-Item -ItemType Directory -Force -Path $msixStage | Out-Null
 
@@ -200,8 +204,10 @@ Remove-Item "$msixStage\debug.log", "$msixStage\startup_debug.log" -Force -Error
 
 # Copy manifest and assets
 # Replace x-generate with actual languages because MakeAppx.exe does not expand it.
+# Also stamp the package architecture for this build (source manifest stays x64).
 $manifestXml = [xml](Get-Content "$root\Package.appxmanifest")
 $ns = $manifestXml.Package.NamespaceURI
+$manifestXml.Package.Identity.SetAttribute('ProcessorArchitecture', $archLower)
 $resourcesNode = $manifestXml.Package.Resources
 $resourcesNode.RemoveAll()
 foreach ($lang in $langs) {
@@ -218,7 +224,7 @@ if (Test-Path "$root\resources\assets") {
     robocopy "$root\resources\assets" "$msixStage\resources\assets" /E /R:3 /W:1 | Out-Null
 }
 
-$msixPath = "$buildDir\AgentRedactor.msix"
+$msixPath = "$buildDir\AgentRedactor-$archLower.msix"
 if (-not (Test-Path "$msixStage\resources.pri")) {
     Write-Warning "resources.pri not found in MSIX stage. Localization may not work."
 }

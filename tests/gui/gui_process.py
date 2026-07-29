@@ -7,6 +7,7 @@ up and restoring those dirs.
 
 from __future__ import annotations
 
+import platform
 import socket
 import subprocess
 import sys
@@ -18,7 +19,10 @@ import psutil
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_EXE = PROJECT_ROOT / "AgentRedactor" / "build" / "x64" / "Release" / "AgentRedactor.exe"
+# The vcxproj outputs to build/<Platform>/Release where <Platform> is the
+# MSBuild platform name (x64 / ARM64). Match the host architecture.
+_BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
+DEFAULT_EXE = PROJECT_ROOT / "AgentRedactor" / "build" / _BUILD_PLATFORM / "Release" / "AgentRedactor.exe"
 
 
 def _find_free_port() -> int:

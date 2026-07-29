@@ -47,14 +47,20 @@ cd AgentRedactor
 .\buildquick.ps1
 ```
 
-Release build producing the MSIX package (`AgentRedactor\build\AgentRedactor.msix`):
+Release build producing the per-architecture MSIX package (`AgentRedactor\build\AgentRedactor-x64.msix`; pass `-Platform ARM64` for the ARM64 build):
 
 ```powershell
 cd AgentRedactor
 .\build.ps1
 ```
 
-The MSIX is unsigned; the Microsoft Store signs it on submission. To install it
+After building both architectures, combine them into the single Store package:
+
+```powershell
+.\buildbundle.ps1   # -> AgentRedactor\build\AgentRedactor.msixbundle
+```
+
+The MSIX/bundle is unsigned; the Microsoft Store signs it on submission. To install it
 locally you must sign it with your own certificate first.
 
 ## Tests

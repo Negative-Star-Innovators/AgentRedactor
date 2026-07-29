@@ -9,6 +9,9 @@ These tests drive the **real** `AgentRedactor.exe` Windows UI with a FlaUI/C# he
    cd ..\AgentRedactor
    .\buildquick.ps1 -Configuration Release
    ```
+   On ARM64 Windows, add `-Platform ARM64` (the tests pick the exe from
+   `build\x64\Release` or `build\ARM64\Release` automatically based on the
+   host architecture).
 
 2. Build the FlaUI helper:
    ```powershell
