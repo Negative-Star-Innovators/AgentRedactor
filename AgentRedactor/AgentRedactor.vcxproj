@@ -5,7 +5,7 @@
     <VcpkgEnableManifest>false</VcpkgEnableManifest>
     <VcpkgEnableClassic>true</VcpkgEnableClassic>
   </PropertyGroup>
-  <Import Project="..\vcpkg\scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('..\vcpkg\scripts\buildsystems\msbuild\vcpkg.props')" />
+  <Import Project="$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props')" />
   <Import Project="packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.props')" />
   <Import Project="packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.props')" />
   <PropertyGroup Label="Globals">
@@ -394,7 +394,7 @@
   </Target>
   <Target Name="AddProcessedXamlFilesToCopyLocal" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Import Project="..\vcpkg\scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('..\vcpkg\scripts\buildsystems\msbuild\vcpkg.targets')" />
+  <Import Project="$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.targets')" />
   <Import Project="packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('packages\Microsoft.Windows.CppWinRT.2.0.240405.15\build\native\Microsoft.Windows.CppWinRT.targets')" />
   <Import Project="packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('packages\Microsoft.WindowsAppSDK.1.6.250228001\build\native\Microsoft.WindowsAppSDK.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

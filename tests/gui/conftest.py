@@ -102,11 +102,15 @@ async def gui_app(
         app.stop()
         if returncode is not None and returncode != 0:
             localappdata = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
-            agent_dir = localappdata / "AgentRedactor"
-            for rel in ("sessions/gui_test_stdout.txt", "sessions/gui_test_stderr.txt", "agent_redactor.log"):
-                path = agent_dir / rel
+            appdata = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+            candidates = [
+                localappdata / "AgentRedactor" / "sessions" / "gui_test_stdout.txt",
+                localappdata / "AgentRedactor" / "sessions" / "gui_test_stderr.txt",
+                appdata / "AgentRedactor" / "agent_redactor.log",
+            ]
+            for path in candidates:
                 if path.exists():
-                    print(f"\n--- {rel} ---")
+                    print(f"\n--- {path.name} ---")
                     try:
                         print(path.read_text(encoding="utf-8", errors="ignore")[-4000:])
                     except Exception as e:

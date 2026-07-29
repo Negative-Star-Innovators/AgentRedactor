@@ -129,10 +129,25 @@ class GuiAppProcess:
         )
 
         if not _wait_for_port(self.proxy_port, timeout=90.0):
+            details = []
+            returncode = self.process.poll()
+            if returncode is not None:
+                details.append(f"process exited early with code {returncode} (0x{returncode & 0xFFFFFFFF:08X})")
+            # The app writes milestone traces to debug.log next to the exe and
+            # its real log to %APPDATA%\AgentRedactor\agent_redactor.log.
+            debug_log = self.exe_path.parent / "debug.log"
+            for path in (debug_log,):
+                if path.exists():
+                    try:
+                        tail = path.read_text(encoding="utf-8", errors="ignore")[-2000:]
+                        details.append(f"--- tail of {path} ---\n{tail}")
+                    except Exception:
+                        pass
             self.stop()
-            raise RuntimeError(
-                f"AgentRedactor did not start listening on port {self.proxy_port}"
-            )
+            msg = f"AgentRedactor did not start listening on port {self.proxy_port}"
+            if details:
+                msg += "\n" + "\n".join(details)
+            raise RuntimeError(msg)
 
     def stop(self) -> None:
         try:
