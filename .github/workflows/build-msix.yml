@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Needed to publish the MSIX to the rolling "latest" release.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -55,3 +59,15 @@ jobs:
           name: AgentRedactor-msix
           path: repo/AgentRedactor/build/AgentRedactor.msix
           retention-days: 30
+
+      # Publish the MSIX to a rolling "latest" prerelease so anyone can
+      # download the most recent build from the Releases page. Runs only on
+      # pushes to main (not PRs, which may come from forks without secrets).
+      - name: Publish MSIX to latest release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build
+          prerelease: true
+          files: repo/AgentRedactor/build/AgentRedactor.msix
