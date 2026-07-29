@@ -85,41 +85,35 @@ jobs:
           compression-level: 0
           retention-days: 7
 
-  bundle:
+  release:
     needs: build
     runs-on: windows-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: repo
-
       - name: Download per-arch MSIX packages
         uses: actions/download-artifact@v4
         with:
           pattern: AgentRedactor-msix-*
-          path: repo/AgentRedactor/build
+          path: msix
           merge-multiple: true
 
-      - name: Create MSIX bundle (x64 + arm64)
+      # Remove the stale bundle asset from earlier releases (it exceeded
+      # GitHub's 2 GB per-asset limit; we now publish per-arch MSIX files).
+      - name: Delete old bundle asset if present
         shell: pwsh
-        run: repo/AgentRedactor/buildbundle.ps1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete-asset latest AgentRedactor.msixbundle -R ${{ github.repository }}
 
-      - name: Upload MSIX bundle artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AgentRedactor-msixbundle
-          path: repo/AgentRedactor/build/AgentRedactor.msixbundle
-          retention-days: 30
-
-      # Publish the bundle to a rolling "latest" prerelease so anyone can
-      # download the most recent build from the Releases page. Runs only on
-      # pushes to main (not PRs, which may come from forks without secrets).
-      - name: Publish MSIX bundle to latest release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      # Publish both per-arch MSIX packages to the rolling "latest" prerelease.
+      # (Each is ~1.8 GB, under GitHub's 2 GB per-asset limit; a combined
+      # bundle would exceed it. Partner Center accepts both files in a single
+      # Store submission and serves the right arch per device.)
+      - name: Publish MSIX packages to latest release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: Latest build
           prerelease: true
-          files: repo/AgentRedactor/build/AgentRedactor.msixbundle
+          files: msix/AgentRedactor-*.msix

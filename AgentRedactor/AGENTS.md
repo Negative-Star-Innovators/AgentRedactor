@@ -37,7 +37,7 @@ Run from the `AgentRedactor` folder when you need installer packages:
 
 This performs a release build and then packages the output into:
 - `build\AgentRedactor-<arch>.msix` (per architecture; pass `-Platform x64` or `-Platform ARM64`, default x64)
-- `build\AgentRedactor.msixbundle` (x64 + ARM64 combined, via `.\buildbundle.ps1` after building both archs — this is the single package to submit to the Store)
+- `build\AgentRedactor.msixbundle` (x64 + ARM64 combined, via `.\buildbundle.ps1` after building both archs — optional; for the Store we submit the two per-arch `.msix` files in one submission instead, since the bundle exceeds GitHub's 2 GB release-asset limit)
 - `build\msi\AgentRedactor.msi`
 
 The script also:

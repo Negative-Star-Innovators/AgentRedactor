@@ -54,14 +54,14 @@ cd AgentRedactor
 .\build.ps1
 ```
 
-After building both architectures, combine them into the single Store package:
+For the Store, upload **both** per-architecture MSIX files (`AgentRedactor-x64.msix`
+and `AgentRedactor-arm64.msix`) to a single Partner Center submission — the Store
+serves the right architecture to each device. (A combined `.msixbundle` also works
+— `.\buildbundle.ps1` builds one — but the two-file submission is what we publish,
+since the bundle exceeds GitHub's 2 GB release-asset limit.)
 
-```powershell
-.\buildbundle.ps1   # -> AgentRedactor\build\AgentRedactor.msixbundle
-```
-
-The MSIX/bundle is unsigned; the Microsoft Store signs it on submission. To install it
-locally you must sign it with your own certificate first.
+The MSIX packages are unsigned; the Microsoft Store signs them on submission. To install
+locally you must sign with your own certificate first.
 
 ## Tests
 
