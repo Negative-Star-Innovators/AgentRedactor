@@ -1833,9 +1833,9 @@ namespace FlaUIHelper
                     InvokeElement(check);
 
                     // Poll for the dialog's password boxes; on slow runners the
-                    // ContentDialog can take seconds to appear and may render as
-                    // a popup outside the main window.
-                    passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(15));
+                    // ContentDialog can take many seconds to appear and may
+                    // render as a popup outside the main window.
+                    passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(30));
                 }
                 tookAction = true;
 
@@ -1843,14 +1843,20 @@ namespace FlaUIHelper
                 {
                     var confirmEdit = FindDialogEditByName(automation, window, "Confirm password", TimeSpan.FromSeconds(10));
                     if (passEdit == null || confirmEdit == null)
+                    {
+                        DumpUiTree(automation, window);
                         throw new InvalidOperationException("Set master password password boxes not found.");
+                    }
                     SetEditValue(passEdit, password);
                     SetEditValue(confirmEdit, confirm);
                 }
                 else
                 {
                     if (passEdit == null)
+                    {
+                        DumpUiTree(automation, window);
                         throw new InvalidOperationException("Disable master password password box not found.");
+                    }
                     SetEditValue(passEdit, password);
                 }
 
@@ -1875,26 +1881,144 @@ namespace FlaUIHelper
 
         private static AutomationElement FindDialogEditByName(UIA3Automation automation, Window window, string name, TimeSpan timeout)
         {
-            // ContentDialogs may render as a popup that is not a descendant of
-            // the main window, so fall back to a desktop-wide search.
-            var desktop = automation.GetDesktop();
-            return Retry.WhileNull(() =>
-            {
-                var el = window.FindFirstDescendant(x => x.ByControlType(ControlType.Edit).And(x.ByName(name)));
-                if (el != null) return el;
-                return desktop.FindFirstDescendant(x => x.ByControlType(ControlType.Edit).And(x.ByName(name)));
-            }, timeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
+            return FindDialogElement(automation, window, name, true, timeout);
         }
 
         private static AutomationElement FindDialogButtonByName(UIA3Automation automation, Window window, string name, TimeSpan timeout)
         {
+            return FindDialogElement(automation, window, name, false, timeout);
+        }
+
+        private static AutomationElement FindDialogElement(UIA3Automation automation, Window window, string name, bool editsOnly, TimeSpan timeout)
+        {
+            // ContentDialogs may render as a popup that is not a descendant of
+            // the main window, so after the window search, scan the desktop's
+            // top-level windows one by one. Every UIA call is wrapped so a
+            // single misbehaving element or window (e.g. COMException
+            // E_UNEXPECTED) is treated as "not found, keep polling" instead of
+            // aborting the whole search.
             var desktop = automation.GetDesktop();
             return Retry.WhileNull(() =>
             {
-                var el = window.FindFirstDescendant(x => x.ByName(name));
-                if (el != null) return el;
-                return desktop.FindFirstDescendant(x => x.ByName(name));
+                try
+                {
+                    var el = editsOnly
+                        ? window.FindFirstDescendant(x => x.ByControlType(ControlType.Edit).And(x.ByName(name)))
+                        : window.FindFirstDescendant(x => x.ByName(name));
+                    if (el != null) return el;
+                }
+                catch { }
+
+                AutomationElement[] topLevel;
+                try { topLevel = desktop.FindAllChildren(); }
+                catch { return null; }
+
+                foreach (var top in topLevel)
+                {
+                    try
+                    {
+                        var el = editsOnly
+                            ? top.FindFirstDescendant(x => x.ByControlType(ControlType.Edit).And(x.ByName(name)))
+                            : top.FindFirstDescendant(x => x.ByName(name));
+                        if (el != null) return el;
+                    }
+                    catch { }
+                }
+                return null;
             }, timeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
+        }
+
+        private static void DumpUiTree(UIA3Automation automation, Window window)
+        {
+            // Diagnostic dump for CI logs: what is actually on screen when the
+            // master password dialog cannot be found. Prints structure only
+            // (control types, names, ids) — never field values, so no password
+            // content can leak.
+            const int maxLines = 300;
+            int lines = 0;
+
+            try
+            {
+                var check = FindByAutomationId(window, "RequirePasswordCheck")?.AsCheckBox();
+                var btn = FindByAutomationId(window, "ChangePasswordBtn")?.AsButton();
+                Console.WriteLine($"DIAG RequirePasswordCheck.IsChecked={check?.IsChecked} ChangePasswordBtn.IsEnabled={btn?.IsEnabled}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG state read failed: {ex.Message}");
+            }
+
+            AutomationElement[] topLevel;
+            try { topLevel = automation.GetDesktop().FindAllChildren(); }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG desktop enumeration failed: {ex.Message}");
+                return;
+            }
+
+            Console.WriteLine($"DIAG top-level windows: {topLevel.Length}");
+            foreach (var top in topLevel)
+            {
+                if (lines >= maxLines)
+                {
+                    Console.WriteLine("DIAG ... output truncated ...");
+                    return;
+                }
+
+                string name, className, automationId;
+                try
+                {
+                    name = top.Properties.Name.ValueOrDefault ?? "";
+                    className = top.Properties.ClassName.ValueOrDefault ?? "";
+                    automationId = top.Properties.AutomationId.ValueOrDefault ?? "";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"DIAG window <unreadable: {ex.Message}>");
+                    lines++;
+                    continue;
+                }
+
+                Console.WriteLine($"DIAG window Name='{name}' Class='{className}' Id='{automationId}'");
+                lines++;
+
+                string haystack = name + " " + className + " " + automationId;
+                bool interesting =
+                    haystack.IndexOf("Agent", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    haystack.IndexOf("Redactor", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    haystack.IndexOf("Xaml", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    haystack.IndexOf("Popup", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    haystack.IndexOf("Dialog", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (interesting)
+                {
+                    DumpDescendants(top, 1, 3, ref lines, maxLines);
+                }
+            }
+        }
+
+        private static void DumpDescendants(AutomationElement parent, int depth, int maxDepth, ref int lines, int maxLines)
+        {
+            if (depth > maxDepth || lines >= maxLines) return;
+
+            AutomationElement[] children;
+            try { children = parent.FindAllChildren(); }
+            catch { return; }
+
+            foreach (var child in children)
+            {
+                if (lines >= maxLines) return;
+                try
+                {
+                    string indent = new string(' ', depth * 2);
+                    string childName = child.Properties.Name.ValueOrDefault ?? "";
+                    string childId = child.Properties.AutomationId.ValueOrDefault ?? "";
+                    bool offscreen = child.Properties.IsOffscreen.ValueOrDefault;
+                    Console.WriteLine($"DIAG {indent}{child.ControlType} Name='{childName}' Id='{childId}' Offscreen={offscreen}");
+                    lines++;
+                }
+                catch { continue; }
+                DumpDescendants(child, depth + 1, maxDepth, ref lines, maxLines);
+            }
         }
 
         private static bool WaitForChangePasswordButtonState(Window window, bool expectedEnabled, int timeoutMs)
