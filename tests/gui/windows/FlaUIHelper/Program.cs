@@ -948,22 +948,49 @@ namespace FlaUIHelper
             }
 
             var window = PrepareWindow(automation);
-            var regexBox = FindByAutomationId(window, "NewRegexBox").AsTextBox();
 
-            SetTextBoxValue(regexBox, pattern);
-            Console.WriteLine("Entered regex; pausing for observation...");
-            Thread.Sleep(ObservationDelayMs);
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                // Re-find the box each attempt; the element can go stale after the
+                // list updates on a slow machine.
+                var regexBox = FindByAutomationId(window, "NewRegexBox").AsTextBox();
 
-            regexBox.Focus();
-            Thread.Sleep(50);
-            Keyboard.Press(VirtualKeyShort.RETURN);
+                SetTextBoxValue(regexBox, pattern);
+                Console.WriteLine("Entered regex; pausing for observation...");
+                Thread.Sleep(ObservationDelayMs);
 
-            Thread.Sleep(ListUpdateDelayMs + ObservationDelayMs);
-            Console.WriteLine("Regex added; pausing for observation...");
-            Thread.Sleep(ObservationDelayMs);
+                regexBox.Focus();
+                Thread.Sleep(50);
+                Keyboard.Press(VirtualKeyShort.RETURN);
 
-            Console.WriteLine("OK");
-            return 0;
+                Thread.Sleep(ListUpdateDelayMs + ObservationDelayMs);
+                Console.WriteLine("Regex added; pausing for observation...");
+
+                if (WaitForRegexRow(window, pattern, 5000))
+                {
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+                Console.WriteLine($"Regex row did not appear after attempt {attempt + 1}; retrying...");
+            }
+
+            Console.Error.WriteLine($"ERROR: regex '{pattern}' did not appear in the regex list after 3 attempts.");
+            return 1;
+        }
+
+        private static bool WaitForRegexRow(Window window, string text, int timeoutMs)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            do
+            {
+                foreach (var (idx, textBox) in FindRegexTextBoxes(window))
+                {
+                    if (ExtractRegexText(textBox, idx).Equals(text, StringComparison.Ordinal))
+                        return true;
+                }
+                Thread.Sleep(250);
+            } while (DateTime.UtcNow < deadline);
+            return false;
         }
 
         private static int SetForwardUrl(UIA3Automation automation, string[] args)
@@ -1609,43 +1636,75 @@ namespace FlaUIHelper
 
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
-            var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
-            bool currentlyEnabled = check.IsChecked.HasValue && check.IsChecked.Value;
 
-            if (enabled == currentlyEnabled)
+            for (int attempt = 0; attempt < 3; attempt++)
             {
-                Console.WriteLine($"Master password already {(enabled ? "enabled" : "disabled")}.");
-                Console.WriteLine("OK");
-                return 0;
+                var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
+                bool currentlyEnabled = check.IsChecked.HasValue && check.IsChecked.Value;
+
+                if (enabled == currentlyEnabled)
+                {
+                    if (attempt == 0)
+                        Console.WriteLine($"Master password already {(enabled ? "enabled" : "disabled")}.");
+                }
+                else
+                {
+                    InvokeElement(check);
+                    Thread.Sleep(SettleDelayMs);
+
+                    if (enabled)
+                    {
+                        var passEdit = FindWindowEditByName(window, "Password", TimeSpan.FromSeconds(10));
+                        var confirmEdit = FindWindowEditByName(window, "Confirm password", TimeSpan.FromSeconds(10));
+                        if (passEdit == null || confirmEdit == null)
+                            throw new InvalidOperationException("Set master password password boxes not found.");
+                        SetEditValue(passEdit, password);
+                        SetEditValue(confirmEdit, confirm);
+                        var btn = FindWindowButtonByName(window, "Set Password", TimeSpan.FromSeconds(5));
+                        InvokeElement(btn);
+                    }
+                    else
+                    {
+                        var passEdit = FindWindowEditByName(window, "Current password", TimeSpan.FromSeconds(10));
+                        if (passEdit == null)
+                            throw new InvalidOperationException("Disable master password password box not found.");
+                        SetEditValue(passEdit, password);
+                        var btn = FindWindowButtonByName(window, "Disable", TimeSpan.FromSeconds(5));
+                        InvokeElement(btn);
+                    }
+
+                    Thread.Sleep(SettleDelayMs);
+                }
+
+                // Verify the action took effect: the Change password button should
+                // be enabled exactly when a master password is set.
+                if (WaitForChangePasswordButtonState(window, enabled, 5000))
+                {
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+                Console.WriteLine($"Master password state did not settle after attempt {attempt + 1}; retrying...");
             }
 
-            InvokeElement(check);
-            Thread.Sleep(SettleDelayMs);
+            Console.Error.WriteLine($"ERROR: Change password button did not become {(enabled ? "enabled" : "disabled")} after 3 attempts.");
+            return 1;
+        }
 
-            if (enabled)
+        private static bool WaitForChangePasswordButtonState(Window window, bool expectedEnabled, int timeoutMs)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+            do
             {
-                var passEdit = FindWindowEditByName(window, "Password", TimeSpan.FromSeconds(10));
-                var confirmEdit = FindWindowEditByName(window, "Confirm password", TimeSpan.FromSeconds(10));
-                if (passEdit == null || confirmEdit == null)
-                    throw new InvalidOperationException("Set master password password boxes not found.");
-                SetEditValue(passEdit, password);
-                SetEditValue(confirmEdit, confirm);
-                var btn = FindWindowButtonByName(window, "Set Password", TimeSpan.FromSeconds(5));
-                InvokeElement(btn);
-            }
-            else
-            {
-                var passEdit = FindWindowEditByName(window, "Current password", TimeSpan.FromSeconds(10));
-                if (passEdit == null)
-                    throw new InvalidOperationException("Disable master password password box not found.");
-                SetEditValue(passEdit, password);
-                var btn = FindWindowButtonByName(window, "Disable", TimeSpan.FromSeconds(5));
-                InvokeElement(btn);
-            }
-
-            Thread.Sleep(SettleDelayMs);
-            Console.WriteLine("OK");
-            return 0;
+                try
+                {
+                    var btn = FindByAutomationId(window, "ChangePasswordBtn");
+                    if (btn != null && btn.AsButton().IsEnabled == expectedEnabled)
+                        return true;
+                }
+                catch { }
+                Thread.Sleep(250);
+            } while (DateTime.UtcNow < deadline);
+            return false;
         }
 
         private static int ChangeMasterPassword(UIA3Automation automation, string[] args)

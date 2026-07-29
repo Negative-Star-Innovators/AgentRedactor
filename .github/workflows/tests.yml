@@ -8,7 +8,10 @@ name: Tests
 #   gui-tests-hosted    GitHub-hosted windows-latest. Hosted Windows runners
 #                       auto-logon to an interactive desktop session, so UI
 #                       automation generally works there. Free for public
-#                       repos.
+#                       repos. Does NOT compile the app: it downloads the
+#                       AgentRedactor-release-bin artifact from the latest
+#                       successful Build MSIX run on main, so that workflow
+#                       must have run at least once.
 #   gui-tests           Self-hosted Windows runner logged in to an interactive
 #                       session. Kept as a fallback in case the hosted job
 #                       turns out to be flaky for this app.
@@ -27,23 +30,25 @@ jobs:
         with:
           path: repo
 
-      # Cache the whole vcpkg tree (including installed packages) so the
-      # onnxruntime/json/wil install only happens once. Bump v1 to invalidate.
-      - name: Cache vcpkg
-        uses: actions/cache@v4
-        with:
-          path: vcpkg
-          key: vcpkg-onnxruntime-nlohmann-json-wil-v1
-
-      - name: Clone vcpkg
+      # Reuse the Release binaries built by the Build MSIX workflow instead of
+      # compiling here (vcpkg + msbuild was the bulk of this job's runtime).
+      - name: Find latest successful Build MSIX run
+        id: msix
         shell: pwsh
-        run: if (-not (Test-Path vcpkg)) { git clone https://github.com/microsoft/vcpkg vcpkg }
-
-      - name: Install vcpkg dependencies
-        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if (-not (Test-Path vcpkg\vcpkg.exe)) { vcpkg\bootstrap-vcpkg.bat -disableMetrics }
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
+          $id = gh run list --workflow build-msix.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId'
+          if (-not $id) { throw "No successful Build MSIX run found on main; run that workflow first." }
+          echo "run_id=$id" >> $env:GITHUB_OUTPUT
+
+      - name: Download prebuilt AgentRedactor binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: AgentRedactor-release-bin
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ steps.msix.outputs.run_id }}
+          path: repo/AgentRedactor/build/x64/Release
 
       # The ONNX weights are ~1.6 GB; cache them across runs. Bump v1 to
       # invalidate. Restored cache makes the download step below a no-op.
@@ -62,9 +67,13 @@ jobs:
             gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
           }
 
-      - name: Build app (buildquick.ps1)
+      # The binaries artifact excludes models/; copy the cached model in.
+      - name: Restore ONNX model into build output
         shell: pwsh
-        run: repo/AgentRedactor/buildquick.ps1 -Configuration Release
+        run: |
+          robocopy repo/AgentRedactor/models repo/AgentRedactor/build/x64/Release/models /E /NFL /NDL /NJH /NJS | Out-Null
+          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
+          exit 0
 
       - name: Build FlaUI helper
         shell: pwsh

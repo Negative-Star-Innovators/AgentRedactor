@@ -172,11 +172,12 @@ def add_regex(pattern: str) -> None:
 def get_log_text(max_chars: int = 50_000) -> str:
     """Read the tail of the AgentRedactor log file.
 
-    Uses the real LOCALAPPDATA location that the GUI test fixtures
-    isolate for each test run.
+    The app writes its logs to Roaming APPDATA (with settings), NOT to
+    LocalAppData (see InitializeLogging in src/utils.cpp). The GUI test
+    fixtures isolate that directory for each test run.
     """
     log_path = (
-        Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData/Local"))
+        Path(os.environ.get("APPDATA", Path.home() / "AppData/Roaming"))
         / "AgentRedactor"
         / "agent_redactor.log"
     )
@@ -191,11 +192,12 @@ def get_log_text(max_chars: int = 50_000) -> str:
 def get_debug_log_text(max_chars: int = 50_000) -> str:
     """Read the tail of the AgentRedactor debug traffic log file.
 
-    Uses the real LOCALAPPDATA location that the GUI test fixtures
-    isolate for each test run. Returns "" if the file does not exist.
+    The app writes its logs to Roaming APPDATA (with settings), NOT to
+    LocalAppData (see InitializeDebugTrafficLogging in src/utils.cpp).
+    Returns "" if the file does not exist.
     """
     log_path = (
-        Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData/Local"))
+        Path(os.environ.get("APPDATA", Path.home() / "AppData/Roaming"))
         / "AgentRedactor"
         / "agent_redactor_debug.log"
     )

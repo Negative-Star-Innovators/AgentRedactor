@@ -60,6 +60,24 @@ jobs:
           path: repo/AgentRedactor/build/AgentRedactor.msix
           retention-days: 30
 
+      # Upload the unpackaged Release build so the gui-tests-hosted job can
+      # reuse it instead of compiling again. (The MSIX itself is unsuitable
+      # for the tests: installing it virtualizes AppData, which the tests
+      # depend on.) models/ (1.6 GB, cached separately in the test job),
+      # obj/ (build intermediates) and the .pdb are excluded.
+      - name: Upload Release binaries artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-release-bin
+          path: |
+            repo/AgentRedactor/build/x64/Release
+            !repo/AgentRedactor/build/x64/Release/models
+            !repo/AgentRedactor/build/x64/Release/obj
+            !repo/AgentRedactor/build/x64/Release/*.pdb
+          compression-level: 0
+          retention-days: 7
+
       # Publish the MSIX to a rolling "latest" prerelease so anyone can
       # download the most recent build from the Releases page. Runs only on
       # pushes to main (not PRs, which may come from forks without secrets).
