@@ -90,8 +90,31 @@ namespace FlaUIHelper
         [DllImport("kernel32.dll")]
         private static extern uint GetCurrentThreadId();
 
+        [DllImport("user32.dll")]
+        private static extern bool OpenClipboard(IntPtr hWndNewOwner);
+
+        [DllImport("user32.dll")]
+        private static extern bool CloseClipboard();
+
+        [DllImport("user32.dll")]
+        private static extern bool EmptyClipboard();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GlobalLock(IntPtr hMem);
+
+        [DllImport("kernel32.dll")]
+        private static extern bool GlobalUnlock(IntPtr hMem);
+
         private const int SW_RESTORE = 9;
         private const uint WM_CLOSE = 0x0010;
+        private const uint CF_UNICODETEXT = 13;
+        private const uint GMEM_MOVEABLE = 0x0002;
 
         private static int Main(string[] args)
         {
@@ -523,7 +546,8 @@ namespace FlaUIHelper
         // A failed master-password attempt leaves the app's validation error
         // ContentDialog (titled "Error", close button "OK") open on top of the
         // main window. Dismiss it so the next attempt starts from a clean UI.
-        private static void DismissAppErrorDialog(Window window)
+        // Returns true when a dialog was dismissed.
+        private static bool DismissAppErrorDialog(Window window)
         {
             try
             {
@@ -531,7 +555,7 @@ namespace FlaUIHelper
                     x => x.ByControlType(ControlType.Window).And(x.ByName("Error")));
                 if (errorDialog == null)
                 {
-                    return;
+                    return false;
                 }
                 AutomationElement closeBtn = null;
                 try { closeBtn = errorDialog.FindFirstDescendant(x => x.ByName("OK")); } catch { }
@@ -541,9 +565,11 @@ namespace FlaUIHelper
                 {
                     InvokeElement(closeBtn);
                     Thread.Sleep(SettleDelayMs);
+                    return true;
                 }
             }
             catch { }
+            return false;
         }
 
         private static void ScrollToBottomWithKeyboard(Window window)
@@ -1841,8 +1867,61 @@ namespace FlaUIHelper
                 Keyboard.Press(VirtualKeyShort.KEY_A);
             }
             Thread.Sleep(TypeDelayMs);
-            Keyboard.Type(value);
+            // Paste the value atomically: per-key typing can drop or double a
+            // character on a busy runner, and for password boxes a mismatch is
+            // indistinguishable from an empty field (the value is unreadable
+            // via UIA), which then strands the flow on a validation error
+            // dialog. Fall back to per-key typing only if the clipboard cannot
+            // be opened.
+            if (TrySetClipboardText(value))
+            {
+                using (Keyboard.Pressing(VirtualKeyShort.CONTROL))
+                {
+                    Keyboard.Press(VirtualKeyShort.KEY_V);
+                }
+            }
+            else
+            {
+                Console.WriteLine("DIAG SetEditValue: clipboard unavailable, falling back to per-key typing.");
+                Keyboard.Type(value);
+            }
             Thread.Sleep(TypeDelayMs);
+        }
+
+        private static bool TrySetClipboardText(string text)
+        {
+            // The clipboard can be held briefly by another process; retry.
+            for (int i = 0; i < 10; i++)
+            {
+                if (OpenClipboard(IntPtr.Zero))
+                {
+                    try
+                    {
+                        EmptyClipboard();
+                        var hMem = GlobalAlloc(GMEM_MOVEABLE, (UIntPtr)((text.Length + 1) * 2));
+                        if (hMem == IntPtr.Zero)
+                        {
+                            return false;
+                        }
+                        var ptr = GlobalLock(hMem);
+                        if (ptr == IntPtr.Zero)
+                        {
+                            return false;
+                        }
+                        Marshal.Copy(text.ToCharArray(), 0, ptr, text.Length);
+                        Marshal.WriteInt16(ptr, text.Length * 2, 0);
+                        GlobalUnlock(hMem);
+                        // On success the clipboard owns hMem.
+                        return SetClipboardData(CF_UNICODETEXT, hMem) != IntPtr.Zero;
+                    }
+                    finally
+                    {
+                        CloseClipboard();
+                    }
+                }
+                Thread.Sleep(100);
+            }
+            return false;
         }
 
         private static string DescribeForegroundWindow()
@@ -1995,7 +2074,6 @@ namespace FlaUIHelper
             LogAgentRedactorLiveness("set-master-password start");
 
             bool tookAction = false;
-            bool invokedCheck = false;
             for (int attempt = 0; attempt < 3; attempt++)
             {
                 LogAgentRedactorLiveness($"attempt start {attempt + 1}");
@@ -2003,7 +2081,10 @@ namespace FlaUIHelper
                 // attempt, and any validation error dialog a previous attempt
                 // left behind; typing below needs the app to own the foreground.
                 DismissShellNags(automation);
-                DismissAppErrorDialog(window);
+                if (DismissAppErrorDialog(window))
+                {
+                    Console.WriteLine($"DIAG attempt {attempt + 1}: dismissed a leftover validation error dialog.");
+                }
                 // The app process dying mid-flow is unrecoverable; stop instead
                 // of clicking anything else.
                 if (AgentRedactorProcessCount() == 0)
@@ -2024,26 +2105,25 @@ namespace FlaUIHelper
                     return 0;
                 }
 
-                // Reuse a dialog left open by a previous attempt instead of
-                // toggling the checkbox again.
+                // Reuse a dialog left open by a previous attempt; otherwise
+                // open a fresh one. Re-invoking is safe: RequirePassword_Click
+                // in HomePage.cpp returns early while a dialog is in flight,
+                // so a duplicate invoke is a no-op rather than a crash, and if
+                // a validation error closed the previous dialog this reopens
+                // it so the attempt can recover.
                 string editName = enabled ? "Password" : "Current password";
                 string buttonName = enabled ? "Set Password" : "Disable";
                 var passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(1));
-                if (passEdit == null && !invokedCheck)
+                if (passEdit == null)
                 {
-                    // Invoke the checkbox at most once per call: WinUI allows a
-                    // single ContentDialog, and a second ShowAsync while the
-                    // first is in flight terminates the app process.
                     var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
                     InvokeElement(check);
-                    invokedCheck = true;
                 }
                 if (passEdit == null)
                 {
                     // Keep polling for the dialog's password boxes; on slow
                     // runners the ContentDialog can take many seconds to appear
-                    // and may render as a popup outside the main window. Never
-                    // re-invoke the checkbox on retries.
+                    // and may render as a popup outside the main window.
                     passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(30));
                 }
                 tookAction = true;
