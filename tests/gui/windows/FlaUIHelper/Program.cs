@@ -78,6 +78,18 @@ namespace FlaUIHelper
         [DllImport("user32.dll")]
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        [DllImport("user32.dll")]
+        private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        [DllImport("user32.dll")]
+        private static extern bool BringWindowToTop(IntPtr hWnd);
+
+        [DllImport("kernel32.dll")]
+        private static extern uint GetCurrentThreadId();
+
         private const int SW_RESTORE = 9;
         private const uint WM_CLOSE = 0x0010;
 
@@ -385,32 +397,66 @@ namespace FlaUIHelper
                 ControlFindTimeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
         }
 
-        private static void BringToForeground(Window window)
+        private static bool BringToForeground(Window window)
         {
             try
             {
                 var hwnd = window.Properties.NativeWindowHandle;
                 if (hwnd == IntPtr.Zero)
                 {
-                    return;
+                    return false;
                 }
-                // SetForegroundWindow can be silently refused while another
-                // window (e.g. the Windows 11 client OOBE nag) holds foreground
-                // rights, so retry briefly until it actually sticks.
+                // SetForegroundWindow is silently refused for a background
+                // process while another window (OOBE nag, Search flyout, ...)
+                // holds foreground rights. Temporarily attaching our input
+                // queue to the foreground window's thread makes the call
+                // acceptable to Windows. Verified by polling
+                // GetForegroundWindow; returns false if nothing worked.
                 var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(2);
                 do
                 {
                     ShowWindow(hwnd, SW_RESTORE);
-                    SetForegroundWindow(hwnd);
+                    var fg = GetForegroundWindow();
+                    uint curThread = GetCurrentThreadId();
+                    uint fgThread = fg != IntPtr.Zero ? GetWindowThreadProcessId(fg, out _) : 0;
+                    uint appThread = GetWindowThreadProcessId(hwnd, out _);
+                    bool attachedFg = fgThread != 0 && fgThread != curThread && AttachThreadInput(curThread, fgThread, true);
+                    bool attachedApp = appThread != 0 && appThread != curThread && AttachThreadInput(curThread, appThread, true);
+                    try
+                    {
+                        BringWindowToTop(hwnd);
+                        SetForegroundWindow(hwnd);
+                    }
+                    finally
+                    {
+                        if (attachedFg) AttachThreadInput(curThread, fgThread, false);
+                        if (attachedApp) AttachThreadInput(curThread, appThread, false);
+                    }
                     if (GetForegroundWindow() == hwnd)
                     {
-                        return;
+                        return true;
                     }
                     Thread.Sleep(100);
                 }
                 while (DateTime.UtcNow < deadline);
+
+                // Last resort: a genuine mouse click on the title bar counts
+                // as user input, which grants foreground legitimately.
+                try
+                {
+                    var r = window.BoundingRectangle;
+                    if (!r.IsEmpty)
+                    {
+                        Mouse.MoveTo(r.Left + r.Width / 2, r.Top + 12);
+                        Thread.Sleep(50);
+                        Mouse.Click();
+                        Thread.Sleep(200);
+                    }
+                }
+                catch { }
+                return GetForegroundWindow() == hwnd;
             }
-            catch { }
+            catch { return false; }
         }
 
         private static void MaximizeWindow(Window window)
@@ -424,14 +470,16 @@ namespace FlaUIHelper
         }
 
         // The Windows 11 client image (windows-11-arm runner) periodically shows
-        // the first-sign-in OOBE nag ("Microsoft account / Choose privacy
-        // settings", hosted by CloudExperienceHost). It takes the foreground
-        // mid-run, so keystrokes meant for the app's ContentDialog land in the
-        // nag instead. Kill the hosting processes and close its windows; every
-        // step is best-effort and must never throw.
-        private static void DismissOobeWindows(UIA3Automation automation)
+        // shell nags that take the foreground mid-run, so keystrokes meant for
+        // the app's ContentDialog land in the nag instead: the first-sign-in
+        // OOBE screen ("Microsoft account / Choose privacy settings", hosted
+        // by CloudExperienceHost) and the Search flyout (SearchHost), which
+        // also opens by itself when stray keystrokes reach the desktop. Kill
+        // the hosting processes and close their windows; every step is
+        // best-effort and must never throw.
+        private static void DismissShellNags(UIA3Automation automation)
         {
-            foreach (var name in new[] { "CloudExperienceHost", "UserOOBEBroker" })
+            foreach (var name in new[] { "CloudExperienceHost", "UserOOBEBroker", "SearchHost" })
             {
                 try
                 {
@@ -453,12 +501,12 @@ namespace FlaUIHelper
                 {
                     string className = top.Properties.ClassName.ValueOrDefault ?? "";
                     string name = top.Properties.Name.ValueOrDefault ?? "";
-                    bool isOobe =
+                    bool isNag =
                         className == "UserOOBEWindowClass" ||
                         className == "Shell_OOBEProxy" ||
                         (className == "Windows.UI.Core.CoreWindow" &&
-                            (name == "Microsoft account" || name == "Windows Setup"));
-                    if (!isOobe)
+                            (name == "Microsoft account" || name == "Windows Setup" || name == "Search"));
+                    if (!isNag)
                     {
                         continue;
                     }
@@ -470,6 +518,32 @@ namespace FlaUIHelper
                 }
                 catch { }
             }
+        }
+
+        // A failed master-password attempt leaves the app's validation error
+        // ContentDialog (titled "Error", close button "OK") open on top of the
+        // main window. Dismiss it so the next attempt starts from a clean UI.
+        private static void DismissAppErrorDialog(Window window)
+        {
+            try
+            {
+                var errorDialog = window.FindFirstDescendant(
+                    x => x.ByControlType(ControlType.Window).And(x.ByName("Error")));
+                if (errorDialog == null)
+                {
+                    return;
+                }
+                AutomationElement closeBtn = null;
+                try { closeBtn = errorDialog.FindFirstDescendant(x => x.ByName("OK")); } catch { }
+                if (closeBtn == null)
+                    try { closeBtn = errorDialog.FindFirstDescendant(x => x.ByAutomationId("CloseButton")); } catch { }
+                if (closeBtn != null)
+                {
+                    InvokeElement(closeBtn);
+                    Thread.Sleep(SettleDelayMs);
+                }
+            }
+            catch { }
         }
 
         private static void ScrollToBottomWithKeyboard(Window window)
@@ -1757,6 +1831,11 @@ namespace FlaUIHelper
         {
             edit.Focus();
             Thread.Sleep(50);
+            try
+            {
+                Console.WriteLine($"DIAG SetEditValue '{edit.Name}': HasKeyboardFocus={edit.Properties.HasKeyboardFocus.ValueOrDefault}");
+            }
+            catch { }
             using (Keyboard.Pressing(VirtualKeyShort.CONTROL))
             {
                 Keyboard.Press(VirtualKeyShort.KEY_A);
@@ -1764,6 +1843,22 @@ namespace FlaUIHelper
             Thread.Sleep(TypeDelayMs);
             Keyboard.Type(value);
             Thread.Sleep(TypeDelayMs);
+        }
+
+        private static string DescribeForegroundWindow()
+        {
+            try
+            {
+                var fg = GetForegroundWindow();
+                if (fg == IntPtr.Zero)
+                {
+                    return "foreground=none";
+                }
+                var sb = new System.Text.StringBuilder(256);
+                GetWindowText(fg, sb, sb.Capacity);
+                return $"foreground=0x{fg.ToInt64():X} '{sb}'";
+            }
+            catch { return "foreground=?"; }
         }
 
         private static string GetTextBlockText(AutomationElement element)
@@ -1904,9 +1999,11 @@ namespace FlaUIHelper
             for (int attempt = 0; attempt < 3; attempt++)
             {
                 LogAgentRedactorLiveness($"attempt start {attempt + 1}");
-                // Clear any OOBE nag that took the foreground since the last
-                // attempt; typing below needs the app to own the foreground.
-                DismissOobeWindows(automation);
+                // Clear any shell nag that took the foreground since the last
+                // attempt, and any validation error dialog a previous attempt
+                // left behind; typing below needs the app to own the foreground.
+                DismissShellNags(automation);
+                DismissAppErrorDialog(window);
                 // The app process dying mid-flow is unrecoverable; stop instead
                 // of clicking anything else.
                 if (AgentRedactorProcessCount() == 0)
@@ -1960,8 +2057,9 @@ namespace FlaUIHelper
                         throw new InvalidOperationException("Set master password password boxes not found.");
                     }
                     // Typing is focus-dependent; make sure the app (not a
-                    // leftover OOBE nag) owns the foreground before typing.
-                    BringToForeground(window);
+                    // leftover shell nag) owns the foreground before typing.
+                    bool fgOk = BringToForeground(window);
+                    Console.WriteLine($"DIAG foreground before typing: acquired={fgOk} ({DescribeForegroundWindow()})");
                     SetEditValue(passEdit, password);
                     SetEditValue(confirmEdit, confirm);
                 }
@@ -1975,7 +2073,6 @@ namespace FlaUIHelper
                     BringToForeground(window);
                     SetEditValue(passEdit, password);
                 }
-
                 var btn = FindDialogButtonByName(automation, window, buttonName, TimeSpan.FromSeconds(10));
                 if (btn == null)
                     throw new InvalidOperationException($"Master password dialog button '{buttonName}' not found.");
