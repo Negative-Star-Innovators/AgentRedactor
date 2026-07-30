@@ -155,6 +155,20 @@ jobs:
         shell: pwsh
         run: repo/tests/gui/windows/build.ps1
 
+      # The app process dies on this runner during the master-password tests
+      # with a 'Windows Security' window in the foreground. Capture Windows
+      # Error Reporting mini-dumps so we can see whether it crashes or is
+      # killed by Defender/Smart App Control.
+      - name: Enable crash dump collection
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path C:\dumps | Out-Null
+          $k = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\AgentRedactor.exe"
+          New-Item -Path $k -Force | Out-Null
+          Set-ItemProperty -Path $k -Name DumpFolder -Value "C:\dumps"
+          Set-ItemProperty -Path $k -Name DumpCount -Value 5
+          Set-ItemProperty -Path $k -Name DumpType -Value 1
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -169,6 +183,26 @@ jobs:
         run: |
           cd repo/tests
           pytest -v gui/
+
+      - name: Show crash event-log entries
+        if: always()
+        shell: pwsh
+        run: |
+          foreach ($provider in @('Application Error', 'Windows Error Reporting')) {
+            Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName=$provider} -MaxEvents 50 -ErrorAction SilentlyContinue |
+              Where-Object { $_.Message -match 'AgentRedactor' } |
+              ForEach-Object { $_.TimeCreated; $_.Message; '---' }
+          }
+          Get-ChildItem C:\dumps -ErrorAction SilentlyContinue | Format-List Name, Length, LastWriteTime
+
+      - name: Upload crash dumps
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arm64-crash-dumps
+          path: C:\dumps
+          if-no-files-found: ignore
+          retention-days: 7
 
   gui-tests:
     runs-on: [self-hosted, windows]

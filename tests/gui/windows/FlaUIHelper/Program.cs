@@ -2057,6 +2057,33 @@ namespace FlaUIHelper
                 Console.WriteLine($"DIAG process enumeration failed: {ex.Message}");
             }
 
+            // Defender/SmartScreen involvement: if the app was killed by
+            // SmartScreen/Smart App Control or crashed, a WerFault,
+            // smartscreen, or SecurityHealth process may be around.
+            try
+            {
+                int related = 0;
+                foreach (var p in Process.GetProcesses())
+                {
+                    string pname;
+                    try { pname = p.ProcessName ?? ""; } catch { continue; }
+                    if (pname.IndexOf("WerFault", StringComparison.OrdinalIgnoreCase) < 0 &&
+                        pname.IndexOf("smartscreen", StringComparison.OrdinalIgnoreCase) < 0 &&
+                        pname.IndexOf("SecurityHealth", StringComparison.OrdinalIgnoreCase) < 0)
+                        continue;
+                    string ptitle = "";
+                    try { ptitle = p.MainWindowTitle ?? ""; } catch { }
+                    Console.WriteLine($"DIAG related process Name='{pname}' Id={p.Id} Title='{ptitle}'");
+                    related++;
+                }
+                if (related == 0)
+                    Console.WriteLine("DIAG related processes (WerFault/smartscreen/SecurityHealth): none");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DIAG related process enumeration failed: {ex.Message}");
+            }
+
             // (b) Foreground window and input desktop name: an OOBE/SCOOBE
             // takeover would show a foreign foreground window and/or a
             // non-"Default" input desktop.
@@ -2071,6 +2098,24 @@ namespace FlaUIHelper
                         foregroundTitle = sb.ToString();
                 }
                 Console.WriteLine($"DIAG ForegroundWindow=0x{foreground.ToInt64():X} Title='{foregroundTitle}'");
+
+                // Dump the foreground window's readable text (e.g. a SmartScreen
+                // or 'Windows Security' prompt) so the CI log shows what it says.
+                if (foreground != IntPtr.Zero)
+                {
+                    try
+                    {
+                        var fgElement = automation.FromHandle(foreground);
+                        int fgLines = 0;
+                        DumpNameBearingDescendants(fgElement, 1, 4, ref fgLines, 80);
+                        if (fgLines >= 80)
+                            Console.WriteLine("DIAG ... foreground text truncated ...");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"DIAG foreground UIA dump failed: {ex.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -2116,6 +2161,35 @@ namespace FlaUIHelper
             catch (Exception ex)
             {
                 Console.WriteLine($"DIAG app window Win32 state read failed: {ex.Message}");
+            }
+        }
+
+        private static void DumpNameBearingDescendants(AutomationElement parent, int depth, int maxDepth, ref int lines, int maxLines)
+        {
+            // Like DumpDescendants, but only prints elements that carry readable
+            // text (non-empty Name) while still recursing through the rest.
+            if (depth > maxDepth || lines >= maxLines) return;
+
+            AutomationElement[] children;
+            try { children = parent.FindAllChildren(); }
+            catch { return; }
+
+            foreach (var child in children)
+            {
+                if (lines >= maxLines) return;
+                try
+                {
+                    string childName = child.Properties.Name.ValueOrDefault ?? "";
+                    if (!string.IsNullOrWhiteSpace(childName))
+                    {
+                        string indent = new string(' ', depth * 2);
+                        string childId = child.Properties.AutomationId.ValueOrDefault ?? "";
+                        Console.WriteLine($"DIAG {indent}{child.ControlType} Name='{childName}' Id='{childId}'");
+                        lines++;
+                    }
+                }
+                catch { continue; }
+                DumpNameBearingDescendants(child, depth + 1, maxDepth, ref lines, maxLines);
             }
         }
 
