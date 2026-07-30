@@ -1830,10 +1830,12 @@ namespace FlaUIHelper
 
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
+            LogAgentRedactorLiveness("set-master-password start");
 
             bool tookAction = false;
             for (int attempt = 0; attempt < 3; attempt++)
             {
+                LogAgentRedactorLiveness($"attempt start {attempt + 1}");
                 // The app reverts RequirePasswordCheck while the dialog is open
                 // (HomePage.cpp RequirePassword_Click), so the checkbox state is
                 // not a reliable progress signal; check the Change password
@@ -1922,8 +1924,17 @@ namespace FlaUIHelper
             // E_UNEXPECTED) is treated as "not found, keep polling" instead of
             // aborting the whole search.
             var desktop = automation.GetDesktop();
+            var lastLivenessLog = DateTime.MinValue;
             return Retry.WhileNull(() =>
             {
+                // Log app-process liveness every ~5s while polling so the CI
+                // log pinpoints when the process dies relative to the search.
+                if (DateTime.UtcNow - lastLivenessLog >= TimeSpan.FromSeconds(5))
+                {
+                    lastLivenessLog = DateTime.UtcNow;
+                    LogAgentRedactorLiveness($"dialog poll for '{name}'");
+                }
+
                 try
                 {
                     var el = editsOnly
@@ -1950,6 +1961,16 @@ namespace FlaUIHelper
                 }
                 return null;
             }, timeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
+        }
+
+        private static void LogAgentRedactorLiveness(string context)
+        {
+            try
+            {
+                int count = Process.GetProcessesByName("AgentRedactor").Length;
+                Console.WriteLine($"DIAG liveness: AgentRedactor processes={count} ({context})");
+            }
+            catch { }
         }
 
         private static void DumpUiTree(UIA3Automation automation, Window window)

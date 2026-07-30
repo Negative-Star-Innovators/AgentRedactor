@@ -155,6 +155,15 @@ jobs:
         shell: pwsh
         run: repo/tests/gui/windows/build.ps1
 
+      # The Windows 11 client image shows a modal Windows Firewall prompt the
+      # first time the app binds its proxy port ("Windows Firewall has blocked
+      # some features of agentredactor..."). It steals foreground for the
+      # whole run and breaks UI automation. Loopback is what the tests use,
+      # so just disable the firewall for the duration of the job.
+      - name: Disable Windows Firewall prompts
+        shell: pwsh
+        run: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
       # The app process dies on this runner during the master-password tests
       # with a 'Windows Security' window in the foreground. Capture Windows
       # Error Reporting mini-dumps so we can see whether it crashes or is
