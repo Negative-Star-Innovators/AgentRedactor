@@ -172,6 +172,8 @@ jobs:
         run: |
           New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Force | Out-Null
           Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name ScoobeSystemSettingEnabled -Value 0
+          New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Force | Out-Null
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Name DisablePrivacyExperience -Value 1
           Get-Process -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -match 'CloudExperienceHost|UserOOBEBroker' } |
             Stop-Process -Force -ErrorAction SilentlyContinue
@@ -197,11 +199,21 @@ jobs:
         shell: pwsh
         run: pip install -r repo/tests/requirements.txt
 
+      # The OOBE nag can respawn mid-run and steal the foreground (keystrokes
+      # for the app's password dialog then land in the nag). Kill its hosting
+      # processes on a loop for the duration of the test run; the FlaUI helper
+      # also dismisses leftover windows on demand.
       - name: Run GUI tests
         shell: pwsh
         run: |
-          cd repo/tests
-          pytest -v gui/
+          $watchdog = Start-Process -PassThru -WindowStyle Hidden powershell -ArgumentList '-NoProfile','-Command',
+            'while ($true) { Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ''CloudExperienceHost|UserOOBEBroker'' } | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2 }'
+          try {
+            cd repo/tests
+            pytest -v gui/
+          } finally {
+            Stop-Process -Id $watchdog.Id -Force -ErrorAction SilentlyContinue
+          }
 
       - name: Show crash event-log entries
         if: always()

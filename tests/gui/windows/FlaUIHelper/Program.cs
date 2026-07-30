@@ -75,7 +75,11 @@ namespace FlaUIHelper
         [DllImport("user32.dll")]
         private static extern bool IsIconic(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
         private const int SW_RESTORE = 9;
+        private const uint WM_CLOSE = 0x0010;
 
         private static int Main(string[] args)
         {
@@ -386,11 +390,25 @@ namespace FlaUIHelper
             try
             {
                 var hwnd = window.Properties.NativeWindowHandle;
-                if (hwnd != IntPtr.Zero)
+                if (hwnd == IntPtr.Zero)
+                {
+                    return;
+                }
+                // SetForegroundWindow can be silently refused while another
+                // window (e.g. the Windows 11 client OOBE nag) holds foreground
+                // rights, so retry briefly until it actually sticks.
+                var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+                do
                 {
                     ShowWindow(hwnd, SW_RESTORE);
                     SetForegroundWindow(hwnd);
+                    if (GetForegroundWindow() == hwnd)
+                    {
+                        return;
+                    }
+                    Thread.Sleep(100);
                 }
+                while (DateTime.UtcNow < deadline);
             }
             catch { }
         }
@@ -403,6 +421,55 @@ namespace FlaUIHelper
                 Thread.Sleep(WindowVisualStateDelayMs);
             }
             catch { }
+        }
+
+        // The Windows 11 client image (windows-11-arm runner) periodically shows
+        // the first-sign-in OOBE nag ("Microsoft account / Choose privacy
+        // settings", hosted by CloudExperienceHost). It takes the foreground
+        // mid-run, so keystrokes meant for the app's ContentDialog land in the
+        // nag instead. Kill the hosting processes and close its windows; every
+        // step is best-effort and must never throw.
+        private static void DismissOobeWindows(UIA3Automation automation)
+        {
+            foreach (var name in new[] { "CloudExperienceHost", "UserOOBEBroker" })
+            {
+                try
+                {
+                    foreach (var p in Process.GetProcessesByName(name))
+                    {
+                        try { p.Kill(); } catch { }
+                    }
+                }
+                catch { }
+            }
+
+            AutomationElement[] topLevel;
+            try { topLevel = automation.GetDesktop().FindAllChildren(); }
+            catch { return; }
+
+            foreach (var top in topLevel)
+            {
+                try
+                {
+                    string className = top.Properties.ClassName.ValueOrDefault ?? "";
+                    string name = top.Properties.Name.ValueOrDefault ?? "";
+                    bool isOobe =
+                        className == "UserOOBEWindowClass" ||
+                        className == "Shell_OOBEProxy" ||
+                        (className == "Windows.UI.Core.CoreWindow" &&
+                            (name == "Microsoft account" || name == "Windows Setup"));
+                    if (!isOobe)
+                    {
+                        continue;
+                    }
+                    var hwnd = top.Properties.NativeWindowHandle.ValueOrDefault;
+                    if (hwnd != IntPtr.Zero)
+                    {
+                        PostMessage(hwnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                    }
+                }
+                catch { }
+            }
         }
 
         private static void ScrollToBottomWithKeyboard(Window window)
@@ -1837,6 +1904,9 @@ namespace FlaUIHelper
             for (int attempt = 0; attempt < 3; attempt++)
             {
                 LogAgentRedactorLiveness($"attempt start {attempt + 1}");
+                // Clear any OOBE nag that took the foreground since the last
+                // attempt; typing below needs the app to own the foreground.
+                DismissOobeWindows(automation);
                 // The app process dying mid-flow is unrecoverable; stop instead
                 // of clicking anything else.
                 if (AgentRedactorProcessCount() == 0)
@@ -1889,6 +1959,9 @@ namespace FlaUIHelper
                         DumpUiTree(automation, window);
                         throw new InvalidOperationException("Set master password password boxes not found.");
                     }
+                    // Typing is focus-dependent; make sure the app (not a
+                    // leftover OOBE nag) owns the foreground before typing.
+                    BringToForeground(window);
                     SetEditValue(passEdit, password);
                     SetEditValue(confirmEdit, confirm);
                 }
@@ -1899,6 +1972,7 @@ namespace FlaUIHelper
                         DumpUiTree(automation, window);
                         throw new InvalidOperationException("Disable master password password box not found.");
                     }
+                    BringToForeground(window);
                     SetEditValue(passEdit, password);
                 }
 
