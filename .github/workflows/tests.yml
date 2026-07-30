@@ -164,10 +164,20 @@ jobs:
         shell: pwsh
         run: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-      # The app process dies on this runner during the master-password tests
-      # with a 'Windows Security' window in the foreground. Capture Windows
-      # Error Reporting mini-dumps so we can see whether it crashes or is
-      # killed by Defender/Smart App Control.
+      # The Windows 11 client image periodically shows the SCOOBE "Microsoft
+      # account / privacy settings" fullscreen nag (CloudExperienceHost), which
+      # takes the foreground and blocks the app's XAML dialogs from rendering.
+      - name: Dismiss OOBE nag screens
+        shell: pwsh
+        run: |
+          New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Force | Out-Null
+          Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name ScoobeSystemSettingEnabled -Value 0
+          Get-Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match 'CloudExperienceHost|UserOOBEBroker' } |
+            Stop-Process -Force -ErrorAction SilentlyContinue
+
+      # Capture Windows Error Reporting mini-dumps in case the app still dies,
+      # so we can see whether it crashes or is killed externally.
       - name: Enable crash dump collection
         shell: pwsh
         run: |

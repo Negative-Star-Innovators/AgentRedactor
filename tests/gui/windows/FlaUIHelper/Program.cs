@@ -1833,9 +1833,18 @@ namespace FlaUIHelper
             LogAgentRedactorLiveness("set-master-password start");
 
             bool tookAction = false;
+            bool invokedCheck = false;
             for (int attempt = 0; attempt < 3; attempt++)
             {
                 LogAgentRedactorLiveness($"attempt start {attempt + 1}");
+                // The app process dying mid-flow is unrecoverable; stop instead
+                // of clicking anything else.
+                if (AgentRedactorProcessCount() == 0)
+                {
+                    Console.Error.WriteLine("ERROR: AgentRedactor process exited during set-master-password.");
+                    return 1;
+                }
+
                 // The app reverts RequirePasswordCheck while the dialog is open
                 // (HomePage.cpp RequirePassword_Click), so the checkbox state is
                 // not a reliable progress signal; check the Change password
@@ -1853,14 +1862,21 @@ namespace FlaUIHelper
                 string editName = enabled ? "Password" : "Current password";
                 string buttonName = enabled ? "Set Password" : "Disable";
                 var passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(1));
-                if (passEdit == null)
+                if (passEdit == null && !invokedCheck)
                 {
+                    // Invoke the checkbox at most once per call: WinUI allows a
+                    // single ContentDialog, and a second ShowAsync while the
+                    // first is in flight terminates the app process.
                     var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
                     InvokeElement(check);
-
-                    // Poll for the dialog's password boxes; on slow runners the
-                    // ContentDialog can take many seconds to appear and may
-                    // render as a popup outside the main window.
+                    invokedCheck = true;
+                }
+                if (passEdit == null)
+                {
+                    // Keep polling for the dialog's password boxes; on slow
+                    // runners the ContentDialog can take many seconds to appear
+                    // and may render as a popup outside the main window. Never
+                    // re-invoke the checkbox on retries.
                     passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(30));
                 }
                 tookAction = true;
@@ -1971,6 +1987,12 @@ namespace FlaUIHelper
                 Console.WriteLine($"DIAG liveness: AgentRedactor processes={count} ({context})");
             }
             catch { }
+        }
+
+        private static int AgentRedactorProcessCount()
+        {
+            try { return Process.GetProcessesByName("AgentRedactor").Length; }
+            catch { return -1; }
         }
 
         private static void DumpUiTree(UIA3Automation automation, Window window)

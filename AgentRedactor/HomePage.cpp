@@ -1082,6 +1082,10 @@ namespace winrt::AgentRedactor::implementation
     // -------------------------------------------------------------------------
     void HomePage::RequirePassword_Click(IInspectable const&, RoutedEventArgs const&)
     {
+        // Guard against re-entry: a second click while a dialog is in flight
+        // would throw (only one ContentDialog can be open) and, inside the
+        // fire_and_forget coroutine, terminate the process.
+        if (activeDialog_) return;
         bool checked = RequirePasswordCheck().IsChecked().GetBoolean();
         // Revert immediately; dialog will set the correct state on success
         RequirePasswordCheck().IsChecked(!checked);
@@ -1095,6 +1099,7 @@ namespace winrt::AgentRedactor::implementation
 
     void HomePage::ChangePassword_Click(IInspectable const&, RoutedEventArgs const&)
     {
+        if (activeDialog_) return;  // see RequirePassword_Click
         ShowChangePasswordDialogAsync();
     }
 
