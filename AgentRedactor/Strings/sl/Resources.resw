@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Podrobno beleženje omogočeno. Dnevniki lahko vsebujejo občutljive podatke, vključno z izvirnimi telesi zahtev.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Posodobitve</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Različica {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Preveri posodobitve</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Posodobitve upravlja Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Preverjanje posodobitev...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Imate najnovejšo različico.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Posodobitev je bila prenesena in je pripravljena za namestitev.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Posodobitev ni bilo mogoče preveriti. Poskusite znova pozneje.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Posodobitev je pripravljena za namestitev</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} je bil prenesen. Zdaj znova zaženite, da uporabite posodobitev.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Znova zaženi zdaj</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Pozneje</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Prenašanje modela UI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Prenos modela ni uspel. Preverite internetno povezavo in poskusite znova. Zaznavanje PII ni na voljo, dokler prenos ni končan.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Poskusi znova</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Potrebno je glavno geslo</value>
   </data>

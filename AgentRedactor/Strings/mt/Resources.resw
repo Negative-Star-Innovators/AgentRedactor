@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Logging dettaljat attivat. Il-logs jistgħu jikkontenu data sensittiva, inklużi l-korpi tat-talbiet oriġinali.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Aġġornamenti</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Verżjoni {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Iċċekkja għal aġġornamenti</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>L-aġġornamenti huma mmaniġġjati mill-Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Qed jiġi ċċekkjat għal aġġornamenti...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Għandek l-aħħar verżjoni.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Aġġornament ġie ddawnlowdjat u huwa lest biex jinstalla.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Ma setax jiġi ċċekkjat għal aġġornamenti. Erġa' pprova aktar tard.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Aġġornament lest biex jinstalla</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} ġie ddawnlowdjat. Erġa' niedi issa biex jiġi applikat l-aġġornament.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Erġa' niedi issa</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Aktar tard</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Qed jitniżżel il-mudell AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Id-dawnload tal-mudell falla. Iċċekkja l-konnessjoni tal-internet tiegħek, imbagħad erġa' pprova. Is-sejbien ta' PII mhuwiex disponibbli sakemm id-dawnload jitlesta.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Erġa' pprova</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Password Prinċipali Meħtieġa</value>
   </data>

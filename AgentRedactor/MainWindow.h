@@ -14,6 +14,7 @@ namespace winrt::AgentRedactor::implementation
         void ApplyTitleBarTheme();
         void OnColorValuesChanged(Windows::UI::ViewManagement::UISettings const& sender, Windows::Foundation::IInspectable const& args);
         void CloseWindow();
+        void UpdateModelDownloadDialog();
         winrt::fire_and_forget ShowQuitConfirmationAsync();
         static LRESULT CALLBACK SubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
@@ -21,6 +22,9 @@ namespace winrt::AgentRedactor::implementation
         bool allowClose_ = false;
         Windows::UI::ViewManagement::UISettings uiSettings_;
         event_token colorValuesChangedToken_;
+        winrt::Microsoft::UI::Xaml::Controls::ContentDialog modelDialog_{ nullptr };
+        winrt::Microsoft::UI::Xaml::Controls::TextBlock modelStatusText_{ nullptr };
+        winrt::Microsoft::UI::Xaml::Controls::ProgressBar modelProgressBar_{ nullptr };
     };
 }
 

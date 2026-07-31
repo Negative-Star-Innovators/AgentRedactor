@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>詳細ログが有効になりました。ログには、元のリクエスト本文を含む機密データが含まれる可能性があります。</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>バージョン {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>更新を確認</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>更新は Microsoft Store によって管理されます。</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>更新を確認しています...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>最新の状態です。</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>更新がダウンロードされ、インストールの準備ができました。</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>更新を確認できませんでした。後でもう一度お試しください。</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>更新をインストールできます</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} がダウンロードされました。今すぐ再起動して更新を適用してください。</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>今すぐ再起動</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>後で</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI モデルをダウンロードしています</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>モデルのダウンロードに失敗しました。インターネット接続を確認してから再試行してください。ダウンロードが完了するまで PII 検出は利用できません。</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>再試行</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>マスター パスワードが必要</value>
   </data>

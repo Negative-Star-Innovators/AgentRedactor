@@ -22,7 +22,7 @@ A native Windows C++ desktop application that acts as an intelligent HTTP proxy 
 - **System Tray**: Runs minimized in the system tray; auto-start with Windows.
 - **Native Win32 GUI**: No WebView2 — pure native C++ with RichEdit colored logs.
 - **Stats & Logs**: Per-profile statistics and colored logs (blue = user→proxy, green = proxy→LLM, orange = LLM→proxy, purple = proxy→user).
-- **MSI & MSIX Packaging**: CMake-based build with PowerShell packaging script.
+- **Two distribution channels**: Microsoft Store MSIX, and a self-updating Velopack self-release channel (`version.txt` is the version source of truth).
 
 ## Project Structure
 
@@ -35,8 +35,21 @@ AgentRedactor/
 ├── CMakeLists.txt    # CMake build config
 ├── vcpkg.json        # vcpkg dependencies
 ├── Package.appxmanifest  # MSIX manifest
-└── build.ps1         # Build script for MSI + MSIX
+├── version.txt       # Self-release version source of truth
+├── build.ps1         # Build script (MSIX; -SelfRelease for the Velopack channel)
+└── build-selfrelease.ps1  # Self-release wrapper (reads version.txt, runs vpk pack)
 ```
+
+## Distribution Channels
+
+- **Microsoft Store (MSIX)** — built with `.\build.ps1`. Ships the full ~1.6 GB
+  ONNX weights inside the package and contains no self-update code.
+- **Self-release (Velopack)** — built with `.\build-selfrelease.ps1` (x64).
+  The installer is produced by `vpk pack` into `build\velopack\`; the large
+  model weights are downloaded on first run from the `models-v1` GitHub
+  release into `%LOCALAPPDATA%\AgentRedactor\models`, and app updates are
+  delivered from `api.agentredactor.negativestarinnovators.com` via the
+  bundled Velopack `Update.exe`. The version comes from `version.txt`.
 
 ## Build Requirements
 

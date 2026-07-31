@@ -4,6 +4,7 @@
 #include "AppState.h"
 #include "localization.h"
 #include "logging.h"
+#include "update_manager.h"
 #include "HomePage.h"
 #include "SettingsPage.h"
 #include "RegexPage.h"
@@ -109,6 +110,104 @@ namespace winrt::AgentRedactor::implementation
         if (result == ContentDialogResult::Primary) {
             lifetime->allowClose_ = true;
             lifetime->Close();
+        }
+    }
+
+    // Shows / updates / dismisses the blocking first-run model-download dialog
+    // from the current AppState download status. Runs on the UI thread. While
+    // AppState reports the download as required the app is blocked (no proxy
+    // servers), so the dialog is modal and cannot be dismissed: it closes only
+    // after the download and detector initialization succeed.
+    void MainWindow::UpdateModelDownloadDialog()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+
+        bool required = app->IsModelDownloadRequired();
+        bool inProgress = app->IsModelDownloadInProgress();
+        bool failed = app->HasModelDownloadFailed();
+
+        if (!required && !inProgress && !failed) {
+            // Download finished (or was never needed): close the dialog.
+            if (modelDialog_) {
+                try { modelDialog_.Hide(); } catch (...) {}
+                modelDialog_ = nullptr;
+                modelStatusText_ = nullptr;
+                modelProgressBar_ = nullptr;
+            }
+            return;
+        }
+
+        // A ContentDialog needs the XamlRoot of a visible window; status
+        // changes and the Activated handler re-trigger this once it is shown.
+        if (!hwnd_ || !IsWindowVisible(hwnd_)) return;
+
+        if (!modelDialog_) {
+            Controls::TextBlock statusText;
+            statusText.TextWrapping(TextWrapping::WrapWholeWords);
+            Controls::ProgressBar progressBar;
+            progressBar.Minimum(0);
+            progressBar.Maximum(100);
+            Controls::StackPanel panel;
+            panel.Spacing(8);
+            panel.Children().Append(statusText);
+            panel.Children().Append(progressBar);
+
+            Controls::ContentDialog dialog;
+            dialog.XamlRoot(Content().XamlRoot());
+            dialog.Title(box_value(::AgentRedactor::LocString(L"ModelDownload_Title")));
+            dialog.Content(panel);
+            dialog.PrimaryButtonText(::AgentRedactor::LocString(L"ModelDownload_RetryButton"));
+            // No close button on purpose: the app is blocked until the model
+            // exists, so the dialog must not be dismissible. Retry (primary)
+            // is enabled only after a failure.
+            dialog.DefaultButton(Controls::ContentDialogButton::Primary);
+            dialog.PrimaryButtonClick([](auto&&, auto&&) {
+                if (auto appState = ::AgentRedactor::AppState::Instance()) {
+                    appState->RetryModelDownload();
+                }
+            });
+            dialog.Closed([this](auto&&, auto&&) {
+                modelDialog_ = nullptr;
+                modelStatusText_ = nullptr;
+                modelProgressBar_ = nullptr;
+            });
+
+            modelDialog_ = dialog;
+            modelStatusText_ = statusText;
+            modelProgressBar_ = progressBar;
+            try {
+                dialog.ShowAsync();
+            } catch (...) {
+                LOG(L"[MainWindow] Failed to show model download dialog");
+                modelDialog_ = nullptr;
+                modelStatusText_ = nullptr;
+                modelProgressBar_ = nullptr;
+                return;
+            }
+        }
+
+        if (inProgress) {
+            int percent = app->ModelDownloadPercent();
+            modelDialog_.IsPrimaryButtonEnabled(false);
+            modelStatusText_.Text(app->ModelDownloadStatus());
+            if (percent >= 0) {
+                modelProgressBar_.IsIndeterminate(false);
+                modelProgressBar_.Value(percent);
+            } else {
+                modelProgressBar_.IsIndeterminate(true);
+            }
+        } else if (failed) {
+            modelDialog_.IsPrimaryButtonEnabled(true);
+            modelStatusText_.Text(::AgentRedactor::LocString(L"ModelDownload_Failed"));
+            modelProgressBar_.IsIndeterminate(false);
+            modelProgressBar_.Value(0);
+        } else {
+            // Required but not started yet (dialog just appeared): kick off the
+            // download so the user immediately sees progress.
+            modelDialog_.IsPrimaryButtonEnabled(false);
+            modelProgressBar_.IsIndeterminate(true);
+            app->StartModelDownloadIfNeeded();
         }
     }
 
@@ -251,7 +350,33 @@ namespace winrt::AgentRedactor::implementation
                     this->ReloadLocalization();
                 });
             });
+            app->SetOnModelDownloadStatus([this]() {
+                this->DispatcherQueue().TryEnqueue([this]() {
+                    this->UpdateModelDownloadDialog();
+                });
+            });
+
+            // Self-release channel only (no-ops in the Store/MSIX build): give
+            // the update manager a way to show dialogs on the UI thread, then
+            // kick the startup check + download.
+            ::AgentRedactor::UpdateManager::SetUiDispatch(
+                [weak = get_weak()](::AgentRedactor::UpdateManager::UiAction action) {
+                    if (auto self = weak.get()) {
+                        self->DispatcherQueue().TryEnqueue([self, action = std::move(action)]() mutable {
+                            if (self->hwnd_ && IsWindowVisible(self->hwnd_)) {
+                                action(self->Content().XamlRoot());
+                            }
+                        });
+                    }
+                });
+            ::AgentRedactor::UpdateManager::CheckAndDownloadInBackground();
         }
+
+        // Re-evaluate the model-download dialog whenever the window is shown
+        // (a failed download may have completed while hidden in the tray).
+        Activated([this](auto&&, auto&&) {
+            UpdateModelDownloadDialog();
+        });
 
         colorValuesChangedToken_ = uiSettings_.ColorValuesChanged({ this, &MainWindow::OnColorValuesChanged });
 

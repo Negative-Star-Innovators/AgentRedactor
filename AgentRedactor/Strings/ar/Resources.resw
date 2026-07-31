@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>تم تمكين التسجيل المطول. قد تحتوي السجلات على بيانات حساسة بما في ذلك نصوص الطلبات الأصلية.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>التحديثات</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>الإصدار {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>التحقق من التحديثات</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>تتم إدارة التحديثات بواسطة Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>جارٍ التحقق من التحديثات...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>لديك أحدث إصدار.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>تم تنزيل تحديث وهو جاهز للتثبيت.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>تعذّر التحقق من التحديثات. حاول مرة أخرى لاحقًا.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>التحديث جاهز للتثبيت</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>تم تنزيل Agent Redactor {0}. أعد التشغيل الآن لتطبيق التحديث.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>إعادة التشغيل الآن</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>لاحقًا</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>جارٍ تنزيل نموذج الذكاء الاصطناعي</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>فشل تنزيل النموذج. تحقق من اتصالك بالإنترنت، ثم أعد المحاولة. الكشف عن PII غير متاح حتى يكتمل التنزيل.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>إعادة المحاولة</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>كلمة المرور الرئيسية مطلوبة</value>
   </data>

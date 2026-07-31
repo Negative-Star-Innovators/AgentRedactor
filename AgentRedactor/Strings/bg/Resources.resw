@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Подробното регистриране е активирано. Логовете могат да съдържат чувствителни данни, включително оригинални тела на заявки.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Актуализации</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Проверка за актуализации</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Актуализациите се управляват от Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Проверява се за актуализации...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Имате най-новата версия.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Актуализация е изтеглена и е готова за инсталиране.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Не можа да се провери за актуализации. Опитайте отново по-късно.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Актуализацията е готова за инсталиране</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} е изтеглен. Рестартирайте сега, за да приложите актуализацията.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Рестартиране сега</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>По-късно</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Изтегляне на AI модел</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Изтеглянето на модела не успя. Проверете интернет връзката си и опитайте отново. Откриването на PII не е налично, докато изтеглянето не приключи.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Опитай отново</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Изисква се главна парола</value>
   </data>

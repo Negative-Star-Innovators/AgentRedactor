@@ -8,7 +8,16 @@
 namespace AgentRedactor {
 
 constexpr const wchar_t* APP_NAME = L"Agent Redactor";
+// Self-release builds stamp the real version via AR_VERSION_STRING (a quoted
+// narrow string literal from -p:AppVersion=<version.txt>); the Store/MSIX
+// build falls back to this default.
+#ifdef AR_VERSION_STRING
+#define AR_STRINGIZE_INNER(x) L##x
+#define AR_STRINGIZE(x) AR_STRINGIZE_INNER(x)
+constexpr const wchar_t* APP_VERSION = AR_STRINGIZE(AR_VERSION_STRING);
+#else
 constexpr const wchar_t* APP_VERSION = L"1.0.0";
+#endif
 constexpr UINT WM_TRAYICON = WM_USER + 1;
 
 constexpr size_t MAX_TOKENS_PER_CHUNK = 128000;

@@ -1,0 +1,163 @@
+name: Self-Release (Velopack)
+
+# Manual gating: updates are only ever published when the maintainer pushes a
+# version tag (v*) or manually re-runs this workflow with a version input.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.1.0). Must match AgentRedactor/version.txt.'
+        required: true
+        type: string
+
+# Needed to create the GitHub release and upload Velopack release assets.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # Same runner image build-msix.yml uses for x64.
+    runs-on: windows-latest
+    env:
+      # Expected version: tag name (minus the leading v) on tag pushes,
+      # the version input on manual re-runs.
+      EXPECTED_VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+    steps:
+      # The vcxproj references vcpkg at ..\..\vcpkg relative to itself, so the
+      # repo is checked out into a subfolder and vcpkg sits next to it.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      # Fail early if the tag/input version doesn't match version.txt — the
+      # build script reads the version from that file, so a mismatch would
+      # publish an updater release stamped with the wrong version.
+      - name: Validate tag matches version.txt
+        shell: pwsh
+        run: |
+          $expected = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
+          if ($expected -notmatch '^\d+\.\d+\.\d+$') {
+            Write-Error "Expected version '$expected' is not a valid semver (e.g. v1.1.0)."
+            exit 1
+          }
+          $fileVersion = (Get-Content -Raw repo/AgentRedactor/version.txt).Trim()
+          if ($fileVersion -ne $expected) {
+            Write-Error ("Version mismatch: tag/input is 'v{0}' but AgentRedactor/version.txt contains '{1}'. " +
+              "Bump version.txt to '$expected' and re-tag (see scripts/new-release.ps1)." -f $expected, $fileVersion)
+            exit 1
+          }
+          Write-Host "Version OK: v$expected"
+
+      - name: Clone vcpkg
+        shell: pwsh
+        run: git clone https://github.com/microsoft/vcpkg vcpkg
+
+      - name: Cache vcpkg artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            vcpkg/installed
+            vcpkg/downloads
+          key: vcpkg-x64-${{ hashFiles('repo/AgentRedactor/vcpkg.json') }}
+          restore-keys: vcpkg-x64-
+
+      - name: Install vcpkg dependencies (first run is slow, then cached)
+        shell: pwsh
+        run: |
+          vcpkg\bootstrap-vcpkg.bat -disableMetrics
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
+
+      # NOTE: unlike build-msix.yml we intentionally do NOT download the 1.6 GB
+      # ONNX weights — the self-release package excludes them and the app
+      # downloads them on first run (ModelDownloader).
+
+      - name: Install vpk (Velopack CLI)
+        shell: pwsh
+        run: dotnet tool install -g vpk
+
+      # Builds Release x64 with -p:SelfRelease=true and runs `vpk pack` into
+      # repo/AgentRedactor/build/velopack (version from version.txt, already
+      # validated against the tag above).
+      - name: Build and pack self-release (build-selfrelease.ps1)
+        shell: pwsh
+        run: repo/AgentRedactor/build-selfrelease.ps1 -Platform x64
+
+      # Gate the publish on tests: settings-migration coverage against the
+      # just-built exe, then the upgrade E2E (previous release -> this build).
+      # Both must pass before anything is uploaded (no continue-on-error).
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        shell: pwsh
+        run: pip install -r repo/tests/requirements.txt
+
+      - name: Run settings migration tests
+        shell: pwsh
+        env:
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/x64/Release/AgentRedactor.exe
+        run: python -m pytest repo/tests/migration/test_settings_migration.py -v
+
+      # Grab the previous published release's Setup.exe for the upgrade E2E.
+      # The very first self-release has no predecessor — skip gracefully with
+      # a warning in that case.
+      - name: Download previous release Setup.exe
+        id: prevsetup
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $currentTag = "v$($env:EXPECTED_VERSION.Trim().TrimStart('v', 'V'))"
+          $releases = gh release list --limit 50 --json tagName,isDraft | ConvertFrom-Json
+          $prevTag = $null
+          foreach ($r in @($releases)) {
+            if ($r.isDraft -or $r.tagName -eq $currentTag) { continue }
+            $assets = @(gh release view $r.tagName --json assets --jq '.assets[].name')
+            if ($assets | Where-Object { $_ -match '-Setup\.exe$' }) {
+              $prevTag = $r.tagName
+              break
+            }
+          }
+          if (-not $prevTag) {
+            Write-Host "::warning::No previous release with a *-Setup.exe asset found; skipping upgrade E2E (expected for the first self-release)."
+            echo "found=false" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          Write-Host "Previous release with Setup asset: $prevTag"
+          gh release download $prevTag --pattern "*-Setup.exe" --dir prev-setup --clobber
+          if ($LASTEXITCODE -ne 0) { throw "gh release download $prevTag failed" }
+          $setup = (Get-ChildItem prev-setup -Filter "*-Setup.exe" | Select-Object -First 1).FullName
+          if (-not $setup) { throw "No *-Setup.exe found after downloading $prevTag" }
+          echo "found=true" >> $env:GITHUB_OUTPUT
+          echo "setup_path=$setup" >> $env:GITHUB_OUTPUT
+
+      - name: Upgrade E2E (previous release -> this build)
+        if: steps.prevsetup.outputs.found == 'true'
+        shell: pwsh
+        env:
+          AGENTREDACTOR_UPGRADE_TEST: "1"
+          AGENTREDACTOR_PREV_SETUP: ${{ steps.prevsetup.outputs.setup_path }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/AgentRedactor/build/velopack
+          AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
+        run: python -m pytest repo/tests/migration/test_selfrelease_upgrade.py -v
+
+      # Publishes the Velopack release: creates the GitHub release for this tag
+      # and uploads releases.win.json + the nupkg/delta assets so installed
+      # instances can auto-update. All flags live in this one step so they're
+      # easy to adjust.
+      - name: Publish Velopack release to GitHub
+        shell: pwsh
+        run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --releaseName "AgentRedactor ${{ env.EXPECTED_VERSION }}" --tag "v${{ env.EXPECTED_VERSION }}" --outputDir repo/AgentRedactor/build/velopack
+
+      # Keep the raw Velopack output around for debugging failed/odd releases.
+      - name: Upload Velopack output artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}
+          path: repo/AgentRedactor/build/velopack
+          retention-days: 30

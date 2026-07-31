@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Ítarleg skráning virk. Skrár geta innihaldið viðkvæm gögn, þar með talið upprunaleg innihald beiðna.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Uppfærslur</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Útgáfa {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Athuga uppfærslur</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Microsoft Store sér um uppfærslur.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Athugar uppfærslur...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Þú ert með nýjustu útgáfuna.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Uppfærsla hefur verið sótt og er tilbúin til uppsetningar.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Ekki tókst að athuga uppfærslur. Reyndu aftur síðar.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Uppfærsla tilbúin til uppsetningar</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} hefur verið sótt. Endurræstu núna til að virkja uppfærsluna.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Endurræsa núna</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Seinna</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Sækir gervigreindarlíkan</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Niðurhal líkansins mistókst. Athugaðu nettenginguna og reyndu aftur. PII-greining er ekki í boði fyrr en niðurhalið lýkur.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Reyna aftur</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Aðallykilorðs er krafist</value>
   </data>

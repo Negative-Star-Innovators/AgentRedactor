@@ -1,11 +1,13 @@
 # Agent Redactor Build Script
 # Builds WinUI 3 AgentRedactor and packages as MSIX (Microsoft Store)
+# or, with -SelfRelease, as a Velopack installer (self-release channel).
 
 param(
     [string]$Version = "1.0.0",
     [ValidateSet("x64", "ARM64")]
     [string]$Platform = "x64",
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$SelfRelease
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,6 +16,15 @@ $root = $PSScriptRoot
 $buildDir = "$root\build"
 $outDir = "$buildDir\$Platform\Release"
 $archLower = $Platform.ToLower()
+
+# Self-release builds are versioned from version.txt unless -Version is given
+if ($SelfRelease -and -not $PSBoundParameters.ContainsKey('Version')) {
+    $versionFile = "$root\version.txt"
+    if (Test-Path $versionFile) {
+        $Version = (Get-Content $versionFile -Raw).Trim()
+        Write-Host "Self-release version from version.txt: $Version" -ForegroundColor Cyan
+    }
+}
 
 # Stop any running instance
 $proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
@@ -129,7 +140,23 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Building AgentRedactor (Release|$Platform)..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-& $msbuild "$root\AgentRedactor.vcxproj" -p:Configuration=Release -p:Platform=$Platform -p:RestorePackages=false
+$msbuildArgs = @(
+    "$root\AgentRedactor.vcxproj",
+    "-p:Configuration=Release",
+    "-p:Platform=$Platform",
+    "-p:RestorePackages=false"
+)
+if ($SelfRelease) {
+    # Stamps AGENTREDACTOR_SELFRELEASE + AR_VERSION_STRING (see vcxproj)
+    $msbuildArgs += "-p:SelfRelease=true"
+    $msbuildArgs += "-p:AppVersion=$Version"
+    # 4-part comma form for the VERSIONINFO resource (AR_VERSION_QUAD); the rc
+    # preprocessor cannot split strings, so the quad is computed here.
+    $versionCore = ($Version -split '[-+]')[0]
+    $appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
+    $msbuildArgs += "-p:AppVersionQuad=$appVersionQuad"
+}
+& $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
 # Copy models and resources
@@ -138,7 +165,15 @@ if (Test-Path "$root\models") {
     if (-not (Test-Path "$outDir\models")) {
         New-Item -ItemType Directory -Force -Path "$outDir\models" | Out-Null
     }
-    robocopy "$root\models" "$outDir\models" /E /R:3 /W:1 | Out-Null
+    if ($SelfRelease) {
+        # The 1.6 GB weight file (model_quantized.onnx_data) is NOT shipped in
+        # the self-release installer; the app downloads it on first run from
+        # the models-v1 GitHub release. The tiny model graph (.onnx) and the
+        # companion files still ship.
+        robocopy "$root\models" "$outDir\models" /E /XF *.onnx_data /R:3 /W:1 | Out-Null
+    } else {
+        robocopy "$root\models" "$outDir\models" /E /R:3 /W:1 | Out-Null
+    }
 }
 
 $icoFiles = @("app.ico", "fox_grey.ico", "fox_warning.ico")
@@ -184,8 +219,41 @@ Remove-Item -Path "$outDir\resources.pri.xml" -Force -ErrorAction SilentlyContin
 Remove-Item -Path "$outDir\resources.language-*.pri.xml" -Force -ErrorAction SilentlyContinue
 
 # ============================================================================
-# MSIX
+# MSIX (Store channel only)
 # ============================================================================
+if ($SelfRelease) {
+    # ========================================================================
+    # VELOPACK PACK (self-release channel)
+    # ========================================================================
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "Packing Velopack release v$Version..." -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+
+    $vpk = Get-Command vpk -ErrorAction SilentlyContinue
+    if (-not $vpk) {
+        Write-Host "vpk (Velopack CLI) not found; installing via dotnet tool..." -ForegroundColor Yellow
+        & dotnet tool install -g vpk
+        if ($LASTEXITCODE -ne 0) { throw "Failed to install vpk (is the .NET SDK installed?)" }
+        $vpk = Get-Command vpk -ErrorAction SilentlyContinue
+        if (-not $vpk) { throw "vpk is still not on PATH after install; open a new shell and retry" }
+    }
+    Write-Host "Found vpk: $($vpk.Source)" -ForegroundColor Green
+
+    $velopackOut = "$buildDir\velopack"
+    & vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
+        --packTitle "Agent Redactor" -i "$root\resources\app.ico" -o $velopackOut
+    if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
+
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Green
+    Write-Host "Self-release build complete!" -ForegroundColor Green
+    Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+    Write-Host "Velopack output: $velopackOut" -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Green
+    return
+}
+
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Creating MSIX package..." -ForegroundColor Cyan

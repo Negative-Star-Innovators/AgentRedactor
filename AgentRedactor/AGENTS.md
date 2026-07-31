@@ -8,7 +8,9 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 - `src/` / `include/` — Core C++ sources (proxy, PII detector, settings, tray icon, etc.).
 - `HomePage.xaml` / `MainWindow.xaml` — WinUI 3 UI.
 - `buildquick.ps1` — Fast local build (EXE + copy models/resources).
-- `build.ps1` — Full release build (MSI + MSIX packaging; much slower).
+- `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
+- `build-selfrelease.ps1` — Self-release wrapper: reads `version.txt`, calls `build.ps1 -SelfRelease`, then runs `vpk pack`.
+- `version.txt` — Single version source of truth for the self-release channel (stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION`).
 
 ## Quick Build (for testing)
 
@@ -48,6 +50,38 @@ The script also:
 
 This script downloads NuGet and WiX v3.14 if they are not present, so the first run may take a while.
 
+## Release Channels
+
+The app ships through two channels from the same codebase:
+
+- **Microsoft Store (MSIX)** — `.\build.ps1`. The full ~1.6 GB model weights are
+  packed inside the MSIX. Contains **zero** update code (Store policy).
+- **Self-release (Velopack)** — `.\build-selfrelease.ps1` (x64 only for now).
+  Compiles with `AGENTREDACTOR_SELFRELEASE` (via `-p:SelfRelease=true
+  -p:AppVersion=<version.txt>`), excludes `*.onnx_data` from the model copy
+  (weights download on first run to `%LOCALAPPDATA%\AgentRedactor\models`),
+  skips MSIX packing, and runs `vpk pack` into `build\velopack\`.
+
+Key pieces of the self-release channel:
+
+- `version.txt` is the version source of truth; it becomes `AR_VERSION_STRING`
+  → `APP_VERSION` (`include/constants.h`) and the `vpk pack` version.
+- `src/update_manager.cpp` (all inside `#ifdef AGENTREDACTOR_SELFRELEASE`):
+  polls `releases.win.json` from the update feed
+  (`https://api.agentredactor.negativestarinnovators.com/updates/win`),
+  downloads newer full packages, and applies them via the bundled
+  `Update.exe apply --package <nupkg> --waitPid <pid>` after a restart prompt.
+  `App.cpp` exits immediately on `--veloapp-*` lifecycle args.
+- `src/model_downloader.cpp` (both channels): first-run download of
+  `model_quantized.onnx_data` from the `models-v1` GitHub release; only fires
+  when the weights are missing. `AppState` resolves the model dir via
+  `ModelDownloader::ResolveModelDir()` (exe-dir first, fallback second).
+- To cut a self-release: bump `version.txt`, tag `v<version>`, push — the
+  `release-selfrelease.yml` workflow builds, packs, runs the settings-migration
+  tests plus the previous-release upgrade E2E (`tests/migration/`, skipped with
+  a warning when no prior release exists), and only then uploads the release.
+  Local loop: `.\build-selfrelease.ps1` then install `build\velopack\*-Setup.exe`.
+
 ## Common Files to Know
 
 | Area | Key files |
@@ -57,7 +91,26 @@ This script downloads NuGet and WiX v3.14 if they are not present, so the first 
 | Home page UI layout | `HomePage.xaml`, `HomePage.cpp` |
 | Settings / start-on-boot | `SettingsPage.xaml`, `SettingsPage.cpp`, `AppState.cpp` |
 | Proxy engine | `src/proxy_engine.cpp`, `src/http_server.cpp` |
-| Settings persistence | `src/settings_manager.cpp` |
+| Settings persistence | `src/settings_manager.cpp`, `src/migrations/settings_migrator.cpp` |
+
+## Changing the settings schema
+
+`settings.json` is versioned via `settings_version` (absent == 1, the original
+unversioned layout). The current version is `SETTINGS_SCHEMA_VERSION` in
+`include/migrations/settings_migrator.h`. To change the schema:
+
+1. Bump `SETTINGS_SCHEMA_VERSION` by one.
+2. Add a `MigrateNToN+1` step to the ordered table in
+   `src/migrations/settings_migrator.cpp` (marked "ADD FUTURE MIGRATIONS
+   HERE"). Never edit or reorder steps that have shipped — older installs
+   replay them verbatim.
+3. Add a fixture under `tests/migration/fixtures/settings/` (a pre-migration
+   `settings.json` plus its expected post-migration form) so the
+   `--selftest-migrate-settings` migration tests cover the new step.
+
+`SettingsManager` runs `SettingsMigrator::MigrateInPlace` right after every
+load and saves when anything changed. On a JSON parse failure the corrupt file
+is first backed up to `<name>.corrupt-<timestamp>.bak` and only then reset.
 
 ## Build Requirements
 

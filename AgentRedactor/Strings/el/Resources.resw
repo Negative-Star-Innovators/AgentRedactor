@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Η λεπτομερής καταγραφή είναι ενεργοποιημένη. Τα αρχεία καταγραφής μπορεί να περιέχουν ευαίσθητα δεδομένα, συμπεριλαμβανομένων των πρωτογενών σωμάτων αιτημάτων.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Ενημερώσεις</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Έκδοση {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Έλεγχος για ενημερώσεις</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Οι ενημερώσεις διαχειρίζονται από το Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Έλεγχος για ενημερώσεις...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Έχετε την πιο πρόσφατη έκδοση.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Μια ενημέρωση έχει ληφθεί και είναι έτοιμη για εγκατάσταση.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Δεν ήταν δυνατός ο έλεγχος για ενημερώσεις. Δοκιμάστε ξανά αργότερα.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Η ενημέρωση είναι έτοιμη για εγκατάσταση</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Το Agent Redactor {0} έχει ληφθεί. Κάντε επανεκκίνηση τώρα για να εφαρμοστεί η ενημέρωση.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Επανεκκίνηση τώρα</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Αργότερα</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Λήψη μοντέλου AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Η λήψη του μοντέλου απέτυχε. Ελέγξτε τη σύνδεσή σας στο διαδίκτυο και δοκιμάστε ξανά. Ο εντοπισμός PII δεν είναι διαθέσιμος μέχρι να ολοκληρωθεί η λήψη.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Επανάληψη</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Απαιτείται κύριος κωδικός πρόσβασης</value>
   </data>

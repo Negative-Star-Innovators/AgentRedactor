@@ -20,6 +20,8 @@ namespace winrt::AgentRedactor::implementation
             Microsoft::UI::Xaml::RoutedEventArgs const& e);
         void ToggleShowSensitive_Click(winrt::Windows::Foundation::IInspectable const& sender,
             Microsoft::UI::Xaml::RoutedEventArgs const& e);
+        void CheckUpdates_Click(winrt::Windows::Foundation::IInspectable const& sender,
+            Microsoft::UI::Xaml::RoutedEventArgs const& e);
         void ComboLanguage_SelectionChanged(winrt::Windows::Foundation::IInspectable const& sender,
             Microsoft::UI::Xaml::Controls::SelectionChangedEventArgs const& e);
         void Back_Click(winrt::Windows::Foundation::IInspectable const& sender,

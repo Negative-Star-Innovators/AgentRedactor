@@ -5,11 +5,13 @@
 #include "constants.h"
 #include "api_key_profile.h"
 #include "logging.h"
+#include "model_downloader.h"
 #include <nlohmann/json.hpp>
 #include <chrono>
 #include <fstream>
 #include <sstream>
 #include <deque>
+#include <thread>
 
 using json = nlohmann::json;
 
@@ -18,6 +20,7 @@ using namespace AgentRedactor;
 namespace {
     constexpr UINT WM_APP_NOTIFY_LOG = WM_APP + 1;
     constexpr UINT WM_APP_NOTIFY_STATS = WM_APP + 2;
+    constexpr UINT WM_APP_NOTIFY_MODEL = WM_APP + 3;
     constexpr UINT WM_TRAYICON = WM_USER + 1;
     constexpr wchar_t MSG_WND_CLASS[] = L"AgentRedactorMsgWindow";
 
@@ -313,12 +316,30 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
     // Apply any saved language override before any UI resources are loaded.
     ::AgentRedactor::InitializeLocalization();
 
-    detector_ = std::make_unique<PIIDetector>(Utils::GetExecutablePath() / L"models");
+    // MSIX/Store builds ship the weights next to the exe (identical behavior
+    // to before); self-release installs download them on first run into
+    // %LOCALAPPDATA%\AgentRedactor\models.
+    auto modelDir = ModelDownloader::ResolveModelDir();
+    detector_ = std::make_unique<PIIDetector>(modelDir);
     // Set the provider BEFORE initializing so the model loads with the user's
     // chosen execution provider (CPU, GPU/Auto/DirectML/CUDA).
     detector_->SetProvider(settings_->GetOnnxProvider());
-    if (!detector_->Initialize()) {
-        LOG_LIFECYCLE(L"[AppState] WARNING: PII Detector failed to initialize. Model may be missing.");
+    if (!ModelDownloader::HasModelWeights(modelDir)) {
+        // Blocking first-run download: the app must not run degraded
+        // (regex/keyword-only), so the detector stays uninitialized and the
+        // proxy servers are NOT started below. MainWindow shows a modal
+        // download dialog; StartModelDownloadIfNeeded() initializes the
+        // detector and starts the proxies once the download succeeds.
+        {
+            std::lock_guard lock(callbackMutex_);
+            modelDownloadRequired_ = true;
+        }
+        LOG_LIFECYCLE(L"[AppState] Model weights missing; startup blocked until the first-run download completes");
+    } else if (!detector_->Initialize()) {
+        // Weights are present but the model failed to load. This is the same
+        // degraded fallback the app has always had (regex/keyword-only); the
+        // blocking flow above only covers missing weights.
+        LOG_LIFECYCLE(L"[AppState] WARNING: PII Detector failed to initialize although model weights are present.");
     }
 
     logManager_->SetLoggingEnabled(settings_->IsLoggingEnabled());
@@ -347,7 +368,11 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
         UnregisterStartupTask();
     }
 
-    StartProxyServers();
+    // Never serve traffic while the blocking first-run download is pending:
+    // the proxies start only after the download + detector init succeed.
+    if (!IsModelDownloadRequired()) {
+        StartProxyServers();
+    }
     return true;
 }
 
@@ -383,6 +408,116 @@ void AppState::NotifyStatsUpdated() {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Blocking first-run model download (fires only when the weights are missing,
+// e.g. a fresh self-release install; never in current MSIX builds, which ship
+// the weights next to the exe). While the download is pending the app is
+// blocked: no detector, no proxy servers.
+// ---------------------------------------------------------------------------
+
+void AppState::SetOnModelDownloadStatus(std::function<void()> cb) {
+    std::lock_guard lock(callbackMutex_);
+    onModelDownloadStatus_ = std::move(cb);
+}
+
+void AppState::NotifyModelDownloadStatus() {
+    if (messageHwnd_) {
+        PostMessage(messageHwnd_, WM_APP_NOTIFY_MODEL, 0, 0);
+    }
+}
+
+bool AppState::IsModelDownloadRequired() const {
+    std::lock_guard lock(callbackMutex_);
+    return modelDownloadRequired_;
+}
+
+bool AppState::IsModelDownloadInProgress() const {
+    std::lock_guard lock(callbackMutex_);
+    return modelDownloadInProgress_;
+}
+
+bool AppState::HasModelDownloadFailed() const {
+    std::lock_guard lock(callbackMutex_);
+    return modelDownloadFailed_;
+}
+
+std::wstring AppState::ModelDownloadStatus() const {
+    std::lock_guard lock(callbackMutex_);
+    return modelDownloadStatus_;
+}
+
+int AppState::ModelDownloadPercent() const {
+    std::lock_guard lock(callbackMutex_);
+    return modelDownloadPercent_;
+}
+
+void AppState::RetryModelDownload() {
+    StartModelDownloadIfNeeded();
+}
+
+void AppState::StartModelDownloadIfNeeded() {
+    {
+        std::lock_guard lock(callbackMutex_);
+        if (modelDownloadInProgress_) return;
+        modelDownloadInProgress_ = true;
+        modelDownloadFailed_ = false;
+        modelDownloadPercent_ = -1;
+        modelDownloadStatus_.clear();
+    }
+    NotifyModelDownloadStatus();
+
+    const auto fallbackDir = ModelDownloader::GetFallbackModelDir();
+    std::thread([this, fallbackDir]() {
+        auto progress = [this](int percent, const std::wstring& message) {
+            {
+                std::lock_guard lock(callbackMutex_);
+                modelDownloadPercent_ = percent;
+                if (!message.empty()) modelDownloadStatus_ = message;
+            }
+            NotifyModelDownloadStatus();
+        };
+
+        bool ok = false;
+        try {
+            ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
+        } catch (...) {
+            ok = false;
+        }
+
+        if (ok) {
+            // Load the model now that the files exist. Stop the proxy first so
+            // no in-flight request can touch the detector while it initializes
+            // (on the blocking first-run path the proxies were never started,
+            // so Stop is a no-op and Start below unblocks the app).
+            StopProxyServers();
+            bool initOk = false;
+            try {
+                if (detector_) initOk = detector_->Initialize();
+            } catch (...) {
+                initOk = false;
+            }
+            if (initOk) {
+                StartProxyServers();
+            }
+            LOG_LIFECYCLE(initOk
+                ? L"[AppState] Model downloaded and initialized"
+                : L"[AppState] Model downloaded but detector initialization failed");
+            ok = initOk;
+        } else {
+            LOG_LIFECYCLE(L"[AppState] Model download failed");
+        }
+
+        {
+            std::lock_guard lock(callbackMutex_);
+            modelDownloadInProgress_ = false;
+            modelDownloadFailed_ = !ok;
+            modelDownloadPercent_ = ok ? 100 : -1;
+            if (ok) modelDownloadRequired_ = false;
+        }
+        NotifyModelDownloadStatus();
+    }).detach();
+}
+
 HWND AppState::CreateMessageWindow() {
     HINSTANCE hInst = GetModuleHandle(nullptr);
     WNDCLASSEXW wc = { sizeof(WNDCLASSEXW) };
@@ -413,6 +548,11 @@ LRESULT CALLBACK AppState::MessageWndProc(HWND hwnd, UINT msg, WPARAM wParam, LP
     if (msg == WM_APP_NOTIFY_STATS) {
         std::lock_guard lock(app->callbackMutex_);
         if (app->onStatsUpdated_) app->onStatsUpdated_();
+        return 0;
+    }
+    if (msg == WM_APP_NOTIFY_MODEL) {
+        std::lock_guard lock(app->callbackMutex_);
+        if (app->onModelDownloadStatus_) app->onModelDownloadStatus_();
         return 0;
     }
     if (msg == WM_TRAYICON) {

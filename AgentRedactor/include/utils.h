@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <functional>
 #include <optional>
 #include <windows.h>
 #include "logging.h"
@@ -57,6 +58,13 @@ std::wstring FormatLocalizedFloat(double value, int precision = 6);
 double ParseLocalizedFloat(const std::wstring& text);
 std::wstring FormatLocalizedTime(const std::time_t& time);
 std::wstring FormatLocalizedDateTime(const std::time_t& time);
+
+// Simple synchronous HTTP(S) GET helpers (WinHTTP), shared by the update
+// manager and the first-run model downloader. Follow redirects across hosts
+// (the update feed and GitHub release assets both 302). Never throw.
+bool HttpGetString(const std::wstring& url, std::string& outBody);
+bool HttpDownloadFile(const std::wstring& url, const std::filesystem::path& destPath,
+    const std::function<void(uint64_t downloaded, uint64_t total)>& progress = nullptr);
 
 } // namespace Utils
 } // namespace AgentRedactor

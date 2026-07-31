@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Registrazione dettagliata abilitata. I log possono contenere dati sensibili, inclusi i corpi delle richieste originali.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Aggiornamenti</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versione {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Cerca aggiornamenti</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Gli aggiornamenti sono gestiti dal Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Ricerca di aggiornamenti in corso...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>L'app è aggiornata.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Un aggiornamento è stato scaricato ed è pronto per l'installazione.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Impossibile cercare aggiornamenti. Riprova più tardi.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Aggiornamento pronto per l'installazione</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} è stato scaricato. Riavvia ora per applicare l'aggiornamento.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Riavvia ora</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Più tardi</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Download del modello di IA in corso</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Download del modello non riuscito. Controlla la connessione a Internet e riprova. Il rilevamento delle PII non è disponibile fino al completamento del download.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Riprova</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Password principale richiesta</value>
   </data>

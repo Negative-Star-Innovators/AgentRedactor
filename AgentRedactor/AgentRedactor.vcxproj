@@ -94,6 +94,18 @@
     <IntDir>$(ProjectDir)build\$(Platform)\$(Configuration)\obj\</IntDir>
     <TargetName>AgentRedactor</TargetName>
   </PropertyGroup>
+  <!-- Self-release (Velopack) channel: enabled with -p:SelfRelease=true.
+       Kept as an MSBuild property (not command-line PreprocessorDefinitions)
+       so it composes with the per-config ItemDefinitionGroups and the
+       FixClCompilePreprocessorDefinitions target. -->
+  <PropertyGroup Condition="'$(SelfRelease)'=='true'">
+    <AppVersion Condition="'$(AppVersion)'==''">1.0.0</AppVersion>
+    <!-- 4-part comma form of AppVersion for the VERSIONINFO resource; the rc
+         preprocessor cannot split strings, so build.ps1 passes
+         -p:AppVersionQuad=x,y,z,0 (fallback here when unset). -->
+    <AppVersionQuad Condition="'$(AppVersionQuad)'==''">1,0,0,0</AppVersionQuad>
+    <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE;AR_VERSION_STRING=&quot;$(AppVersion)&quot;;AR_VERSION_QUAD=$(AppVersionQuad)</SelfReleaseDefines>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -150,6 +162,17 @@
       <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;gdi32.lib;ole32.lib;comdlg32.lib;uuid.lib;Rpcrt4.lib;windowsapp.lib;comctl32.lib;msimg32.lib;gdiplus.lib;winhttp.lib;ws2_32.lib;ntdll.lib;crypt32.lib;bcrypt.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <!-- Appended after the per-config groups so %(PreprocessorDefinitions) picks up
+       their values; when SelfReleaseDefines is empty this expands to nothing and the
+       Store/MSIX build is unchanged. Applies to all four configurations. -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>$(SelfReleaseDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>$(SelfReleaseDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.h" />
@@ -176,6 +199,9 @@
     <ClInclude Include="include\regex_engine.h" />
     <ClInclude Include="include\keyword_engine.h" />
     <ClInclude Include="include\secure_storage.h" />
+    <ClInclude Include="include\update_manager.h" />
+    <ClInclude Include="include\model_downloader.h" />
+    <ClInclude Include="include\migrations\settings_migrator.h" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +230,9 @@
     <ClCompile Include="src\regex_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="src\keyword_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="src\secure_storage.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\update_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\model_downloader.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="src\migrations\settings_migrator.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="$(IntDir)XamlTypeInfo.g.cpp" />
     <ClCompile Include="$(IntDir)XamlTypeInfo.Impl.g.cpp" />
   </ItemGroup>

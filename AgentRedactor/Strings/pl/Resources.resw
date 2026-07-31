@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Szczegółowe logowanie włączone. Dzienniki mogą zawierać wrażliwe dane, w tym oryginalne treści żądań.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Aktualizacje</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Wersja {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Sprawdź aktualizacje</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Aktualizacjami zarządza Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Sprawdzanie aktualizacji...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Masz najnowszą wersję.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Aktualizacja została pobrana i jest gotowa do zainstalowania.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Nie można sprawdzić aktualizacji. Spróbuj ponownie później.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Aktualizacja gotowa do zainstalowania</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} został pobrany. Uruchom ponownie teraz, aby zastosować aktualizację.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Uruchom ponownie teraz</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Później</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Pobieranie modelu AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Pobieranie modelu nie powiodło się. Sprawdź połączenie internetowe i spróbuj ponownie. Wykrywanie PII jest niedostępne do zakończenia pobierania.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Spróbuj ponownie</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Wymagane jest hasło główne</value>
   </data>

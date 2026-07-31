@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Detailléiert Loggen aktivéiert. Logfichieren kënnen sensibel Donnéeën, inklusiv ursprénglech Ufroen, enthalen.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Aktualiséierungen</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versioun {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>No Updates sichen</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Updates ginn iwwer de Microsoft Store geréiert.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>No Updates siche...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Dir sidd um neiste Stand.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>En Update gouf erofgelueden an ass prett fir installéiert ze ginn.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Et konnt net no Updates gesicht ginn. Probéiert et méi spéit nach eng Kéier.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Update prett fir d'Installatioun</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} gouf erofgelueden. Start elo nei fir den Update unzewenden.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Elo nei starten</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Méi spéit</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI-Modell gëtt erofgelueden</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Den Download vum Modell ass feelgeschloe. Iwwerpréift är Internetverbindung a probéiert et nach eng Kéier. D'PII-Erkennung ass net verfügbar, bis den Download ofgeschloss ass.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Nach eng Kéier probéieren</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Haaptpasswuert erfuerderlech</value>
   </data>

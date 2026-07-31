@@ -1,0 +1,16 @@
+name = "agentredactor-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Custom domain: attach api.agentredactor.negativestarinnovators.com
+# Requires the negativestarinnovators.com zone to be active on Cloudflare.
+# Uncomment once the zone is onboarded (or attach via dashboard ->
+# Workers -> agentredactor-api -> Settings -> Domains & Routes).
+# routes = [
+#   { pattern = "api.agentredactor.negativestarinnovators.com", custom_domain = true }
+# ]
+
+[vars]
+# Non-secret configuration lives here.
+# Secrets (e.g. GH_TOKEN) go in via: npx wrangler secret put GH_TOKEN
+GITHUB_REPO = "Negative-Star-Innovators/AgentRedactor"

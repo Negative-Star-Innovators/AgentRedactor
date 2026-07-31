@@ -28,6 +28,11 @@
             <ToggleSwitch x:Name="ToggleEnableLogging" Toggled="ToggleEnableLogging_Click"/>
             <ToggleSwitch x:Name="ToggleShowSensitive" Toggled="ToggleShowSensitive_Click"/>
 
+            <TextBlock x:Name="UpdatesHeader" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+            <TextBlock x:Name="UpdatesVersionText" FontSize="12" Opacity="0.6"/>
+            <Button x:Name="BtnCheckUpdates" Click="CheckUpdates_Click" HorizontalAlignment="Left"/>
+            <TextBlock x:Name="UpdatesStatusText" FontSize="12" Opacity="0.6" TextWrapping="Wrap"/>
+
             <Button x:Name="BtnSave" Click="SaveSettings_Click" Style="{StaticResource AccentButtonStyle}"/>
         </StackPanel>
     </Grid>

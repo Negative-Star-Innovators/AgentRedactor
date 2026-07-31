@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Подробное ведение журнала включено. Журналы могут содержать конфиденциальные данные, включая исходные тела запросов.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Обновления</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Проверить обновления</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Обновлениями управляет Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Проверка обновлений...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>У вас последняя версия.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Обновление скачано и готово к установке.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Не удалось проверить обновления. Повторите попытку позже.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Обновление готово к установке</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} скачан. Перезапустите сейчас, чтобы применить обновление.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Перезапустить сейчас</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Позже</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Скачивание модели ИИ</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Не удалось скачать модель. Проверьте подключение к Интернету и повторите попытку. Обнаружение PII будет недоступно до завершения скачивания.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Требуется мастер-пароль</value>
   </data>

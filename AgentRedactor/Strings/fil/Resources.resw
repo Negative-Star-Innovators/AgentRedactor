@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Naka-enable ang verbose logging. Ang mga log ay maaaring maglaman ng sensitibong data, kabilang ang orihinal na request bodies.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Mga Update</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Bersyon {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Mag-check ng mga update</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Ang mga update ay pinamamahalaan ng Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Nagche-check ng mga update...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Naka-update ka na.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>May na-download na update at handa nang i-install.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Hindi nagawang mag-check ng mga update. Subukan ulit mamaya.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Handa nang i-install ang update</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Na-download na ang Agent Redactor {0}. I-restart ngayon para mailapat ang update.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>I-restart ngayon</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Mamaya</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Dina-download ang AI model</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Nabigo ang pag-download ng model. Suriin ang iyong koneksyon sa internet, pagkatapos ay subukan ulit. Hindi available ang PII detection hanggang matapos ang download.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Subukan ulit</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Kailangan ang Master Password</value>
   </data>

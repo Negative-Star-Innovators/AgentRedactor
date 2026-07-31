@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Մանրամասն մատյանագրումը միացված է: Մատյանները կարող են պարունակել զգայուն տվյալներ, ներառյալ՝ բնօրինակ հարցման մարմինները:</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Թարմացումներ</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Տարբերակ {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Ստուգել թարմացումները</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Թարմացումները կառավարվում են Microsoft Store-ի կողմից։</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Թարմացումների ստուգում...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Դուք ունեք վերջին տարբերակը։</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Թարմացումը ներբեռնված է և պատրաստ է տեղադրման։</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Չհաջողվեց ստուգել թարմացումները։ Փորձեք ավելի ուշ։</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Թարմացումը պատրաստ է տեղադրման</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0}-ը ներբեռնված է։ Վերամեկնարկեք հիմա՝ թարմացումը կիրառելու համար։</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Վերամեկնարկել հիմա</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Ավելի ուշ</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI մոդելի ներբեռնում</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Մոդելի ներբեռնումը ձախողվեց։ Ստուգեք ձեր ինտերնետ կապը և փորձեք կրկին։ PII-ի հայտնաբերումը հասանելի չէ մինչև ներբեռնման ավարտը։</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Կրկնել</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Պահանջվում է հիմնական գաղտնաբառ</value>
   </data>

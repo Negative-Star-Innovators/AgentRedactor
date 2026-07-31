@@ -1,0 +1,5 @@
+{
+  "start_on_boot": false,
+  "app_language": "fr",
+  "onnx_provider": "cpu"
+}

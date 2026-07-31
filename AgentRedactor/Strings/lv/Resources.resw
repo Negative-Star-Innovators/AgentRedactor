@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Detalizētā reģistrēšana ir iespējota. Žurnāli var saturēt jutīgus datus, tostarp oriģinālos pieprasījumu ķermeņus.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Atjauninājumi</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versija {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Pārbaudīt atjauninājumus</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Atjauninājumus pārvalda Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Notiek atjauninājumu pārbaude...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Jums ir jaunākā versija.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Atjauninājums ir lejupielādēts un gatavs instalēšanai.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Neizdevās pārbaudīt atjauninājumus. Mēģiniet vēlāk vēlreiz.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Atjauninājums gatavs instalēšanai</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} ir lejupielādēts. Restartējiet tagad, lai lietotu atjauninājumu.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Restartēt tagad</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Vēlāk</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Lejupielādē AI modeli</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Modeļa lejupielāde neizdevās. Pārbaudiet interneta savienojumu un mēģiniet vēlreiz. PII noteikšana nav pieejama, līdz lejupielāde ir pabeigta.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Mēģināt vēlreiz</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Nepieciešama galvenā parole</value>
   </data>

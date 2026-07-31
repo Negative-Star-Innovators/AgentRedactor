@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Ətraflı qeyd aktivləşdirildi. Jurnallarda orijinal sorğu orqanları daxil olmaqla həssas məlumatlar ola bilər.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Yeniləmələr</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versiya {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Yeniləmələri yoxla</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Yeniləmələr Microsoft Store tərəfindən idarə olunur.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Yeniləmələr yoxlanılır...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Ən son versiyadan istifadə edirsiniz.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Yeniləmə yükləndi və quraşdırılmağa hazırdır.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Yeniləmələri yoxlamaq mümkün olmadı. Daha sonra yenidən cəhd edin.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Yeniləmə quraşdırılmağa hazırdır</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} yükləndi. Yeniləməni tətbiq etmək üçün indi yenidən başladın.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>İndi yenidən başlat</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Daha sonra</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI modeli yüklənir</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Modelin yüklənməsi uğursuz oldu. İnternet bağlantınızı yoxlayın, sonra yenidən cəhd edin. Yükləmə tamamlanana qədər PII aşkarlanması mövcud deyil.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Yenidən cəhd et</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Master Parol Tələb olunur</value>
   </data>

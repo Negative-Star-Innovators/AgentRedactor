@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Registo verboso ativado. Os registos podem conter dados sensíveis, incluindo corpos de pedido originais.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Atualizações</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versão {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Procurar atualizações</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>As atualizações são geridas pela Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>A procurar atualizações...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Está atualizado.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Foi transferida uma atualização e está pronta a instalar.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Não foi possível procurar atualizações. Tente novamente mais tarde.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Atualização pronta a instalar</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>O Agent Redactor {0} foi transferido. Reinicie agora para aplicar a atualização.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Reiniciar agora</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Mais tarde</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>A transferir o modelo de IA</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>A transferência do modelo falhou. Verifique a sua ligação à Internet e tente novamente. A deteção de PII não está disponível até a transferência concluir.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Tentar novamente</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Palavra-passe mestra necessária</value>
   </data>

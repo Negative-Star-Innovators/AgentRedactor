@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Üksikasjalik logimine on lubatud. Logid võivad sisaldada tundlikke andmeid, sealhulgas algupäraseid päringukehi.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Värskendused</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versioon {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Kontrolli värskendusi</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Värskendusi haldab Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Värskenduste kontrollimine...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Teil on uusim versioon.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Värskendus on alla laaditud ja valmis installimiseks.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Värskendusi ei saanud kontrollida. Proovige hiljem uuesti.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Värskendus on installimiseks valmis</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} on alla laaditud. Värskenduse rakendamiseks taaskäivitage kohe.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Taaskäivita kohe</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Hiljem</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI-mudeli allalaadimine</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Mudeli allalaadimine ebaõnnestus. Kontrollige oma internetiühendust ja proovige uuesti. PII tuvastamine pole saadaval enne allalaadimise lõppu.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Proovi uuesti</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Peaparool on nõutav</value>
   </data>

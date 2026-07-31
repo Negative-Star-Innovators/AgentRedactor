@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Gedetailleerde logboek geaktiveer. Loglêers kan sensitiewe data bevat, insluitend oorspronklike versoekliggame.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Opdaterings</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Weergawe {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Soek vir opdaterings</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Opdaterings word deur die Microsoft Store bestuur.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Soek tans vir opdaterings...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Jy is op datum.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>'n Opdatering is afgelaai en is gereed om te installeer.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Kon nie vir opdaterings soek nie. Probeer later weer.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Opdatering gereed om te installeer</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} is afgelaai. Herbegin nou om die opdatering toe te pas.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Herbegin nou</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Laai KI-model af</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Die aflaai van die model het misluk. Gaan jou internetverbinding na en probeer weer. PII-opsporing is nie beskikbaar totdat die aflaai voltooi is nie.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Probeer weer</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Meesterwagwoord vereis</value>
   </data>

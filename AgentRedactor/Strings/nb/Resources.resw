@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Detaljert logging aktivert. Logger kan inneholde sensitive data, inkludert originale forespørselsorganer.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Oppdateringer</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versjon {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Se etter oppdateringer</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Oppdateringer administreres av Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Ser etter oppdateringer...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Du har den nyeste versjonen.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>En oppdatering er lastet ned og er klar til å installeres.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Kunne ikke se etter oppdateringer. Prøv igjen senere.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Oppdatering klar til å installeres</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} er lastet ned. Start på nytt nå for å bruke oppdateringen.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Start på nytt nå</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Senere</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Laster ned AI-modell</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Nedlastingen av modellen mislyktes. Kontroller Internett-tilkoblingen din, og prøv på nytt. PII-gjenkjenning er ikke tilgjengelig før nedlastingen er fullført.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Prøv på nytt</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Hovedpassord kreves</value>
   </data>

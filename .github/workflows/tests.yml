@@ -10,8 +10,10 @@ name: Tests
 #                       so UI automation generally works there. Free for
 #                       public repos. Does NOT compile the app: it downloads
 #                       the AgentRedactor-release-bin artifact from the latest
-#                       successful Build MSIX run on main, so that workflow
-#                       must have run at least once.
+#                       successful Build MSIX run on the SAME branch this
+#                       workflow was dispatched on (Build MSIX runs
+#                       automatically on every PR, so opening a PR produces
+#                       the artifacts; wait for it to finish first).
 #   gui-tests-hosted-arm64
 #                       Same as gui-tests-hosted but on the windows-11-arm
 #                       ARM64 runner, using the AgentRedactor-release-bin-arm64
@@ -36,14 +38,17 @@ jobs:
 
       # Reuse the Release binaries built by the Build MSIX workflow instead of
       # compiling here (vcpkg + msbuild was the bulk of this job's runtime).
+      # IMPORTANT: use the run from THIS branch (github.ref_name), so a run
+      # dispatched on a PR branch tests that branch's binaries, not main's.
       - name: Find latest successful Build MSIX run
         id: msix
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $id = gh run list -R ${{ github.repository }} --workflow build-msix.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId'
-          if (-not $id) { throw "No successful Build MSIX run found on main; run that workflow first." }
+          $branch = "${{ github.ref_name }}"
+          $id = gh run list -R ${{ github.repository }} --workflow build-msix.yml --branch $branch --status success --limit 1 --json databaseId --jq '.[0].databaseId'
+          if (-not $id) { throw "No successful Build MSIX run found on branch '$branch'. Opening a PR triggers one automatically — wait for it to finish, then re-run this workflow on the same branch." }
           echo "run_id=$id" >> $env:GITHUB_OUTPUT
 
       - name: Download prebuilt AgentRedactor binaries
@@ -92,6 +97,16 @@ jobs:
         shell: pwsh
         run: pip install -r repo/tests/requirements.txt
 
+      # Headless settings-migration tests (--selftest-migrate-settings needs
+      # no GUI session), run against the Store-channel Release binaries too.
+      - name: Run settings migration tests
+        shell: pwsh
+        env:
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/x64/Release/AgentRedactor.exe
+        run: |
+          cd repo/tests
+          pytest -v migration/test_settings_migration.py
+
       - name: Run GUI tests
         shell: pwsh
         run: |
@@ -107,15 +122,17 @@ jobs:
           path: repo
 
       # Reuse the ARM64 Release binaries built by the Build MSIX workflow
-      # instead of compiling here.
+      # instead of compiling here. Uses the run from THIS branch (see the
+      # x64 job for why).
       - name: Find latest successful Build MSIX run
         id: msix
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $id = gh run list -R ${{ github.repository }} --workflow build-msix.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId'
-          if (-not $id) { throw "No successful Build MSIX run found on main; run that workflow first." }
+          $branch = "${{ github.ref_name }}"
+          $id = gh run list -R ${{ github.repository }} --workflow build-msix.yml --branch $branch --status success --limit 1 --json databaseId --jq '.[0].databaseId'
+          if (-not $id) { throw "No successful Build MSIX run found on branch '$branch'. Opening a PR triggers one automatically — wait for it to finish, then re-run this workflow on the same branch." }
           echo "run_id=$id" >> $env:GITHUB_OUTPUT
 
       - name: Download prebuilt AgentRedactor binaries (arm64)

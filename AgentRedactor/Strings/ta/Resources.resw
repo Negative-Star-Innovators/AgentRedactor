@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>விரிவான பதிவு இயக்கப்பட்டுள்ளது. பதிவுகளில் அசல் கோரிக்கை உடல்கள் உள்ளிட்ட முக்கியமான தரவுகள் இருக்கலாம்.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>புதுப்பிப்புகள்</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>பதிப்பு {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>புதுப்பிப்புகளைச் சரிபார்</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>புதுப்பிப்புகள் Microsoft Store மூலம் நிர்வகிக்கப்படுகின்றன.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>புதுப்பிப்புகளைச் சரிபார்க்கிறது...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>நீங்கள் புதுப்பித்த நிலையில் உள்ளீர்கள்.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>ஒரு புதுப்பிப்பு பதிவிறக்கப்பட்டு நிறுவ தயாராக உள்ளது.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>புதுப்பிப்பு நிறுவ தயார்</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} பதிவிறக்கப்பட்டது. புதுப்பிப்பைப் பயன்படுத்த இப்போது மீண்டும் தொடங்கவும்.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>இப்போது மீண்டும் தொடங்கு</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>பின்னர்</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI மாதிரியைப் பதிவிறக்குகிறது</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>மாதிரி பதிவிறக்கம் தோல்வியடைந்தது. உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும். பதிவிறக்கம் முடியும் வரை PII கண்டறிதல் கிடைக்காது.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>மீண்டும் முயற்சி</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>முதன்மை கடவுச்சொல் தேவை</value>
   </data>

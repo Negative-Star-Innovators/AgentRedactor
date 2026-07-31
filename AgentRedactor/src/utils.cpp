@@ -1,11 +1,13 @@
 #include "utils.h"
 #include <windows.h>
 #include <shlobj.h>
+#include <winhttp.h>
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
 #include <fstream>
 #include <chrono>
+#include <cstdlib>
 #include <mutex>
 #include <atomic>
 
@@ -262,6 +264,13 @@ bool CreateDirectoryRecursive(const std::filesystem::path& path) {
 }
 
 std::filesystem::path GetAppDataPath() {
+    // Test/diagnostic hook (both channels): AGENTREDACTOR_CONFIG_DIR overrides
+    // the config directory so tests can seed settings fixtures against an
+    // isolated directory. Unset in normal use.
+    if (const wchar_t* overrideDir = _wgetenv(L"AGENTREDACTOR_CONFIG_DIR");
+        overrideDir && *overrideDir) {
+        return std::filesystem::path(overrideDir);
+    }
     wchar_t path[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path))) {
         return std::filesystem::path(path) / L"AgentRedactor";
@@ -384,6 +393,126 @@ std::wstring FormatLocalizedDateTime(const std::time_t& time) {
     }
     std::wstring timeStr = FormatLocalizedTime(time);
     return buffer + L" " + timeStr;
+}
+
+namespace {
+
+struct WinHttpHandle {
+    HINTERNET h = nullptr;
+    WinHttpHandle() = default;
+    explicit WinHttpHandle(HINTERNET handle) : h(handle) {}
+    ~WinHttpHandle() { if (h) WinHttpCloseHandle(h); }
+    WinHttpHandle(const WinHttpHandle&) = delete;
+    WinHttpHandle& operator=(const WinHttpHandle&) = delete;
+};
+
+// Performs a GET against `url`, following redirects manually (the default
+// auto policy is disabled so cross-host chains like worker -> github.com ->
+// release asset CDN are explicit). On HTTP 200, invokes `consume` with the
+// open request handle; its return value becomes the result.
+bool HttpGetInternal(const std::wstring& url,
+    const std::function<bool(HINTERNET request, uint64_t contentLength)>& consume) {
+    std::wstring current = url;
+    for (int redirect = 0; redirect < 5; ++redirect) {
+        URL_COMPONENTS uc = { sizeof(uc) };
+        uc.dwSchemeLength = (DWORD)-1;
+        uc.dwHostNameLength = (DWORD)-1;
+        uc.dwUrlPathLength = (DWORD)-1;
+        uc.dwExtraInfoLength = (DWORD)-1;
+        if (!WinHttpCrackUrl(current.c_str(), 0, 0, &uc)) return false;
+
+        std::wstring host(uc.lpszHostName, uc.dwHostNameLength);
+        std::wstring path(uc.lpszUrlPath, uc.dwUrlPathLength);
+        if (uc.dwExtraInfoLength > 0) path += std::wstring(uc.lpszExtraInfo, uc.dwExtraInfoLength);
+        if (path.empty()) path = L"/";
+
+        WinHttpHandle session{ WinHttpOpen(L"AgentRedactor/1.0", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+            WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0) };
+        if (!session.h) return false;
+        WinHttpHandle connect{ WinHttpConnect(session.h, host.c_str(), uc.nPort, 0) };
+        if (!connect.h) return false;
+        DWORD flags = (uc.nScheme == INTERNET_SCHEME_HTTPS) ? WINHTTP_FLAG_SECURE : 0;
+        WinHttpHandle request{ WinHttpOpenRequest(connect.h, L"GET", path.c_str(), nullptr,
+            WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, flags) };
+        if (!request.h) return false;
+
+        DWORD policy = WINHTTP_OPTION_REDIRECT_POLICY_NEVER;
+        WinHttpSetOption(request.h, WINHTTP_OPTION_REDIRECT_POLICY, &policy, sizeof(policy));
+        // Generous receive timeout: model weights and update packages are large.
+        WinHttpSetTimeouts(request.h, 30000, 30000, 30000, 300000);
+
+        if (!WinHttpSendRequest(request.h, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+            WINHTTP_NO_REQUEST_DATA, 0, 0, 0)) return false;
+        if (!WinHttpReceiveResponse(request.h, nullptr)) return false;
+
+        DWORD status = 0;
+        DWORD statusSize = sizeof(status);
+        WinHttpQueryHeaders(request.h, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+            WINHTTP_HEADER_NAME_BY_INDEX, &status, &statusSize, WINHTTP_NO_HEADER_INDEX);
+
+        if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308) {
+            DWORD bufSize = 0;
+            WinHttpQueryHeaders(request.h, WINHTTP_QUERY_LOCATION, WINHTTP_HEADER_NAME_BY_INDEX,
+                WINHTTP_NO_OUTPUT_BUFFER, &bufSize, WINHTTP_NO_HEADER_INDEX);
+            if (bufSize == 0) return false;
+            std::wstring location(bufSize / sizeof(wchar_t) + 1, L'\0');
+            if (!WinHttpQueryHeaders(request.h, WINHTTP_QUERY_LOCATION, WINHTTP_HEADER_NAME_BY_INDEX,
+                location.data(), &bufSize, WINHTTP_NO_HEADER_INDEX)) return false;
+            location.resize(wcslen(location.c_str()));
+            if (location.empty()) return false;
+            current = location;
+            continue;
+        }
+        if (status != 200) return false;
+
+        uint64_t contentLength = 0;
+        DWORD cl = 0;
+        DWORD clSize = sizeof(cl);
+        if (WinHttpQueryHeaders(request.h, WINHTTP_QUERY_CONTENT_LENGTH | WINHTTP_QUERY_FLAG_NUMBER,
+            WINHTTP_HEADER_NAME_BY_INDEX, &cl, &clSize, WINHTTP_NO_HEADER_INDEX)) {
+            contentLength = cl;
+        }
+        return consume(request.h, contentLength);
+    }
+    return false;
+}
+
+} // anonymous namespace
+
+bool HttpGetString(const std::wstring& url, std::string& outBody) {
+    outBody.clear();
+    return HttpGetInternal(url, [&outBody](HINTERNET request, uint64_t) {
+        DWORD avail = 0;
+        while (WinHttpQueryDataAvailable(request, &avail) && avail > 0) {
+            std::vector<char> buffer(avail);
+            DWORD read = 0;
+            if (!WinHttpReadData(request, buffer.data(), avail, &read)) return false;
+            if (read > 0) outBody.append(buffer.data(), read);
+        }
+        return true;
+    });
+}
+
+bool HttpDownloadFile(const std::wstring& url, const std::filesystem::path& destPath,
+    const std::function<void(uint64_t downloaded, uint64_t total)>& progress) {
+    return HttpGetInternal(url, [&](HINTERNET request, uint64_t total) {
+        std::ofstream file(destPath, std::ios::binary | std::ios::trunc);
+        if (!file) return false;
+        uint64_t downloaded = 0;
+        DWORD avail = 0;
+        while (WinHttpQueryDataAvailable(request, &avail) && avail > 0) {
+            std::vector<char> buffer(avail);
+            DWORD read = 0;
+            if (!WinHttpReadData(request, buffer.data(), avail, &read)) return false;
+            if (read > 0) {
+                file.write(buffer.data(), read);
+                downloaded += read;
+                if (progress) progress(downloaded, total);
+            }
+        }
+        file.flush();
+        return file.good();
+    });
 }
 
 } // namespace Utils

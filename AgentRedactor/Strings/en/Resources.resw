@@ -421,6 +421,55 @@
   <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
     <value>Sensitive information logging enabled. Logs will contain unredacted data including original request bodies and your API key. This resets when you close the app.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Updates are managed by the Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>You're up to date.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>An update has been downloaded and is ready to install.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Couldn't check for updates. Try again later.</value>
+  </data>
+
+  <!-- Updates (self-release channel) -->
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Update ready to install</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} has been downloaded. Restart now to apply the update.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Later</value>
+  </data>
+
+  <!-- First-run model download -->
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Downloading AI model</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>The model download failed. Check your internet connection, then retry. PII detection is unavailable until the download completes.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Retry</value>
+  </data>
 
   <!-- Dialogs: Master password -->
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">

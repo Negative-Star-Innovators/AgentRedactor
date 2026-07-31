@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Uitgebreide logboekregistratie ingeschakeld. Logboeken kunnen gevoelige gegevens bevatten, inclusief originele aanvraagteksten.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versie {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Controleren op updates</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Updates worden beheerd via de Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Bezig met controleren op updates...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Je bent up-to-date.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Er is een update gedownload die klaar is om te installeren.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Kan niet controleren op updates. Probeer het later opnieuw.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Update gereed om te installeren</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} is gedownload. Start nu opnieuw op om de update toe te passen.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Nu opnieuw opstarten</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI-model downloaden</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Het downloaden van het model is mislukt. Controleer je internetverbinding en probeer het opnieuw. PII-detectie is niet beschikbaar totdat de download is voltooid.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Opnieuw proberen</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Hoofdwachtwoord vereist</value>
   </data>

@@ -1,6 +1,9 @@
 #include "settings_manager.h"
 #include "constants.h"
 #include "logging.h"
+#include "migrations/settings_migrator.h"
+#include <chrono>
+#include <ctime>
 #include <fstream>
 
 namespace AgentRedactor {
@@ -14,18 +17,19 @@ SettingsManager::SettingsManager(const std::filesystem::path& configDir) {
     Utils::CreateDirectoryRecursive(configDir_);
     settingsFile_ = configDir_ / SETTINGS_FILE;
     LoadSettings();
+    // Run schema migrations. A file reset after corruption is schema-current
+    // (empty), so the migrator only stamps settings_version there.
+    if (SettingsMigrator::MigrateInPlace(settings_, [](const std::wstring& msg) {
+            LOG_LIFECYCLE(msg);
+        })) {
+        SaveSettings();
+    }
     if (!settings_.contains("start_on_boot")) {
         settings_["start_on_boot"] = true;
         SaveSettings();
     }
-    if (settings_.contains("verbose_logging")) {
-        // Migrate legacy verbose_logging setting to logging_enabled.
-        if (!settings_.contains("logging_enabled")) {
-            settings_["logging_enabled"] = settings_["verbose_logging"];
-        }
-        settings_.erase("verbose_logging");
-        SaveSettings();
-    }
+    // NOTE: the legacy verbose_logging -> logging_enabled rename lives in
+    // migration 1 -> 2 (src/migrations/settings_migrator.cpp), not here.
     if (!settings_.contains("logging_enabled")) {
         settings_["logging_enabled"] = false;
         SaveSettings();
@@ -298,8 +302,39 @@ void SettingsManager::LoadSettings() {
         // If master password is enabled, decryption is deferred until UnlockWithPassword is called
     } catch (const std::exception& e) {
         LOGF_LIFECYCLE(L"[SettingsManager] Load error: %s", Utils::Utf8ToWide(e.what()).c_str());
+        BackupCorruptSettingsFile();
         settings_ = json::object();
         secureStorage_.Initialize(json::object(), L"");
+    }
+}
+
+// Called before a corrupt settings file is reset to {}: copies the unreadable
+// file to <name>.corrupt-<timestamp>.bak so user data is never silently
+// destroyed. Never throws.
+void SettingsManager::BackupCorruptSettingsFile() {
+    try {
+        if (settingsFile_.empty() || !Utils::FileExists(settingsFile_)) return;
+        auto now = std::chrono::system_clock::now();
+        std::time_t t = std::chrono::system_clock::to_time_t(now);
+        std::tm tm{};
+        localtime_s(&tm, &t);
+        wchar_t stamp[32] = {};
+        std::wcsftime(stamp, sizeof(stamp) / sizeof(stamp[0]), L"%Y%m%d-%H%M%S", &tm);
+        auto backup = settingsFile_;
+        backup += L".corrupt-";
+        backup += stamp;
+        backup += L".bak";
+        std::error_code ec;
+        std::filesystem::copy_file(settingsFile_, backup, ec);
+        if (ec) {
+            LOGF_LIFECYCLE(L"[SettingsManager] FAILED to back up corrupt settings file to %s: %s",
+                backup.c_str(), Utils::Utf8ToWide(ec.message()).c_str());
+        } else {
+            LOGF_LIFECYCLE(L"[SettingsManager] Corrupt settings file backed up to %s before reset",
+                backup.c_str());
+        }
+    } catch (...) {
+        LOG_LIFECYCLE(L"[SettingsManager] FAILED to back up corrupt settings file (unknown error)");
     }
 }
 

@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Detaljno vođenje dnevnika je omogućeno. Dnevnici mogu sadržati osetljive podatke, uključujući originalna tela zahteva.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Ažuriranja</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Verzija {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Proveri ažuriranja</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Ažuriranjima upravlja Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Provera ažuriranja...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Imate najnoviju verziju.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Ažuriranje je preuzeto i spremno je za instalaciju.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Nije moguće proveriti ažuriranja. Pokušajte ponovo kasnije.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Ažuriranje je spremno za instalaciju</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} je preuzet. Restartujte sada da biste primenili ažuriranje.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Restartuj sada</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Kasnije</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Preuzimanje AI modela</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Preuzimanje modela nije uspelo. Proverite internet konekciju, a zatim pokušajte ponovo. Otkrivanje PII podataka nije dostupno dok se preuzimanje ne završi.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Pokušaj ponovo</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Potrebna je glavna lozinka</value>
   </data>

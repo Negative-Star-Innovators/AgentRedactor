@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Utförlig loggning aktiverad. Loggar kan innehålla känsliga data, inklusive ursprungliga begärandekroppar.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Uppdateringar</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Sök efter uppdateringar</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Uppdateringar hanteras av Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Söker efter uppdateringar...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Du har den senaste versionen.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>En uppdatering har laddats ned och är redo att installeras.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Det gick inte att söka efter uppdateringar. Försök igen senare.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Uppdatering redo att installeras</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} har laddats ned. Starta om nu för att tillämpa uppdateringen.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Starta om nu</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Senare</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Laddar ned AI-modell</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Nedladdningen av modellen misslyckades. Kontrollera din internetanslutning och försök igen. PII-identifiering är inte tillgänglig förrän nedladdningen är klar.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Försök igen</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Huvudlösenord krävs</value>
   </data>
