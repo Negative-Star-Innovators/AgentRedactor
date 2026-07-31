@@ -10,7 +10,7 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 - `buildquick.ps1` — Fast local build (EXE + copy models/resources).
 - `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
 - `build-selfrelease.ps1` — Self-release wrapper: reads `version.txt`, calls `build.ps1 -SelfRelease`, then runs `vpk pack`.
-- `version.txt` — Single version source of truth for the self-release channel (stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION`).
+- `version.txt` — Single version source of truth for the self-release channel (stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION` for C++ and as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the VERSIONINFO resource).
 
 ## Quick Build (for testing)
 
@@ -66,7 +66,14 @@ The app ships through two channels from the same codebase:
 Key pieces of the self-release channel:
 
 - `version.txt` is the version source of truth; it becomes `AR_VERSION_STRING`
-  → `APP_VERSION` (`include/constants.h`) and the `vpk pack` version.
+  → `APP_VERSION` (`include/constants.h`) and the `vpk pack` version. For the
+  exe's VERSIONINFO resource, the vcxproj passes `ResourceCompile` a separate
+  quote-free define set (`AR_VERSION_TEXT` + `AR_VERSION_QUAD`, stringized in
+  `resources/app.rc`) because embedded quotes do not survive the MSBuild →
+  rc.exe command line (the quoted value silently compiled in empty and the exe
+  read as 0.0.0.0). Keep `app.rc` to a SINGLE StringFileInfo block: version.dll
+  (GetFileVersionInfo) rejects VERSIONINFO resources larger than 32 KB — the
+  old fully-localized 53-block resource exceeded that and read as 0.0.0.0.
 - `src/update_manager.cpp` (all inside `#ifdef AGENTREDACTOR_SELFRELEASE`):
   polls `releases.<channel>.json` from the arch-aware update feed
   (`https://api.agentredactor.negativestarinnovators.com/updates/win` on x64,

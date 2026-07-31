@@ -105,6 +105,11 @@
          -p:AppVersionQuad=x,y,z,0 (fallback here when unset). -->
     <AppVersionQuad Condition="'$(AppVersionQuad)'==''">1,0,0,0</AppVersionQuad>
     <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE;AR_VERSION_STRING=&quot;$(AppVersion)&quot;;AR_VERSION_QUAD=$(AppVersionQuad)</SelfReleaseDefines>
+    <!-- rc.exe gets its own set: embedded quotes (AR_VERSION_STRING) do not
+         survive the MSBuild -> tracker -> rc.exe command line (the value
+         silently compiled in empty, producing a corrupt VERSIONINFO that
+         reads as 0.0.0.0). AR_VERSION_TEXT is unquoted; app.rc stringizes it. -->
+    <SelfReleaseRcDefines>AGENTREDACTOR_SELFRELEASE;AR_VERSION_TEXT=$(AppVersion);AR_VERSION_QUAD=$(AppVersionQuad)</SelfReleaseRcDefines>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -164,13 +169,14 @@
   </ItemDefinitionGroup>
   <!-- Appended after the per-config groups so %(PreprocessorDefinitions) picks up
        their values; when SelfReleaseDefines is empty this expands to nothing and the
-       Store/MSIX build is unchanged. Applies to all four configurations. -->
+       Store/MSIX build is unchanged. Applies to all four configurations. ResourceCompile
+       uses the quote-free SelfReleaseRcDefines (see above). -->
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>$(SelfReleaseDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>$(SelfReleaseDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(SelfReleaseRcDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

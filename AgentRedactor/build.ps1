@@ -269,9 +269,12 @@ if ($SelfRelease) {
     $rid = if ($Platform -eq "ARM64") { "win-arm64" } else { "win-x64" }
     $channel = if ($Platform -eq "ARM64") { "win-arm64" } else { "win" }
     $velopackOut = if ($Platform -eq "ARM64") { "$buildDir\velopack-arm64" } else { "$buildDir\velopack" }
+    # -s: language-neutral splash shown by Setup.exe during install (fox logo
+    # on dark background, no text — Velopack's own Setup UI text is English).
     & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
         -r $rid -c $channel `
-        --packTitle "Agent Redactor" -i "$root\resources\app.ico" -o $velopackOut
+        --packTitle "Agent Redactor" -i "$root\resources\app.ico" `
+        -s "$root\resources\splash.png" -o $velopackOut
     if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
 
     Write-Host ""
