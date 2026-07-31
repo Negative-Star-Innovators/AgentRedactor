@@ -11,6 +11,11 @@ on:
         description: 'Version to release (e.g. 1.1.0). Must match AgentRedactor/version.txt.'
         required: true
         type: string
+      publish:
+        description: 'Publish the GitHub release. Off = dry-run: full build + pack + tests, artifacts only.'
+        required: false
+        type: boolean
+        default: false
 
 # Needed to create the GitHub release and upload Velopack release assets.
 permissions:
@@ -148,9 +153,10 @@ jobs:
 
       # Publishes the Velopack release: creates the GitHub release for this tag
       # and uploads releases.win.json + the nupkg/delta assets so installed
-      # instances can auto-update. All flags live in this one step so they're
-      # easy to adjust.
+      # instances can auto-update. Tag pushes always publish; manual dispatches
+      # only publish when the publish input is checked (default = dry-run).
       - name: Publish Velopack release to GitHub
+        if: github.event_name == 'push' || inputs.publish
         shell: pwsh
         run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --releaseName "AgentRedactor ${{ env.EXPECTED_VERSION }}" --tag "v${{ env.EXPECTED_VERSION }}" --outputDir repo/AgentRedactor/build/velopack
 
