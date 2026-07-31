@@ -233,18 +233,33 @@ if ($SelfRelease) {
     Write-Host "Packing Velopack release v$Version..." -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
 
-    $vpk = Get-Command vpk -ErrorAction SilentlyContinue
+    # vpk resolution: PATH first, then the dotnet global-tools shim dir.
+    # `dotnet tool install -g vpk` drops vpk.exe in ~/.dotnet/tools, which is
+    # NOT on PATH in shells started before the install — so check the shim
+    # path directly both before installing (a previous shell may have
+    # installed it) and after, instead of relying on PATH alone.
+    $dotnetToolsVpk = "$env:USERPROFILE\.dotnet\tools\vpk.exe"
+    $vpkCmd = Get-Command vpk -ErrorAction SilentlyContinue
+    $vpk = if ($vpkCmd) { $vpkCmd.Source } elseif (Test-Path $dotnetToolsVpk) { $dotnetToolsVpk } else { $null }
     if (-not $vpk) {
         Write-Host "vpk (Velopack CLI) not found; installing via dotnet tool..." -ForegroundColor Yellow
         & dotnet tool install -g vpk
         if ($LASTEXITCODE -ne 0) { throw "Failed to install vpk (is the .NET SDK installed?)" }
-        $vpk = Get-Command vpk -ErrorAction SilentlyContinue
-        if (-not $vpk) { throw "vpk is still not on PATH after install; open a new shell and retry" }
+        $vpkCmd = Get-Command vpk -ErrorAction SilentlyContinue
+        $vpk = if ($vpkCmd) { $vpkCmd.Source } elseif (Test-Path $dotnetToolsVpk) { $dotnetToolsVpk } else { $null }
+        if (-not $vpk) { throw "vpk is still missing after install (expected at $dotnetToolsVpk)" }
     }
-    Write-Host "Found vpk: $($vpk.Source)" -ForegroundColor Green
+    Write-Host "Found vpk: $vpk" -ForegroundColor Green
 
-    $velopackOut = "$buildDir\velopack"
-    & vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
+    # Channel/runtime per arch (vpk pack -r/-c, vpk 1.2.0): x64 keeps the
+    # original 'win' channel (feed URLs already deployed), ARM64 gets its own
+    # 'win-arm64' channel. ARM64 packs into a SEPARATE output folder —
+    # two channels in one folder would mix their releases.<channel>.json feeds.
+    $rid = if ($Platform -eq "ARM64") { "win-arm64" } else { "win-x64" }
+    $channel = if ($Platform -eq "ARM64") { "win-arm64" } else { "win" }
+    $velopackOut = if ($Platform -eq "ARM64") { "$buildDir\velopack-arm64" } else { "$buildDir\velopack" }
+    & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
+        -r $rid -c $channel `
         --packTitle "Agent Redactor" -i "$root\resources\app.ico" -o $velopackOut
     if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
 

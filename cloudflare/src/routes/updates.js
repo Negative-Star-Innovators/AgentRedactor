@@ -1,9 +1,14 @@
 import { getLatestReleaseTag } from '../lib/github.js';
 
+// Self-release update channels: x64 builds use the original 'win' channel,
+// ARM64 builds use 'win-arm64'. Both redirect to assets on the same GitHub
+// release — the channel only selects which feed/files a build requests.
+const CHANNEL_PATTERN = /^(win|win-arm64)$/;
+
 // Strict allowlist for files Velopack requests from the update feed:
-//   releases.win.json, *.nupkg, *-Setup.exe, *-Portable.zip
+//   releases.<channel>.json, *.nupkg, *-Setup.exe, *-Portable.zip
 // Case-sensitive, matched against the basename only.
-const FILE_PATTERN = /^(releases\.win\.json|[^/\\]+\.nupkg|[^/\\]+-Setup\.exe|[^/\\]+-Portable\.zip)$/;
+const FILE_PATTERN = /^(releases\.[a-z0-9-]+\.json|[^/\\]+\.nupkg|[^/\\]+-Setup\.exe|[^/\\]+-Portable\.zip)$/;
 
 function jsonError(message, status) {
   return new Response(JSON.stringify({ error: message }), {
@@ -13,10 +18,12 @@ function jsonError(message, status) {
 }
 
 export default async function updates(request, env, ctx, params) {
+  const channel = params.channel || '';
   const file = params.file || '';
 
   // Basename-only: reject anything with slashes, backslashes, or traversal.
-  if (file.includes('..') || file.includes('/') || file.includes('\\') || !FILE_PATTERN.test(file)) {
+  if (!CHANNEL_PATTERN.test(channel) ||
+      file.includes('..') || file.includes('/') || file.includes('\\') || !FILE_PATTERN.test(file)) {
     return jsonError('not found', 404);
   }
 

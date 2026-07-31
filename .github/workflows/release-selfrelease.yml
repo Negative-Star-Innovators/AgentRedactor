@@ -23,8 +23,15 @@ permissions:
 
 jobs:
   release:
-    # Same runner image build-msix.yml uses for x64.
-    runs-on: windows-latest
+    strategy:
+      # One arch failing must not cancel the other — a single-arch release is
+      # still useful, and the publish job only runs when both succeed anyway.
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    # Build each architecture natively, same runner pattern as build-msix.yml:
+    # x64 on windows-latest, ARM64 on the free ARM64 hosted runner.
+    runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
     env:
       # Expected version: tag name (minus the leading v) on tag pushes,
       # the version input on manual re-runs.
@@ -60,20 +67,22 @@ jobs:
         shell: pwsh
         run: git clone https://github.com/microsoft/vcpkg vcpkg
 
+      # Cache is arch-scoped (vcpkg-x64-* / vcpkg-arm64-*), same as
+      # build-msix.yml — triplets differ per arch and must not share a cache.
       - name: Cache vcpkg artifacts
         uses: actions/cache@v4
         with:
           path: |
             vcpkg/installed
             vcpkg/downloads
-          key: vcpkg-x64-${{ hashFiles('repo/AgentRedactor/vcpkg.json') }}
-          restore-keys: vcpkg-x64-
+          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('repo/AgentRedactor/vcpkg.json') }}
+          restore-keys: vcpkg-${{ matrix.arch }}-
 
-      - name: Install vcpkg dependencies (first run is slow, then cached)
+      - name: Install vcpkg dependencies (first run per arch is slow, then cached)
         shell: pwsh
         run: |
           vcpkg\bootstrap-vcpkg.bat -disableMetrics
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
+          vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
 
       # NOTE: unlike build-msix.yml we intentionally do NOT download the 1.6 GB
       # ONNX weights — the self-release package excludes them and the app
@@ -83,16 +92,18 @@ jobs:
         shell: pwsh
         run: dotnet tool install -g vpk
 
-      # Builds Release x64 with -p:SelfRelease=true and runs `vpk pack` into
-      # repo/AgentRedactor/build/velopack (version from version.txt, already
-      # validated against the tag above).
+      # Builds Release for this arch with -p:SelfRelease=true and runs
+      # `vpk pack` (version from version.txt, already validated against the
+      # tag above). x64 packs channel 'win' into build/velopack, ARM64 packs
+      # channel 'win-arm64' into build/velopack-arm64 (see build.ps1).
       - name: Build and pack self-release (build-selfrelease.ps1)
         shell: pwsh
-        run: repo/AgentRedactor/build-selfrelease.ps1 -Platform x64
+        run: repo/AgentRedactor/build-selfrelease.ps1 -Platform ${{ matrix.arch }}
 
       # Gate the publish on tests: settings-migration coverage against the
-      # just-built exe, then the upgrade E2E (previous release -> this build).
-      # Both must pass before anything is uploaded (no continue-on-error).
+      # just-built exe (both arches), then the upgrade E2E (previous release
+      # -> this build, x64 only). Both must pass before anything is uploaded
+      # (no continue-on-error).
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -105,14 +116,19 @@ jobs:
       - name: Run settings migration tests
         shell: pwsh
         env:
-          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/x64/Release/AgentRedactor.exe
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactor.exe
         run: python -m pytest repo/tests/migration/test_settings_migration.py -v
 
-      # Grab the previous published release's Setup.exe for the upgrade E2E.
+      # Grab the previous published release's x64 Setup.exe for the upgrade
+      # E2E. x64 leg only. The glob is arch-explicit: releases published after
+      # ARM64 support carry BOTH AgentRedactor-win-Setup.exe and
+      # AgentRedactor-win-arm64-Setup.exe, and a plain *-Setup.exe glob would
+      # match both (and could pick the ARM64 one).
       # The very first self-release has no predecessor — skip gracefully with
       # a warning in that case.
-      - name: Download previous release Setup.exe
+      - name: Download previous release Setup.exe (x64)
         id: prevsetup
+        if: matrix.arch == 'x64'
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -123,26 +139,26 @@ jobs:
           foreach ($r in @($releases)) {
             if ($r.isDraft -or $r.tagName -eq $currentTag) { continue }
             $assets = @(gh release view $r.tagName --json assets --jq '.assets[].name')
-            if ($assets | Where-Object { $_ -match '-Setup\.exe$' }) {
+            if ($assets | Where-Object { $_ -match '-win-Setup\.exe$' }) {
               $prevTag = $r.tagName
               break
             }
           }
           if (-not $prevTag) {
-            Write-Host "::warning::No previous release with a *-Setup.exe asset found; skipping upgrade E2E (expected for the first self-release)."
+            Write-Host "::warning::No previous release with a *-win-Setup.exe asset found; skipping upgrade E2E (expected for the first self-release)."
             echo "found=false" >> $env:GITHUB_OUTPUT
             exit 0
           }
-          Write-Host "Previous release with Setup asset: $prevTag"
-          gh release download $prevTag --pattern "*-Setup.exe" --dir prev-setup --clobber
+          Write-Host "Previous release with x64 Setup asset: $prevTag"
+          gh release download $prevTag --pattern "*-win-Setup.exe" --dir prev-setup --clobber
           if ($LASTEXITCODE -ne 0) { throw "gh release download $prevTag failed" }
-          $setup = (Get-ChildItem prev-setup -Filter "*-Setup.exe" | Select-Object -First 1).FullName
-          if (-not $setup) { throw "No *-Setup.exe found after downloading $prevTag" }
+          $setup = (Get-ChildItem prev-setup -Filter "*-win-Setup.exe" | Select-Object -First 1).FullName
+          if (-not $setup) { throw "No *-win-Setup.exe found after downloading $prevTag" }
           echo "found=true" >> $env:GITHUB_OUTPUT
           echo "setup_path=$setup" >> $env:GITHUB_OUTPUT
 
       - name: Upgrade E2E (previous release -> this build)
-        if: steps.prevsetup.outputs.found == 'true'
+        if: matrix.arch == 'x64' && steps.prevsetup.outputs.found == 'true'
         shell: pwsh
         env:
           AGENTREDACTOR_UPGRADE_TEST: "1"
@@ -151,19 +167,61 @@ jobs:
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
         run: python -m pytest repo/tests/migration/test_selfrelease_upgrade.py -v
 
-      # Publishes the Velopack release: creates the GitHub release for this tag
-      # and uploads releases.win.json + the nupkg/delta assets so installed
-      # instances can auto-update. Tag pushes always publish; manual dispatches
-      # only publish when the publish input is checked (default = dry-run).
-      - name: Publish Velopack release to GitHub
-        if: github.event_name == 'push' || inputs.publish
-        shell: pwsh
-        run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --releaseName "AgentRedactor ${{ env.EXPECTED_VERSION }}" --tag "v${{ env.EXPECTED_VERSION }}" --outputDir repo/AgentRedactor/build/velopack
-
-      # Keep the raw Velopack output around for debugging failed/odd releases.
+      # Keep the raw Velopack output around per arch — the publish job below
+      # downloads both, and they help debug failed/odd releases.
       - name: Upload Velopack output artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}
-          path: repo/AgentRedactor/build/velopack
+          name: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-${{ matrix.arch }}
+          path: repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
           retention-days: 30
+
+  # Publish is deliberately OUT of the matrix: both arch legs must pass first,
+  # then ONE job uploads both channels to a single GitHub release. Running
+  # `vpk upload github` per arch leg would race on release creation.
+  # `vpk upload github --help` (vpk 1.2.0) shows:
+  #   --merge, --merge <merge>   Allow merging this upload with an existing
+  #                              release. [default: False]
+  # so the two channels are uploaded sequentially with --merge: the first call
+  # creates the release (or merges if a re-run left one behind), the second
+  # merges the win-arm64 assets into it. This keeps vpk's per-channel asset
+  # selection instead of hand-rolling `gh release create/upload` file lists.
+  publish:
+    needs: release
+    runs-on: windows-latest
+    # Tag pushes always publish; manual dispatches only when publish is checked.
+    if: github.event_name == 'push' || inputs.publish
+    env:
+      EXPECTED_VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+    steps:
+      # EXPECTED_VERSION is github.ref_name on tag pushes, i.e. it already
+      # carries the leading "v" (v1.2.3); dispatch inputs do not. Normalize
+      # once so --tag doesn't become "vv1.2.3".
+      - name: Normalize version
+        id: ver
+        shell: pwsh
+        run: echo "version=$($env:EXPECTED_VERSION.Trim().TrimStart('v','V'))" >> $env:GITHUB_OUTPUT
+
+      - name: Download Velopack outputs (both arches)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-*
+          path: velopack
+      # Lands in velopack/AgentRedactor-velopack-<ver>-x64 and ...-arm64.
+
+      - name: Install vpk (Velopack CLI)
+        shell: pwsh
+        run: dotnet tool install -g vpk
+
+      # Creates the GitHub release for this tag and uploads the win-channel
+      # assets (releases.win.json + nupkg/Setup/Portable) so installed x64
+      # instances can auto-update. --merge makes re-runs idempotent.
+      - name: Publish x64 channel (creates the GitHub release)
+        shell: pwsh
+        run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --merge --releaseName "AgentRedactor ${{ steps.ver.outputs.version }}" --tag "v${{ steps.ver.outputs.version }}" --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-x64"
+
+      # Merges the win-arm64 channel assets (releases.win-arm64.json etc.)
+      # into the same release created above.
+      - name: Publish ARM64 channel (merges into the same release)
+        shell: pwsh
+        run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --merge -c win-arm64 --releaseName "AgentRedactor ${{ steps.ver.outputs.version }}" --tag "v${{ steps.ver.outputs.version }}" --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-arm64"

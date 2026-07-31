@@ -6,7 +6,7 @@ import { INSTALL_PS1 } from './static/install.ps1.js';
 // Patterns are '/'-separated; segments starting with ':' capture a param,
 // and a trailing '?' makes the segment optional.
 const routes = [
-  { pattern: '/updates/win/:file', handler: updates },
+  { pattern: '/updates/:channel/:file', handler: updates },
   { pattern: '/install.ps1', handler: installPs1 },
   { pattern: '/health', handler: health },
 ];

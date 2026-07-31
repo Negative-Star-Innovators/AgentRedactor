@@ -27,9 +27,17 @@ namespace UpdateManager {
 namespace {
 
 // The Cloudflare worker 302-redirects every file under this prefix to the
-// assets of the latest published GitHub release.
-constexpr const wchar_t* kUpdateFeedUrl =
-    L"https://api.agentredactor.negativestarinnovators.com/updates/win";
+// assets of the latest published GitHub release. The host is shared; the
+// channel segment is arch-aware: x64 builds use the original "win" channel,
+// ARM64 builds use "win-arm64" (matches vpk pack -c in build.ps1).
+#define AR_UPDATE_FEED_HOST L"https://api.agentredactor.negativestarinnovators.com/updates/"
+#if defined(_M_ARM64)
+constexpr const wchar_t* kUpdateChannel = L"win-arm64";
+constexpr const wchar_t* kUpdateFeedUrl = AR_UPDATE_FEED_HOST L"win-arm64";
+#else
+constexpr const wchar_t* kUpdateChannel = L"win";
+constexpr const wchar_t* kUpdateFeedUrl = AR_UPDATE_FEED_HOST L"win";
+#endif
 
 // Test hook (self-release builds only): AGENTREDACTOR_UPDATE_FEED overrides
 // the update feed URL so the upgrade E2E test can point at a local folder
@@ -128,7 +136,7 @@ CheckOutcome CheckAndDownload() {
     }
 
     std::string body;
-    std::wstring feedJsonUrl = GetUpdateFeedUrl() + L"/releases.win.json";
+    std::wstring feedJsonUrl = GetUpdateFeedUrl() + L"/releases." + kUpdateChannel + L".json";
     if (!Utils::HttpGetString(feedJsonUrl, body)) {
         LOG_LIFECYCLE(L"[UpdateManager] Update check failed (feed unreachable)");
         return { CheckResult::Error, {} };

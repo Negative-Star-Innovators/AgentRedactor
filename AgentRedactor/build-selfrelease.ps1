@@ -2,8 +2,9 @@
 # Reads the version from version.txt (the single version source of truth for
 # the self-release channel) and invokes build.ps1 -SelfRelease.
 #
-# Output lands in build\velopack\ (Setup.exe, *-full.nupkg, releases.win.json,
-# portable zip). Upload with: vpk upload github --repoUrl <repo> --publish
+# Output lands in build\velopack\ (x64) or build\velopack-arm64\ (ARM64):
+# Setup.exe, *-full.nupkg, releases.<channel>.json, portable zip. Upload with:
+# vpk upload github --repoUrl <repo> --publish [--merge] [-c win-arm64]
 
 param(
     [ValidateSet("x64", "ARM64")]

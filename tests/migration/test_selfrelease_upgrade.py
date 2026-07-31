@@ -6,7 +6,11 @@ auto-apply update to swap in the new version. Afterwards it verifies that the
 user's settings survived the upgrade and still migrate cleanly.
 
 Skipped unless AGENTREDACTOR_UPGRADE_TEST=1. Required env vars:
-  AGENTREDACTOR_PREV_SETUP   path to the previous release's *-Setup.exe
+  AGENTREDACTOR_PREV_SETUP   path to the previous release's x64 Setup.exe
+                             (AgentRedactor-win-Setup.exe; CI selects it with
+                             the arch-explicit glob *-win-Setup.exe so the
+                             ARM64 *-win-arm64-Setup.exe asset on the same
+                             GitHub release is never picked)
   AGENTREDACTOR_FEED_DIR     folder with the vNext vpk output
                              (releases.win.json + *-full.nupkg)
 Optional:

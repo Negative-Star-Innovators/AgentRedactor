@@ -56,19 +56,21 @@ The app ships through two channels from the same codebase:
 
 - **Microsoft Store (MSIX)** — `.\build.ps1`. The full ~1.6 GB model weights are
   packed inside the MSIX. Contains **zero** update code (Store policy).
-- **Self-release (Velopack)** — `.\build-selfrelease.ps1` (x64 only for now).
+- **Self-release (Velopack)** — `.\build-selfrelease.ps1 [-Platform x64|ARM64]`.
   Compiles with `AGENTREDACTOR_SELFRELEASE` (via `-p:SelfRelease=true
   -p:AppVersion=<version.txt>`), excludes `*.onnx_data` from the model copy
   (weights download on first run to `%LOCALAPPDATA%\AgentRedactor\models`),
-  skips MSIX packing, and runs `vpk pack` into `build\velopack\`.
+  skips MSIX packing, and runs `vpk pack` into `build\velopack\` (x64,
+  channel `win`) or `build\velopack-arm64\` (ARM64, channel `win-arm64`).
 
 Key pieces of the self-release channel:
 
 - `version.txt` is the version source of truth; it becomes `AR_VERSION_STRING`
   → `APP_VERSION` (`include/constants.h`) and the `vpk pack` version.
 - `src/update_manager.cpp` (all inside `#ifdef AGENTREDACTOR_SELFRELEASE`):
-  polls `releases.win.json` from the update feed
-  (`https://api.agentredactor.negativestarinnovators.com/updates/win`),
+  polls `releases.<channel>.json` from the arch-aware update feed
+  (`https://api.agentredactor.negativestarinnovators.com/updates/win` on x64,
+  `.../updates/win-arm64` on ARM64, selected via `_M_ARM64`),
   downloads newer full packages, and applies them via the bundled
   `Update.exe apply --package <nupkg> --waitPid <pid>` after a restart prompt.
   `App.cpp` exits immediately on `--veloapp-*` lifecycle args.
