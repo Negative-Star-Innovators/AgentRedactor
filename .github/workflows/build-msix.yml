@@ -6,6 +6,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Rapid pushes to the same PR/branch cancel the superseded build — only the
+# latest commit's artifacts matter (the Tests workflow consumes them).
+concurrency:
+  group: build-msix-${{ github.ref }}
+  cancel-in-progress: true
+
 # Needed to publish the MSIX bundle to the rolling "latest" release.
 permissions:
   contents: write
@@ -73,7 +79,6 @@ jobs:
       # intermediates) and the .pdb are excluded. The x64 artifact keeps the
       # original AgentRedactor-release-bin name for compatibility.
       - name: Upload Release binaries artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.arch == 'x64' && 'AgentRedactor-release-bin' || 'AgentRedactor-release-bin-arm64' }}

@@ -154,7 +154,10 @@ if ($SelfRelease) {
     # preprocessor cannot split strings, so the quad is computed here.
     $versionCore = ($Version -split '[-+]')[0]
     $appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
-    $msbuildArgs += "-p:AppVersionQuad=$appVersionQuad"
+    # Embedded quotes: without them PowerShell's native-argument passing
+    # splits the comma-separated value into separate msbuild arguments
+    # (MSB1006 "Property is not valid").
+    $msbuildArgs += "-p:AppVersionQuad=`"$appVersionQuad`""
 }
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
