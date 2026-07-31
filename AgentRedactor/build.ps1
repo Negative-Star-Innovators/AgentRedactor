@@ -124,6 +124,13 @@ if ($Clean -and (Test-Path $buildDir)) {
     } catch {
         Write-Warning "Could not fully clean build directory. Continuing anyway..."
     }
+    # The clean wiped build\tools\nuget.exe (our fallback NuGet location)
+    # after it was already resolved above — re-download if it's gone.
+    if (-not (Test-Path $nuget)) {
+        New-Item -ItemType Directory -Force -Path "$root\build\tools" | Out-Null
+        Write-Host "Re-downloading NuGet (clean removed it)..." -ForegroundColor Cyan
+        Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nuget
+    }
 }
 
 # ============================================================================
@@ -174,6 +181,10 @@ if (Test-Path "$root\models") {
         # the models-v1 GitHub release. The tiny model graph (.onnx) and the
         # companion files still ship.
         robocopy "$root\models" "$outDir\models" /E /XF *.onnx_data /R:3 /W:1 | Out-Null
+        # robocopy /E does not purge: remove weight files left behind by
+        # earlier non-SelfRelease (MSIX) builds of the same output folder,
+        # which would otherwise bloat the installer to ~1.8 GB.
+        Remove-Item "$outDir\models\*.onnx_data", "$outDir\models\onnx\*.onnx_data" -Force -ErrorAction SilentlyContinue
     } else {
         robocopy "$root\models" "$outDir\models" /E /R:3 /W:1 | Out-Null
     }
