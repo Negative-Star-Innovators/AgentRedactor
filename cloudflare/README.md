@@ -27,6 +27,25 @@ The Velopack update feeds and installers are served from the `agentredactor-rele
 
 From then on, the `publish` job in `.github/workflows/release-selfrelease.yml` uploads each channel automatically via `vpk upload s3 --bucket agentredactor-releases --prefix <channel> ...` (see the workflow for the full command lines). No manual upload is needed.
 
+### Seeding the first release manually (chicken-and-egg)
+
+Some tests (the upgrade E2E's "previous live release", and the `verify-live`
+one-liner install canary) need *something* already live in R2. Before the
+first tagged release exists, seed the bucket manually from any local or CI
+build output (the `AgentRedactor-velopack-*` artifacts of a PR run work):
+
+```powershell
+dotnet tool install -g vpk
+# x64 channel (prefix win)
+vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> --prefix win --outputDir AgentRedactor\build\velopack
+# ARM64 channel (prefix win-arm64)
+vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> -c win-arm64 --prefix win-arm64 --outputDir AgentRedactor\build\velopack-arm64
+```
+
+WARNING: this is a *live* publish — every installed self-release instance
+will auto-update to whatever you seed. Only do this pre-launch (or with a
+build you're happy to ship).
+
 ## Model hosting (R2)
 
 The quantized ONNX weights (`model_quantized.onnx_data`, ~1.6 GB) are served from an R2 bucket via `/models/:file`, with Range support for the app's segmented/resumable downloader. This is the app's only model source.
@@ -62,11 +81,23 @@ Expect `HTTP 206` with a `Content-Range: bytes 0-99/<size>` header and exactly 1
 
 Deploys run from CI (`.github/workflows/deploy-worker.yml`): PRs touching
 `cloudflare/**` get a `wrangler deploy --dry-run` validation plus an
-`install.ps1` PowerShell parse check; pushes to `main` (and manual dispatches)
-deploy for real and then smoke-test the live endpoints (`/health`,
-`/install.ps1`, a `/models` Range request, the update feeds). Required repo
-secrets: `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit) and
-`CLOUDFLARE_ACCOUNT_ID`.
+`install.ps1` PowerShell parse check; if the secrets below are configured, PRs
+also upload an **inactive** Worker version (`wrangler versions upload`) — it
+proves credentials + bundle work without touching what production serves.
+Pushes to `main` (and manual dispatches) deploy for real and then smoke-test
+the live endpoints (`/health`, `/install.ps1`, a `/models` Range request, the
+update feeds).
+
+Required repo secrets (GitHub repo → **Settings → Secrets and variables →
+Actions → New repository secret**):
+
+- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare dashboard → any zone/overview page →
+  the **Account ID** shown in the right-hand sidebar (also in the dashboard
+  URL: `dash.cloudflare.com/<account-id>/...`).
+- `CLOUDFLARE_API_TOKEN` — Cloudflare dashboard → top-right profile menu →
+  **My Profile → API Tokens → Create Token** → use the **"Edit Cloudflare
+  Workers"** template (or a custom token with **Account → Workers Scripts →
+  Edit** scoped to this account) → create, copy the value (shown once).
 
 Manual deploy (fallback / first-time setup):
 

@@ -140,8 +140,10 @@ current-schema fixture which is also compared byte-for-byte.
   comes from the **live R2 channel** (`/updates/<channel>/*-Setup.exe`), not
   from GitHub releases. All of these gate `vpk upload`; a failed E2E blocks
   the publish. The upgrade E2E skips with a warning when the channel has no
-  live release yet, or when the live version is not older than this build
-  (expected on PRs without a version bump).
+  live release yet. On PRs the build is stamped one patch above the live
+  version (synthetic, never published) so the upgrade E2E runs there too;
+  when version.txt in the PR is already ahead of live, that version is used
+  as-is.
 - After a real publish, the `verify-live` job runs the public one-line
   installer (`irm .../install.ps1 | iex`) on fresh x64 and ARM64 runners and
   asserts the installed app matches the live feed. On PRs it runs against the

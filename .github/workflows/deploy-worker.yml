@@ -1,0 +1,158 @@
+name: Deploy Worker
+
+# CI/CD for the Cloudflare Worker in cloudflare/ (the service behind
+# api.agentredactor.negativestarinnovators.com: /install.ps1, /updates,
+# /models). Replaces the manual `npx wrangler deploy` documented in
+# cloudflare/README.md.
+#
+# PRs that touch cloudflare/** get validation only (wrangler dry-run +
+# install.ps1 parse check) — no secrets, no deploy. Pushes to main and manual
+# dispatches deploy for real, then smoke-test the live endpoints.
+#
+# Required repo secrets for the deploy job:
+#   CLOUDFLARE_API_TOKEN     API token with Workers Scripts:Edit on the account
+#   CLOUDFLARE_ACCOUNT_ID    the Cloudflare account ID
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/**'
+      - '.github/workflows/deploy-worker.yml'
+  pull_request:
+    paths:
+      - 'cloudflare/**'
+      - '.github/workflows/deploy-worker.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-worker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Compiles/bundles the Worker without uploading — catches syntax and
+      # wrangler.toml errors on PRs (no credentials needed).
+      - name: Validate Worker build (wrangler deploy --dry-run)
+        working-directory: cloudflare
+        run: npx wrangler@latest deploy --dry-run
+
+      # install.ps1 is a JS template literal executed via iex on user
+      # machines; a PowerShell syntax error in it only shows up at install
+      # time. Extract it and parse it as a scriptblock here instead.
+      - name: Validate install.ps1 parses as PowerShell
+        shell: pwsh
+        run: |
+          $js = Get-Content -Raw cloudflare/src/static/install.ps1.js
+          $m = [regex]::Match($js, '(?s)`(.*)`')
+          if (-not $m.Success) { throw 'Could not extract install.ps1 template literal from install.ps1.js' }
+          $script = $m.Groups[1].Value
+          try {
+            $null = [scriptblock]::Create($script)
+          } catch {
+            throw "install.ps1 does not parse as PowerShell: $($_.Exception.Message)"
+          }
+          foreach ($needle in @('PROCESSOR_ARCHITECTURE', 'win-arm64', 'AgentRedactor-win-Setup.exe', '/updates')) {
+            if ($script -notmatch [regex]::Escape($needle)) { throw "install.ps1 is missing expected content: $needle" }
+          }
+          Write-Host 'install.ps1 parses and contains the arch-selection logic.'
+
+      # Chicken-egg defeater for the deploy path: uploads the Worker as a new
+      # INACTIVE version (production keeps serving the current one — nothing
+      # goes live), proving the credentials and the bundle work end-to-end on
+      # a PR. If wrangler reports a preview URL, smoke-test it. Skips
+      # gracefully when the secrets aren't configured (e.g. not added yet, or
+      # a fork PR, where secrets are withheld).
+      - name: Upload inactive Worker version (deploy dry-run with credentials)
+        working-directory: cloudflare
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not set; skipping version upload (the plain dry-run above already validated the build)."
+            exit 0
+          fi
+          out=$(npx wrangler@latest versions upload 2>&1) || { echo "$out"; exit 1; }
+          echo "$out"
+          url=$(echo "$out" | grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev' | head -1)
+          if [ -n "$url" ]; then
+            echo "Preview URL: $url — smoke-testing (best effort)"
+            curl -sf "$url/health" | grep -q '"ok":true' && echo 'preview /health OK' \
+              || echo "::warning::preview /health not reachable (workers.dev previews may be disabled)"
+            curl -sf "$url/install.ps1" | grep -q 'AgentRedactor' && echo 'preview /install.ps1 OK' \
+              || echo "::warning::preview /install.ps1 not reachable"
+          fi
+
+  deploy:
+    needs: validate
+    # PRs stop at validation; main pushes and manual dispatches deploy.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Deploy Worker
+        working-directory: cloudflare
+        run: npx wrangler@latest deploy
+
+      - name: Smoke-test live endpoints
+        shell: bash
+        run: |
+          set -e
+          base=https://api.agentredactor.negativestarinnovators.com
+
+          echo '== /health =='
+          curl -sf "$base/health" | grep -q '"ok":true' && echo OK
+
+          echo '== /install.ps1 =='
+          curl -sf "$base/install.ps1" -o /tmp/install.ps1
+          grep -q 'AgentRedactor' /tmp/install.ps1 && echo OK
+
+          echo '== /models range request (expect 206) =='
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Range: bytes=0-99' "$base/models/model_quantized.onnx_data")
+          [ "$code" = "206" ] || { echo "expected 206, got $code"; exit 1; }
+          echo OK
+
+          echo '== update feeds =='
+          for ch in win win-arm64; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$base/updates/$ch/releases.$ch.json")
+            if [ "$code" = "404" ]; then
+              echo "::warning::channel $ch has no release yet (404) — fine before its first publish"
+            elif [ "$code" != "200" ]; then
+              echo "channel $ch feed returned $code"; exit 1
+            else
+              echo "$ch: OK"
+            fi
+          done
+
+      - name: Validate served install.ps1 parses as PowerShell
+        shell: pwsh
+        run: |
+          $script = (Invoke-WebRequest -UseBasicParsing 'https://api.agentredactor.negativestarinnovators.com/install.ps1').Content
+          try {
+            $null = [scriptblock]::Create($script)
+          } catch {
+            throw "Served install.ps1 does not parse as PowerShell: $($_.Exception.Message)"
+          }
+          Write-Host 'Served install.ps1 parses.'

@@ -9,22 +9,28 @@
 param(
     [ValidateSet("x64", "ARM64")]
     [string]$Platform = "x64",
+    # Optional override; defaults to version.txt. CI uses this to stamp PR
+    # builds one patch above the live version so the upgrade E2E has
+    # something to upgrade to (PR artifacts are never published).
+    [string]$Version,
     [switch]$Clean
 )
 
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 
-$versionFile = "$root\version.txt"
-if (-not (Test-Path $versionFile)) { throw "version.txt not found at $versionFile" }
-$version = (Get-Content $versionFile -Raw).Trim()
-if ([string]::IsNullOrWhiteSpace($version)) { throw "version.txt is empty" }
+if (-not $Version) {
+    $versionFile = "$root\version.txt"
+    if (-not (Test-Path $versionFile)) { throw "version.txt not found at $versionFile" }
+    $Version = (Get-Content $versionFile -Raw).Trim()
+    if ([string]::IsNullOrWhiteSpace($Version)) { throw "version.txt is empty" }
+}
 
-Write-Host "Building self-release v$version ($Platform)..." -ForegroundColor Cyan
+Write-Host "Building self-release v$Version ($Platform)..." -ForegroundColor Cyan
 
 $buildArgs = @{
     SelfRelease = $true
-    Version     = $version
+    Version     = $Version
     Platform    = $Platform
 }
 if ($Clean) { $buildArgs.Clean = $true }

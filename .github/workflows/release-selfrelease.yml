@@ -60,24 +60,36 @@ jobs:
       # Fail early if the tag/input version doesn't match version.txt — the
       # build script reads the version from that file, so a mismatch would
       # publish an updater release stamped with the wrong version. On PRs
-      # there is no tag/input to check; use version.txt as the version and
-      # export it for the later steps (artifact names, upgrade E2E).
+      # there is no tag/input to check; instead, stamp the build one patch
+      # ABOVE the live version when version.txt isn't already ahead, so the
+      # upgrade E2E always has something to upgrade to (PR artifacts are
+      # never published, so the synthetic version is harmless). The resolved
+      # version is exported for the later steps (build, artifact names, E2Es).
       - name: Resolve and validate version
         shell: pwsh
         run: |
           $fileVersion = (Get-Content -Raw repo/AgentRedactor/version.txt).Trim()
           $expected = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
           if (-not $expected) {
-            # PR build: nothing to validate against — version.txt is the source.
             $expected = $fileVersion
+            $feed = try { Invoke-RestMethod -Uri 'https://api.agentredactor.negativestarinnovators.com/updates/win/releases.win.json' } catch { $null }
+            $live = $feed.Assets | Where-Object { $_.Type -eq 1 -and $_.Version } |
+              ForEach-Object { $_.Version.TrimStart('v','V') } |
+              Sort-Object { [version]$_ } | Select-Object -Last 1
+            if ($live -and [version]$fileVersion -le [version]$live) {
+              $v = [version]$live
+              $expected = '{0}.{1}.{2}' -f $v.Major, $v.Minor, ($v.Build + 1)
+              Write-Host "PR build: version.txt ($fileVersion) is not ahead of live ($live); stamping this build as v$expected so the upgrade E2E can run."
+            } else {
+              Write-Host "PR build (no tag/input); version from version.txt: v$expected"
+            }
             echo "EXPECTED_VERSION=$expected" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-            Write-Host "PR build (no tag/input); version from version.txt: v$expected"
           }
           if ($expected -notmatch '^\d+\.\d+\.\d+$') {
             Write-Error "Expected version '$expected' is not a valid semver (e.g. v1.1.0)."
             exit 1
           }
-          if ($fileVersion -ne $expected) {
+          if ('${{ github.event_name }}' -ne 'pull_request' -and $fileVersion -ne $expected) {
             Write-Error ("Version mismatch: tag/input is 'v{0}' but AgentRedactor/version.txt contains '{1}'. " +
               "Bump version.txt to '$expected' and re-tag (see scripts/new-release.ps1)." -f $expected, $fileVersion)
             exit 1
@@ -114,12 +126,16 @@ jobs:
         run: dotnet tool install -g vpk
 
       # Builds Release for this arch with -p:SelfRelease=true and runs
-      # `vpk pack` (version from version.txt, already validated against the
-      # tag above). x64 packs channel 'win' into build/velopack, ARM64 packs
-      # channel 'win-arm64' into build/velopack-arm64 (see build.ps1).
+      # `vpk pack`. The version comes from the resolve step above: version.txt
+      # (validated against the tag) on tag/dispatch runs, the synthetic
+      # live+1 patch version on PRs. x64 packs channel 'win' into
+      # build/velopack, ARM64 packs channel 'win-arm64' into
+      # build/velopack-arm64 (see build.ps1).
       - name: Build and pack self-release (build-selfrelease.ps1)
         shell: pwsh
-        run: repo/AgentRedactor/build-selfrelease.ps1 -Platform ${{ matrix.arch }}
+        run: |
+          $v = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
+          repo/AgentRedactor/build-selfrelease.ps1 -Platform ${{ matrix.arch }} -Version $v
 
       # Cheap sanity check that vpk produced a usable feed before spending
       # time on install tests: feed file, full nupkg and Setup.exe must exist.
