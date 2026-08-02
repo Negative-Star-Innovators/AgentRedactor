@@ -49,8 +49,18 @@ jobs:
       - name: Install vcpkg dependencies (first run per arch is slow, then cached)
         shell: pwsh
         run: |
-          vcpkg\bootstrap-vcpkg.bat -disableMetrics
-          vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
+          # The bootstrap download of vcpkg.exe itself occasionally times out
+          # on the hosted runners (seen on windows-11-arm) — retry a few times.
+          foreach ($attempt in 1..3) {
+            vcpkg\bootstrap-vcpkg.bat -disableMetrics
+            if ($LASTEXITCODE -eq 0) {
+              vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
+              if ($LASTEXITCODE -eq 0) { break }
+            }
+            Write-Host "vcpkg attempt $attempt failed (exit $LASTEXITCODE); retrying..."
+            Start-Sleep -Seconds 15
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'vcpkg bootstrap/install failed after 3 attempts' }
 
       # The 1.6 GB model weights are not in the repo; they are served from the
       # Cloudflare R2 bucket via the api worker (see cloudflare/README.md).
@@ -125,6 +135,26 @@ jobs:
           New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Force | Out-Null
           Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Name AllowAllTrustedApps -Value 1
 
+      # Same Windows 11 client-image quirks as the GUI tests (tests-gui.yml):
+      # a modal firewall prompt the first time the app binds its proxy port,
+      # and the SCOOBE nag, can both block the packaged app's first launch.
+      - name: Disable Windows Firewall prompts (arm64)
+        if: matrix.arch == 'arm64'
+        shell: pwsh
+        run: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+      - name: Dismiss OOBE nag screens (arm64)
+        if: matrix.arch == 'arm64'
+        shell: pwsh
+        run: |
+          New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Force | Out-Null
+          Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name ScoobeSystemSettingEnabled -Value 0
+          New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Force | Out-Null
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Name DisablePrivacyExperience -Value 1
+          Get-Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match 'CloudExperienceHost|UserOOBEBroker' } |
+            Stop-Process -Force -ErrorAction SilentlyContinue
+
       # Creates a throwaway self-signed cert matching the manifest Publisher,
       # signs the MSIX, and trusts the cert (LocalMachine\TrustedPeople+Root)
       # so Add-AppxPackage accepts it.
@@ -150,15 +180,28 @@ jobs:
           $appId = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Id
           Write-Host "Launching shell:AppsFolder$($pkg.PackageFamilyName)!$appId"
           Start-Process "explorer.exe" -ArgumentList "shell:AppsFolder$($pkg.PackageFamilyName)!$appId"
-          $deadline = (Get-Date).AddSeconds(90)
+          $deadline = (Get-Date).AddSeconds(180)
           $proc = $null
           while ((Get-Date) -lt $deadline -and -not $proc) {
             Start-Sleep -Seconds 3
             $proc = Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue
           }
-          if (-not $proc) { throw 'Packaged app did not start within 90s' }
+          if (-not $proc) { throw 'Packaged app did not start within 180s' }
           Write-Host "Packaged app is running (PID $($proc[0].Id)); stopping it."
           $proc | Stop-Process -Force -ErrorAction SilentlyContinue
+
+      # If the launch above failed, the reason is almost always in the
+      # Application event log (crash, missing dependency, activation error).
+      - name: Dump diagnostics on failure
+        if: failure()
+        shell: pwsh
+        run: |
+          foreach ($provider in @('Application Error', 'Windows Error Reporting')) {
+            Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName=$provider} -MaxEvents 20 -ErrorAction SilentlyContinue |
+              ForEach-Object { $_.TimeCreated; $_.Message; '---' }
+          }
+          Get-AppxPackage -Name '*AgentRedactor*' -ErrorAction SilentlyContinue |
+            Format-List Name, PackageFullName, Status, InstallLocation
 
       - name: Uninstall and verify removal
         if: always()

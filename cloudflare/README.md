@@ -31,16 +31,54 @@ From then on, the `publish` job in `.github/workflows/release-selfrelease.yml` u
 
 Some tests (the upgrade E2E's "previous live release", and the `verify-live`
 one-liner install canary) need *something* already live in R2. Before the
-first tagged release exists, seed the bucket manually from any local or CI
-build output (the `AgentRedactor-velopack-*` artifacts of a PR run work):
+first tagged release exists, seed the bucket manually.
 
-```powershell
-dotnet tool install -g vpk
-# x64 channel (prefix win)
-vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> --prefix win --outputDir AgentRedactor\build\velopack
-# ARM64 channel (prefix win-arm64)
-vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> -c win-arm64 --prefix win-arm64 --outputDir AgentRedactor\build\velopack-arm64
-```
+**Yes — you run these commands on your own PC (Windows, PowerShell).** They
+take the files GitHub already built (downloaded from a successful workflow
+run) and push them into the R2 bucket. Nothing runs on GitHub's side; your PC
+is just the courier. From then on the api worker serves them at
+`/updates/<channel>/...`, exactly as if a real release had happened.
+
+1. Download the vpk output artifacts from a successful **Self-Release
+   (Velopack)** run (Actions → the run → Artifacts at the bottom of the page),
+   or with the `gh` CLI from the repo root:
+
+   ```powershell
+   # find the run id of the latest successful Self-Release run on your branch
+   gh run list --workflow release-selfrelease.yml --branch feature/self-release --status success --limit 1
+
+   # download both channels' vpk output (substitute the run id and version)
+   gh run download <RUN_ID> -n AgentRedactor-velopack-<version>-x64   -D seed\velopack-x64
+   gh run download <RUN_ID> -n AgentRedactor-velopack-<version>-arm64 -D seed\velopack-arm64
+   ```
+
+   Each folder then contains that channel's vpk output
+   (`releases.<channel>.json`, `*-full.nupkg`, `*-Setup.exe`).
+
+2. Install the Velopack CLI once:
+
+   ```powershell
+   dotnet tool install -g vpk
+   ```
+
+3. Upload each channel to R2 with your R2 credentials (Cloudflare dashboard →
+   R2 → Manage API tokens; same values as the `R2_*` GitHub secrets):
+
+   ```powershell
+   # x64 channel (prefix win)
+   vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> --prefix win --outputDir seed\velopack-x64
+   # ARM64 channel (prefix win-arm64)
+   vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> -c win-arm64 --prefix win-arm64 --outputDir seed\velopack-arm64
+   ```
+
+4. Verify the worker now serves the feeds:
+
+   ```
+   curl -I https://api.agentredactor.negativestarinnovators.com/updates/win/releases.win.json
+   curl -I https://api.agentredactor.negativestarinnovators.com/updates/win-arm64/releases.win-arm64.json
+   ```
+
+   Both should return `HTTP 200`.
 
 WARNING: this is a *live* publish — every installed self-release instance
 will auto-update to whatever you seed. Only do this pre-launch (or with a

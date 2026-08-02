@@ -114,8 +114,18 @@ jobs:
       - name: Install vcpkg dependencies (first run per arch is slow, then cached)
         shell: pwsh
         run: |
-          vcpkg\bootstrap-vcpkg.bat -disableMetrics
-          vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
+          # The bootstrap download of vcpkg.exe itself occasionally times out
+          # on the hosted runners (seen on windows-11-arm) — retry a few times.
+          foreach ($attempt in 1..3) {
+            vcpkg\bootstrap-vcpkg.bat -disableMetrics
+            if ($LASTEXITCODE -eq 0) {
+              vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
+              if ($LASTEXITCODE -eq 0) { break }
+            }
+            Write-Host "vcpkg attempt $attempt failed (exit $LASTEXITCODE); retrying..."
+            Start-Sleep -Seconds 15
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'vcpkg bootstrap/install failed after 3 attempts' }
 
       # NOTE: unlike build-msix.yml we intentionally do NOT download the 1.6 GB
       # ONNX weights — the self-release package excludes them and the app
