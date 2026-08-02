@@ -5,7 +5,7 @@ name: Tests
 # workflow in tests-gui.yml (same one the Self-Release pipeline uses to gate
 # publishing):
 #
-#   gui-tests-hosted / gui-tests-hosted-arm64
+#   gui-tests-x64 / gui-tests-arm64
 #                       GitHub-hosted runners (windows-latest / windows-11-arm;
 #                       hosted Windows runners auto-logon to an interactive
 #                       desktop session, so UI automation works there). They
@@ -43,10 +43,11 @@ jobs:
           if (-not $id) { throw "No successful Build MSIX run found on branch '$branch'. Opening a PR triggers one automatically — wait for it to finish, then re-run this workflow on the same branch." }
           echo "run_id=$id" >> $env:GITHUB_OUTPUT
 
-  # Job names MUST stay gui-tests-hosted / gui-tests-hosted-arm64: branch
-  # protection requires checks under exactly these names (they report when
-  # this workflow is dispatched on the PR branch).
-  gui-tests-hosted:
+  # NOTE: these job names appear as required status checks. When renaming
+  # them, update the branch protection rule for main (Settings → Branches →
+  # edit rule → Required status checks) or merges stay blocked on the old
+  # names forever.
+  gui-tests-x64:
     needs: resolve-msix-run
     uses: ./.github/workflows/tests-gui.yml
     with:
@@ -55,7 +56,7 @@ jobs:
       run-id: ${{ needs.resolve-msix-run.outputs.run_id }}
       run-migration: true
 
-  gui-tests-hosted-arm64:
+  gui-tests-arm64:
     needs: resolve-msix-run
     uses: ./.github/workflows/tests-gui.yml
     with:
