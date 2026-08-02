@@ -95,10 +95,14 @@ Key pieces of the self-release channel:
   deletes fallback-dir weights (never MSIX exe-dir weights) when the detector
   fails to initialize right after a successful download.
 - To cut a self-release: bump `version.txt`, tag `v<version>`, push — the
-  `release-selfrelease.yml` workflow builds, packs, runs the settings-migration
-  tests plus the previous-release upgrade E2E (`tests/migration/`, skipped with
-  a warning when no prior release exists), and only then uploads the release.
-  Local loop: `.\build-selfrelease.ps1` then install `build\velopack\*-Setup.exe`.
+  `release-selfrelease.yml` workflow builds and packs both arches, then gates
+  the R2 publish on the settings-migration tests, the fresh-install E2E and
+  the previous-live-release upgrade E2E (`tests/migration/`, per channel; the
+  upgrade E2E skips with a warning when the channel has no live release yet or
+  the live version is not older). After publishing, a `verify-live` job runs
+  the public `install.ps1` one-liner on fresh x64/ARM64 runners as a canary.
+  The workflow also runs on PRs as a dry-run (no publish). Local loop:
+  `.\build-selfrelease.ps1` then install `build\velopack\*-Setup.exe`.
 
 ## Common Files to Know
 

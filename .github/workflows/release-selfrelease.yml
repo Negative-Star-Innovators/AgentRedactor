@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       publish:
-        description: 'Publish the GitHub release. Off = dry-run: full build + pack + tests, artifacts only.'
+        description: 'Publish to R2 (agentredactor-releases bucket). Off = dry-run: full build + pack + tests, artifacts only.'
         required: false
         type: boolean
         default: false
@@ -27,12 +27,14 @@ concurrency:
   group: release-selfrelease-${{ github.ref }}
   cancel-in-progress: true
 
-# Needed to create the GitHub release and upload Velopack release assets.
+# Publishing uploads to the R2 bucket (R2 is the only release host; no GitHub
+# release is created). contents: write is not strictly needed anymore but kept
+# so future gh-based steps (release notes etc.) don't silently break.
 permissions:
   contents: write
 
 jobs:
-  release:
+  build:
     strategy:
       # One arch failing must not cancel the other — a single-arch release is
       # still useful, and the publish job only runs when both succeed anyway.
@@ -119,10 +121,25 @@ jobs:
         shell: pwsh
         run: repo/AgentRedactor/build-selfrelease.ps1 -Platform ${{ matrix.arch }}
 
+      # Cheap sanity check that vpk produced a usable feed before spending
+      # time on install tests: feed file, full nupkg and Setup.exe must exist.
+      - name: Verify Velopack output
+        shell: pwsh
+        run: |
+          $dir = if ('${{ matrix.arch }}' -eq 'x64') { 'repo/AgentRedactor/build/velopack' } else { 'repo/AgentRedactor/build/velopack-arm64' }
+          $channel = if ('${{ matrix.arch }}' -eq 'x64') { 'win' } else { 'win-arm64' }
+          $feed = Join-Path $dir "releases.$channel.json"
+          if (-not (Test-Path $feed)) { throw "Missing feed file: $feed" }
+          if (-not (Get-ChildItem $dir -Filter '*-full.nupkg')) { throw "No *-full.nupkg in $dir" }
+          if (-not (Get-ChildItem $dir -Filter '*-Setup.exe')) { throw "No *-Setup.exe in $dir" }
+          $json = Get-Content -Raw $feed | ConvertFrom-Json
+          if (-not $json.Assets -or $json.Assets.Count -eq 0) { throw "$feed has no assets" }
+          Write-Host "Velopack output OK: $($json.Assets.Count) asset(s) in releases.$channel.json"
+
       # Gate the publish on tests: settings-migration coverage against the
-      # just-built exe (both arches), then the upgrade E2E (previous release
-      # -> this build, x64 only). Both must pass before anything is uploaded
-      # (no continue-on-error).
+      # just-built exe (both arches), then the fresh-install E2E and the
+      # upgrade E2E (previous live release -> this build, both arches). All
+      # must pass before anything is uploaded (no continue-on-error).
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -138,51 +155,69 @@ jobs:
           AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactor.exe
         run: python -m pytest repo/tests/migration/test_settings_migration.py -v
 
-      # Grab the previous published release's x64 Setup.exe for the upgrade
-      # E2E. x64 leg only. The glob is arch-explicit: releases published after
-      # ARM64 support carry BOTH AgentRedactor-win-Setup.exe and
-      # AgentRedactor-win-arm64-Setup.exe, and a plain *-Setup.exe glob would
-      # match both (and could pick the ARM64 one).
-      # The very first self-release has no predecessor — skip gracefully with
-      # a warning in that case.
-      - name: Download previous release Setup.exe (x64)
-        id: prevsetup
-        if: matrix.arch == 'x64'
+      # Fresh-install E2E: silent-install THIS build's Setup.exe, verify the
+      # installed layout/version/architecture, and run the headless migration
+      # hook on the installed exe. Uninstalls again afterwards.
+      - name: Fresh-install E2E (this build)
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AGENTREDACTOR_INSTALL_TEST: "1"
+          AGENTREDACTOR_SETUP: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}/AgentRedactor-${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}-Setup.exe
+          AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
+          AGENTREDACTOR_EXPECT_MACHINE: ${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
+        run: python -m pytest repo/tests/migration/test_selfrelease_install.py -v
+
+      # Grab the previous LIVE release's Setup.exe from R2 for the upgrade
+      # E2E. R2 is the only release host (see cloudflare/README.md) — the
+      # fixed-name *-Setup.exe at the channel root is always the latest live
+      # build. Both arch legs run this; each channel's URL is arch-explicit
+      # by construction.
+      # Skipped gracefully (warning) when the channel has no live release yet
+      # (first release of a channel), or when the live version is not older
+      # than this build's version — there is nothing to upgrade *to* then
+      # (expected on PR runs without a version bump).
+      - name: Download previous live Setup.exe from R2
+        id: prevsetup
+        shell: pwsh
         run: |
-          $currentTag = "v$($env:EXPECTED_VERSION.Trim().TrimStart('v', 'V'))"
-          $releases = gh release list --limit 50 --json tagName,isDraft | ConvertFrom-Json
-          $prevTag = $null
-          foreach ($r in @($releases)) {
-            if ($r.isDraft -or $r.tagName -eq $currentTag) { continue }
-            $assets = @(gh release view $r.tagName --json assets --jq '.assets[].name')
-            if ($assets | Where-Object { $_ -match '-win-Setup\.exe$' }) {
-              $prevTag = $r.tagName
-              break
-            }
-          }
-          if (-not $prevTag) {
-            Write-Host "::warning::No previous release with a *-win-Setup.exe asset found; skipping upgrade E2E (expected for the first self-release)."
+          $channel = if ('${{ matrix.arch }}' -eq 'x64') { 'win' } else { 'win-arm64' }
+          $base = "https://api.agentredactor.negativestarinnovators.com/updates/$channel"
+          $expected = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
+
+          $feed = try { Invoke-RestMethod -Uri "$base/releases.$channel.json" } catch { $null }
+          $latest = $feed.Assets | Where-Object { $_.Type -eq 1 -and $_.Version } |
+            ForEach-Object { $_.Version } |
+            Sort-Object { [version]($_.TrimStart('v','V')) } |
+            Select-Object -Last 1
+          if (-not $latest) {
+            Write-Host "::warning::No live release on channel '$channel' yet; skipping upgrade E2E (expected for a channel's first release)."
             echo "found=false" >> $env:GITHUB_OUTPUT
             exit 0
           }
-          Write-Host "Previous release with x64 Setup asset: $prevTag"
-          gh release download $prevTag --pattern "*-win-Setup.exe" --dir prev-setup --clobber
-          if ($LASTEXITCODE -ne 0) { throw "gh release download $prevTag failed" }
-          $setup = (Get-ChildItem prev-setup -Filter "*-win-Setup.exe" | Select-Object -First 1).FullName
-          if (-not $setup) { throw "No *-win-Setup.exe found after downloading $prevTag" }
+          Write-Host "Latest live version on '$channel': $latest (this build: $expected)"
+          if ([version]($latest.TrimStart('v','V')) -ge [version]$expected) {
+            Write-Host "::warning::Live version $latest is not older than this build ($expected); nothing to upgrade to — skipping upgrade E2E (expected on PRs without a version bump)."
+            echo "found=false" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+
+          New-Item -ItemType Directory -Force -Path prev-setup | Out-Null
+          $setupName = "AgentRedactor-$channel-Setup.exe"
+          curl.exe -L --fail -o "prev-setup/$setupName" "$base/$setupName"
+          if ($LASTEXITCODE -ne 0) { throw "Failed to download $base/$setupName" }
+          $setup = (Get-ChildItem prev-setup -Filter $setupName | Select-Object -First 1).FullName
+          if (-not $setup) { throw "No $setupName found after download" }
           echo "found=true" >> $env:GITHUB_OUTPUT
           echo "setup_path=$setup" >> $env:GITHUB_OUTPUT
 
-      - name: Upgrade E2E (previous release -> this build)
-        if: matrix.arch == 'x64' && steps.prevsetup.outputs.found == 'true'
+      - name: Upgrade E2E (previous live release -> this build)
+        if: steps.prevsetup.outputs.found == 'true'
         shell: pwsh
         env:
           AGENTREDACTOR_UPGRADE_TEST: "1"
+          AGENTREDACTOR_CHANNEL: ${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}
           AGENTREDACTOR_PREV_SETUP: ${{ steps.prevsetup.outputs.setup_path }}
-          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/AgentRedactor/build/velopack
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
         run: python -m pytest repo/tests/migration/test_selfrelease_upgrade.py -v
 
@@ -202,7 +237,7 @@ jobs:
   # vpk upload s3 defaults to path-style URLs, which R2 expects; --region
   # auto is the conventional value for R2's S3-compatible endpoint.
   publish:
-    needs: release
+    needs: build
     runs-on: windows-latest
     # Tag pushes always publish; manual dispatches only when publish is checked.
     if: github.event_name == 'push' || inputs.publish
@@ -253,4 +288,88 @@ jobs:
           $endpoint = "https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com"
           foreach ($channel in @('win', 'win-arm64')) {
             aws s3 rm "s3://agentredactor-releases/$channel/" --endpoint-url $endpoint --region auto --recursive --exclude "*" --include "*-Portable.zip" --include "RELEASES" --include "assets.*.json"
+          }
+
+  # Post-publish canary: the only test that covers the assembled production
+  # path (Worker + R2 + install.ps1 + published assets). Runs the exact
+  # public one-line installer on fresh runners of both architectures and
+  # asserts the installed app matches the live feed (version + machine type).
+  #
+  # Also runs on PRs (against whatever release is currently live): install.ps1
+  # can only be exercised against production, and a PR that breaks the
+  # one-liner should fail here. Skipped with a warning when no live release
+  # exists yet. If this fails after a real publish, the release is already
+  # public — treat it as an alarm and roll back (re-publish the previous
+  # feed to R2) rather than as a gate.
+  verify-live:
+    needs: [build, publish]
+    # PRs: publish is skipped, run against the currently-live release.
+    # Tag/dispatch: only after a successful publish.
+    if: ${{ always() && needs.build.result == 'success' && (github.event_name == 'pull_request' || needs.publish.result == 'success') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
+    timeout-minutes: 25
+    steps:
+      - name: Check a live release exists
+        id: live
+        shell: pwsh
+        run: |
+          $code = curl.exe -s -o NUL -w '%{http_code}' https://api.agentredactor.negativestarinnovators.com/updates/win/releases.win.json
+          if ($code -ne '200') {
+            Write-Host "::warning::No live release published yet (feed returned $code); skipping live-install verification."
+            echo "live=false" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "live=true" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Run the public one-line installer
+        if: steps.live.outputs.live == 'true'
+        shell: pwsh
+        timeout-minutes: 15
+        run: iex "& { $(irm https://api.agentredactor.negativestarinnovators.com/install.ps1) }"
+
+      - name: Verify installed app matches the live feed
+        if: steps.live.outputs.live == 'true'
+        shell: pwsh
+        run: |
+          $exe = "$env:LOCALAPPDATA\AgentRedactor\current\AgentRedactor.exe"
+          if (-not (Test-Path $exe)) { throw "one-line installer finished but $exe does not exist" }
+
+          # PE machine type: the installed build decides which channel's feed
+          # to compare against (ARM64 runners legitimately get the x64 fallback
+          # when no win-arm64 release is live).
+          $bytes = [System.IO.File]::ReadAllBytes($exe)
+          $pe = [BitConverter]::ToInt32($bytes, 0x3C)
+          $machine = [BitConverter]::ToUInt16($bytes, $pe + 4)
+          $machineName = switch ($machine) { 0x8664 { 'AMD64' } 0xAA64 { 'ARM64' } default { "unknown(0x{0:X4})" -f $machine } }
+          Write-Host "Installed exe machine type: $machineName (runner arch: ${{ matrix.arch }})"
+          if ('${{ matrix.arch }}' -eq 'x64' -and $machineName -ne 'AMD64') {
+            throw "x64 runner got a $machineName build — install.ps1 arch detection is broken"
+          }
+          if ('${{ matrix.arch }}' -eq 'arm64' -and $machineName -eq 'AMD64') {
+            Write-Host "::warning::ARM64 runner got the x64 fallback build (no win-arm64 release live, or fallback logic triggered)."
+          }
+
+          $channel = if ($machineName -eq 'ARM64') { 'win-arm64' } else { 'win' }
+          $feed = Invoke-RestMethod "https://api.agentredactor.negativestarinnovators.com/updates/$channel/releases.$channel.json"
+          $latest = $feed.Assets | Where-Object { $_.Type -eq 1 -and $_.Version } | ForEach-Object { $_.Version.TrimStart('v','V') } | Sort-Object { [version]$_ } | Select-Object -Last 1
+          $installed = (Get-Item $exe).VersionInfo.FileVersion
+          $installedCore = (($installed -split '\.')[0..2]) -join '.'
+          Write-Host "Installed: $installed; live feed ($channel): $latest"
+          if ($installedCore -ne $latest) {
+            throw "Installed version $installed does not match latest live feed version $latest on channel '$channel'"
+          }
+          Write-Host "Live install verified: v$installedCore ($machineName) via channel '$channel'"
+
+      - name: Clean up install
+        if: always()
+        shell: pwsh
+        run: |
+          Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          $updateExe = "$env:LOCALAPPDATA\AgentRedactor\Update.exe"
+          if (Test-Path $updateExe) {
+            & $updateExe uninstall | Out-Host
           }

@@ -87,8 +87,92 @@ jobs:
           compression-level: 0
           retention-days: 7
 
-  release:
+  # Smoke-test the packaged MSIX itself: self-sign it (the runner is
+  # ephemeral, so a throwaway cert + TrustedPeople import is fine), install,
+  # verify registration, launch, and uninstall. This catches manifest, asset,
+  # publisher and capability regressions that the loose-binary GUI tests in
+  # tests.yml structurally cannot see (installing the MSIX virtualizes
+  # AppData, which is why those tests avoid it — here that doesn't matter,
+  # we only assert install/register/launch).
+  test-msix:
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
+    timeout-minutes: 20
+    steps:
+      # scripts/sign-agentredactor-msix.ps1 reads the Publisher from
+      # AgentRedactor/Package.appxmanifest relative to the script, so the
+      # checkout layout must keep scripts/ and AgentRedactor/ siblings.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Download MSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AgentRedactor-msix-${{ matrix.arch }}
+          path: msix
+
+      # Allow sideloading of trusted apps (default on Win11 client, not
+      # necessarily on the Server image).
+      - name: Enable sideloading
+        shell: pwsh
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Force | Out-Null
+          Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Name AllowAllTrustedApps -Value 1
+
+      # Creates a throwaway self-signed cert matching the manifest Publisher,
+      # signs the MSIX, and trusts the cert (LocalMachine\TrustedPeople+Root)
+      # so Add-AppxPackage accepts it.
+      - name: Self-sign MSIX
+        shell: pwsh
+        run: repo/scripts/sign-agentredactor-msix.ps1 -MsixPath "msix/AgentRedactor-${{ matrix.arch }}.msix" -TrustCert
+
+      - name: Install MSIX and verify registration
+        shell: pwsh
+        run: |
+          Add-AppxPackage -Path "msix/AgentRedactor-${{ matrix.arch }}.msix" -ErrorAction Stop
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*'
+          if (-not $pkg) { throw 'Package not registered after Add-AppxPackage' }
+          Write-Host "Registered: $($pkg.PackageFullName) ($($pkg.Architecture))"
+          $expectedArch = if ('${{ matrix.arch }}' -eq 'x64') { 'X64' } else { 'Arm64' }
+          if ($pkg.Architecture -ne $expectedArch) { throw "Package architecture $($pkg.Architecture) != $expectedArch" }
+
+      - name: Launch packaged app and verify process
+        shell: pwsh
+        run: |
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*'
+          $appId = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Id
+          Write-Host "Launching shell:AppsFolder$($pkg.PackageFamilyName)!$appId"
+          Start-Process "explorer.exe" -ArgumentList "shell:AppsFolder$($pkg.PackageFamilyName)!$appId"
+          $deadline = (Get-Date).AddSeconds(90)
+          $proc = $null
+          while ((Get-Date) -lt $deadline -and -not $proc) {
+            Start-Sleep -Seconds 3
+            $proc = Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue
+          }
+          if (-not $proc) { throw 'Packaged app did not start within 90s' }
+          Write-Host "Packaged app is running (PID $($proc[0].Id)); stopping it."
+          $proc | Stop-Process -Force -ErrorAction SilentlyContinue
+
+      - name: Uninstall and verify removal
+        if: always()
+        shell: pwsh
+        run: |
+          Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*'
+          if ($pkg) {
+            $pkg | Remove-AppxPackage -ErrorAction Stop
+            if (Get-AppxPackage -Name '*AgentRedactor*') { throw 'Package still present after Remove-AppxPackage' }
+            Write-Host 'Package uninstalled cleanly.'
+          }
+
+  release:
+    needs: [build, test-msix]
     runs-on: windows-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:

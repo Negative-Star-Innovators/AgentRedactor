@@ -60,6 +60,16 @@ Expect `HTTP 206` with a `Content-Range: bytes 0-99/<size>` header and exactly 1
 
 ## Deploy
 
+Deploys run from CI (`.github/workflows/deploy-worker.yml`): PRs touching
+`cloudflare/**` get a `wrangler deploy --dry-run` validation plus an
+`install.ps1` PowerShell parse check; pushes to `main` (and manual dispatches)
+deploy for real and then smoke-test the live endpoints (`/health`,
+`/install.ps1`, a `/models` Range request, the update feeds). Required repo
+secrets: `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit) and
+`CLOUDFLARE_ACCOUNT_ID`.
+
+Manual deploy (fallback / first-time setup):
+
 1. Either have the `negativestarinnovators.com` zone active on Cloudflare, or deploy to the default `workers.dev` subdomain as a fallback (skip step 4 then).
 2. `npx wrangler login`
 3. `npx wrangler deploy`

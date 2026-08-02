@@ -41,6 +41,32 @@ $env:AGENTREDACTOR_EXE = "C:\path\to\AgentRedactor.exe"
 pytest -v migration/test_settings_migration.py
 ```
 
+### `test_selfrelease_install.py` (marker: `install`)
+
+The fresh-install E2E for the self-release channel:
+
+1. Silent-installs the build under test (`*-Setup.exe --silent`).
+2. Verifies the Velopack layout under `%LOCALAPPDATA%\AgentRedactor\`
+   (`Update.exe` at the root, app under `current\`).
+3. Asserts the installed exe's file version (`AGENTREDACTOR_EXPECT_VERSION`)
+   and PE machine type (`AGENTREDACTOR_EXPECT_MACHINE`: `AMD64` / `ARM64`) —
+   the latter guards against packing the wrong arch into a channel.
+4. Runs `--selftest-migrate-settings` on the *installed* exe against an
+   isolated config dir.
+5. Uninstalls again (`Update.exe uninstall`) unless
+   `AGENTREDACTOR_KEEP_INSTALL=1`.
+
+It is **opt-in** and skipped unless `AGENTREDACTOR_INSTALL_TEST=1`:
+
+```powershell
+$env:AGENTREDACTOR_INSTALL_TEST = "1"
+$env:AGENTREDACTOR_SETUP = "...\AgentRedactor\build\velopack\AgentRedactor-win-Setup.exe"
+$env:AGENTREDACTOR_EXPECT_VERSION = "1.1.0"   # optional
+$env:AGENTREDACTOR_EXPECT_MACHINE = "AMD64"   # optional; ARM64 for the arm64 build
+cd tests
+pytest -v migration/test_selfrelease_install.py
+```
+
 ### `test_selfrelease_upgrade.py` (marker: `upgrade`)
 
 The full self-release upgrade E2E:
@@ -50,8 +76,11 @@ The full self-release upgrade E2E:
    (`Update.exe` at the root, app under `current\`).
 2. Seeds a settings.json in a temp config dir.
 3. Serves `AGENTREDACTOR_FEED_DIR` (the vNext `vpk pack` output:
-   `releases.win.json` + `*-full.nupkg`) over `python -m http.server` on an
-   ephemeral localhost port — the feed override requires HTTP/HTTPS.
+   `releases.<channel>.json` + `*-full.nupkg`) over `python -m http.server` on an
+   ephemeral localhost port — the feed override requires HTTP/HTTPS. The
+   channel is `win` (x64) by default; set `AGENTREDACTOR_CHANNEL=win-arm64`
+   for the ARM64 leg (feed file `releases.win-arm64.json`, vpk output in
+   `build/velopack-arm64`).
 4. Launches the installed app with `AGENTREDACTOR_UPDATE_FEED=http://127.0.0.1:<port>`
    and `AGENTREDACTOR_UPDATE_AUTOAPPLY=1` (apply + restart without prompting).
 5. Polls (up to 5 min) until `current\AgentRedactor.exe`'s file version
@@ -64,8 +93,9 @@ It is **opt-in** and skipped unless `AGENTREDACTOR_UPGRADE_TEST=1`:
 
 ```powershell
 $env:AGENTREDACTOR_UPGRADE_TEST = "1"
-$env:AGENTREDACTOR_PREV_SETUP = "C:\dl\AgentRedactor-1.0.0-Setup.exe"   # previous release
+$env:AGENTREDACTOR_PREV_SETUP = "C:\dl\AgentRedactor-win-Setup.exe"     # previous release
 $env:AGENTREDACTOR_FEED_DIR = "...\AgentRedactor\build\velopack"        # vNext vpk output
+$env:AGENTREDACTOR_CHANNEL = "win"          # optional; win-arm64 for the ARM64 leg
 $env:AGENTREDACTOR_EXPECT_VERSION = "1.1.0"   # optional; default = newest in feed
 cd tests
 pytest -v migration/test_selfrelease_upgrade.py
@@ -102,11 +132,20 @@ current-schema fixture which is also compared byte-for-byte.
 
 ## CI wiring
 
-- `release-selfrelease.yml` runs `test_settings_migration.py` against the
-  just-built self-release exe, then — when a previous published release with a
-  `*-Setup.exe` asset exists — the upgrade E2E, both **before** `vpk upload`
-  publishes. A failed E2E blocks the publish; the first-ever self-release
-  skips the E2E with a warning.
+- `release-selfrelease.yml` runs on tag pushes (publish), manual dispatch
+  (dry-run unless `publish` is checked) and PRs (dry-run). Per arch, the
+  `build` job runs `test_settings_migration.py` against the just-built
+  self-release exe, then the fresh-install E2E (`test_selfrelease_install.py`
+  on this build's Setup.exe), then the upgrade E2E — the previous Setup.exe
+  comes from the **live R2 channel** (`/updates/<channel>/*-Setup.exe`), not
+  from GitHub releases. All of these gate `vpk upload`; a failed E2E blocks
+  the publish. The upgrade E2E skips with a warning when the channel has no
+  live release yet, or when the live version is not older than this build
+  (expected on PRs without a version bump).
+- After a real publish, the `verify-live` job runs the public one-line
+  installer (`irm .../install.ps1 | iex`) on fresh x64 and ARM64 runners and
+  asserts the installed app matches the live feed. On PRs it runs against the
+  currently-live release (canary for `install.ps1` itself).
 - `tests.yml` runs `test_settings_migration.py` against the
   `AgentRedactor-release-bin` (Store-channel) artifact, since the migration
   hook exists in both channels.

@@ -6,16 +6,16 @@ auto-apply update to swap in the new version. Afterwards it verifies that the
 user's settings survived the upgrade and still migrate cleanly.
 
 Skipped unless AGENTREDACTOR_UPGRADE_TEST=1. Required env vars:
-  AGENTREDACTOR_PREV_SETUP   path to the previous release's x64 Setup.exe
-                             (AgentRedactor-win-Setup.exe; CI selects it with
-                             the arch-explicit glob *-win-Setup.exe so the
-                             ARM64 *-win-arm64-Setup.exe asset on the same
-                             GitHub release is never picked)
+  AGENTREDACTOR_PREV_SETUP   path to the previous release's Setup.exe for the
+                             channel under test (e.g. AgentRedactor-win-Setup.exe
+                             for x64, AgentRedactor-win-arm64-Setup.exe for ARM64)
   AGENTREDACTOR_FEED_DIR     folder with the vNext vpk output
-                             (releases.win.json + *-full.nupkg)
+                             (releases.<channel>.json + *-full.nupkg)
 Optional:
+  AGENTREDACTOR_CHANNEL      update channel: 'win' (x64, default) or 'win-arm64'.
+                             Selects the releases.<channel>.json feed file.
   AGENTREDACTOR_EXPECT_VERSION  expected new version (default: newest version
-                             in the feed's releases.win.json)
+                             in the feed's releases.<channel>.json)
 
 See tests/migration/README.md for the full contract and CI wiring.
 """
@@ -84,15 +84,15 @@ def _file_version(exe: Path) -> str:
     return out.stdout.strip()
 
 
-def _latest_feed_version(feed_dir: Path) -> str:
-    feed = json.loads((feed_dir / "releases.win.json").read_text(encoding="utf-8"))
+def _latest_feed_version(feed_dir: Path, channel: str) -> str:
+    feed = json.loads((feed_dir / f"releases.{channel}.json").read_text(encoding="utf-8"))
     versions = [
         asset["Version"]
         for asset in feed.get("Assets", [])
         if asset.get("Type") == 1 and asset.get("Version")  # Type 1 == Full nupkg
     ]
     if not versions:
-        pytest.fail(f"no full-package assets in {feed_dir / 'releases.win.json'}")
+        pytest.fail(f"no full-package assets in {feed_dir / f'releases.{channel}.json'}")
     return max(versions, key=_version_key)
 
 
@@ -120,15 +120,17 @@ def test_selfrelease_upgrade(tmp_path):
     prev_setup = os.environ.get("AGENTREDACTOR_PREV_SETUP")
     if not prev_setup or not Path(prev_setup).is_file():
         pytest.skip("AGENTREDACTOR_PREV_SETUP is not set or does not point at a Setup.exe")
+    channel = os.environ.get("AGENTREDACTOR_CHANNEL", "win")
+    feed_file = f"releases.{channel}.json"
     feed_dir = os.environ.get("AGENTREDACTOR_FEED_DIR")
-    if not feed_dir or not (Path(feed_dir) / "releases.win.json").is_file():
+    if not feed_dir or not (Path(feed_dir) / feed_file).is_file():
         pytest.skip(
-            "AGENTREDACTOR_FEED_DIR is not set or has no releases.win.json "
+            f"AGENTREDACTOR_FEED_DIR is not set or has no {feed_file} "
             "(point it at the vpk output folder, e.g. AgentRedactor/build/velopack)"
         )
     feed_dir_path = Path(feed_dir)
     expected = os.environ.get("AGENTREDACTOR_EXPECT_VERSION") or _latest_feed_version(
-        feed_dir_path
+        feed_dir_path, channel
     )
 
     install_root = Path(os.environ["LOCALAPPDATA"]) / INSTALL_DIR_NAME
