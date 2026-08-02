@@ -147,8 +147,13 @@ CheckOutcome CheckAndDownload() {
     try {
         auto feed = json::parse(body);
         for (const auto& asset : feed.value("Assets", json::array())) {
-            // Type 1 == Full (nupkg); skip delta/portable/installer assets.
-            if (asset.value("Type", 0) != 1) continue;
+            // Full nupkg only; skip delta/portable/installer assets. Current
+            // vpk writes Type as the string "Full"; older feeds used the
+            // numeric value 1. Accept both.
+            const auto type = asset.value("Type", json());
+            const bool isFull = (type.is_number() && type.get<int>() == 1) ||
+                (type.is_string() && type.get<std::string>() == "Full");
+            if (!isFull) continue;
             std::string version = asset.value("Version", "");
             std::string fileName = asset.value("FileName", "");
             if (version.empty() || fileName.empty()) continue;
