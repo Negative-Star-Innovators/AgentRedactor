@@ -73,7 +73,7 @@ jobs:
           if (-not $expected) {
             $expected = $fileVersion
             $feed = try { Invoke-RestMethod -Uri 'https://api.agentredactor.negativestarinnovators.com/updates/win/releases.win.json' } catch { $null }
-            $live = $feed.Assets | Where-Object { $_.Type -eq 1 -and $_.Version } |
+            $live = $feed.Assets | Where-Object { $_.Version -and ("$($_.Type)" -in '1', 'Full') } |
               ForEach-Object { $_.Version.TrimStart('v','V') } |
               Sort-Object { [version]$_ } | Select-Object -Last 1
             if ($live -and [version]$fileVersion -le [version]$live) {
@@ -214,7 +214,7 @@ jobs:
           $expected = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
 
           $feed = try { Invoke-RestMethod -Uri "$base/releases.$channel.json" } catch { $null }
-          $latest = $feed.Assets | Where-Object { $_.Type -eq 1 -and $_.Version } |
+          $latest = $feed.Assets | Where-Object { $_.Version -and ("$($_.Type)" -in '1', 'Full') } |
             ForEach-Object { $_.Version } |
             Sort-Object { [version]($_.TrimStart('v','V')) } |
             Select-Object -Last 1
@@ -421,7 +421,7 @@ jobs:
 
           $channel = if ($machineName -eq 'ARM64') { 'win-arm64' } else { 'win' }
           $feed = Invoke-RestMethod "https://api.agentredactor.negativestarinnovators.com/updates/$channel/releases.$channel.json"
-          $latest = $feed.Assets | Where-Object { $_.Type -eq 1 -and $_.Version } | ForEach-Object { $_.Version.TrimStart('v','V') } | Sort-Object { [version]$_ } | Select-Object -Last 1
+          $latest = $feed.Assets | Where-Object { $_.Version -and ("$($_.Type)" -in '1', 'Full') } | ForEach-Object { $_.Version.TrimStart('v','V') } | Sort-Object { [version]$_ } | Select-Object -Last 1
           $installed = (Get-Item $exe).VersionInfo.FileVersion
           $installedCore = (($installed -split '\.')[0..2]) -join '.'
           Write-Host "Installed: $installed; live feed ($channel): $latest"
