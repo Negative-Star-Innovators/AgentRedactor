@@ -251,8 +251,11 @@ jobs:
         run: python -m pytest repo/tests/migration/test_selfrelease_upgrade.py -v
 
       # Keep the raw Velopack output around per arch — the publish job below
-      # downloads both, and they help debug failed/odd releases.
+      # downloads both, and they help debug failed/odd releases. Runs even
+      # when an earlier test step failed, so failed runs still yield their
+      # packages (needed to re-seed R2 from a PR build).
       - name: Upload Velopack output artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-${{ matrix.arch }}
