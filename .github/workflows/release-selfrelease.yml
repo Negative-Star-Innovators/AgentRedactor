@@ -1,10 +1,14 @@
 name: Self-Release (Velopack)
 
-# Manual gating: updates are only ever published when the maintainer pushes a
-# version tag (v*) or manually re-runs this workflow with a version input.
+# Publishing is gated: updates are only ever published when the maintainer
+# pushes a version tag (v*) or manually re-runs this workflow with publish
+# checked. Pull requests run the same build + pack + tests as a dry-run
+# (the publish job stays off for PRs — see its `if:`), so release problems
+# surface before tagging.
 on:
   push:
     tags: ['v*']
+  pull_request:
   workflow_dispatch:
     inputs:
       version:
@@ -16,6 +20,12 @@ on:
         required: false
         type: boolean
         default: false
+
+# Rapid pushes to the same PR cancel the superseded run. Tag pushes get their
+# own group per ref, so a release in flight is never cancelled.
+concurrency:
+  group: release-selfrelease-${{ github.ref }}
+  cancel-in-progress: true
 
 # Needed to create the GitHub release and upload Velopack release assets.
 permissions:
@@ -33,8 +43,9 @@ jobs:
     # x64 on windows-latest, ARM64 on the free ARM64 hosted runner.
     runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
     env:
-      # Expected version: tag name (minus the leading v) on tag pushes,
-      # the version input on manual re-runs.
+      # Expected version: tag name on tag pushes, the version input on manual
+      # re-runs. Empty on pull_request — the validate step below falls back to
+      # version.txt (there is no tag to validate against on a PR).
       EXPECTED_VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
     steps:
       # The vcxproj references vcpkg at ..\..\vcpkg relative to itself, so the
@@ -46,16 +57,24 @@ jobs:
 
       # Fail early if the tag/input version doesn't match version.txt — the
       # build script reads the version from that file, so a mismatch would
-      # publish an updater release stamped with the wrong version.
-      - name: Validate tag matches version.txt
+      # publish an updater release stamped with the wrong version. On PRs
+      # there is no tag/input to check; use version.txt as the version and
+      # export it for the later steps (artifact names, upgrade E2E).
+      - name: Resolve and validate version
         shell: pwsh
         run: |
+          $fileVersion = (Get-Content -Raw repo/AgentRedactor/version.txt).Trim()
           $expected = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
+          if (-not $expected) {
+            # PR build: nothing to validate against — version.txt is the source.
+            $expected = $fileVersion
+            echo "EXPECTED_VERSION=$expected" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            Write-Host "PR build (no tag/input); version from version.txt: v$expected"
+          }
           if ($expected -notmatch '^\d+\.\d+\.\d+$') {
             Write-Error "Expected version '$expected' is not a valid semver (e.g. v1.1.0)."
             exit 1
           }
-          $fileVersion = (Get-Content -Raw repo/AgentRedactor/version.txt).Trim()
           if ($fileVersion -ne $expected) {
             Write-Error ("Version mismatch: tag/input is 'v{0}' but AgentRedactor/version.txt contains '{1}'. " +
               "Bump version.txt to '$expected' and re-tag (see scripts/new-release.ps1)." -f $expected, $fileVersion)
