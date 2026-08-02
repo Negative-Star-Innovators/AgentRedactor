@@ -178,20 +178,47 @@ jobs:
         run: |
           $pkg = Get-AppxPackage -Name '*AgentRedactor*'
           $appId = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Id
-          Write-Host "Launching shell:AppsFolder$($pkg.PackageFamilyName)!$appId"
-          Start-Process "explorer.exe" -ArgumentList "shell:AppsFolder$($pkg.PackageFamilyName)!$appId"
+          $aumid = "$($pkg.PackageFamilyName)!$appId"
+          Write-Host "Activating $aumid"
+
+          # Activate via IApplicationActivationManager instead of
+          # `explorer.exe shell:AppsFolder...` — explorer silently swallows
+          # activation failures (no process, no error), while this surfaces
+          # the real HRESULT and the launched PID.
+          Add-Type -TypeDefinition @'
+          using System;
+          using System.Runtime.InteropServices;
+          public static class PackagedAppLauncher {
+              [ComImport, Guid("2e941141-7f97-4756-ba1d-9decde894a3d"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+              private interface IApplicationActivationManager {
+                  int ActivateApplication([MarshalAs(UnmanagedType.LPWStr)] string appUserModelId, [MarshalAs(UnmanagedType.LPWStr)] string arguments, int options, out uint processId);
+              }
+              [ComImport, Guid("45BA127D-10A8-46EA-8AB7-56EA9078943C")]
+              private class ApplicationActivationManager {}
+              public static uint Launch(string aumid) {
+                  var mgr = (IApplicationActivationManager)new ApplicationActivationManager();
+                  uint pid;
+                  int hr = mgr.ActivateApplication(aumid, null, 0, out pid);
+                  if (hr != 0) Marshal.ThrowExceptionForHR(hr);
+                  return pid;
+              }
+          }
+          '@
+          $launchedPid = [PackagedAppLauncher]::Launch($aumid)
+          Write-Host "Activation returned PID $launchedPid; waiting for the process..."
           $deadline = (Get-Date).AddSeconds(180)
           $proc = $null
           while ((Get-Date) -lt $deadline -and -not $proc) {
             Start-Sleep -Seconds 3
             $proc = Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue
           }
-          if (-not $proc) { throw 'Packaged app did not start within 180s' }
+          if (-not $proc) { throw "Packaged app did not start within 180s (activation PID was $launchedPid)" }
           Write-Host "Packaged app is running (PID $($proc[0].Id)); stopping it."
           $proc | Stop-Process -Force -ErrorAction SilentlyContinue
 
-      # If the launch above failed, the reason is almost always in the
-      # Application event log (crash, missing dependency, activation error).
+      # If the launch above failed, the reason is usually in the Application
+      # event log (crash, activation error) or the app's own log inside the
+      # package state dir (LocalCache is the virtualized AppData).
       - name: Dump diagnostics on failure
         if: failure()
         shell: pwsh
@@ -200,8 +227,21 @@ jobs:
             Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName=$provider} -MaxEvents 20 -ErrorAction SilentlyContinue |
               ForEach-Object { $_.TimeCreated; $_.Message; '---' }
           }
-          Get-AppxPackage -Name '*AgentRedactor*' -ErrorAction SilentlyContinue |
-            Format-List Name, PackageFullName, Status, InstallLocation
+          Get-WinEvent -LogName 'Microsoft-Windows-AppXDeploymentServer/Operational' -MaxEvents 20 -ErrorAction SilentlyContinue |
+            Where-Object { $_.LevelDisplayName -in @('Error', 'Warning') } |
+            ForEach-Object { $_.TimeCreated; $_.Message; '---' }
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*' -ErrorAction SilentlyContinue
+          if ($pkg) {
+            $pkg | Format-List Name, PackageFullName, Status, InstallLocation
+            foreach ($root in @(
+              (Join-Path $env:LOCALAPPDATA "Packages\$($pkg.PackageFamilyName)\LocalCache"),
+              (Join-Path $env:APPDATA 'AgentRedactor'))) {
+              Get-ChildItem $root -Recurse -Filter '*.log' -ErrorAction SilentlyContinue | ForEach-Object {
+                Write-Host "== $($_.FullName) =="
+                Get-Content $_.FullName -Tail 80 -ErrorAction SilentlyContinue
+              }
+            }
+          }
 
       - name: Uninstall and verify removal
         if: always()
