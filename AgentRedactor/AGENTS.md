@@ -82,9 +82,18 @@ Key pieces of the self-release channel:
   `Update.exe apply --package <nupkg> --waitPid <pid>` after a restart prompt.
   `App.cpp` exits immediately on `--veloapp-*` lifecycle args.
 - `src/model_downloader.cpp` (both channels): first-run download of
-  `model_quantized.onnx_data` from the `models-v1` GitHub release; only fires
+  `model_quantized.onnx_data` exclusively from the Cloudflare R2 endpoint
+  (`https://api.agentredactor.negativestarinnovators.com/models/...`; R2 is
+  the single host for model downloads — no fallback). The download is parallel
+  segmented + resumable (`Utils::HttpDownloadFileSegmented`, 8 ranges to
+  `.partN` files, falling back to a resumable single stream); interrupted
+  downloads keep `.partial`/`.partN` files so a retry resumes. Weights are
+  only accepted at exactly `kWeightsExpectedBytes` — a wrong-sized file is
+  deleted and re-downloaded (self-heal for old corrupt installs). Only fires
   when the weights are missing. `AppState` resolves the model dir via
-  `ModelDownloader::ResolveModelDir()` (exe-dir first, fallback second).
+  `ModelDownloader::ResolveModelDir()` (exe-dir first, fallback second), and
+  deletes fallback-dir weights (never MSIX exe-dir weights) when the detector
+  fails to initialize right after a successful download.
 - To cut a self-release: bump `version.txt`, tag `v<version>`, push — the
   `release-selfrelease.yml` workflow builds, packs, runs the settings-migration
   tests plus the previous-release upgrade E2E (`tests/migration/`, skipped with

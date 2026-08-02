@@ -178,8 +178,8 @@ if (Test-Path "$root\models") {
     if ($SelfRelease) {
         # The 1.6 GB weight file (model_quantized.onnx_data) is NOT shipped in
         # the self-release installer; the app downloads it on first run from
-        # the models-v1 GitHub release. The tiny model graph (.onnx) and the
-        # companion files still ship.
+        # the Cloudflare R2 endpoint (see src/model_downloader.cpp). The tiny
+        # model graph (.onnx) and the companion files still ship.
         robocopy "$root\models" "$outDir\models" /E /XF *.onnx_data /R:3 /W:1 | Out-Null
         # robocopy /E does not purge: remove weight files left behind by
         # earlier non-SelfRelease (MSIX) builds of the same output folder,

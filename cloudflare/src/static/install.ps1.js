@@ -22,7 +22,7 @@ if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') {
 $setupPath = Join-Path $env:TEMP 'AgentRedactor-Setup.exe'
 
 try {
-    # Invoke-WebRequest follows the 302 redirect to the GitHub release asset.
+    # The updates endpoint serves the installer directly from R2.
     Write-Host "Downloading AgentRedactor setup ($channel)..."
     try {
         Invoke-WebRequest -Uri "$baseUrl/$channel/$setupName" -OutFile $setupPath -UseBasicParsing
@@ -46,14 +46,33 @@ try {
         }
     }
 
-    # Run the installer and wait for it to finish.
+    # Strip the Mark-of-the-Web so SmartScreen doesn't block the downloaded
+    # (not-yet-reputation) installer on dev machines.
+    Unblock-File -Path $setupPath
+
+    # Run the installer. Velopack's Setup.exe stays alive for as long as the
+    # installed app runs, so don't -Wait on it: poll until the app is
+    # installed and launched (or Setup exits on its own), then hand the
+    # terminal back.
     Write-Host 'Running installer...'
-    Start-Process -FilePath $setupPath -Wait
+    $proc = Start-Process -FilePath $setupPath -PassThru
+    $appExe = Join-Path $env:LOCALAPPDATA 'AgentRedactor\current\AgentRedactor.exe'
+    $deadline = (Get-Date).AddMinutes(5)
+    while (-not $proc.HasExited -and (Get-Date) -lt $deadline) {
+        if ((Test-Path $appExe) -and (Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue)) { break }
+        Start-Sleep -Seconds 2
+    }
+    if ($proc.HasExited -and $proc.ExitCode -ne 0) {
+        Write-Warning "The installer exited with code $($proc.ExitCode). Agent Redactor may not be installed."
+    } elseif (Test-Path $appExe) {
+        Write-Host 'AgentRedactor installed successfully. The app is starting — you can launch it anytime from the Start menu.'
+    } else {
+        Write-Warning 'Timed out waiting for the installer. Check the Start menu for Agent Redactor.'
+    }
 }
 finally {
-    # Clean up the downloaded installer regardless of outcome.
-    if (Test-Path $setupPath) { Remove-Item $setupPath -Force }
+    # Clean up the downloaded installer. Setup.exe may still be running (it
+    # stays alive with the app), so a locked file is fine — it is in %TEMP%.
+    if (Test-Path $setupPath) { Remove-Item $setupPath -Force -ErrorAction SilentlyContinue }
 }
-
-Write-Host 'AgentRedactor installed successfully. You can launch it from the Start menu.'
 `;

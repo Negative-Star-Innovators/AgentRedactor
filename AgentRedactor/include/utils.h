@@ -63,8 +63,19 @@ std::wstring FormatLocalizedDateTime(const std::time_t& time);
 // manager and the first-run model downloader. Follow redirects across hosts
 // (the update feed and GitHub release assets both 302). Never throw.
 bool HttpGetString(const std::wstring& url, std::string& outBody);
+// Resumes from an existing non-empty `destPath` via a Range request when the
+// server honors it (206); a 200 restarts from zero. Fails when the server
+// reports a total size and fewer bytes arrive (truncated transfer).
 bool HttpDownloadFile(const std::wstring& url, const std::filesystem::path& destPath,
     const std::function<void(uint64_t downloaded, uint64_t total)>& progress = nullptr);
+// Parallel variant for large files: probes the total size and range support,
+// then downloads up to `maxSegments` ranges concurrently into `<destPath>.partN`
+// files (each resumable) and concatenates them into `destPath`, verifying the
+// final size. Part files are kept on failure so the next call resumes. Falls
+// back to HttpDownloadFile when ranges are unsupported or the file is small.
+bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::path& destPath,
+    const std::function<void(uint64_t downloaded, uint64_t total)>& progress = nullptr,
+    size_t maxSegments = 8);
 
 } // namespace Utils
 } // namespace AgentRedactor

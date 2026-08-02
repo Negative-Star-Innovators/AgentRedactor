@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <mutex>
 #include <atomic>
+#include <thread>
+#include <cwchar>
 
 namespace AgentRedactor {
 namespace Utils {
@@ -406,12 +408,29 @@ struct WinHttpHandle {
     WinHttpHandle& operator=(const WinHttpHandle&) = delete;
 };
 
+// Reads the Content-Length header as a 64-bit value from the header string
+// (the numeric DWORD query truncates files larger than 4 GB). Returns 0 when
+// the header is absent.
+uint64_t QueryContentLength(HINTERNET request) {
+    DWORD bufSize = 0;
+    WinHttpQueryHeaders(request, WINHTTP_QUERY_CONTENT_LENGTH, WINHTTP_HEADER_NAME_BY_INDEX,
+        WINHTTP_NO_OUTPUT_BUFFER, &bufSize, WINHTTP_NO_HEADER_INDEX);
+    if (bufSize == 0) return 0;
+    std::wstring value(bufSize / sizeof(wchar_t) + 1, L'\0');
+    if (!WinHttpQueryHeaders(request, WINHTTP_QUERY_CONTENT_LENGTH, WINHTTP_HEADER_NAME_BY_INDEX,
+        value.data(), &bufSize, WINHTTP_NO_HEADER_INDEX)) return 0;
+    return _wcstoui64(value.c_str(), nullptr, 10);
+}
+
 // Performs a GET against `url`, following redirects manually (the default
 // auto policy is disabled so cross-host chains like worker -> github.com ->
-// release asset CDN are explicit). On HTTP 200, invokes `consume` with the
-// open request handle; its return value becomes the result.
+// release asset CDN are explicit). `extraHeaders` (e.g. a Range header) is
+// re-sent on every hop of the redirect chain. On HTTP 200 or 206, invokes
+// `consume` with the open request handle, the Content-Length (0 when absent)
+// and the status code; its return value becomes the result.
 bool HttpGetInternal(const std::wstring& url,
-    const std::function<bool(HINTERNET request, uint64_t contentLength)>& consume) {
+    const std::function<bool(HINTERNET request, uint64_t contentLength, DWORD status)>& consume,
+    const std::wstring& extraHeaders = L"") {
     std::wstring current = url;
     for (int redirect = 0; redirect < 5; ++redirect) {
         URL_COMPONENTS uc = { sizeof(uc) };
@@ -441,7 +460,9 @@ bool HttpGetInternal(const std::wstring& url,
         // Generous receive timeout: model weights and update packages are large.
         WinHttpSetTimeouts(request.h, 30000, 30000, 30000, 300000);
 
-        if (!WinHttpSendRequest(request.h, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+        const wchar_t* headers = extraHeaders.empty() ? WINHTTP_NO_ADDITIONAL_HEADERS : extraHeaders.c_str();
+        DWORD headersLength = extraHeaders.empty() ? 0 : static_cast<DWORD>(extraHeaders.size());
+        if (!WinHttpSendRequest(request.h, headers, headersLength,
             WINHTTP_NO_REQUEST_DATA, 0, 0, 0)) return false;
         if (!WinHttpReceiveResponse(request.h, nullptr)) return false;
 
@@ -463,16 +484,9 @@ bool HttpGetInternal(const std::wstring& url,
             current = location;
             continue;
         }
-        if (status != 200) return false;
+        if (status != 200 && status != 206) return false;
 
-        uint64_t contentLength = 0;
-        DWORD cl = 0;
-        DWORD clSize = sizeof(cl);
-        if (WinHttpQueryHeaders(request.h, WINHTTP_QUERY_CONTENT_LENGTH | WINHTTP_QUERY_FLAG_NUMBER,
-            WINHTTP_HEADER_NAME_BY_INDEX, &cl, &clSize, WINHTTP_NO_HEADER_INDEX)) {
-            contentLength = cl;
-        }
-        return consume(request.h, contentLength);
+        return consume(request.h, QueryContentLength(request.h), status);
     }
     return false;
 }
@@ -481,7 +495,7 @@ bool HttpGetInternal(const std::wstring& url,
 
 bool HttpGetString(const std::wstring& url, std::string& outBody) {
     outBody.clear();
-    return HttpGetInternal(url, [&outBody](HINTERNET request, uint64_t) {
+    return HttpGetInternal(url, [&outBody](HINTERNET request, uint64_t, DWORD) {
         DWORD avail = 0;
         while (WinHttpQueryDataAvailable(request, &avail) && avail > 0) {
             std::vector<char> buffer(avail);
@@ -495,10 +509,24 @@ bool HttpGetString(const std::wstring& url, std::string& outBody) {
 
 bool HttpDownloadFile(const std::wstring& url, const std::filesystem::path& destPath,
     const std::function<void(uint64_t downloaded, uint64_t total)>& progress) {
-    return HttpGetInternal(url, [&](HINTERNET request, uint64_t total) {
-        std::ofstream file(destPath, std::ios::binary | std::ios::trunc);
+    // Resume from an existing partial file when the server honors ranges.
+    uint64_t existing = 0;
+    {
+        std::error_code ec;
+        auto size = std::filesystem::file_size(destPath, ec);
+        if (!ec) existing = size;
+    }
+    std::wstring rangeHeader;
+    if (existing > 0) rangeHeader = L"Range: bytes=" + std::to_wstring(existing) + L"-\r\n";
+    return HttpGetInternal(url, [&](HINTERNET request, uint64_t contentLength, DWORD status) {
+        // 206: the server honored the Range request, append. 200: it answered
+        // the whole file instead (or the partial was already complete) —
+        // discard the partial and restart from zero.
+        const bool resuming = (existing > 0 && status == 206);
+        std::ofstream file(destPath, std::ios::binary | (resuming ? std::ios::app : std::ios::trunc));
         if (!file) return false;
-        uint64_t downloaded = 0;
+        const uint64_t total = resuming ? existing + contentLength : contentLength;
+        uint64_t downloaded = resuming ? existing : 0;
         DWORD avail = 0;
         while (WinHttpQueryDataAvailable(request, &avail) && avail > 0) {
             std::vector<char> buffer(avail);
@@ -511,8 +539,163 @@ bool HttpDownloadFile(const std::wstring& url, const std::filesystem::path& dest
             }
         }
         file.flush();
-        return file.good();
+        // A cleanly closed connection ends the loop above early; a short file
+        // is a failed download, not a success.
+        return file.good() && (total == 0 || downloaded == total);
+    }, rangeHeader);
+}
+
+bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::path& destPath,
+    const std::function<void(uint64_t downloaded, uint64_t total)>& progress,
+    size_t maxSegments) {
+    constexpr uint64_t kMinSegmentedBytes = 64ull * 1024 * 1024;
+
+    // Probe the total size and range support before committing to segments.
+    uint64_t totalSize = 0;
+    HttpGetInternal(url, [&](HINTERNET, uint64_t contentLength, DWORD) {
+        totalSize = contentLength;
+        return true;
     });
+    bool rangesSupported = false;
+    if (totalSize > 0) {
+        HttpGetInternal(url, [&](HINTERNET, uint64_t, DWORD status) {
+            rangesSupported = (status == 206);
+            return true;
+        }, L"Range: bytes=0-0\r\n");
+    }
+
+    size_t segmentCount = static_cast<size_t>(std::min<uint64_t>(maxSegments, totalSize / kMinSegmentedBytes));
+    if (!rangesSupported || segmentCount < 2) {
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %s (ranges %s, size %llu)",
+            url.c_str(), rangesSupported ? L"supported" : L"unsupported",
+            static_cast<unsigned long long>(totalSize));
+        return HttpDownloadFile(url, destPath, progress);
+    }
+
+    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %s",
+        static_cast<unsigned long long>(totalSize), segmentCount, url.c_str());
+
+    const uint64_t segmentSize = totalSize / segmentCount;
+    std::vector<std::filesystem::path> partPaths(segmentCount);
+    for (size_t i = 0; i < segmentCount; ++i) {
+        partPaths[i] = destPath;
+        partPaths[i] += L".part" + std::to_wstring(i);
+    }
+
+    std::atomic<uint64_t> totalDownloaded{ 0 };
+    std::mutex progressMutex;
+    auto reportProgress = [&](uint64_t downloaded) {
+        if (progress) {
+            std::lock_guard lock(progressMutex);
+            progress(downloaded, totalSize);
+        }
+    };
+
+    // One thread per segment, each on its own WinHTTP connection with an
+    // explicit Range header (redirects are followed per segment, like
+    // HttpGetInternal does for single-stream downloads).
+    std::vector<char> results(segmentCount, 0);
+    std::vector<std::thread> threads;
+    threads.reserve(segmentCount);
+    try {
+        for (size_t i = 0; i < segmentCount; ++i) {
+            threads.emplace_back([&, i] {
+                try {
+                    const uint64_t begin = i * segmentSize;
+                    const uint64_t end = (i + 1 == segmentCount) ? totalSize - 1 : begin + segmentSize - 1;
+                    const uint64_t expected = end - begin + 1;
+                    const auto& partPath = partPaths[i];
+
+                    // Resume a partially downloaded segment. A complete part
+                    // needs no request; an oversized one is corrupt.
+                    uint64_t existing = 0;
+                    {
+                        std::error_code ec;
+                        auto size = std::filesystem::file_size(partPath, ec);
+                        if (!ec) existing = size;
+                    }
+                    if (existing == expected) {
+                        reportProgress(totalDownloaded.fetch_add(expected) + expected);
+                        results[i] = 1;
+                        return;
+                    }
+                    if (existing > expected) {
+                        std::error_code ec;
+                        std::filesystem::remove(partPath, ec);
+                        existing = 0;
+                    }
+
+                    totalDownloaded.fetch_add(existing);
+                    const std::wstring rangeHeader = L"Range: bytes=" + std::to_wstring(begin + existing) +
+                        L"-" + std::to_wstring(end) + L"\r\n";
+                    results[i] = HttpGetInternal(url, [&](HINTERNET request, uint64_t, DWORD status) {
+                        if (status != 206) return false;  // server ignored the Range header
+                        std::ofstream file(partPath, std::ios::binary | (existing > 0 ? std::ios::app : std::ios::trunc));
+                        if (!file) return false;
+                        uint64_t have = existing;
+                        while (have < expected) {
+                            DWORD avail = 0;
+                            if (!WinHttpQueryDataAvailable(request, &avail)) return false;
+                            if (avail == 0) break;
+                            DWORD chunk = static_cast<DWORD>(std::min<uint64_t>(avail, expected - have));
+                            std::vector<char> buffer(chunk);
+                            DWORD read = 0;
+                            if (!WinHttpReadData(request, buffer.data(), chunk, &read)) return false;
+                            if (read == 0) break;
+                            file.write(buffer.data(), read);
+                            have += read;
+                            reportProgress(totalDownloaded.fetch_add(read) + read);
+                        }
+                        file.flush();
+                        return file.good() && have == expected;
+                    }, rangeHeader) ? 1 : 0;
+                } catch (...) {
+                    results[i] = 0;
+                }
+            });
+        }
+    } catch (...) {
+        for (auto& t : threads) if (t.joinable()) t.join();
+        return false;
+    }
+    for (auto& t : threads) t.join();
+    for (size_t i = 0; i < segmentCount; ++i) {
+        if (!results[i]) {
+            // Part files are kept so the next retry resumes each segment.
+            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %s", i, url.c_str());
+            return false;
+        }
+    }
+
+    // Concatenate the segments in order and verify the final size. On any
+    // failure the part files survive for the next retry.
+    {
+        std::ofstream out(destPath, std::ios::binary | std::ios::trunc);
+        if (!out) return false;
+        std::vector<char> buffer(1024 * 1024);
+        for (size_t i = 0; i < segmentCount; ++i) {
+            std::ifstream in(partPaths[i], std::ios::binary);
+            if (!in) return false;
+            while (in) {
+                in.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+                auto got = in.gcount();
+                if (got > 0) out.write(buffer.data(), got);
+            }
+        }
+        out.flush();
+        if (!out.good()) return false;
+    }
+    std::error_code ec;
+    auto finalSize = std::filesystem::file_size(destPath, ec);
+    if (ec || finalSize != totalSize) {
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %s", url.c_str());
+        std::filesystem::remove(destPath, ec);
+        return false;
+    }
+    for (const auto& partPath : partPaths) std::filesystem::remove(partPath, ec);
+    reportProgress(totalSize);
+    LOG_LIFECYCLE(L"[Utils] Segmented download complete");
+    return true;
 }
 
 } // namespace Utils

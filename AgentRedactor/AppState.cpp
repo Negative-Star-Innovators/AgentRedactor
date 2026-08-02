@@ -498,6 +498,16 @@ void AppState::StartModelDownloadIfNeeded() {
             }
             if (initOk) {
                 StartProxyServers();
+            } else if (ModelDownloader::ResolveModelDir() == fallbackDir) {
+                // The weights passed the size check but failed to load (e.g.
+                // a corrupt download from before size verification existed).
+                // Delete them so the next Retry re-downloads instead of
+                // looping on the same bad file — but ONLY in the fallback
+                // dir; exe-dir weights are MSIX package content and are never
+                // touched.
+                std::error_code ec;
+                std::filesystem::remove(ModelDownloader::WeightsFilePath(fallbackDir), ec);
+                LOG_LIFECYCLE(L"[AppState] Deleted corrupt downloaded weights; the next retry will re-download");
             }
             LOG_LIFECYCLE(initOk
                 ? L"[AppState] Model downloaded and initialized"

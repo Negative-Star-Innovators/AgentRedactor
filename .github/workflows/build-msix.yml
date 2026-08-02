@@ -52,14 +52,11 @@ jobs:
           vcpkg\bootstrap-vcpkg.bat -disableMetrics
           vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
 
-      # The 1.6 GB model weights are not in the repo; they are a release asset
-      # (see README). Skipped automatically on forks/PRs without access.
+      # The 1.6 GB model weights are not in the repo; they are served from the
+      # Cloudflare R2 bucket via the api worker (see cloudflare/README.md).
       - name: Download ONNX model weights
         shell: pwsh
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
+        run: curl.exe -L --fail -o repo/AgentRedactor/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
 
       - name: Build MSIX (build.ps1)
         shell: pwsh

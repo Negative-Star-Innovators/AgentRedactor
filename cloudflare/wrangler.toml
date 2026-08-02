@@ -10,7 +10,13 @@ compatibility_date = "2025-01-01"
 #   { pattern = "api.agentredactor.negativestarinnovators.com", custom_domain = true }
 # ]
 
-[vars]
-# Non-secret configuration lives here.
-# Secrets (e.g. GH_TOKEN) go in via: npx wrangler secret put GH_TOKEN
-GITHUB_REPO = "Negative-Star-Innovators/AgentRedactor"
+# R2 bucket holding the AI model weights (see README -> Model hosting (R2)).
+[[r2_buckets]]
+binding = "MODELS_BUCKET"
+bucket_name = "agentredactor-models"
+
+# Velopack update feeds + installers, keyed <channel>/<file> (see README ->
+# Updates hosting (R2)). R2 is the only update source.
+[[r2_buckets]]
+binding = "RELEASES_BUCKET"
+bucket_name = "agentredactor-releases"

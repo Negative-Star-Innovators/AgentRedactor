@@ -1,4 +1,5 @@
 import updates from './routes/updates.js';
+import models from './routes/models.js';
 import { INSTALL_PS1 } from './static/install.ps1.js';
 
 // Tiny hand-rolled router. To add a route module later, import it and
@@ -8,6 +9,7 @@ import { INSTALL_PS1 } from './static/install.ps1.js';
 const routes = [
   { pattern: '/updates/:channel/:file', handler: updates },
   { pattern: '/install.ps1', handler: installPs1 },
+  { pattern: '/models/:file', handler: models },
   { pattern: '/health', handler: health },
 ];
 

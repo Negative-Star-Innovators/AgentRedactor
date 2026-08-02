@@ -10,10 +10,11 @@ namespace ModelDownloader {
 
 namespace {
 
-// The only large file not in the repo; it is an asset of the `models-v1`
-// GitHub release (mirrors the download step in .github/workflows/build-msix.yml).
-constexpr const wchar_t* kWeightsUrl =
-    L"https://github.com/Negative-Star-Innovators/AgentRedactor/releases/download/models-v1/model_quantized.onnx_data";
+// The only large file not in the repo. Served exclusively from the
+// Cloudflare R2 endpoint (R2 is the single host for model downloads).
+constexpr const wchar_t* kWeightsUrls[] = {
+    L"https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data",
+};
 constexpr const wchar_t* kWeightsRelativePath = L"onnx\\model_quantized.onnx_data";
 
 // Small companion files that ship with the app next to the exe and are copied
@@ -38,6 +39,10 @@ void ReportProgress(const std::function<void(int, const std::wstring&)>& progres
 
 } // anonymous namespace
 
+std::filesystem::path WeightsFilePath(const std::filesystem::path& modelDir) {
+    return WeightsPath(modelDir);
+}
+
 std::filesystem::path GetFallbackModelDir() {
     wchar_t path[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_LOCAL_APPDATA, nullptr, 0, path))) {
@@ -48,7 +53,19 @@ std::filesystem::path GetFallbackModelDir() {
 
 bool HasModelWeights(const std::filesystem::path& modelDir) {
     std::error_code ec;
-    return std::filesystem::exists(WeightsPath(modelDir), ec) && !ec;
+    auto weights = WeightsPath(modelDir);
+    if (!std::filesystem::exists(weights, ec) || ec) return false;
+    auto size = std::filesystem::file_size(weights, ec);
+    if (ec) return false;
+    if (size == kWeightsExpectedBytes) return true;
+    // A wrong-sized file is a truncated or corrupt download: treat it as
+    // missing and delete it so the next launch re-downloads (self-heal)
+    // instead of failing to initialize the detector forever.
+    LOGF_LIFECYCLE(L"[ModelDownloader] Deleting corrupt weights (size %llu, expected %llu): %s",
+        static_cast<unsigned long long>(size), static_cast<unsigned long long>(kWeightsExpectedBytes),
+        weights.c_str());
+    std::filesystem::remove(weights, ec);
+    return false;
 }
 
 std::filesystem::path ResolveModelDir() {
@@ -90,7 +107,9 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     }
 
     // Download the large weights to a .partial file and rename on success so a
-    // killed download never leaves a truncated file looking complete.
+    // killed download never leaves a truncated file looking complete. The
+    // download is segmented and resumable; on failure the .partial and .partN
+    // files are KEPT so the next retry resumes instead of restarting 1.6 GB.
     auto weightsDest = WeightsPath(fallbackModelDir);
     auto partial = weightsDest;
     partial += L".partial";
@@ -102,32 +121,44 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
         return false;
     }
 
-    LOG_LIFECYCLE(L"[ModelDownloader] Downloading model weights (~1.6 GB)...");
     auto lastPercent = -1;
-    bool ok = Utils::HttpDownloadFile(kWeightsUrl, partial,
-        [&](uint64_t downloaded, uint64_t total) {
-            int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : -1;
-            if (percent != lastPercent) {
-                lastPercent = percent;
-                std::wstring message = total > 0
-                    ? Utils::FormatString(L"%s / %s",
-                        Utils::FormatSize(static_cast<size_t>(downloaded)).c_str(),
-                        Utils::FormatSize(static_cast<size_t>(total)).c_str())
-                    : Utils::FormatSize(static_cast<size_t>(downloaded));
-                ReportProgress(progress, percent, message);
-            }
-        });
+    auto progressCallback = [&](uint64_t downloaded, uint64_t total) {
+        int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : -1;
+        if (percent != lastPercent) {
+            lastPercent = percent;
+            std::wstring message = total > 0
+                ? Utils::FormatString(L"%s / %s",
+                    Utils::FormatSize(static_cast<size_t>(downloaded)).c_str(),
+                    Utils::FormatSize(static_cast<size_t>(total)).c_str())
+                : Utils::FormatSize(static_cast<size_t>(downloaded));
+            ReportProgress(progress, percent, message);
+        }
+    };
+
+    // A previous attempt may have fully downloaded but failed to rename.
+    bool ok = false;
+    auto partialSize = std::filesystem::file_size(partial, ec);
+    if (!ec && partialSize == kWeightsExpectedBytes) {
+        ok = true;
+    } else {
+        for (const auto* url : kWeightsUrls) {
+            LOGF_LIFECYCLE(L"[ModelDownloader] Downloading model weights (~1.6 GB) from %s", url);
+            ok = Utils::HttpDownloadFileSegmented(url, partial, progressCallback);
+            if (ok) break;
+            LOGF_LIFECYCLE(L"[ModelDownloader] Weight download failed from %s", url);
+        }
+    }
 
     if (!ok) {
         LOG_LIFECYCLE(L"[ModelDownloader] Weight download failed");
-        std::filesystem::remove(partial, ec);
         return false;
     }
 
     std::filesystem::rename(partial, weightsDest, ec);
     if (ec) {
+        // Keep the complete .partial; the next retry finalizes it without
+        // downloading again.
         LOGF_LIFECYCLE(L"[ModelDownloader] Failed to finalize %s", weightsDest.c_str());
-        std::filesystem::remove(partial, ec);
         return false;
     }
 

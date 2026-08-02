@@ -177,15 +177,11 @@ jobs:
           retention-days: 30
 
   # Publish is deliberately OUT of the matrix: both arch legs must pass first,
-  # then ONE job uploads both channels to a single GitHub release. Running
-  # `vpk upload github` per arch leg would race on release creation.
-  # `vpk upload github --help` (vpk 1.2.0) shows:
-  #   --merge, --merge <merge>   Allow merging this upload with an existing
-  #                              release. [default: False]
-  # so the two channels are uploaded sequentially with --merge: the first call
-  # creates the release (or merges if a re-run left one behind), the second
-  # merges the win-arm64 assets into it. This keeps vpk's per-channel asset
-  # selection instead of hand-rolling `gh release create/upload` file lists.
+  # then ONE job uploads both channels to R2 (bucket agentredactor-releases,
+  # key prefix <channel>/). R2 is the ONLY update source — the api worker
+  # serves /updates straight from the bucket, no GitHub fallback.
+  # vpk upload s3 defaults to path-style URLs, which R2 expects; --region
+  # auto is the conventional value for R2's S3-compatible endpoint.
   publish:
     needs: release
     runs-on: windows-latest
@@ -213,15 +209,29 @@ jobs:
         shell: pwsh
         run: dotnet tool install -g vpk
 
-      # Creates the GitHub release for this tag and uploads the win-channel
-      # assets (releases.win.json + nupkg/Setup/Portable) so installed x64
-      # instances can auto-update. --merge makes re-runs idempotent.
-      - name: Publish x64 channel (creates the GitHub release)
+      # Publishes the win-channel assets (releases.win.json + nupkg/Setup.exe)
+      # to R2 so installed x64 instances can auto-update.
+      - name: Publish x64 channel to R2
         shell: pwsh
-        run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --merge --releaseName "AgentRedactor ${{ steps.ver.outputs.version }}" --tag "v${{ steps.ver.outputs.version }}" --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-x64"
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --region auto --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} --prefix win --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-x64"
 
-      # Merges the win-arm64 channel assets (releases.win-arm64.json etc.)
-      # into the same release created above.
-      - name: Publish ARM64 channel (merges into the same release)
+      # Same for the win-arm64 channel (prefix win-arm64/).
+      - name: Publish ARM64 channel to R2
         shell: pwsh
-        run: vpk upload github --repoUrl https://github.com/Negative-Star-Innovators/AgentRedactor --token ${{ secrets.GITHUB_TOKEN }} --publish --merge -c win-arm64 --releaseName "AgentRedactor ${{ steps.ver.outputs.version }}" --tag "v${{ steps.ver.outputs.version }}" --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-arm64"
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --region auto --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} -c win-arm64 --prefix win-arm64 --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-arm64"
+
+      # vpk uploads everything in the output dir, including files no client
+      # ever downloads (the Portable.zip, the legacy Squirrel RELEASES file
+      # and vpk's assets.*.json upload manifest). Delete them so the bucket
+      # holds only what clients use: releases.*.json, *-full/-delta.nupkg and
+      # *-Setup.exe. aws cli is preinstalled on windows-latest.
+      - name: Remove non-client files from R2
+        shell: pwsh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          $endpoint = "https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+          foreach ($channel in @('win', 'win-arm64')) {
+            aws s3 rm "s3://agentredactor-releases/$channel/" --endpoint-url $endpoint --region auto --recursive --exclude "*" --include "*-Portable.zip" --include "RELEASES" --include "assets.*.json"
+          }
