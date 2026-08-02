@@ -1,45 +1,37 @@
 name: Tests
 
 # The tests drive the real application UI with FlaUI, so they need an
-# interactive Windows desktop session. There are two variants of the GUI test
-# job (both run only the tests in tests/gui/; the third-party integration
-# tests in third_party_tests/ are run locally, not in CI):
+# interactive Windows desktop session. The hosted jobs call the reusable
+# workflow in tests-gui.yml (same one the Self-Release pipeline uses to gate
+# publishing):
 #
-#   gui-tests-hosted    GitHub-hosted windows-latest (x64). Hosted Windows
-#                       runners auto-logon to an interactive desktop session,
-#                       so UI automation generally works there. Free for
-#                       public repos. Does NOT compile the app: it downloads
-#                       the AgentRedactor-release-bin artifact from the latest
-#                       successful Build MSIX run on the SAME branch this
-#                       workflow was dispatched on (Build MSIX runs
+#   gui-tests-x64 / gui-tests-arm64
+#                       GitHub-hosted runners (windows-latest / windows-11-arm;
+#                       hosted Windows runners auto-logon to an interactive
+#                       desktop session, so UI automation works there). They
+#                       test the AgentRedactor-release-bin[-arm64] artifact
+#                       from the latest successful Build MSIX run on the SAME
+#                       branch this workflow was dispatched on (Build MSIX runs
 #                       automatically on every PR, so opening a PR produces
 #                       the artifacts; wait for it to finish first).
-#   gui-tests-hosted-arm64
-#                       Same as gui-tests-hosted but on the windows-11-arm
-#                       ARM64 runner, using the AgentRedactor-release-bin-arm64
-#                       artifact from the same Build MSIX run.
 #   gui-tests           Self-hosted Windows runner logged in to an interactive
 #                       session. Kept as a fallback in case the hosted job
 #                       turns out to be flaky for this app.
 #
-# Trigger manually with: Actions -> Tests -> Run workflow.
+# The third-party integration tests in third_party_tests/ are run locally,
+# not in CI. Trigger manually with: Actions -> Tests -> Run workflow.
 
 on:
   workflow_dispatch:
 
 jobs:
-  gui-tests-hosted:
-    runs-on: windows-latest
+  # Find the Build MSIX run on THIS branch (github.ref_name), so a run
+  # dispatched on a PR branch tests that branch's binaries, not main's.
+  resolve-msix-run:
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.msix.outputs.run_id }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: repo
-
-      # Reuse the Release binaries built by the Build MSIX workflow instead of
-      # compiling here (vcpkg + msbuild was the bulk of this job's runtime).
-      # IMPORTANT: use the run from THIS branch (github.ref_name), so a run
-      # dispatched on a PR branch tests that branch's binaries, not main's.
       - name: Find latest successful Build MSIX run
         id: msix
         shell: pwsh
@@ -51,206 +43,22 @@ jobs:
           if (-not $id) { throw "No successful Build MSIX run found on branch '$branch'. Opening a PR triggers one automatically — wait for it to finish, then re-run this workflow on the same branch." }
           echo "run_id=$id" >> $env:GITHUB_OUTPUT
 
-      - name: Download prebuilt AgentRedactor binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: AgentRedactor-release-bin
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ steps.msix.outputs.run_id }}
-          path: repo/AgentRedactor/build/x64/Release
+  gui-tests-x64:
+    needs: resolve-msix-run
+    uses: ./.github/workflows/tests-gui.yml
+    with:
+      arch: x64
+      artifact: AgentRedactor-release-bin
+      run-id: ${{ needs.resolve-msix-run.outputs.run_id }}
+      run-migration: true
 
-      # The ONNX weights are ~1.6 GB; cache them across runs. Bump v1 to
-      # invalidate. Restored cache makes the download step below a no-op.
-      - name: Cache ONNX model weights
-        uses: actions/cache@v4
-        with:
-          path: repo/AgentRedactor/models/onnx
-          key: onnx-models-v1
-
-      - name: Download ONNX model weights
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if (-not (Test-Path repo/AgentRedactor/models/onnx/model_quantized.onnx_data)) {
-            gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
-          }
-
-      # The binaries artifact excludes models/; copy the cached model in.
-      - name: Restore ONNX model into build output
-        shell: pwsh
-        run: |
-          robocopy repo/AgentRedactor/models repo/AgentRedactor/build/x64/Release/models /E /NFL /NDL /NJH /NJS | Out-Null
-          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
-          exit 0
-
-      - name: Build FlaUI helper
-        shell: pwsh
-        run: repo/tests/gui/windows/build.ps1
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install test dependencies
-        shell: pwsh
-        run: pip install -r repo/tests/requirements.txt
-
-      # Headless settings-migration tests (--selftest-migrate-settings needs
-      # no GUI session), run against the Store-channel Release binaries too.
-      - name: Run settings migration tests
-        shell: pwsh
-        env:
-          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/x64/Release/AgentRedactor.exe
-        run: |
-          cd repo/tests
-          pytest -v migration/test_settings_migration.py
-
-      - name: Run GUI tests
-        shell: pwsh
-        run: |
-          cd repo/tests
-          pytest -v gui/
-
-  gui-tests-hosted-arm64:
-    runs-on: windows-11-arm
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: repo
-
-      # Reuse the ARM64 Release binaries built by the Build MSIX workflow
-      # instead of compiling here. Uses the run from THIS branch (see the
-      # x64 job for why).
-      - name: Find latest successful Build MSIX run
-        id: msix
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $branch = "${{ github.ref_name }}"
-          $id = gh run list -R ${{ github.repository }} --workflow build-msix.yml --branch $branch --status success --limit 1 --json databaseId --jq '.[0].databaseId'
-          if (-not $id) { throw "No successful Build MSIX run found on branch '$branch'. Opening a PR triggers one automatically — wait for it to finish, then re-run this workflow on the same branch." }
-          echo "run_id=$id" >> $env:GITHUB_OUTPUT
-
-      - name: Download prebuilt AgentRedactor binaries (arm64)
-        uses: actions/download-artifact@v4
-        with:
-          name: AgentRedactor-release-bin-arm64
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ steps.msix.outputs.run_id }}
-          path: repo/AgentRedactor/build/ARM64/Release
-
-      # The ONNX weights are ~1.6 GB; cache them across runs. Arch-neutral
-      # file, so this shares the cache key with the x64 job.
-      - name: Cache ONNX model weights
-        uses: actions/cache@v4
-        with:
-          path: repo/AgentRedactor/models/onnx
-          key: onnx-models-v1
-
-      - name: Download ONNX model weights
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if (-not (Test-Path repo/AgentRedactor/models/onnx/model_quantized.onnx_data)) {
-            gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
-          }
-
-      # The binaries artifact excludes models/; copy the cached model in.
-      - name: Restore ONNX model into build output
-        shell: pwsh
-        run: |
-          robocopy repo/AgentRedactor/models repo/AgentRedactor/build/ARM64/Release/models /E /NFL /NDL /NJH /NJS | Out-Null
-          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
-          exit 0
-
-      - name: Build FlaUI helper
-        shell: pwsh
-        run: repo/tests/gui/windows/build.ps1
-
-      # The Windows 11 client image shows a modal Windows Firewall prompt the
-      # first time the app binds its proxy port ("Windows Firewall has blocked
-      # some features of agentredactor..."). It steals foreground for the
-      # whole run and breaks UI automation. Loopback is what the tests use,
-      # so just disable the firewall for the duration of the job.
-      - name: Disable Windows Firewall prompts
-        shell: pwsh
-        run: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-
-      # The Windows 11 client image periodically shows the SCOOBE "Microsoft
-      # account / privacy settings" fullscreen nag (CloudExperienceHost), which
-      # takes the foreground and blocks the app's XAML dialogs from rendering.
-      - name: Dismiss OOBE nag screens
-        shell: pwsh
-        run: |
-          New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Force | Out-Null
-          Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name ScoobeSystemSettingEnabled -Value 0
-          New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Force | Out-Null
-          Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Name DisablePrivacyExperience -Value 1
-          Get-Process -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -match 'CloudExperienceHost|UserOOBEBroker' } |
-            Stop-Process -Force -ErrorAction SilentlyContinue
-
-      # Capture Windows Error Reporting mini-dumps in case the app still dies,
-      # so we can see whether it crashes or is killed externally.
-      - name: Enable crash dump collection
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path C:\dumps | Out-Null
-          $k = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\AgentRedactor.exe"
-          New-Item -Path $k -Force | Out-Null
-          Set-ItemProperty -Path $k -Name DumpFolder -Value "C:\dumps"
-          Set-ItemProperty -Path $k -Name DumpCount -Value 5
-          Set-ItemProperty -Path $k -Name DumpType -Value 1
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install test dependencies
-        shell: pwsh
-        run: pip install -r repo/tests/requirements.txt
-
-      # The OOBE nag can respawn mid-run and steal the foreground (keystrokes
-      # for the app's password dialog then land in the nag). Kill its hosting
-      # processes on a loop for the duration of the test run; the FlaUI helper
-      # also dismisses leftover windows on demand.
-      - name: Run GUI tests
-        shell: pwsh
-        run: |
-          $watchdog = Start-Process -PassThru -WindowStyle Hidden powershell -ArgumentList '-NoProfile','-Command',
-            'while ($true) { Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ''CloudExperienceHost|UserOOBEBroker'' } | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2 }'
-          try {
-            cd repo/tests
-            pytest -v gui/
-          } finally {
-            Stop-Process -Id $watchdog.Id -Force -ErrorAction SilentlyContinue
-          }
-
-      - name: Show crash event-log entries
-        if: always()
-        shell: pwsh
-        run: |
-          foreach ($provider in @('Application Error', 'Windows Error Reporting')) {
-            Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName=$provider} -MaxEvents 50 -ErrorAction SilentlyContinue |
-              Where-Object { $_.Message -match 'AgentRedactor' } |
-              ForEach-Object { $_.TimeCreated; $_.Message; '---' }
-          }
-          Get-ChildItem C:\dumps -ErrorAction SilentlyContinue | Format-List Name, Length, LastWriteTime
-
-      - name: Upload crash dumps
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: arm64-crash-dumps
-          path: C:\dumps
-          if-no-files-found: ignore
-          retention-days: 7
+  gui-tests-arm64:
+    needs: resolve-msix-run
+    uses: ./.github/workflows/tests-gui.yml
+    with:
+      arch: arm64
+      artifact: AgentRedactor-release-bin-arm64
+      run-id: ${{ needs.resolve-msix-run.outputs.run_id }}
 
   gui-tests:
     runs-on: [self-hosted, windows]

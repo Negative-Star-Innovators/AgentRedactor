@@ -173,7 +173,9 @@ jobs:
 
       # Fresh-install E2E: silent-install THIS build's Setup.exe, verify the
       # installed layout/version/architecture, and run the headless migration
-      # hook on the installed exe. Uninstalls again afterwards.
+      # hook on the installed exe. Then (MODEL_SMOKE) launch it and assert the
+      # first-run model download really starts fetching from R2. Uninstalls
+      # again afterwards.
       - name: Fresh-install E2E (this build)
         shell: pwsh
         env:
@@ -181,6 +183,7 @@ jobs:
           AGENTREDACTOR_SETUP: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}/AgentRedactor-${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}-Setup.exe
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
           AGENTREDACTOR_EXPECT_MACHINE: ${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
+          AGENTREDACTOR_MODEL_SMOKE: "1"
         run: python -m pytest repo/tests/migration/test_selfrelease_install.py -v
 
       # Grab the previous LIVE release's Setup.exe from R2 for the upgrade
@@ -246,6 +249,43 @@ jobs:
           path: repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
           retention-days: 30
 
+      # Upload the unpackaged SelfRelease build so the reusable GUI-test jobs
+      # below can test it without recompiling. Skipped on PRs, where those
+      # jobs don't run. models/, obj/ and the .pdb are excluded, mirroring
+      # the release-bin artifacts in build-msix.yml.
+      - name: Upload SelfRelease binaries artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch == 'x64' && 'AgentRedactor-selfrelease-bin' || 'AgentRedactor-selfrelease-bin-arm64' }}
+          path: |
+            repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release
+            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/models
+            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/obj
+            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/*.pdb
+          compression-level: 0
+          retention-days: 7
+
+  # FlaUI GUI tests against the SelfRelease binaries (reusable workflow shared
+  # with tests.yml). These gate the publish, so they only run where a publish
+  # is possible — tag pushes and dispatches. PR dry-runs skip them to stay
+  # fast (run the Tests workflow manually for GUI signal on a PR).
+  gui-tests-x64:
+    needs: build
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/tests-gui.yml
+    with:
+      arch: x64
+      artifact: AgentRedactor-selfrelease-bin
+
+  gui-tests-arm64:
+    needs: build
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/tests-gui.yml
+    with:
+      arch: arm64
+      artifact: AgentRedactor-selfrelease-bin-arm64
+
   # Publish is deliberately OUT of the matrix: both arch legs must pass first,
   # then ONE job uploads both channels to R2 (bucket agentredactor-releases,
   # key prefix <channel>/). R2 is the ONLY update source — the api worker
@@ -253,7 +293,7 @@ jobs:
   # vpk upload s3 defaults to path-style URLs, which R2 expects; --region
   # auto is the conventional value for R2's S3-compatible endpoint.
   publish:
-    needs: build
+    needs: [build, gui-tests-x64, gui-tests-arm64]
     runs-on: windows-latest
     # Tag pushes always publish; manual dispatches only when publish is checked.
     if: github.event_name == 'push' || inputs.publish
@@ -387,5 +427,8 @@ jobs:
           Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           $updateExe = "$env:LOCALAPPDATA\AgentRedactor\Update.exe"
           if (Test-Path $updateExe) {
-            & $updateExe uninstall | Out-Host
+            # Best-effort: the uninstaller can hang without an interactive
+            # console — cap it at 60s so cleanup never stalls the job.
+            $p = Start-Process -FilePath $updateExe -ArgumentList 'uninstall' -PassThru -WindowStyle Hidden
+            if (-not $p.WaitForExit(60000)) { $p.Kill() }
           }

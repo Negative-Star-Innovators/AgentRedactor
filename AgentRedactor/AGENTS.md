@@ -96,13 +96,16 @@ Key pieces of the self-release channel:
   fails to initialize right after a successful download.
 - To cut a self-release: bump `version.txt`, tag `v<version>`, push — the
   `release-selfrelease.yml` workflow builds and packs both arches, then gates
-  the R2 publish on the settings-migration tests, the fresh-install E2E and
-  the previous-live-release upgrade E2E (`tests/migration/`, per channel; the
-  upgrade E2E skips with a warning when the channel has no live release yet or
-  the live version is not older). After publishing, a `verify-live` job runs
-  the public `install.ps1` one-liner on fresh x64/ARM64 runners as a canary.
-  The workflow also runs on PRs as a dry-run (no publish). Local loop:
-  `.\build-selfrelease.ps1` then install `build\velopack\*-Setup.exe`.
+  the R2 publish on the settings-migration tests, the fresh-install E2E
+  (incl. a first-run model-download smoke test), the previous-live-release
+  upgrade E2E (`tests/migration/`, per channel; skips with a warning when the
+  channel has no live release yet), and the FlaUI GUI suite on both arches
+  (`tests-gui.yml`, shared with `tests.yml`). After publishing, a
+  `verify-live` job runs the public `install.ps1` one-liner on fresh
+  x64/ARM64 runners as a canary. The workflow also runs on PRs as a dry-run
+  (no publish, no GUI suite — the build is stamped live+1 patch so the
+  upgrade E2E still runs). Local loop: `.\build-selfrelease.ps1` then install
+  `build\velopack\*-Setup.exe`.
 
 ## Common Files to Know
 

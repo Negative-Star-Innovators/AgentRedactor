@@ -13,6 +13,11 @@ Optional:
                                 (e.g. "1.1.0"); skipped when unset
   AGENTREDACTOR_EXPECT_MACHINE  expected PE machine type: 'AMD64' or 'ARM64';
                                 skipped when unset
+  AGENTREDACTOR_MODEL_SMOKE=1   after install verification, launch the app and
+                                assert the first-run model download actually
+                                starts fetching from R2 (partial files appear
+                                and grow under the install root), then kill it.
+                                Does NOT wait for the full 1.6 GB download.
   AGENTREDACTOR_KEEP_INSTALL=1  do not uninstall afterwards
 
 See tests/migration/README.md for the full contract and CI wiring.
@@ -48,6 +53,8 @@ pytestmark = [
 INSTALL_DIR_NAME = "AgentRedactor"
 
 SETUP_TIMEOUT_S = 300
+MODEL_SMOKE_TIMEOUT_S = 180  # first-run dialog + segmented download start
+MODEL_SMOKE_POLL_S = 5
 
 # PE header machine types (IMAGE_FILE_MACHINE_*).
 MACHINE_NAMES = {0x014C: "I386", 0x8664: "AMD64", 0xAA64: "ARM64"}
@@ -166,13 +173,65 @@ def test_selfrelease_fresh_install(tmp_path):
             f"selftest failed on fresh install: {result.stdout} {result.stderr}"
         )
         assert "SETTINGS_MIGRATION_OK" in result.stdout
+
+        # 6. Optional: first-run model-download smoke test. The self-release
+        #    package ships without the 1.6 GB weights and downloads them from
+        #    R2 on first run (to <install root>\models\*.partial / *.partN).
+        #    Launch the app, assert partial files appear AND grow (i.e. the
+        #    segmented downloader is really fetching, not erroring out), then
+        #    kill it — no need to pull the whole file in CI.
+        if os.environ.get("AGENTREDACTOR_MODEL_SMOKE") == "1":
+            models_dir = install_root / "models"
+            app = subprocess.Popen([str(current_exe)])
+            try:
+                deadline = time.monotonic() + MODEL_SMOKE_TIMEOUT_S
+                grown = False
+                last_sizes: dict[str, int] = {}
+                while time.monotonic() < deadline and not grown:
+                    time.sleep(MODEL_SMOKE_POLL_S)
+                    partials = [
+                        p
+                        for pattern in ("*.partial", "*.part*", "*.onnx_data")
+                        for p in models_dir.rglob(pattern)
+                    ] if models_dir.is_dir() else []
+                    sizes = {str(p): p.stat().st_size for p in partials if p.is_file()}
+                    # Progress = any tracked file grew since last poll, or a
+                    # new non-empty partial appeared.
+                    for name, size in sizes.items():
+                        if size > last_sizes.get(name, -1):
+                            grown = True
+                            break
+                    last_sizes = sizes
+                if not grown:
+                    listing = (
+                        "\n".join(str(p) for p in models_dir.rglob("*"))
+                        if models_dir.is_dir()
+                        else f"{models_dir} does not exist"
+                    )
+                    pytest.fail(
+                        f"model download did not start within {MODEL_SMOKE_TIMEOUT_S}s "
+                        f"(no growing .partial/.partN files under {models_dir}).\n{listing}"
+                    )
+            finally:
+                _kill_install_processes(install_root)
+                if app.poll() is None:
+                    app.kill()
     finally:
         _kill_install_processes(install_root)
         if os.environ.get("AGENTREDACTOR_KEEP_INSTALL") != "1" and update_exe.is_file():
             # Velopack's own uninstaller (same path scripts/remove-agentredactor-full.ps1
-            # uses); best-effort, the install root may linger if a file is locked.
-            subprocess.run(
-                [str(update_exe), "uninstall"],
-                capture_output=True,
-                timeout=SETUP_TIMEOUT_S,
-            )
+            # uses), but strictly best-effort: on CI it can hang (no console
+            # session for its UI/IPC), and the runner is ephemeral anyway —
+            # cleanup must never fail or stall the test.
+            try:
+                proc = subprocess.Popen(
+                    [str(update_exe), "uninstall"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                proc.wait(timeout=60)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+            except OSError:
+                pass
+            _kill_install_processes(install_root)

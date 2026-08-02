@@ -130,7 +130,8 @@ jobs:
       # so Add-AppxPackage accepts it.
       - name: Self-sign MSIX
         shell: pwsh
-        run: repo/scripts/sign-agentredactor-msix.ps1 -MsixPath "msix/AgentRedactor-${{ matrix.arch }}.msix" -TrustCert
+        run: |
+          & repo/scripts/sign-agentredactor-msix.ps1 -MsixPath "msix/AgentRedactor-${{ matrix.arch }}.msix" -TrustCert
 
       - name: Install MSIX and verify registration
         shell: pwsh

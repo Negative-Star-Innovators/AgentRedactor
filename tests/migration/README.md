@@ -53,7 +53,12 @@ The fresh-install E2E for the self-release channel:
    the latter guards against packing the wrong arch into a channel.
 4. Runs `--selftest-migrate-settings` on the *installed* exe against an
    isolated config dir.
-5. Uninstalls again (`Update.exe uninstall`) unless
+5. With `AGENTREDACTOR_MODEL_SMOKE=1` (set in CI): launches the installed app
+   and asserts the first-run model download really starts fetching from R2 —
+   `.partial`/`.partN` files must appear and grow under
+   `<install root>\models\` within 3 minutes. The app is then killed; the
+   full 1.6 GB download is NOT completed in CI.
+6. Uninstalls again (`Update.exe uninstall`) unless
    `AGENTREDACTOR_KEEP_INSTALL=1`.
 
 It is **opt-in** and skipped unless `AGENTREDACTOR_INSTALL_TEST=1`:
@@ -136,14 +141,17 @@ current-schema fixture which is also compared byte-for-byte.
   (dry-run unless `publish` is checked) and PRs (dry-run). Per arch, the
   `build` job runs `test_settings_migration.py` against the just-built
   self-release exe, then the fresh-install E2E (`test_selfrelease_install.py`
-  on this build's Setup.exe), then the upgrade E2E — the previous Setup.exe
-  comes from the **live R2 channel** (`/updates/<channel>/*-Setup.exe`), not
-  from GitHub releases. All of these gate `vpk upload`; a failed E2E blocks
-  the publish. The upgrade E2E skips with a warning when the channel has no
-  live release yet. On PRs the build is stamped one patch above the live
-  version (synthetic, never published) so the upgrade E2E runs there too;
-  when version.txt in the PR is already ahead of live, that version is used
-  as-is.
+  on this build's Setup.exe, including the first-run model-download smoke
+  test), then the upgrade E2E — the previous Setup.exe comes from the
+  **live R2 channel** (`/updates/<channel>/*-Setup.exe`), not from GitHub
+  releases. On tag pushes and dispatches, the FlaUI GUI suite
+  (`tests-gui.yml`, shared with `tests.yml`) also runs against the
+  SelfRelease binaries on both arches. ALL of these gate `vpk upload`; a
+  failed test blocks the publish. The upgrade E2E skips with a warning when
+  the channel has no live release yet. On PRs the build is stamped one patch
+  above the live version (synthetic, never published) so the upgrade E2E runs
+  there too; when version.txt in the PR is already ahead of live, that
+  version is used as-is.
 - After a real publish, the `verify-live` job runs the public one-line
   installer (`irm .../install.ps1 | iex`) on fresh x64 and ARM64 runners and
   asserts the installed app matches the live feed. On PRs it runs against the
