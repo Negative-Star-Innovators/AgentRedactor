@@ -336,16 +336,30 @@ jobs:
         shell: pwsh
         run: dotnet tool install -g vpk
 
+      # vpk's error for empty credentials is cryptic; check up front.
+      - name: Check R2 secrets are configured
+        shell: pwsh
+        run: |
+          $missing = @()
+          if ('${{ secrets.R2_ACCOUNT_ID }}' -eq '') { $missing += 'R2_ACCOUNT_ID' }
+          if ('${{ secrets.R2_ACCESS_KEY_ID }}' -eq '') { $missing += 'R2_ACCESS_KEY_ID' }
+          if ('${{ secrets.R2_SECRET_ACCESS_KEY }}' -eq '') { $missing += 'R2_SECRET_ACCESS_KEY' }
+          if ($missing) {
+            throw ("Missing repo secrets: $($missing -join ', '). Create them under Settings -> Secrets and variables -> Actions " +
+              "(Cloudflare dashboard -> R2 -> Manage API tokens; account ID is on the R2 overview page).")
+          }
+
       # Publishes the win-channel assets (releases.win.json + nupkg/Setup.exe)
-      # to R2 so installed x64 instances can auto-update.
+      # to R2 so installed x64 instances can auto-update. NOTE: vpk rejects
+      # --region together with --endpoint (custom S3 endpoint implies it).
       - name: Publish x64 channel to R2
         shell: pwsh
-        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --region auto --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} --prefix win --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-x64"
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} --prefix win --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-x64"
 
       # Same for the win-arm64 channel (prefix win-arm64/).
       - name: Publish ARM64 channel to R2
         shell: pwsh
-        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --region auto --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} -c win-arm64 --prefix win-arm64 --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-arm64"
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} -c win-arm64 --prefix win-arm64 --outputDir "velopack/AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-arm64"
 
       # vpk uploads everything in the output dir, including files no client
       # ever downloads (the Portable.zip, the legacy Squirrel RELEASES file
