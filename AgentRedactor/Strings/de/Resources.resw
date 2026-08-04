@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Ausführliche Protokollierung aktiviert. Protokolle können sensible Daten einschließlich Originalanfragen enthalten.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Updates werden über den Microsoft Store verwaltet.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Suche nach Updates...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Sie sind auf dem neuesten Stand.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Ein Update wurde heruntergeladen und ist bereit zur Installation.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Es konnte nicht nach Updates gesucht werden. Versuchen Sie es später erneut.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Update bereit zur Installation</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} wurde heruntergeladen. Starten Sie jetzt neu, um das Update anzuwenden.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Jetzt neu starten</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Später</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>KI-Modell wird heruntergeladen</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Das Herunterladen des Modells ist fehlgeschlagen. Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut. Die PII-Erkennung ist erst verfügbar, wenn der Download abgeschlossen ist.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Erneut versuchen</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Hauptpasswort erforderlich</value>
   </data>

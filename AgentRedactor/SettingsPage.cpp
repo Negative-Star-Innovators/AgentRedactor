@@ -6,6 +6,7 @@
 #include "settings_manager.h"
 #include "constants.h"
 #include "localization.h"
+#include "update_manager.h"
 
 using namespace winrt;
 using namespace Microsoft::UI::Xaml;
@@ -66,6 +67,18 @@ namespace winrt::AgentRedactor::implementation
         ToggleEnableLogging().Header(winrt::box_value(::AgentRedactor::LocString(L"SettingsPage_EnableLogging_Header/Header")));
         ToggleShowSensitive().Header(winrt::box_value(::AgentRedactor::LocString(L"SettingsPage_SensitiveInfo_Header/Header")));
         BtnSave().Content(winrt::box_value(::AgentRedactor::LocString(L"SettingsPage_SaveButton/Content")));
+
+        // Updates section: live only in the self-release channel; the Store
+        // build hides the button and points at the Microsoft Store instead.
+        UpdatesHeader().Text(::AgentRedactor::LocString(L"SettingsPage_Updates_Header").c_str());
+        UpdatesVersionText().Text(::AgentRedactor::LocFormat(L"SettingsPage_Updates_CurrentVersion", { ::AgentRedactor::APP_VERSION }).c_str());
+        BtnCheckUpdates().Content(winrt::box_value(::AgentRedactor::LocString(L"SettingsPage_Updates_CheckButton")));
+        if (::AgentRedactor::UpdateManager::IsSelfReleaseBuild()) {
+            BtnCheckUpdates().Visibility(Visibility::Visible);
+        } else {
+            BtnCheckUpdates().Visibility(Visibility::Collapsed);
+            UpdatesStatusText().Text(::AgentRedactor::LocString(L"SettingsPage_Updates_StoreManaged").c_str());
+        }
     }
 
     void SettingsPage::OnNavigatedTo(Microsoft::UI::Xaml::Navigation::NavigationEventArgs const&)
@@ -199,5 +212,32 @@ namespace winrt::AgentRedactor::implementation
             dialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
             dialog.ShowAsync();
         }
+    }
+
+    void SettingsPage::CheckUpdates_Click(IInspectable const&, RoutedEventArgs const&)
+    {
+        if (!::AgentRedactor::UpdateManager::IsSelfReleaseBuild()) return;
+        BtnCheckUpdates().IsEnabled(false);
+        UpdatesStatusText().Text(::AgentRedactor::LocString(L"SettingsPage_Updates_Checking").c_str());
+
+        // Completion is delivered on the UI thread by the update manager.
+        auto weak = get_weak();
+        ::AgentRedactor::UpdateManager::CheckNowInteractive(
+            [weak](::AgentRedactor::UpdateManager::CheckResult result) {
+                auto self = weak.get();
+                if (!self) return;
+                self->BtnCheckUpdates().IsEnabled(true);
+                switch (result) {
+                case ::AgentRedactor::UpdateManager::CheckResult::UpdateReady:
+                    self->UpdatesStatusText().Text(::AgentRedactor::LocString(L"SettingsPage_Updates_UpdateReady").c_str());
+                    break;
+                case ::AgentRedactor::UpdateManager::CheckResult::UpToDate:
+                    self->UpdatesStatusText().Text(::AgentRedactor::LocString(L"SettingsPage_Updates_UpToDate").c_str());
+                    break;
+                default:
+                    self->UpdatesStatusText().Text(::AgentRedactor::LocString(L"SettingsPage_Updates_Error").c_str());
+                    break;
+                }
+            });
     }
 }

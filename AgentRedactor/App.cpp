@@ -3,11 +3,13 @@
 #include "MainWindow.h"
 #include "AppState.h"
 #include "localization.h"
+#include "settings_manager.h"
 #include "utils.h"
 #include "constants.h"
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <Microsoft.UI.Xaml.Window.h>
+#include <cstdio>
 #include <fstream>
 #include <filesystem>
 #include <cwchar>
@@ -54,9 +56,17 @@ namespace winrt::AgentRedactor::implementation
         // earlier in AppState::Initialize.
         ::AgentRedactor::InitializeLocalization();
 
+        // When the blocking first-run model download is pending the window
+        // must appear even for a --tray-only launch: the modal download dialog
+        // hosts on it and the app cannot serve traffic until it completes.
+        bool modelDownloadBlocking = false;
+        if (auto appState = ::AgentRedactor::AppState::Instance()) {
+            modelDownloadBlocking = appState->IsModelDownloadRequired();
+        }
+
         window = make<MainWindow>();
         DbgLog(L"App: MainWindow created");
-        if (!trayOnly) {
+        if (!trayOnly || modelDownloadBlocking) {
             window.Activate();
             DbgLog(L"App: window activated");
         }
@@ -83,9 +93,37 @@ LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS)
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
+int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
 {
     SetUnhandledExceptionFilter(MyExceptionFilter);
+
+    // Headless test hook (both channels): load + migrate + save the settings
+    // for the resolved config dir (AGENTREDACTOR_CONFIG_DIR honored), print a
+    // machine-readable result, and exit. Deliberately runs before ANY other
+    // init — no logging, no mutex, no WinUI/apartment — so pytest can drive
+    // settings-migration tests without a GUI session.
+    if (lpCmdLine && wcsstr(lpCmdLine, L"--selftest-migrate-settings") != nullptr) {
+        try {
+            ::AgentRedactor::SettingsManager settings({});
+            printf("SETTINGS_MIGRATION_OK\n");
+            return 0;
+        } catch (const std::exception& e) {
+            printf("SETTINGS_MIGRATION_FAIL %s\n", e.what());
+            return 1;
+        } catch (...) {
+            printf("SETTINGS_MIGRATION_FAIL unknown error\n");
+            return 1;
+        }
+    }
+
+#ifdef AGENTREDACTOR_SELFRELEASE
+    // Velopack invokes the app with --veloapp-* lifecycle arguments (install,
+    // updated, obsolete, uninstall hooks); exit immediately so the installer
+    // is never blocked by the single-instance mutex or the UI.
+    if (lpCmdLine && wcsstr(lpCmdLine, L"--veloapp-") != nullptr) {
+        return 0;
+    }
+#endif
 
     {
         wchar_t path[MAX_PATH];

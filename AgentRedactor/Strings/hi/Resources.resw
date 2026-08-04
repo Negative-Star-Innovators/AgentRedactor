@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>विस्तृत लॉगिंग सक्षम है। लॉग में संवेदनशील डेटा शामिल हो सकता है, जिसमें मूल अनुरोध बॉडी भी शामिल है।</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>अपडेट</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>संस्करण {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>अपडेट जांचें</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>अपडेट Microsoft Store द्वारा प्रबंधित किए जाते हैं।</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>अपडेट जांचे जा रहे हैं...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>आपके पास नवीनतम संस्करण है।</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>एक अपडेट डाउनलोड हो गया है और इंस्टॉल करने के लिए तैयार है।</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>अपडेट जांचे नहीं जा सके। बाद में पुनः प्रयास करें।</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>अपडेट इंस्टॉल करने के लिए तैयार</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} डाउनलोड हो गया है। अपडेट लागू करने के लिए अभी पुनरारंभ करें।</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>अभी पुनरारंभ करें</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>बाद में</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI मॉडल डाउनलोड हो रहा है</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>मॉडल डाउनलोड विफल रहा। अपना इंटरनेट कनेक्शन जांचें, फिर पुनः प्रयास करें। डाउनलोड पूरा होने तक PII पहचान उपलब्ध नहीं है।</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>पुनः प्रयास करें</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>मास्टर पासवर्ड आवश्यक</value>
   </data>

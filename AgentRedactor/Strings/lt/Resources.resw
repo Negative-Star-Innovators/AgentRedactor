@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Išsami registracija įjungta. Žurnaluose gali būti jautrių duomenų, įskaitant pradines užklausų įstaigas.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Naujinimai</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versija {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Tikrinti naujinimus</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Naujinimus valdo Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Tikrinami naujinimai...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Turite naujausią versiją.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Naujinys atsisiųstas ir paruoštas diegti.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Nepavyko patikrinti naujinimų. Bandykite dar kartą vėliau.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Naujinys paruoštas diegti</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} atsisiųstas. Paleiskite iš naujo dabar, kad pritaikytumėte naujinį.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Paleisti iš naujo dabar</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Vėliau</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Atsisiunčiamas AI modelis</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Nepavyko atsisiųsti modelio. Patikrinkite interneto ryšį ir bandykite dar kartą. PII aptikimas nepasiekiamas, kol atsisiuntimas nebus baigtas.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Bandyti dar kartą</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Reikalingas pagrindinis slaptažodis</value>
   </data>

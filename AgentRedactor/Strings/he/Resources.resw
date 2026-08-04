@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>רישום מפורט מופעל. יומנים עשויים להכיל נתונים רגישים, כולל גופי בקשות מקוריים.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>עדכונים</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>גרסה {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>בדוק עדכונים</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>העדכונים מנוהלים על ידי Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>מחפש עדכונים...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>יש לך את הגרסה העדכנית.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>עדכון הורד ומוכן להתקנה.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>לא ניתן היה לבדוק עדכונים. נסה שוב מאוחר יותר.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>עדכון מוכן להתקנה</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} הורד. הפעל מחדש כעת כדי להחיל את העדכון.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>הפעל מחדש כעת</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>מאוחר יותר</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>מוריד מודל AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>הורדת המודל נכשלה. בדוק את חיבור האינטרנט ונסה שוב. זיהוי PII אינו זמין עד שההורדה תושלם.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>נסה שוב</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>נדרשת סיסמת מנהל</value>
   </data>

@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Pengelogan bertele-tele didayakan. Log mungkin mengandungi data sensitif termasuk badan permintaan asal.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Kemas Kini</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versi {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Semak kemas kini</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Kemas kini diuruskan oleh Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Menyemak kemas kini...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Anda menggunakan versi terkini.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Kemas kini telah dimuat turun dan sedia untuk dipasang.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Tidak dapat menyemak kemas kini. Cuba lagi kemudian.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Kemas kini sedia untuk dipasang</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} telah dimuat turun. Mulakan semula sekarang untuk menggunakan kemas kini.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Mulakan semula sekarang</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Kemudian</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Memuat turun model AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Muat turun model gagal. Semak sambungan internet anda, kemudian cuba lagi. Pengesanan PII tidak tersedia sehingga muat turun selesai.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Cuba lagi</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Kata Laluan Induk Diperlukan</value>
   </data>

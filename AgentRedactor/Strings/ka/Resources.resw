@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>დეტალური ჟურნალირება ჩართულია. ჟურნალებს შეიძლება შეიცავდნენ მგრძნობიარე მონაცემებს, მათ შორის ორიგინალ მოთხოვნების სხეულებს.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>განახლებები</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>ვერსია {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>განახლებების შემოწმება</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>განახლებებს მართავს Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>განახლებების შემოწმება...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>თქვენ გაქვთ უახლესი ვერსია.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>განახლება ჩამოტვირთულია და მზადაა დასაყენებლად.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>განახლებების შემოწმება ვერ მოხერხდა. სცადეთ მოგვიანებით.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>განახლება მზადაა დასაყენებლად</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} ჩამოტვირთულია. გადატვირთეთ ახლა განახლების გამოსაყენებლად.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>გადატვირთვა ახლა</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>მოგვიანებით</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI მოდელის ჩამოტვირთვა</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>მოდელის ჩამოტვირთვა ვერ მოხერხდა. შეამოწმეთ ინტერნეტ კავშირი და სცადეთ ხელახლა. PII-ის ამოცნობა მიუწვდომელია ჩამოტვირთვის დასრულებამდე.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>ხელახლა ცდა</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>საჭიროა მთავარი პაროლი</value>
   </data>

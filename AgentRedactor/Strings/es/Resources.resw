@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Registro detallado habilitado. Los registros pueden contener datos sensibles, incluidos los cuerpos de solicitud originales.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Actualizaciones</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versión {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Buscar actualizaciones</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Las actualizaciones las gestiona Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Buscando actualizaciones...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Está al día.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Se ha descargado una actualización y está lista para instalarse.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>No se pudieron buscar actualizaciones. Inténtelo de nuevo más tarde.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Actualización lista para instalarse</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Se ha descargado Agent Redactor {0}. Reinicie ahora para aplicar la actualización.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Reiniciar ahora</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Más tarde</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Descargando modelo de IA</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Error al descargar el modelo. Compruebe su conexión a Internet e inténtelo de nuevo. La detección de PII no estará disponible hasta que finalice la descarga.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Contraseña maestra requerida</value>
   </data>

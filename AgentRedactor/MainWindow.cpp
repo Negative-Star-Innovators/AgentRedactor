@@ -4,6 +4,7 @@
 #include "AppState.h"
 #include "localization.h"
 #include "logging.h"
+#include "update_manager.h"
 #include "HomePage.h"
 #include "SettingsPage.h"
 #include "RegexPage.h"
@@ -14,6 +15,7 @@
 #include <Microsoft.UI.Xaml.Window.h>
 #include <dwmapi.h>
 #include <commctrl.h>
+#include <algorithm>
 
 using namespace winrt;
 using namespace Microsoft::UI::Xaml;
@@ -105,10 +107,205 @@ namespace winrt::AgentRedactor::implementation
         msg.Foreground(SolidColorBrush(fg));
         dialog.Content(msg);
 
-        auto result = co_await dialog.ShowAsync();
+        auto result = ContentDialogResult::None;
+        try {
+            result = co_await dialog.ShowAsync();
+        } catch (...) {
+            // Another ContentDialog (e.g. the blocking first-run download
+            // dialog) is open; WinUI allows only one at a time. Never let the
+            // failure escape into the XAML framework.
+            co_return;
+        }
         if (result == ContentDialogResult::Primary) {
             lifetime->allowClose_ = true;
             lifetime->Close();
+        }
+    }
+
+    // Shows / updates / dismisses the blocking first-run model-download dialog
+    // from the current AppState download status. Runs on the UI thread. While
+    // AppState reports the download as required the app is blocked (no proxy
+    // servers), so the dialog is modal and cannot be dismissed: it closes only
+    // after the download and detector initialization succeed.
+    //
+    // Safety rules (violating these crashed self-release builds with a stowed
+    // 0xc000027b inside Microsoft.UI.Xaml.dll):
+    //  - NO ProgressBar in the dialog content: instantiating one inside this
+    //    ContentDialog fail-fasted XAML during open (combase 0x800F1000 "no
+    //    installed components") on Windows 11 24H2 + WindowsAppSDK 1.6
+    //    self-contained. Progress is reported as text instead.
+    //  - ShowAsync is called exactly once per dialog instance and is always
+    //    awaited inside a try/catch; failures are logged, never thrown into
+    //    the XAML framework.
+    //  - Never two ContentDialogs at once: the update-manager prompt is
+    //    deferred while this dialog exists, and this dialog is only (re)built
+    //    after the previous instance fully closed.
+    //  - Nothing here runs inside the window's Activated callback directly;
+    //    callers post onto the dispatcher (Low priority) so activation and
+    //    the first frame complete before any dialog work.
+    void MainWindow::UpdateModelDownloadDialog()
+    {
+        try {
+            auto app = ::AgentRedactor::AppState::Instance();
+            if (!app) return;
+
+            bool required = app->IsModelDownloadRequired();
+            bool inProgress = app->IsModelDownloadInProgress();
+            bool failed = app->HasModelDownloadFailed();
+
+            if (!required && !inProgress && !failed) {
+                // Download finished (or was never needed): close the dialog.
+                // The member references are dropped and any deferred update
+                // prompt is run from the ShowModelDownloadDialogAsync
+                // continuation once the dialog is fully closed.
+                if (modelDialog_) {
+                    try { modelDialog_.Hide(); } catch (...) {}
+                } else {
+                    RunPendingUpdateUiAction();
+                }
+                return;
+            }
+
+            // A ContentDialog needs the XamlRoot of a visible window; status
+            // changes, the Activated handler and this retry timer re-trigger
+            // this once it is shown.
+            if (!hwnd_ || !IsWindowVisible(hwnd_)) {
+                ScheduleModelDialogRetry();
+                return;
+            }
+
+            if (!modelDialog_) {
+                auto xamlRoot = Content().XamlRoot();
+                if (!xamlRoot) {
+                    LOG_LIFECYCLE(L"[MainWindow] Model download dialog: XamlRoot not ready; retrying shortly");
+                    ScheduleModelDialogRetry();
+                    return;
+                }
+                // Text-only content on purpose: a ProgressBar inside this
+                // ContentDialog deterministically crashed the self-release
+                // build with a stowed 0xc000027b (combase 0x800F1000) on
+                // Windows 11 24H2 + WindowsAppSDK 1.6 self-contained. The
+                // status text carries "x MB / y GB (z%)" instead.
+                Controls::TextBlock statusText;
+                statusText.TextWrapping(TextWrapping::WrapWholeWords);
+
+                Controls::ContentDialog dialog;
+                dialog.XamlRoot(xamlRoot);
+                dialog.Title(box_value(::AgentRedactor::LocString(L"ModelDownload_Title")));
+                dialog.Content(statusText);
+                dialog.PrimaryButtonText(::AgentRedactor::LocString(L"ModelDownload_RetryButton"));
+                // No close button on purpose: the app is blocked until the model
+                // exists, so the dialog must not be dismissible. Retry (primary)
+                // is enabled only after a failure.
+                dialog.DefaultButton(Controls::ContentDialogButton::Primary);
+                dialog.PrimaryButtonClick([](auto&&, auto&&) {
+                    if (auto appState = ::AgentRedactor::AppState::Instance()) {
+                        appState->RetryModelDownload();
+                    }
+                });
+
+                modelDialog_ = dialog;
+                modelStatusText_ = statusText;
+                modelDialogShowing_ = true;
+                LOG_LIFECYCLE(L"[MainWindow] Model download dialog: calling ShowAsync");
+                ShowModelDownloadDialogAsync(dialog);
+            }
+
+            if (inProgress) {
+                int percent = app->ModelDownloadPercent();
+                modelDialog_.IsPrimaryButtonEnabled(false);
+                std::wstring status = app->ModelDownloadStatus();
+                if (percent >= 0) {
+                    status += L" (" + std::to_wstring(std::clamp(percent, 0, 100)) + L"%)";
+                }
+                modelStatusText_.Text(status);
+            } else if (failed) {
+                modelDialog_.IsPrimaryButtonEnabled(true);
+                modelStatusText_.Text(::AgentRedactor::LocString(L"ModelDownload_Failed"));
+            } else {
+                // Required but not started yet (dialog just appeared): kick off the
+                // download so the user immediately sees progress.
+                modelDialog_.IsPrimaryButtonEnabled(false);
+                LOG_LIFECYCLE(L"[MainWindow] Model download dialog shown; starting download");
+                app->StartModelDownloadIfNeeded();
+            }
+        } catch (const winrt::hresult_error& e) {
+            LOGF_LIFECYCLE(L"[MainWindow] UpdateModelDownloadDialog failed: %s (0x%08X)",
+                e.message().c_str(), static_cast<unsigned int>(e.code().value));
+        } catch (...) {
+            LOG_LIFECYCLE(L"[MainWindow] UpdateModelDownloadDialog failed with an unknown error");
+        }
+    }
+
+    // Awaits the one and only ShowAsync call of a model-download dialog
+    // instance. A failure (e.g. another ContentDialog managed to open first,
+    // or the window was not ready) is caught and logged here instead of
+    // escaping into the XAML framework. Once the dialog closes — normally or
+    // after a failed show — the member references are dropped so a later
+    // status update can cleanly re-create it.
+    winrt::fire_and_forget MainWindow::ShowModelDownloadDialogAsync(Controls::ContentDialog dialog)
+    {
+        auto lifetime = get_strong();
+        bool shown = true;
+        try {
+            co_await dialog.ShowAsync();
+            LOG_LIFECYCLE(L"[MainWindow] Model download dialog: ShowAsync completed (dialog closed)");
+        } catch (const winrt::hresult_error& e) {
+            shown = false;
+            LOGF_LIFECYCLE(L"[MainWindow] Model download dialog failed to show: %s (0x%08X)",
+                e.message().c_str(), static_cast<unsigned int>(e.code().value));
+        } catch (...) {
+            shown = false;
+            LOG_LIFECYCLE(L"[MainWindow] Model download dialog failed to show (unknown error)");
+        }
+
+        lifetime->modelDialogShowing_ = false;
+        if (lifetime->modelDialog_ &&
+            winrt::get_abi(lifetime->modelDialog_) == winrt::get_abi(dialog)) {
+            lifetime->modelDialog_ = nullptr;
+            lifetime->modelStatusText_ = nullptr;
+        }
+        if (!shown) {
+            // Re-evaluate shortly: either the state changed (dialog no longer
+            // needed) or the retry timer re-shows it once the UI is ready.
+            lifetime->ScheduleModelDialogRetry();
+        } else {
+            lifetime->RunPendingUpdateUiAction();
+        }
+    }
+
+    // Re-runs UpdateModelDownloadDialog once, shortly, on the UI thread. Used
+    // when the dialog could not be shown yet (window not visible / not ready)
+    // so the blocking first-run download does not wait for the next user
+    // action (the Activated event is not guaranteed to fire again).
+    void MainWindow::ScheduleModelDialogRetry()
+    {
+        if (!modelDialogRetryTimer_) {
+            modelDialogRetryTimer_ = DispatcherQueue().CreateTimer();
+            modelDialogRetryTimer_.Interval(std::chrono::milliseconds(500));
+            modelDialogRetryTimer_.IsRepeating(false);
+            modelDialogRetryTimer_.Tick([this](auto&&, auto&&) {
+                UpdateModelDownloadDialog();
+            });
+        }
+        if (!modelDialogRetryTimer_.IsRunning()) {
+            modelDialogRetryTimer_.Start();
+        }
+    }
+
+    // Runs the deferred update-manager prompt (if any) now that the blocking
+    // model-download dialog is gone; keeps the one-ContentDialog-at-a-time
+    // rule intact.
+    void MainWindow::RunPendingUpdateUiAction()
+    {
+        if (!pendingUpdateUiAction_) return;
+        if (!hwnd_ || !IsWindowVisible(hwnd_)) return;
+        auto action = std::move(pendingUpdateUiAction_);
+        pendingUpdateUiAction_ = nullptr;
+        try {
+            action(Content().XamlRoot());
+        } catch (...) {
+            LOG_LIFECYCLE(L"[MainWindow] Deferred update prompt failed");
         }
     }
 
@@ -251,7 +448,46 @@ namespace winrt::AgentRedactor::implementation
                     this->ReloadLocalization();
                 });
             });
+            app->SetOnModelDownloadStatus([this]() {
+                this->DispatcherQueue().TryEnqueue([this]() {
+                    this->UpdateModelDownloadDialog();
+                });
+            });
+
+            // Self-release channel only (no-ops in the Store/MSIX build): give
+            // the update manager a way to show dialogs on the UI thread, then
+            // kick the startup check + download.
+            ::AgentRedactor::UpdateManager::SetUiDispatch(
+                [weak = get_weak()](::AgentRedactor::UpdateManager::UiAction action) {
+                    if (auto self = weak.get()) {
+                        self->DispatcherQueue().TryEnqueue([self, action = std::move(action)]() mutable {
+                            if (!self->hwnd_ || !IsWindowVisible(self->hwnd_)) return;
+                            // Never stack the update prompt on top of the
+                            // blocking first-run download dialog (WinUI allows
+                            // only one ContentDialog at a time): defer it until
+                            // that dialog has fully closed.
+                            if (self->modelDialog_ || self->modelDialogShowing_) {
+                                self->pendingUpdateUiAction_ = std::move(action);
+                                return;
+                            }
+                            action(self->Content().XamlRoot());
+                        });
+                    }
+                });
+            ::AgentRedactor::UpdateManager::CheckAndDownloadInBackground();
         }
+
+        // Re-evaluate the model-download dialog whenever the window is shown
+        // (a failed download may have completed while hidden in the tray).
+        // Never touch a ContentDialog from inside the Activated callback
+        // itself: post at Low priority so activation and the first frame
+        // complete first (showing a dialog mid-activation is what crashed
+        // self-release builds with a stowed 0xc000027b).
+        Activated([this](auto&&, auto&&) {
+            DispatcherQueue().TryEnqueue(Microsoft::UI::Dispatching::DispatcherQueuePriority::Low, [this]() {
+                UpdateModelDownloadDialog();
+            });
+        });
 
         colorValuesChangedToken_ = uiSettings_.ColorValuesChanged({ this, &MainWindow::OnColorValuesChanged });
 

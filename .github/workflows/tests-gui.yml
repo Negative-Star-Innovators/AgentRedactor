@@ -1,0 +1,191 @@
+name: GUI Tests (reusable)
+
+# Reusable FlaUI GUI-test job, called by:
+#   - tests.yml               (manual dispatch; tests the Store-channel
+#                              AgentRedactor-release-bin[-arm64] artifact from
+#                              the latest Build MSIX run on the branch)
+#   - release-selfrelease.yml (tag pushes / publish dispatches only; tests the
+#                              SelfRelease-channel binaries from the same run,
+#                              gating the R2 publish)
+#
+# Inputs select the architecture, which binaries artifact to test, and where
+# to fetch it from (run-id empty = current workflow run).
+
+on:
+  workflow_call:
+    inputs:
+      arch:
+        description: 'x64 or arm64'
+        required: true
+        type: string
+      artifact:
+        description: 'Name of the Release-binaries artifact to test'
+        required: true
+        type: string
+      run-id:
+        description: 'Workflow run to download the artifact from; empty = current run'
+        required: false
+        type: string
+        default: ''
+      run-migration:
+        description: 'Also run the headless settings-migration tests against the binaries'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  gui:
+    runs-on: ${{ inputs.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
+    timeout-minutes: 60
+    env:
+      RELEASE_DIR: repo/AgentRedactor/build/${{ inputs.arch == 'x64' && 'x64' || 'ARM64' }}/Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Download prebuilt AgentRedactor binaries (current run)
+        if: inputs.run-id == ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          path: ${{ env.RELEASE_DIR }}
+
+      - name: Download prebuilt AgentRedactor binaries (from run ${{ inputs.run-id }})
+        if: inputs.run-id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.run-id }}
+          path: ${{ env.RELEASE_DIR }}
+
+      # The ONNX weights are ~1.6 GB; cache them across runs. Bump v1 to
+      # invalidate. Restored cache makes the download step below a no-op.
+      # Arch-neutral file, shared between both legs.
+      - name: Cache ONNX model weights
+        uses: actions/cache@v4
+        with:
+          path: repo/AgentRedactor/models/onnx
+          key: onnx-models-v1
+
+      - name: Download ONNX model weights
+        shell: pwsh
+        run: |
+          if (-not (Test-Path repo/AgentRedactor/models/onnx/model_quantized.onnx_data)) {
+            curl.exe -L --fail -o repo/AgentRedactor/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
+          }
+
+      # The binaries artifact excludes models/; copy the cached model in.
+      - name: Restore ONNX model into build output
+        shell: pwsh
+        run: |
+          robocopy repo/AgentRedactor/models ${{ env.RELEASE_DIR }}/models /E /NFL /NDL /NJH /NJS | Out-Null
+          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
+          exit 0
+
+      - name: Build FlaUI helper
+        shell: pwsh
+        run: repo/tests/gui/windows/build.ps1
+
+      # --- ARM64-runner mitigations (Windows 11 client image quirks) --------
+
+      # The Windows 11 client image shows a modal Windows Firewall prompt the
+      # first time the app binds its proxy port, stealing foreground for the
+      # whole run. Loopback is what the tests use, so disable the firewall.
+      - name: Disable Windows Firewall prompts (arm64)
+        if: inputs.arch == 'arm64'
+        shell: pwsh
+        run: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+      # The Windows 11 client image periodically shows the SCOOBE "Microsoft
+      # account / privacy settings" fullscreen nag, which takes the foreground
+      # and blocks the app's XAML dialogs from rendering.
+      - name: Dismiss OOBE nag screens (arm64)
+        if: inputs.arch == 'arm64'
+        shell: pwsh
+        run: |
+          New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Force | Out-Null
+          Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name ScoobeSystemSettingEnabled -Value 0
+          New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Force | Out-Null
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Name DisablePrivacyExperience -Value 1
+          Get-Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match 'CloudExperienceHost|UserOOBEBroker' } |
+            Stop-Process -Force -ErrorAction SilentlyContinue
+
+      # Capture Windows Error Reporting mini-dumps in case the app still dies.
+      - name: Enable crash dump collection (arm64)
+        if: inputs.arch == 'arm64'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path C:\dumps | Out-Null
+          $k = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\AgentRedactor.exe"
+          New-Item -Path $k -Force | Out-Null
+          Set-ItemProperty -Path $k -Name DumpFolder -Value "C:\dumps"
+          Set-ItemProperty -Path $k -Name DumpCount -Value 5
+          Set-ItemProperty -Path $k -Name DumpType -Value 1
+
+      # -----------------------------------------------------------------------
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        shell: pwsh
+        run: pip install -r repo/tests/requirements.txt
+
+      # Headless settings-migration tests (--selftest-migrate-settings needs
+      # no GUI session). Optional: the release pipeline runs these in its own
+      # build job already; tests.yml enables them for the Store binaries.
+      - name: Run settings migration tests
+        if: inputs.run-migration
+        shell: pwsh
+        env:
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/${{ env.RELEASE_DIR }}/AgentRedactor.exe
+        run: |
+          cd repo/tests
+          pytest -v migration/test_settings_migration.py
+
+      # On arm64 the OOBE nag can respawn mid-run and steal the foreground
+      # (keystrokes for the app's password dialog then land in the nag), so a
+      # watchdog kills its hosting processes on a loop for the test run. On
+      # x64 the Server image doesn't need it.
+      - name: Run GUI tests
+        shell: pwsh
+        run: |
+          if ('${{ inputs.arch }}' -eq 'arm64') {
+            $watchdog = Start-Process -PassThru -WindowStyle Hidden powershell -ArgumentList '-NoProfile','-Command',
+              'while ($true) { Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ''CloudExperienceHost|UserOOBEBroker'' } | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2 }'
+            try {
+              cd repo/tests
+              pytest -v gui/
+            } finally {
+              Stop-Process -Id $watchdog.Id -Force -ErrorAction SilentlyContinue
+            }
+          } else {
+            cd repo/tests
+            pytest -v gui/
+          }
+
+      - name: Show crash event-log entries (arm64)
+        if: always() && inputs.arch == 'arm64'
+        shell: pwsh
+        run: |
+          foreach ($provider in @('Application Error', 'Windows Error Reporting')) {
+            Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName=$provider} -MaxEvents 50 -ErrorAction SilentlyContinue |
+              Where-Object { $_.Message -match 'AgentRedactor' } |
+              ForEach-Object { $_.TimeCreated; $_.Message; '---' }
+          }
+          Get-ChildItem C:\dumps -ErrorAction SilentlyContinue | Format-List Name, Length, LastWriteTime
+
+      - name: Upload crash dumps (arm64)
+        if: always() && inputs.arch == 'arm64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: arm64-crash-dumps
+          path: C:\dumps
+          if-no-files-found: ignore
+          retention-days: 7

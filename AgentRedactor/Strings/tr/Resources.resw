@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Ayrıntılı günlük etkin. Günlükler, orijinal istek gövdeleri dahil olmak üzere hassas veriler içerebilir.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Güncelleştirmeler</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Sürüm {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Güncelleştirmeleri denetle</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Güncelleştirmeler Microsoft Store tarafından yönetilir.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Güncelleştirmeler denetleniyor...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Güncel durumdasınız.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Bir güncelleştirme indirildi ve yüklenmeye hazır.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Güncelleştirmeler denetlenemedi. Daha sonra yeniden deneyin.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Güncelleştirme yüklenmeye hazır</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} indirildi. Güncelleştirmeyi uygulamak için şimdi yeniden başlatın.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Şimdi yeniden başlat</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Daha sonra</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI modeli indiriliyor</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Model indirilemedi. İnternet bağlantınızı kontrol edip yeniden deneyin. İndirme tamamlanana kadar PII algılama kullanılamaz.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Yeniden dene</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Ana Parola Gerekli</value>
   </data>

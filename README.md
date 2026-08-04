@@ -9,21 +9,39 @@ and un-redacting the responses coming back.
 - Local HTTP proxy with on-device ONNX NER model — no cloud calls for detection
 - Custom keyword and regex redaction rules on top of model-based PII detection
 - Localized UI in 53 languages
-- Distributed via the Microsoft Store (MSIX)
+- Distributed two ways: the Microsoft Store (MSIX) and a self-release channel
+  (Velopack, with built-in auto-updates)
+
+## Install
+
+**Microsoft Store** (x64 and ARM64; updates via the Store):
+<https://apps.microsoft.com/detail/9pn44k2tm2g3>
+
+**Self-release** (x64 and ARM64; updates itself via Velopack). Run in PowerShell:
+
+```powershell
+iex "& { $(irm https://api.agentredactor.negativestarinnovators.com/install.ps1) }"
+```
+
+The installer picks the native build for your architecture (falling back to the
+x64 build on ARM64 if no native package is published yet) and installs per-user
+under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
+Windows SmartScreen may warn on first run.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
 | `AgentRedactor/` | The WinUI 3 app (C++), build scripts, models, resources |
-| `tests/` | GUI end-to-end tests (FlaUI + pytest + mock LLM) |
+| `cloudflare/` | The Cloudflare worker + R2 behind the self-release channel (`/install.ps1`, `/updates`, `/models`) |
+| `tests/` | GUI end-to-end tests (FlaUI + pytest + mock LLM) and self-release install/upgrade E2E |
 | `third_party_tests/` | Integration tests driving real third-party agent CLIs through the proxy |
 | `scripts/` | PowerShell helpers that configure third-party clients for the integration tests |
-| `.github/workflows/` | CI: MSIX build and tests |
+| `.github/workflows/` | CI: MSIX build + package tests, self-release (Velopack) build/test/publish, worker deploy |
 
 ## Prerequisites
 
-- Windows 10/11 x64
+- Windows 10/11, x64 or ARM64
 - Visual Studio 2022 (or Build Tools) with the *Desktop development with C++* workload
 - Windows 10/11 SDK (10.0.19041.0 or newer)
 - [vcpkg](https://github.com/microsoft/vcpkg) cloned **as a sibling folder** of this
@@ -63,6 +81,17 @@ since the bundle exceeds GitHub's 2 GB release-asset limit.)
 The MSIX packages are unsigned; the Microsoft Store signs them on submission. To install
 locally you must sign with your own certificate first.
 
+Self-release (Velopack) build producing the installer, feed and full package under
+`AgentRedactor\build\velopack\` (pass `-Platform ARM64` for the ARM64 channel):
+
+```powershell
+cd AgentRedactor
+.\build-selfrelease.ps1 -Version 1.1.1
+```
+
+Releases are published by pushing a `v*` tag — the Self-Release workflow builds,
+tests and uploads both channels to R2 (see `cloudflare/README.md`).
+
 ## Tests
 
 See `tests/README.md` and `third_party_tests/README.md`. In short:
@@ -74,8 +103,10 @@ pytest -v gui/
 ```
 
 The tests drive the real application UI (FlaUI) and therefore require an
-interactive Windows desktop session — they run on a self-hosted runner, not on
-GitHub-hosted runners. Third-party integration tests additionally need an
+interactive Windows desktop session — in CI they run on GitHub-hosted runners
+(`windows-latest` and `windows-11-arm`, which provide one) via the
+workflow-dispatch **Tests** workflow, or locally on any Windows desktop.
+Third-party integration tests additionally need an
 OpenRouter API key (copy `third_party_tests\.env.example` to `.env`).
 
 ## License

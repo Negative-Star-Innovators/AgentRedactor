@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>A részletes naplózás engedélyezve van. A naplók érzékeny adatokat tartalmazhatnak, beleértve az eredeti kérések törzsét is.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Frissítések</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Verzió {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Frissítések keresése</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>A frissítéseket a Microsoft Store kezeli.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Frissítések keresése...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Az alkalmazás naprakész.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Egy frissítés letöltődött, és készen áll a telepítésre.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Nem sikerült frissítéseket keresni. Próbálja újra később.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Frissítés készen áll a telepítésre</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Az Agent Redactor {0} letöltődött. Indítsa újra most a frissítés alkalmazásához.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Újraindítás most</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Később</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>AI-modell letöltése</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>A modell letöltése nem sikerült. Ellenőrizze az internetkapcsolatot, majd próbálja újra. A PII-észlelés nem érhető el a letöltés befejezéséig.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Újra</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Mesterjelszó szükséges</value>
   </data>

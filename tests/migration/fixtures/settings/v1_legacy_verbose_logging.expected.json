@@ -1,0 +1,7 @@
+{
+  "settings_version": 2,
+  "start_on_boot": true,
+  "logging_enabled": true,
+  "app_language": "de",
+  "onnx_provider": "cpu"
+}

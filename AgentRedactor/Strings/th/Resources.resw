@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>เปิดใช้งานการบันทึกแบบละเอียดแล้ว บันทึกอาจมีข้อมูลที่ละเอียดอ่อน รวมถึงเนื้อหาคำขอดั้งเดิม</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>การอัปเดต</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>เวอร์ชัน {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>ตรวจสอบการอัปเดต</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>การอัปเดตได้รับการจัดการโดย Microsoft Store</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>กำลังตรวจสอบการอัปเดต...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>คุณใช้เวอร์ชันล่าสุดอยู่แล้ว</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>ดาวน์โหลดการอัปเดตแล้วและพร้อมติดตั้ง</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>ไม่สามารถตรวจสอบการอัปเดตได้ ลองอีกครั้งในภายหลัง</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>การอัปเดตพร้อมติดตั้ง</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>ดาวน์โหลด Agent Redactor {0} แล้ว รีสตาร์ทตอนนี้เพื่อใช้การอัปเดต</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>รีสตาร์ทตอนนี้</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>ภายหลัง</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>กำลังดาวน์โหลดโมเดล AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>การดาวน์โหลดโมเดลล้มเหลว ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ แล้วลองอีกครั้ง การตรวจจับ PII จะไม่พร้อมใช้งานจนกว่าการดาวน์โหลดจะเสร็จสมบูรณ์</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>ลองอีกครั้ง</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>ต้องการรหัสผ่านหลัก</value>
   </data>

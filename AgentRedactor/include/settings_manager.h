@@ -63,6 +63,7 @@ private:
 
     void EncryptSensitiveFields();
     void DecryptSensitiveFields();
+    void BackupCorruptSettingsFile();
 };
 
 } // namespace AgentRedactor

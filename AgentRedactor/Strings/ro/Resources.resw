@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Jurnalizarea detaliată este activată. Jurnalele pot conține date sensibile, inclusiv corpuri originale ale cererilor.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Actualizări</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versiunea {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Verificare actualizări</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Actualizările sunt gestionate de Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Se caută actualizări...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Aveți cea mai recentă versiune.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>O actualizare a fost descărcată și este gata de instalare.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Nu s-au putut verifica actualizările. Încercați din nou mai târziu.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Actualizare gata de instalare</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} a fost descărcat. Reporniți acum pentru a aplica actualizarea.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Repornire acum</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Mai târziu</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Se descarcă modelul AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Descărcarea modelului a eșuat. Verificați conexiunea la internet, apoi reîncercați. Detectarea PII nu este disponibilă până la finalizarea descărcării.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Reîncercare</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Parola principală este necesară</value>
   </data>

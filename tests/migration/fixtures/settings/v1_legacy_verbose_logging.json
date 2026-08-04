@@ -1,0 +1,6 @@
+{
+  "start_on_boot": true,
+  "verbose_logging": true,
+  "app_language": "de",
+  "onnx_provider": "cpu"
+}

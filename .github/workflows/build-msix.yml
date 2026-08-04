@@ -6,6 +6,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Rapid pushes to the same PR/branch cancel the superseded build — only the
+# latest commit's artifacts matter (the Tests workflow consumes them).
+concurrency:
+  group: build-msix-${{ github.ref }}
+  cancel-in-progress: true
+
 # Needed to publish the MSIX bundle to the rolling "latest" release.
 permissions:
   contents: write
@@ -43,17 +49,24 @@ jobs:
       - name: Install vcpkg dependencies (first run per arch is slow, then cached)
         shell: pwsh
         run: |
-          vcpkg\bootstrap-vcpkg.bat -disableMetrics
-          vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
+          # The bootstrap download of vcpkg.exe itself occasionally times out
+          # on the hosted runners (seen on windows-11-arm) — retry a few times.
+          foreach ($attempt in 1..3) {
+            vcpkg\bootstrap-vcpkg.bat -disableMetrics
+            if ($LASTEXITCODE -eq 0) {
+              vcpkg\vcpkg install onnxruntime:${{ matrix.arch }}-windows nlohmann-json:${{ matrix.arch }}-windows wil:${{ matrix.arch }}-windows
+              if ($LASTEXITCODE -eq 0) { break }
+            }
+            Write-Host "vcpkg attempt $attempt failed (exit $LASTEXITCODE); retrying..."
+            Start-Sleep -Seconds 15
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'vcpkg bootstrap/install failed after 3 attempts' }
 
-      # The 1.6 GB model weights are not in the repo; they are a release asset
-      # (see README). Skipped automatically on forks/PRs without access.
+      # The 1.6 GB model weights are not in the repo; they are served from the
+      # Cloudflare R2 bucket via the api worker (see cloudflare/README.md).
       - name: Download ONNX model weights
         shell: pwsh
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
+        run: curl.exe -L --fail -o repo/AgentRedactor/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
 
       - name: Build MSIX (build.ps1)
         shell: pwsh
@@ -73,7 +86,6 @@ jobs:
       # intermediates) and the .pdb are excluded. The x64 artifact keeps the
       # original AgentRedactor-release-bin name for compatibility.
       - name: Upload Release binaries artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.arch == 'x64' && 'AgentRedactor-release-bin' || 'AgentRedactor-release-bin-arm64' }}
@@ -85,8 +97,166 @@ jobs:
           compression-level: 0
           retention-days: 7
 
-  release:
+  # Smoke-test the packaged MSIX itself: self-sign it (the runner is
+  # ephemeral, so a throwaway cert + TrustedPeople import is fine), install,
+  # verify registration, launch, and uninstall. This catches manifest, asset,
+  # publisher and capability regressions that the loose-binary GUI tests in
+  # tests.yml structurally cannot see (installing the MSIX virtualizes
+  # AppData, which is why those tests avoid it — here that doesn't matter,
+  # we only assert install/register/launch).
+  test-msix:
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
+    timeout-minutes: 20
+    steps:
+      # scripts/sign-agentredactor-msix.ps1 reads the Publisher from
+      # AgentRedactor/Package.appxmanifest relative to the script, so the
+      # checkout layout must keep scripts/ and AgentRedactor/ siblings.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Download MSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AgentRedactor-msix-${{ matrix.arch }}
+          path: msix
+
+      # Allow sideloading of trusted apps (default on Win11 client, not
+      # necessarily on the Server image).
+      - name: Enable sideloading
+        shell: pwsh
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Force | Out-Null
+          Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Name AllowAllTrustedApps -Value 1
+
+      # Same Windows 11 client-image quirks as the GUI tests (tests-gui.yml):
+      # a modal firewall prompt the first time the app binds its proxy port,
+      # and the SCOOBE nag, can both block the packaged app's first launch.
+      - name: Disable Windows Firewall prompts (arm64)
+        if: matrix.arch == 'arm64'
+        shell: pwsh
+        run: Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+      - name: Dismiss OOBE nag screens (arm64)
+        if: matrix.arch == 'arm64'
+        shell: pwsh
+        run: |
+          New-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Force | Out-Null
+          Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name ScoobeSystemSettingEnabled -Value 0
+          New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Force | Out-Null
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE" -Name DisablePrivacyExperience -Value 1
+          Get-Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match 'CloudExperienceHost|UserOOBEBroker' } |
+            Stop-Process -Force -ErrorAction SilentlyContinue
+
+      # Creates a throwaway self-signed cert matching the manifest Publisher,
+      # signs the MSIX, and trusts the cert (LocalMachine\TrustedPeople+Root)
+      # so Add-AppxPackage accepts it.
+      - name: Self-sign MSIX
+        shell: pwsh
+        run: |
+          & repo/scripts/sign-agentredactor-msix.ps1 -MsixPath "msix/AgentRedactor-${{ matrix.arch }}.msix" -TrustCert
+
+      - name: Install MSIX and verify registration
+        shell: pwsh
+        run: |
+          Add-AppxPackage -Path "msix/AgentRedactor-${{ matrix.arch }}.msix" -ErrorAction Stop
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*'
+          if (-not $pkg) { throw 'Package not registered after Add-AppxPackage' }
+          Write-Host "Registered: $($pkg.PackageFullName) ($($pkg.Architecture))"
+          $expectedArch = if ('${{ matrix.arch }}' -eq 'x64') { 'X64' } else { 'Arm64' }
+          if ($pkg.Architecture -ne $expectedArch) { throw "Package architecture $($pkg.Architecture) != $expectedArch" }
+
+      - name: Launch packaged app and verify process
+        shell: pwsh
+        run: |
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*'
+          $appId = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Id
+          $aumid = "$($pkg.PackageFamilyName)!$appId"
+          Write-Host "Activating $aumid"
+
+          # Activate via IApplicationActivationManager instead of
+          # `explorer.exe shell:AppsFolder...` — explorer silently swallows
+          # activation failures (no process, no error), while this surfaces
+          # the real HRESULT and the launched PID.
+          Add-Type -TypeDefinition @'
+          using System;
+          using System.Runtime.InteropServices;
+          public static class PackagedAppLauncher {
+              [ComImport, Guid("2e941141-7f97-4756-ba1d-9decde894a3d"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+              private interface IApplicationActivationManager {
+                  int ActivateApplication([MarshalAs(UnmanagedType.LPWStr)] string appUserModelId, [MarshalAs(UnmanagedType.LPWStr)] string arguments, int options, out uint processId);
+              }
+              [ComImport, Guid("45BA127D-10A8-46EA-8AB7-56EA9078943C")]
+              private class ApplicationActivationManager {}
+              public static uint Launch(string aumid) {
+                  var mgr = (IApplicationActivationManager)new ApplicationActivationManager();
+                  uint pid;
+                  int hr = mgr.ActivateApplication(aumid, null, 0, out pid);
+                  if (hr != 0) Marshal.ThrowExceptionForHR(hr);
+                  return pid;
+              }
+          }
+          '@
+          $launchedPid = [PackagedAppLauncher]::Launch($aumid)
+          Write-Host "Activation returned PID $launchedPid; waiting for the process..."
+          $deadline = (Get-Date).AddSeconds(180)
+          $proc = $null
+          while ((Get-Date) -lt $deadline -and -not $proc) {
+            Start-Sleep -Seconds 3
+            $proc = Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue
+          }
+          if (-not $proc) { throw "Packaged app did not start within 180s (activation PID was $launchedPid)" }
+          Write-Host "Packaged app is running (PID $($proc[0].Id)); stopping it."
+          $proc | Stop-Process -Force -ErrorAction SilentlyContinue
+
+      # If the launch above failed, the reason is usually in the Application
+      # event log (crash, activation error) or the app's own log inside the
+      # package state dir (LocalCache is the virtualized AppData).
+      - name: Dump diagnostics on failure
+        if: failure()
+        shell: pwsh
+        run: |
+          foreach ($provider in @('Application Error', 'Windows Error Reporting')) {
+            Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName=$provider} -MaxEvents 20 -ErrorAction SilentlyContinue |
+              ForEach-Object { $_.TimeCreated; $_.Message; '---' }
+          }
+          Get-WinEvent -LogName 'Microsoft-Windows-AppXDeploymentServer/Operational' -MaxEvents 20 -ErrorAction SilentlyContinue |
+            Where-Object { $_.LevelDisplayName -in @('Error', 'Warning') } |
+            ForEach-Object { $_.TimeCreated; $_.Message; '---' }
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*' -ErrorAction SilentlyContinue
+          if ($pkg) {
+            $pkg | Format-List Name, PackageFullName, Status, InstallLocation
+            foreach ($root in @(
+              (Join-Path $env:LOCALAPPDATA "Packages\$($pkg.PackageFamilyName)\LocalCache"),
+              (Join-Path $env:APPDATA 'AgentRedactor'))) {
+              Get-ChildItem $root -Recurse -Filter '*.log' -ErrorAction SilentlyContinue | ForEach-Object {
+                Write-Host "== $($_.FullName) =="
+                Get-Content $_.FullName -Tail 80 -ErrorAction SilentlyContinue
+              }
+            }
+          }
+
+      - name: Uninstall and verify removal
+        if: always()
+        shell: pwsh
+        run: |
+          Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          $pkg = Get-AppxPackage -Name '*AgentRedactor*'
+          if ($pkg) {
+            $pkg | Remove-AppxPackage -ErrorAction Stop
+            if (Get-AppxPackage -Name '*AgentRedactor*') { throw 'Package still present after Remove-AppxPackage' }
+            Write-Host 'Package uninstalled cleanly.'
+          }
+
+  release:
+    needs: [build, test-msix]
     runs-on: windows-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:

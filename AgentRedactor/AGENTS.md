@@ -8,7 +8,9 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 - `src/` / `include/` — Core C++ sources (proxy, PII detector, settings, tray icon, etc.).
 - `HomePage.xaml` / `MainWindow.xaml` — WinUI 3 UI.
 - `buildquick.ps1` — Fast local build (EXE + copy models/resources).
-- `build.ps1` — Full release build (MSI + MSIX packaging; much slower).
+- `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
+- `build-selfrelease.ps1` — Self-release wrapper: reads `version.txt`, calls `build.ps1 -SelfRelease`, then runs `vpk pack`.
+- `version.txt` — Single version source of truth for the self-release channel (stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION` for C++ and as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the VERSIONINFO resource).
 
 ## Quick Build (for testing)
 
@@ -48,6 +50,63 @@ The script also:
 
 This script downloads NuGet and WiX v3.14 if they are not present, so the first run may take a while.
 
+## Release Channels
+
+The app ships through two channels from the same codebase:
+
+- **Microsoft Store (MSIX)** — `.\build.ps1`. The full ~1.6 GB model weights are
+  packed inside the MSIX. Contains **zero** update code (Store policy).
+- **Self-release (Velopack)** — `.\build-selfrelease.ps1 [-Platform x64|ARM64]`.
+  Compiles with `AGENTREDACTOR_SELFRELEASE` (via `-p:SelfRelease=true
+  -p:AppVersion=<version.txt>`), excludes `*.onnx_data` from the model copy
+  (weights download on first run to `%LOCALAPPDATA%\AgentRedactor\models`),
+  skips MSIX packing, and runs `vpk pack` into `build\velopack\` (x64,
+  channel `win`) or `build\velopack-arm64\` (ARM64, channel `win-arm64`).
+
+Key pieces of the self-release channel:
+
+- `version.txt` is the version source of truth; it becomes `AR_VERSION_STRING`
+  → `APP_VERSION` (`include/constants.h`) and the `vpk pack` version. For the
+  exe's VERSIONINFO resource, the vcxproj passes `ResourceCompile` a separate
+  quote-free define set (`AR_VERSION_TEXT` + `AR_VERSION_QUAD`, stringized in
+  `resources/app.rc`) because embedded quotes do not survive the MSBuild →
+  rc.exe command line (the quoted value silently compiled in empty and the exe
+  read as 0.0.0.0). Keep `app.rc` to a SINGLE StringFileInfo block: version.dll
+  (GetFileVersionInfo) rejects VERSIONINFO resources larger than 32 KB — the
+  old fully-localized 53-block resource exceeded that and read as 0.0.0.0.
+- `src/update_manager.cpp` (all inside `#ifdef AGENTREDACTOR_SELFRELEASE`):
+  polls `releases.<channel>.json` from the arch-aware update feed
+  (`https://api.agentredactor.negativestarinnovators.com/updates/win` on x64,
+  `.../updates/win-arm64` on ARM64, selected via `_M_ARM64`),
+  downloads newer full packages, and applies them via the bundled
+  `Update.exe apply --package <nupkg> --waitPid <pid>` after a restart prompt.
+  `App.cpp` exits immediately on `--veloapp-*` lifecycle args.
+- `src/model_downloader.cpp` (both channels): first-run download of
+  `model_quantized.onnx_data` exclusively from the Cloudflare R2 endpoint
+  (`https://api.agentredactor.negativestarinnovators.com/models/...`; R2 is
+  the single host for model downloads — no fallback). The download is parallel
+  segmented + resumable (`Utils::HttpDownloadFileSegmented`, 8 ranges to
+  `.partN` files, falling back to a resumable single stream); interrupted
+  downloads keep `.partial`/`.partN` files so a retry resumes. Weights are
+  only accepted at exactly `kWeightsExpectedBytes` — a wrong-sized file is
+  deleted and re-downloaded (self-heal for old corrupt installs). Only fires
+  when the weights are missing. `AppState` resolves the model dir via
+  `ModelDownloader::ResolveModelDir()` (exe-dir first, fallback second), and
+  deletes fallback-dir weights (never MSIX exe-dir weights) when the detector
+  fails to initialize right after a successful download.
+- To cut a self-release: bump `version.txt`, tag `v<version>`, push — the
+  `release-selfrelease.yml` workflow builds and packs both arches, then gates
+  the R2 publish on the settings-migration tests, the fresh-install E2E
+  (incl. a first-run model-download smoke test), the previous-live-release
+  upgrade E2E (`tests/migration/`, per channel; skips with a warning when the
+  channel has no live release yet), and the FlaUI GUI suite on both arches
+  (`tests-gui.yml`, shared with `tests.yml`). After publishing, a
+  `verify-live` job runs the public `install.ps1` one-liner on fresh
+  x64/ARM64 runners as a canary. The workflow also runs on PRs as a dry-run
+  (no publish, no GUI suite — the build is stamped live+1 patch so the
+  upgrade E2E still runs). Local loop: `.\build-selfrelease.ps1` then install
+  `build\velopack\*-Setup.exe`.
+
 ## Common Files to Know
 
 | Area | Key files |
@@ -57,7 +116,26 @@ This script downloads NuGet and WiX v3.14 if they are not present, so the first 
 | Home page UI layout | `HomePage.xaml`, `HomePage.cpp` |
 | Settings / start-on-boot | `SettingsPage.xaml`, `SettingsPage.cpp`, `AppState.cpp` |
 | Proxy engine | `src/proxy_engine.cpp`, `src/http_server.cpp` |
-| Settings persistence | `src/settings_manager.cpp` |
+| Settings persistence | `src/settings_manager.cpp`, `src/migrations/settings_migrator.cpp` |
+
+## Changing the settings schema
+
+`settings.json` is versioned via `settings_version` (absent == 1, the original
+unversioned layout). The current version is `SETTINGS_SCHEMA_VERSION` in
+`include/migrations/settings_migrator.h`. To change the schema:
+
+1. Bump `SETTINGS_SCHEMA_VERSION` by one.
+2. Add a `MigrateNToN+1` step to the ordered table in
+   `src/migrations/settings_migrator.cpp` (marked "ADD FUTURE MIGRATIONS
+   HERE"). Never edit or reorder steps that have shipped — older installs
+   replay them verbatim.
+3. Add a fixture under `tests/migration/fixtures/settings/` (a pre-migration
+   `settings.json` plus its expected post-migration form) so the
+   `--selftest-migrate-settings` migration tests cover the new step.
+
+`SettingsManager` runs `SettingsMigrator::MigrateInPlace` right after every
+load and saves when anything changed. On a JSON parse failure the corrupt file
+is first backed up to `<name>.corrupt-<timestamp>.bak` and only then reset.
 
 ## Build Requirements
 

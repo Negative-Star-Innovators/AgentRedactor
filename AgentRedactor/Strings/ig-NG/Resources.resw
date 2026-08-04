@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Verbose logging gbanyere. Logs nwere ike ịnwe data mmetụta, gụnyere original request bodies.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Mmelite</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Ụdị {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Lelee mmelite</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Microsoft Store na-elekọta mmelite.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Na-achọ mmelite...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>I nwere ụdị kacha ọhụrụ.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Ebudatala mmelite ma ọ dị njikere ịwụnye.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Enweghị ike ịlele mmelite. Gbalịa ọzọ mgbe e mesịrị.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Mmelite dị njikere ịwụnye</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>E budatala Agent Redactor {0}. Malitegharịa ugbu a iji tinye mmelite ahụ.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Malitegharịa ugbu a</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Mgbe e mesịrị</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Na-ebudata nlereanya AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Mbudata nlereanya ahụ dara ada. Lelee njikọ ịntanetị gị, wee gbalịa ọzọ. Nchọpụta PII adịghị ruo mgbe mbudata gasịrị.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Gbalịa ọzọ</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>A chọrọ Master Password</value>
   </data>

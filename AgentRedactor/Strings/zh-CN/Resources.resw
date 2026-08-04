@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>详细日志已启用。日志可能包含敏感数据，包括原始请求体。</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>版本 {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>更新由 Microsoft Store 管理。</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>正在检查更新...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>你已是最新版本。</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>更新已下载，可以安装了。</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>无法检查更新。请稍后重试。</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>更新已准备好安装</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} 已下载。立即重启以应用更新。</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>立即重启</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>稍后</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>正在下载 AI 模型</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>模型下载失败。请检查网络连接，然后重试。下载完成前，PII 检测不可用。</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>重试</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>需要主密码</value>
   </data>

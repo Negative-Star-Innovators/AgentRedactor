@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>An kunna shigar da kalmar verbose. Logs na iya ƙunsar mahimman bayanai gami da ƙungiyoyin buƙatun asali.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Sabuntawa</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Sigar {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Duba sabuntawa</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Microsoft Store ne ke sarrafa sabuntawa.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Ana duba sabuntawa...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Kana da sabon sigar.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>An sauke sabuntawa kuma yana shirye don saka shi.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Ba a iya duba sabuntawa ba. Sake gwadawa daga baya.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Sabuntawa yana shirye don saka shi</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>An sauke Agent Redactor {0}. Sake kunnawa yanzu don amfani da sabuntawar.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Sake kunnawa yanzu</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Daga baya</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Ana sauke samfurin AI</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Sauke samfurin ya gaza. Duba haɗin intanet ɗinka, sannan sake gwadawa. Gano PII ba ya samuwa sai an gama saukewa.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Sake gwadawa</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Ana Bukata Babban Kalmar wucewa</value>
   </data>

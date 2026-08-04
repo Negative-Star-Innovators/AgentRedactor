@@ -36,6 +36,22 @@ public:
     void SetOnLogAdded(std::function<void()> cb);
     void SetOnStatsUpdated(std::function<void()> cb);
 
+    // Blocking first-run model download (fires only when the model weights are
+    // missing, e.g. a fresh self-release install; compiled into both channels
+    // but never triggers in MSIX builds, which always ship the weights).
+    // While IsModelDownloadRequired() is true the detector is uninitialized
+    // and the proxy servers are NOT started; MainWindow shows a modal download
+    // dialog and only a successful download + detector init unblocks the app.
+    void StartModelDownloadIfNeeded();
+    void RetryModelDownload();
+    bool IsModelDownloadRequired() const;
+    bool IsModelDownloadInProgress() const;
+    bool HasModelDownloadFailed() const;
+    std::wstring ModelDownloadStatus() const;
+    int ModelDownloadPercent() const; // -1 = indeterminate
+    void SetOnModelDownloadStatus(std::function<void()> cb);
+    void NotifyModelDownloadStatus();
+
     // Called from background threads; posts to message window
     void NotifyLogAdded();
     void NotifyStatsUpdated();
@@ -88,7 +104,15 @@ private:
     std::function<void()> onMainWindowClose_;
     std::function<void()> localizationReloadCallback_;
     bool restarting_ = false;
-    std::mutex callbackMutex_;
+    mutable std::mutex callbackMutex_;
+
+    // First-run model download state (guarded by callbackMutex_)
+    std::function<void()> onModelDownloadStatus_;
+    std::wstring modelDownloadStatus_;
+    int modelDownloadPercent_ = -1;
+    bool modelDownloadRequired_ = false;
+    bool modelDownloadInProgress_ = false;
+    bool modelDownloadFailed_ = false;
 };
 
 } // namespace AgentRedactor

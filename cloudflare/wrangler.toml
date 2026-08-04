@@ -1,0 +1,22 @@
+name = "agentredactor-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Custom domain: attach api.agentredactor.negativestarinnovators.com
+# Requires the negativestarinnovators.com zone to be active on Cloudflare.
+# Uncomment once the zone is onboarded (or attach via dashboard ->
+# Workers -> agentredactor-api -> Settings -> Domains & Routes).
+# routes = [
+#   { pattern = "api.agentredactor.negativestarinnovators.com", custom_domain = true }
+# ]
+
+# R2 bucket holding the AI model weights (see README -> Model hosting (R2)).
+[[r2_buckets]]
+binding = "MODELS_BUCKET"
+bucket_name = "agentredactor-models"
+
+# Velopack update feeds + installers, keyed <channel>/<file> (see README ->
+# Updates hosting (R2)). R2 is the only update source.
+[[r2_buckets]]
+binding = "RELEASES_BUCKET"
+bucket_name = "agentredactor-releases"

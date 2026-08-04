@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Detaljeret logning aktiveret. Logfiler kan indeholde følsomme data, herunder originale anmodningskroppe.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Opdateringer</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Søg efter opdateringer</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Opdateringer administreres af Microsoft Store.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Søger efter opdateringer...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Du er opdateret.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>En opdatering er blevet downloadet og er klar til at blive installeret.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Kunne ikke søge efter opdateringer. Prøv igen senere.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Opdatering klar til installation</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} er blevet downloadet. Genstart nu for at anvende opdateringen.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Genstart nu</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Senere</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Downloader AI-model</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Download af modellen mislykkedes. Kontrollér din internetforbindelse, og prøv igen. PII-registrering er ikke tilgængelig, før downloaden er fuldført.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Prøv igen</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Hovedadgangskode påkrævet</value>
   </data>

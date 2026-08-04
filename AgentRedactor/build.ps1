@@ -1,11 +1,13 @@
 # Agent Redactor Build Script
 # Builds WinUI 3 AgentRedactor and packages as MSIX (Microsoft Store)
+# or, with -SelfRelease, as a Velopack installer (self-release channel).
 
 param(
     [string]$Version = "1.0.0",
     [ValidateSet("x64", "ARM64")]
     [string]$Platform = "x64",
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$SelfRelease
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,6 +16,15 @@ $root = $PSScriptRoot
 $buildDir = "$root\build"
 $outDir = "$buildDir\$Platform\Release"
 $archLower = $Platform.ToLower()
+
+# Self-release builds are versioned from version.txt unless -Version is given
+if ($SelfRelease -and -not $PSBoundParameters.ContainsKey('Version')) {
+    $versionFile = "$root\version.txt"
+    if (Test-Path $versionFile) {
+        $Version = (Get-Content $versionFile -Raw).Trim()
+        Write-Host "Self-release version from version.txt: $Version" -ForegroundColor Cyan
+    }
+}
 
 # Stop any running instance
 $proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
@@ -113,6 +124,13 @@ if ($Clean -and (Test-Path $buildDir)) {
     } catch {
         Write-Warning "Could not fully clean build directory. Continuing anyway..."
     }
+    # The clean wiped build\tools\nuget.exe (our fallback NuGet location)
+    # after it was already resolved above — re-download if it's gone.
+    if (-not (Test-Path $nuget)) {
+        New-Item -ItemType Directory -Force -Path "$root\build\tools" | Out-Null
+        Write-Host "Re-downloading NuGet (clean removed it)..." -ForegroundColor Cyan
+        Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nuget
+    }
 }
 
 # ============================================================================
@@ -129,7 +147,26 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Building AgentRedactor (Release|$Platform)..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-& $msbuild "$root\AgentRedactor.vcxproj" -p:Configuration=Release -p:Platform=$Platform -p:RestorePackages=false
+$msbuildArgs = @(
+    "$root\AgentRedactor.vcxproj",
+    "-p:Configuration=Release",
+    "-p:Platform=$Platform",
+    "-p:RestorePackages=false"
+)
+if ($SelfRelease) {
+    # Stamps AGENTREDACTOR_SELFRELEASE + AR_VERSION_STRING (see vcxproj)
+    $msbuildArgs += "-p:SelfRelease=true"
+    $msbuildArgs += "-p:AppVersion=$Version"
+    # 4-part comma form for the VERSIONINFO resource (AR_VERSION_QUAD); the rc
+    # preprocessor cannot split strings, so the quad is computed here.
+    $versionCore = ($Version -split '[-+]')[0]
+    $appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
+    # Embedded quotes: without them PowerShell's native-argument passing
+    # splits the comma-separated value into separate msbuild arguments
+    # (MSB1006 "Property is not valid").
+    $msbuildArgs += "-p:AppVersionQuad=`"$appVersionQuad`""
+}
+& $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
 # Copy models and resources
@@ -138,7 +175,19 @@ if (Test-Path "$root\models") {
     if (-not (Test-Path "$outDir\models")) {
         New-Item -ItemType Directory -Force -Path "$outDir\models" | Out-Null
     }
-    robocopy "$root\models" "$outDir\models" /E /R:3 /W:1 | Out-Null
+    if ($SelfRelease) {
+        # The 1.6 GB weight file (model_quantized.onnx_data) is NOT shipped in
+        # the self-release installer; the app downloads it on first run from
+        # the Cloudflare R2 endpoint (see src/model_downloader.cpp). The tiny
+        # model graph (.onnx) and the companion files still ship.
+        robocopy "$root\models" "$outDir\models" /E /XF *.onnx_data /R:3 /W:1 | Out-Null
+        # robocopy /E does not purge: remove weight files left behind by
+        # earlier non-SelfRelease (MSIX) builds of the same output folder,
+        # which would otherwise bloat the installer to ~1.8 GB.
+        Remove-Item "$outDir\models\*.onnx_data", "$outDir\models\onnx\*.onnx_data" -Force -ErrorAction SilentlyContinue
+    } else {
+        robocopy "$root\models" "$outDir\models" /E /R:3 /W:1 | Out-Null
+    }
 }
 
 $icoFiles = @("app.ico", "fox_grey.ico", "fox_warning.ico")
@@ -184,8 +233,59 @@ Remove-Item -Path "$outDir\resources.pri.xml" -Force -ErrorAction SilentlyContin
 Remove-Item -Path "$outDir\resources.language-*.pri.xml" -Force -ErrorAction SilentlyContinue
 
 # ============================================================================
-# MSIX
+# MSIX (Store channel only)
 # ============================================================================
+if ($SelfRelease) {
+    # ========================================================================
+    # VELOPACK PACK (self-release channel)
+    # ========================================================================
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "Packing Velopack release v$Version..." -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+
+    # vpk resolution: PATH first, then the dotnet global-tools shim dir.
+    # `dotnet tool install -g vpk` drops vpk.exe in ~/.dotnet/tools, which is
+    # NOT on PATH in shells started before the install — so check the shim
+    # path directly both before installing (a previous shell may have
+    # installed it) and after, instead of relying on PATH alone.
+    $dotnetToolsVpk = "$env:USERPROFILE\.dotnet\tools\vpk.exe"
+    $vpkCmd = Get-Command vpk -ErrorAction SilentlyContinue
+    $vpk = if ($vpkCmd) { $vpkCmd.Source } elseif (Test-Path $dotnetToolsVpk) { $dotnetToolsVpk } else { $null }
+    if (-not $vpk) {
+        Write-Host "vpk (Velopack CLI) not found; installing via dotnet tool..." -ForegroundColor Yellow
+        & dotnet tool install -g vpk
+        if ($LASTEXITCODE -ne 0) { throw "Failed to install vpk (is the .NET SDK installed?)" }
+        $vpkCmd = Get-Command vpk -ErrorAction SilentlyContinue
+        $vpk = if ($vpkCmd) { $vpkCmd.Source } elseif (Test-Path $dotnetToolsVpk) { $dotnetToolsVpk } else { $null }
+        if (-not $vpk) { throw "vpk is still missing after install (expected at $dotnetToolsVpk)" }
+    }
+    Write-Host "Found vpk: $vpk" -ForegroundColor Green
+
+    # Channel/runtime per arch (vpk pack -r/-c, vpk 1.2.0): x64 keeps the
+    # original 'win' channel (feed URLs already deployed), ARM64 gets its own
+    # 'win-arm64' channel. ARM64 packs into a SEPARATE output folder —
+    # two channels in one folder would mix their releases.<channel>.json feeds.
+    $rid = if ($Platform -eq "ARM64") { "win-arm64" } else { "win-x64" }
+    $channel = if ($Platform -eq "ARM64") { "win-arm64" } else { "win" }
+    $velopackOut = if ($Platform -eq "ARM64") { "$buildDir\velopack-arm64" } else { "$buildDir\velopack" }
+    # -s: language-neutral splash shown by Setup.exe during install (fox logo
+    # on dark background, no text — Velopack's own Setup UI text is English).
+    & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
+        -r $rid -c $channel `
+        --packTitle "Agent Redactor" -i "$root\resources\app.ico" `
+        -s "$root\resources\splash.png" -o $velopackOut
+    if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
+
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Green
+    Write-Host "Self-release build complete!" -ForegroundColor Green
+    Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+    Write-Host "Velopack output: $velopackOut" -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Green
+    return
+}
+
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Creating MSIX package..." -ForegroundColor Cyan

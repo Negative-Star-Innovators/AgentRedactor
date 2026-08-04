@@ -375,6 +375,51 @@
   <data name="SettingsPage_VerboseLoggingWarning_Message" xml:space="preserve">
     <value>Tarkka loki käytössä. Lokit voivat sisältää arkaluonteisia tietoja, mukaan lukien alkuperäiset pyyntörungot.</value>
   </data>
+  <data name="SettingsPage_Updates_Header" xml:space="preserve">
+    <value>Päivitykset</value>
+  </data>
+  <data name="SettingsPage_Updates_CurrentVersion" xml:space="preserve">
+    <value>Versio {0}</value>
+  </data>
+  <data name="SettingsPage_Updates_CheckButton" xml:space="preserve">
+    <value>Tarkista päivitykset</value>
+  </data>
+  <data name="SettingsPage_Updates_StoreManaged" xml:space="preserve">
+    <value>Microsoft Store hallinnoi päivityksiä.</value>
+  </data>
+  <data name="SettingsPage_Updates_Checking" xml:space="preserve">
+    <value>Tarkistetaan päivityksiä...</value>
+  </data>
+  <data name="SettingsPage_Updates_UpToDate" xml:space="preserve">
+    <value>Sinulla on uusin versio.</value>
+  </data>
+  <data name="SettingsPage_Updates_UpdateReady" xml:space="preserve">
+    <value>Päivitys on ladattu ja valmis asennettavaksi.</value>
+  </data>
+  <data name="SettingsPage_Updates_Error" xml:space="preserve">
+    <value>Päivityksiä ei voitu tarkistaa. Yritä myöhemmin uudelleen.</value>
+  </data>
+  <data name="UpdateAvailable_Title" xml:space="preserve">
+    <value>Päivitys valmis asennettavaksi</value>
+  </data>
+  <data name="UpdateAvailable_Message" xml:space="preserve">
+    <value>Agent Redactor {0} on ladattu. Käynnistä nyt uudelleen päivityksen käyttöön ottamiseksi.</value>
+  </data>
+  <data name="Dialog_RestartNowButton" xml:space="preserve">
+    <value>Käynnistä uudelleen nyt</value>
+  </data>
+  <data name="Dialog_RestartLaterButton" xml:space="preserve">
+    <value>Myöhemmin</value>
+  </data>
+  <data name="ModelDownload_Title" xml:space="preserve">
+    <value>Ladataan tekoälymallia</value>
+  </data>
+  <data name="ModelDownload_Failed" xml:space="preserve">
+    <value>Mallin lataus epäonnistui. Tarkista internetyhteys ja yritä uudelleen. PII-tunnistus ei ole käytettävissä ennen kuin lataus on valmis.</value>
+  </data>
+  <data name="ModelDownload_RetryButton" xml:space="preserve">
+    <value>Yritä uudelleen</value>
+  </data>
   <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
     <value>Pääsalasana vaaditaan</value>
   </data>
