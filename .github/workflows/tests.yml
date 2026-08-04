@@ -23,6 +23,11 @@ name: Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      run-self-hosted:
+        description: 'Also run on the self-hosted Windows runner (fallback; leave off if none is online)'
+        type: boolean
+        default: false
 
 jobs:
   # Find the Build MSIX run on THIS branch (github.ref_name), so a run
@@ -65,6 +70,10 @@ jobs:
       run-id: ${{ needs.resolve-msix-run.outputs.run_id }}
 
   gui-tests:
+    # Fallback for when the hosted runners prove flaky for this app. Opt-in
+    # via the run-self-hosted dispatch input, otherwise the job queues
+    # forever when no self-hosted runner is online.
+    if: ${{ inputs.run-self-hosted }}
     runs-on: [self-hosted, windows]
     steps:
       - name: Checkout
