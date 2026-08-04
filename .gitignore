@@ -16,3 +16,6 @@ __pycache__/
 # Wrangler local state (Cloudflare account cache, local dev)
 cloudflare/.wrangler/
 cloudflare/.dev.vars
+
+# Store submission content (kept out of the repo)
+AgentRedactor/store-listing/
