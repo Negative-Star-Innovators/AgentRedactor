@@ -40,12 +40,24 @@ constexpr const wchar_t* kUpdateFeedUrl = AR_UPDATE_FEED_HOST L"win";
 #endif
 
 // Test hook (self-release builds only): AGENTREDACTOR_UPDATE_FEED overrides
-// the update feed URL so the upgrade E2E test can point at a local folder
-// feed. Unset in normal use.
+// the update feed URL so the E2E tests can point at a local folder feed.
+// Loopback only: the tests never need anything else, and honoring an
+// arbitrary remote URL would let anyone who can launch the app with a custom
+// environment steer updates to an untrusted server (the feed channel —
+// HTTPS to our own domain — is the whole trust model for unsigned builds).
+// Unset in normal use.
 std::wstring GetUpdateFeedUrl() {
     if (const wchar_t* overrideUrl = _wgetenv(L"AGENTREDACTOR_UPDATE_FEED");
         overrideUrl && *overrideUrl) {
-        return overrideUrl;
+        std::wstring url = overrideUrl;
+        const std::wstring lower = Utils::ToLower(url);
+        if (lower.starts_with(L"http://127.0.0.1") ||
+            lower.starts_with(L"http://localhost")) {
+            return url;
+        }
+        LOGF_LIFECYCLE(
+            L"[UpdateManager] Ignoring AGENTREDACTOR_UPDATE_FEED (loopback URLs only): %s",
+            url.c_str());
     }
     return kUpdateFeedUrl;
 }
