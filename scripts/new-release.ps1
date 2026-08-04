@@ -5,8 +5,9 @@
 .DESCRIPTION
     Bumps AgentRedactor/version.txt to the given version, commits it, creates
     tag v<Version>, and pushes the commit + tag to origin. Pushing the tag
-    triggers the release-selfrelease.yml workflow, which builds and publishes
-    the Velopack update release to GitHub.
+    triggers the release-selfrelease.yml workflow, which builds x64+arm64,
+    runs the full test suite (incl. GUI tests) and publishes both Velopack
+    channels to R2 (served via the Cloudflare worker).
 
     Use -DryRun to see exactly what would happen without changing anything
     (no file edits, no git mutations).
@@ -51,13 +52,15 @@ try {
     }
     Write-Host "On default branch: $defaultBranch"
 
-    # Working tree must be clean so the release commit contains only the bump.
-    $status = git status --porcelain
+    # Working tree must have no tracked modifications so the release commit
+    # contains only the bump. Untracked working files (-uno) are fine — they
+    # can never enter a commit or a push.
+    $status = git status --porcelain -uno
     if ($status) {
-        git status --short | Write-Host
-        Fail "Working tree is not clean. Commit or stash your changes first."
+        git status --short -uno | Write-Host
+        Fail "Working tree has uncommitted changes. Commit or stash them first."
     }
-    Write-Host "Working tree is clean."
+    Write-Host "Working tree is clean (ignoring untracked files)."
 
     # Local branch should not be behind origin, or the push will be rejected.
     git fetch origin $defaultBranch --quiet
@@ -147,8 +150,9 @@ try {
     Write-Host "  git push origin HEAD --tags"
     Write-Host ""
     Write-Host "Pushing tag $tag triggers the 'Self-Release (Velopack)' GitHub Actions"
-    Write-Host "workflow, which builds Release x64 and publishes the Velopack update"
-    Write-Host "release to GitHub. Installed instances will then auto-update to $Version."
+    Write-Host "workflow, which builds x64+arm64, runs the full test suite (incl. GUI"
+    Write-Host "tests), and publishes both channels to R2. Installed instances will"
+    Write-Host "then auto-update to $Version."
 
     if ($DryRun) {
         Write-Host "`nDry run: no changes were made. Re-run without -DryRun to release." -ForegroundColor Yellow
