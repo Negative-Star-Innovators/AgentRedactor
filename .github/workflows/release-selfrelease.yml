@@ -183,9 +183,11 @@ jobs:
 
       # Fresh-install E2E: silent-install THIS build's Setup.exe, verify the
       # installed layout/version/architecture, and run the headless migration
-      # hook on the installed exe. Then (MODEL_SMOKE) launch it and assert the
-      # first-run model download really starts fetching from R2. Uninstalls
-      # again afterwards.
+      # hook on the installed exe. Then (FEED_DIR) run this build's OWN
+      # updater against its own feed — the upgrade E2E only exercises the
+      # previous release's updater — and (MODEL_SMOKE) launch it and assert
+      # the first-run model download really starts fetching from R2.
+      # Uninstalls again afterwards.
       - name: Fresh-install E2E (this build)
         shell: pwsh
         env:
@@ -193,6 +195,8 @@ jobs:
           AGENTREDACTOR_SETUP: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}/AgentRedactor-${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}-Setup.exe
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
           AGENTREDACTOR_EXPECT_MACHINE: ${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
+          AGENTREDACTOR_CHANNEL: ${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}
           AGENTREDACTOR_MODEL_SMOKE: "1"
         run: python -m pytest repo/tests/migration/test_selfrelease_install.py -v
 

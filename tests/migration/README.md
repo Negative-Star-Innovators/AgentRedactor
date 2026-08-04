@@ -53,12 +53,20 @@ The fresh-install E2E for the self-release channel:
    the latter guards against packing the wrong arch into a channel.
 4. Runs `--selftest-migrate-settings` on the *installed* exe against an
    isolated config dir.
-5. With `AGENTREDACTOR_MODEL_SMOKE=1` (set in CI): launches the installed app
+5. With `AGENTREDACTOR_FEED_DIR` pointing at this build's vpk output (set in
+   CI, together with `AGENTREDACTOR_CHANNEL`): serves that feed over localhost
+   HTTP, launches the installed app with `AGENTREDACTOR_UPDATE_FEED` pointed
+   at it, and requires the lifecycle log to show `[UpdateManager] Up to date`
+   (same version, so nothing downloads). This exercises the NEW build's own
+   fetch/parse/compare path — the upgrade E2E cannot, since there the
+   *previous* release's updater does all the work, so a broken updater in a
+   new build would otherwise only surface at the next release.
+6. With `AGENTREDACTOR_MODEL_SMOKE=1` (set in CI): launches the installed app
    and asserts the first-run model download really starts fetching from R2 —
    `.partial`/`.partN` files must appear and grow under
    `<install root>\models\` within 3 minutes. The app is then killed; the
    full 1.6 GB download is NOT completed in CI.
-6. Uninstalls again (`Update.exe uninstall`) unless
+7. Uninstalls again (`Update.exe uninstall`) unless
    `AGENTREDACTOR_KEEP_INSTALL=1`.
 
 It is **opt-in** and skipped unless `AGENTREDACTOR_INSTALL_TEST=1`:
