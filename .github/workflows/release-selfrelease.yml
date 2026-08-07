@@ -4,11 +4,16 @@ name: Self-Release (Velopack)
 # pushes a version tag (v*) or manually re-runs this workflow with publish
 # checked. Pull requests run the same build + pack + tests as a dry-run
 # (the publish job stays off for PRs — see its `if:`), so release problems
-# surface before tagging.
+# surface before tagging. Docs-only PRs (markdown, website/, docs/) are
+# skipped via paths-ignore; skipped required checks count as passed.
 on:
   push:
     tags: ['v*']
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'website/**'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       version:
