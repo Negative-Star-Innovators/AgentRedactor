@@ -4,16 +4,14 @@ name: Self-Release (Velopack)
 # pushes a version tag (v*) or manually re-runs this workflow with publish
 # checked. Pull requests run the same build + pack + tests as a dry-run
 # (the publish job stays off for PRs — see its `if:`), so release problems
-# surface before tagging. Docs-only PRs (markdown, website/, docs/) are
-# skipped via paths-ignore; skipped required checks count as passed.
+# surface before tagging. Docs-only PRs (markdown, website/, docs/) skip the
+# build via the `changes` gate job below — skipped jobs report a passing
+# result to required status checks, unlike paths-ignore filters, which leave
+# required checks pending forever and block merging.
 on:
   push:
     tags: ['v*']
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'website/**'
-      - 'docs/**'
   workflow_dispatch:
     inputs:
       version:
@@ -39,7 +37,38 @@ permissions:
   contents: write
 
 jobs:
+  # Gate job: decides whether a pull request contains anything but docs.
+  # Cheap (ubuntu, seconds); the Windows build job below keys off its output.
+  # Tag pushes and manual dispatches always build (see the build job's `if:`).
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only "$BASE" HEAD | grep -qvE '\.md$|^website/|^docs/'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: changes
+    # Tags and manual dispatches always build; PRs only when non-docs files
+    # changed (docs-only PRs skip the build, and the skipped required checks
+    # count as passed).
+    if: github.event_name != 'pull_request' || needs.changes.outputs.code == 'true'
     strategy:
       # One arch failing must not cancel the other — a single-arch release is
       # still useful, and the publish job only runs when both succeed anyway.
