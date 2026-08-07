@@ -12,6 +12,19 @@ and un-redacting the responses coming back.
 - Distributed two ways: the Microsoft Store (MSIX) and a self-release channel
   (Velopack, with built-in auto-updates)
 
+**Website:** <https://agentredactor.negativestarinnovators.com/>
+
+## Documentation
+
+Step-by-step integration guides for the supported AI coding agents are on the
+website:
+
+- [Claude Code](https://agentredactor.negativestarinnovators.com/claude-code.html)
+- [Codex](https://agentredactor.negativestarinnovators.com/codex.html)
+- [OpenClaw](https://agentredactor.negativestarinnovators.com/openclaw.html)
+- [OpenCode](https://agentredactor.negativestarinnovators.com/opencode.html)
+- [Hermes](https://agentredactor.negativestarinnovators.com/hermes.html)
+
 ## Install
 
 **Microsoft Store** (x64 and ARM64; updates via the Store):
