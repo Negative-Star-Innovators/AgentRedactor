@@ -5,9 +5,12 @@ name: Self-Release (Velopack)
 # checked. Pull requests run the same build + pack + tests as a dry-run
 # (the publish job stays off for PRs — see its `if:`), so release problems
 # surface before tagging. Docs-only PRs (markdown, website/, docs/) skip the
-# build via the `changes` gate job below — skipped jobs report a passing
-# result to required status checks, unlike paths-ignore filters, which leave
-# required checks pending forever and block merging.
+# build steps via the `changes` gate job below (see RUN_BUILD in the build
+# job). The gate is on the steps, not the job: a skipped matrix job reports a
+# single "build" check, which does not satisfy the required per-arch checks
+# ("build (x64)"/"build (arm64)") — a job whose steps all skip reports success
+# under the real leg names. (Trigger-level paths-ignore is worse still: no
+# check runs at all, so required checks block merging.)
 on:
   push:
     tags: ['v*']
@@ -65,10 +68,12 @@ jobs:
 
   build:
     needs: changes
+    # Gate on the steps, not the job: a skipped matrix job collapses to a
+    # single "build" check run, which does not satisfy the required per-arch
+    # checks ("build (x64)"/"build (arm64)"). Running the job but skipping its
+    # steps reports success under the real matrix-leg names in under a minute.
     # Tags and manual dispatches always build; PRs only when non-docs files
-    # changed (docs-only PRs skip the build, and the skipped required checks
-    # count as passed).
-    if: github.event_name != 'pull_request' || needs.changes.outputs.code == 'true'
+    # changed.
     strategy:
       # One arch failing must not cancel the other — a single-arch release is
       # still useful, and the publish job only runs when both succeed anyway.
@@ -79,6 +84,7 @@ jobs:
     # x64 on windows-latest, ARM64 on the free ARM64 hosted runner.
     runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
     env:
+      RUN_BUILD: ${{ github.event_name != 'pull_request' || needs.changes.outputs.code == 'true' }}
       # Expected version: tag name on tag pushes, the version input on manual
       # re-runs. Empty on pull_request — the validate step below falls back to
       # version.txt (there is no tag to validate against on a PR).
@@ -87,6 +93,7 @@ jobs:
       # The vcxproj references vcpkg at ..\..\vcpkg relative to itself, so the
       # repo is checked out into a subfolder and vcpkg sits next to it.
       - name: Checkout
+        if: env.RUN_BUILD == 'true'
         uses: actions/checkout@v4
         with:
           path: repo
@@ -100,6 +107,7 @@ jobs:
       # never published, so the synthetic version is harmless). The resolved
       # version is exported for the later steps (build, artifact names, E2Es).
       - name: Resolve and validate version
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: |
           $fileVersion = (Get-Content -Raw repo/AgentRedactor/version.txt).Trim()
@@ -131,12 +139,14 @@ jobs:
           Write-Host "Version OK: v$expected"
 
       - name: Clone vcpkg
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: git clone https://github.com/microsoft/vcpkg vcpkg
 
       # Cache is arch-scoped (vcpkg-x64-* / vcpkg-arm64-*), same as
       # build-msix.yml — triplets differ per arch and must not share a cache.
       - name: Cache vcpkg artifacts
+        if: env.RUN_BUILD == 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -146,6 +156,7 @@ jobs:
           restore-keys: vcpkg-${{ matrix.arch }}-
 
       - name: Install vcpkg dependencies (first run per arch is slow, then cached)
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: |
           # The bootstrap download of vcpkg.exe itself occasionally times out
@@ -166,6 +177,7 @@ jobs:
       # downloads them on first run (ModelDownloader).
 
       - name: Install vpk (Velopack CLI)
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: dotnet tool install -g vpk
 
@@ -176,6 +188,7 @@ jobs:
       # build/velopack, ARM64 packs channel 'win-arm64' into
       # build/velopack-arm64 (see build.ps1).
       - name: Build and pack self-release (build-selfrelease.ps1)
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: |
           $v = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
@@ -184,6 +197,7 @@ jobs:
       # Cheap sanity check that vpk produced a usable feed before spending
       # time on install tests: feed file, full nupkg and Setup.exe must exist.
       - name: Verify Velopack output
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: |
           $dir = if ('${{ matrix.arch }}' -eq 'x64') { 'repo/AgentRedactor/build/velopack' } else { 'repo/AgentRedactor/build/velopack-arm64' }
@@ -201,15 +215,18 @@ jobs:
       # upgrade E2E (previous live release -> this build, both arches). All
       # must pass before anything is uploaded (no continue-on-error).
       - name: Set up Python
+        if: env.RUN_BUILD == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install test dependencies
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: pip install -r repo/tests/requirements.txt
 
       - name: Run settings migration tests
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         env:
           AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactor.exe
@@ -223,6 +240,7 @@ jobs:
       # the first-run model download really starts fetching from R2.
       # Uninstalls again afterwards.
       - name: Fresh-install E2E (this build)
+        if: env.RUN_BUILD == 'true'
         shell: pwsh
         env:
           AGENTREDACTOR_INSTALL_TEST: "1"
@@ -244,6 +262,7 @@ jobs:
       # than this build's version — there is nothing to upgrade *to* then
       # (expected on PR runs without a version bump).
       - name: Download previous live Setup.exe from R2
+        if: env.RUN_BUILD == 'true'
         id: prevsetup
         shell: pwsh
         run: |
@@ -278,7 +297,7 @@ jobs:
           echo "setup_path=$setup" >> $env:GITHUB_OUTPUT
 
       - name: Upgrade E2E (previous live release -> this build)
-        if: steps.prevsetup.outputs.found == 'true'
+        if: env.RUN_BUILD == 'true' && steps.prevsetup.outputs.found == 'true'
         shell: pwsh
         env:
           AGENTREDACTOR_UPGRADE_TEST: "1"
@@ -293,7 +312,7 @@ jobs:
       # when an earlier test step failed, so failed runs still yield their
       # packages (needed to re-seed R2 from a PR build).
       - name: Upload Velopack output artifact
-        if: always()
+        if: always() && env.RUN_BUILD == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-${{ matrix.arch }}
@@ -305,7 +324,7 @@ jobs:
       # jobs don't run. models/, obj/ and the .pdb are excluded, mirroring
       # the release-bin artifacts in build-msix.yml.
       - name: Upload SelfRelease binaries artifact
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && env.RUN_BUILD == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.arch == 'x64' && 'AgentRedactor-selfrelease-bin' || 'AgentRedactor-selfrelease-bin-arm64' }}
@@ -423,10 +442,11 @@ jobs:
   # public — treat it as an alarm and roll back (re-publish the previous
   # feed to R2) rather than as a gate.
   verify-live:
-    needs: [build, publish]
-    # PRs: publish is skipped, run against the currently-live release.
+    needs: [changes, build, publish]
+    # PRs: publish is skipped, run against the currently-live release — but
+    # only when the PR actually built something (docs-only PRs skip).
     # Tag/dispatch: only after a successful publish.
-    if: ${{ always() && needs.build.result == 'success' && (github.event_name == 'pull_request' || needs.publish.result == 'success') }}
+    if: ${{ always() && needs.build.result == 'success' && ((github.event_name == 'pull_request' && needs.changes.outputs.code == 'true') || (github.event_name != 'pull_request' && needs.publish.result == 'success')) }}
     strategy:
       fail-fast: false
       matrix:
