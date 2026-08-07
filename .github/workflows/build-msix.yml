@@ -3,7 +3,15 @@ name: Build MSIX
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'website/**'
+      - 'docs/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'website/**'
+      - 'docs/**'
   workflow_dispatch:
 
 # Rapid pushes to the same PR/branch cancel the superseded build — only the
