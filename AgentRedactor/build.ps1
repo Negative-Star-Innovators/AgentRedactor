@@ -308,6 +308,24 @@ Remove-Item "$msixStage\debug.log", "$msixStage\startup_debug.log" -Force -Error
 $manifestXml = [xml](Get-Content "$root\Package.appxmanifest")
 $ns = $manifestXml.Package.NamespaceURI
 $manifestXml.Package.Identity.SetAttribute('ProcessorArchitecture', $archLower)
+# Stamp the package version from version.txt — the single version source of
+# truth for BOTH channels (Store MSIX and Velopack self-release). The Store
+# requires a 4-part version, so a 3-part version.txt gets ".0" appended. The
+# hardcoded Identity Version in Package.appxmanifest is only a fallback for
+# builds where version.txt is absent (e.g. a Visual Studio build).
+$versionFile = "$root\version.txt"
+if (Test-Path $versionFile) {
+    $msixVersion = (Get-Content $versionFile -Raw).Trim()
+    if ($msixVersion -match '^\d+\.\d+\.\d+$') {
+        $msixVersion = "$msixVersion.0"
+    }
+    if ($msixVersion -match '^\d+\.\d+\.\d+\.\d+$') {
+        $manifestXml.Package.Identity.SetAttribute('Version', $msixVersion)
+        Write-Host "MSIX package version from version.txt: $msixVersion" -ForegroundColor Cyan
+    } else {
+        Write-Warning "version.txt contains '$msixVersion' (expected x.y.z); keeping the manifest's Identity Version."
+    }
+}
 $resourcesNode = $manifestXml.Package.Resources
 $resourcesNode.RemoveAll()
 foreach ($lang in $langs) {

@@ -153,6 +153,10 @@ try {
     Write-Host "workflow, which builds x64+arm64, runs the full test suite (incl. GUI"
     Write-Host "tests), and publishes both channels to R2. Installed instances will"
     Write-Host "then auto-update to $Version."
+    Write-Host "The version-bump commit on $defaultBranch also triggers 'Build MSIX',"
+    Write-Host "which stamps the Store packages with $Version.0 (from version.txt) and"
+    Write-Host "publishes them to the rolling 'latest' release for manual Partner"
+    Write-Host "Center submission."
 
     if ($DryRun) {
         Write-Host "`nDry run: no changes were made. Re-run without -DryRun to release." -ForegroundColor Yellow
