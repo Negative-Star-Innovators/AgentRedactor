@@ -10,7 +10,7 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 - `buildquick.ps1` — Fast local build (EXE + copy models/resources).
 - `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
 - `build-selfrelease.ps1` — Self-release wrapper: reads `version.txt`, calls `build.ps1 -SelfRelease`, then runs `vpk pack`.
-- `version.txt` — Single version source of truth for the self-release channel (stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION` for C++ and as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the VERSIONINFO resource).
+- `version.txt` — Single version source of truth for BOTH release channels. For the self-release channel it is stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION` for C++ and as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the VERSIONINFO resource; for the Store channel, `build.ps1` stamps the MSIX `Identity Version` from it at pack time (3-part `x.y.z` → 4-part `x.y.z.0`; the hardcoded version in `Package.appxmanifest` is only a fallback when version.txt is absent).
 
 ## Quick Build (for testing)
 
@@ -52,10 +52,15 @@ This script downloads NuGet and WiX v3.14 if they are not present, so the first 
 
 ## Release Channels
 
-The app ships through two channels from the same codebase:
+The app ships through two channels from the same codebase, both versioned from
+`version.txt` (see the project layout above):
 
 - **Microsoft Store (MSIX)** — `.\build.ps1`. The full ~1.6 GB model weights are
-  packed inside the MSIX. Contains **zero** update code (Store policy).
+  packed inside the MSIX. Contains **zero** update code (Store policy). The MSIX
+  `Identity Version` is stamped from `version.txt` at pack time (x.y.z → x.y.z.0),
+  so a `new-release.ps1` bump also versions the next Store submission; submission
+  itself is manual (download both per-arch MSIX files from the rolling `latest`
+  GitHub release, upload to Partner Center).
 - **Self-release (Velopack)** — `.\build-selfrelease.ps1 [-Platform x64|ARM64]`.
   Compiles with `AGENTREDACTOR_SELFRELEASE` (via `-p:SelfRelease=true
   -p:AppVersion=<version.txt>`), excludes `*.onnx_data` from the model copy
