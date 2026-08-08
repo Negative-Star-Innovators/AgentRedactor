@@ -278,6 +278,7 @@ class MockLLM:
 
     def __init__(self) -> None:
         self.requests: list[dict[str, Any]] = []
+        self.request_headers: list[dict[str, str]] = []
         self.paths: list[str] = []
         self.app = web.Application()
         self.app.router.add_post("/v1/chat/completions", self._handle_chat_completions)
@@ -289,16 +290,22 @@ class MockLLM:
         return self.requests[-1] if self.requests else None
 
     @property
+    def last_request_headers(self) -> dict[str, str] | None:
+        return self.request_headers[-1] if self.request_headers else None
+
+    @property
     def last_path(self) -> str | None:
         return self.paths[-1] if self.paths else None
 
     def reset(self) -> None:
         self.requests.clear()
+        self.request_headers.clear()
         self.paths.clear()
 
     async def _handle_chat_completions(self, request: web.Request) -> web.Response:
         body = await request.json()
         self.requests.append(body)
+        self.request_headers.append(dict(request.headers))
         self.paths.append("/v1/chat/completions")
 
         content = _extract_last_user_content(body)
@@ -320,6 +327,7 @@ class MockLLM:
     async def _handle_anthropic_messages(self, request: web.Request) -> web.Response:
         body = await request.json()
         self.requests.append(body)
+        self.request_headers.append(dict(request.headers))
         self.paths.append("/v1/messages")
 
         content = _extract_last_user_content(body)
@@ -341,6 +349,7 @@ class MockLLM:
     async def _handle_responses(self, request: web.Request) -> web.Response:
         body = await request.json()
         self.requests.append(body)
+        self.request_headers.append(dict(request.headers))
         self.paths.append("/v1/responses")
 
         content = _extract_responses_input_text(body)

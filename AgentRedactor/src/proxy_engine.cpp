@@ -424,6 +424,81 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
         }
     }
 
+    // OpenAI Responses API SSE pass (Codex, /responses). Streaming events
+    // ("response.output_text.delta", "response.reasoning_summary_text.delta",
+    // "response.function_call_arguments.delta", ...) carry text in a top-level
+    // string "delta" field — unlike chat completions, where "delta" is an
+    // object. Group deltas by (type, item_id, output_index) channel so labels
+    // split across chunks are rejoined without mixing text from different
+    // channels. Terminal/snapshot events ("response.output_text.done",
+    // "response.output_item.done", "response.completed", ...) repeat complete
+    // text in nested "text" fields; those hold full values, so unredact each
+    // in place.
+    {
+        struct ResponsesDelta {
+            json* node;
+            std::string original;
+        };
+        std::map<std::string, std::vector<ResponsesDelta>> deltaChannels;
+        for (auto& ev : events) {
+            if (!ev.isJson) continue;
+            auto& j = ev.jsonObj;
+            if (!j.contains("type") || !j["type"].is_string()) continue;
+            std::string evType = j["type"].get<std::string>();
+            if (evType.rfind("response.", 0) != 0) continue;
+            if (j.contains("delta") && j["delta"].is_string()) {
+                std::string channel = evType;
+                if (j.contains("item_id") && j["item_id"].is_string()) {
+                    channel += "|" + j["item_id"].get<std::string>();
+                }
+                if (j.contains("output_index") && j["output_index"].is_number_integer()) {
+                    channel += "|" + std::to_string(j["output_index"].get<int>());
+                }
+                deltaChannels[channel].push_back({&j["delta"], j["delta"].get<std::string>()});
+            }
+        }
+        for (auto& [channel, deltas] : deltaChannels) {
+            std::wstring full;
+            std::vector<std::string> originals;
+            for (const auto& d : deltas) {
+                full += Utils::Utf8ToWide(d.original);
+                originals.push_back(d.original);
+            }
+            std::wstring unredacted = UnredactAll(full, state);
+            std::vector<std::wstring> chunks;
+            redistribute(unredacted, originals, chunks);
+            for (size_t i = 0; i < deltas.size(); ++i) {
+                *deltas[i].node = Utils::WideToUtf8(chunks[i]);
+            }
+        }
+
+        std::function<void(json&)> unredactTextFields = [&](json& node) {
+            if (node.is_object()) {
+                for (auto& item : node.items()) {
+                    json& value = item.value();
+                    // "text" covers output_text/refusal/summary content; some
+                    // providers also add an "output_text" convenience field.
+                    if ((item.key() == "text" || item.key() == "output_text") && value.is_string()) {
+                        value = Utils::WideToUtf8(UnredactAll(Utils::Utf8ToWide(value.get<std::string>()), state));
+                    } else {
+                        unredactTextFields(value);
+                    }
+                }
+            } else if (node.is_array()) {
+                for (auto& item : node) {
+                    unredactTextFields(item);
+                }
+            }
+        };
+        for (auto& ev : events) {
+            if (!ev.isJson) continue;
+            auto& j = ev.jsonObj;
+            if (!j.contains("type") || !j["type"].is_string()) continue;
+            if (j["type"].get<std::string>().rfind("response.", 0) != 0) continue;
+            unredactTextFields(j);
+        }
+    }
+
     // Pass 3: serialize events back
     std::ostringstream output;
     for (const auto& ev : events) {
@@ -913,25 +988,50 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
     DWORD decompression = WINHTTP_DECOMPRESSION_FLAG_ALL;
     WinHttpSetOption(hRequest, WINHTTP_OPTION_DECOMPRESSION, &decompression, sizeof(decompression));
 
-    // Build headers string, stripping hop-by-hop, auth, and accept-encoding headers
-    std::wstring headerString;
-    for (const auto& [name, value] : headers) {
-        std::wstring lowerName = Utils::ToLower(name);
-        if (lowerName == L"host" || lowerName == L"authorization" || lowerName == L"proxy-authorization") continue;
-        if (lowerName == L"connection" || lowerName == L"keep-alive" || lowerName == L"proxy-connection" || lowerName == L"content-length" || lowerName == L"accept-encoding") continue;
-        headerString += name + L": " + value + L"\r\n";
-    }
-    headerString += L"Authorization: Bearer " + apiKey + L"\r\n";
+    // Build headers string, stripping hop-by-hop and accept-encoding headers.
+    // Client credential headers (Authorization, x-api-key, api-key) are
+    // forwarded with the real upstream key substituted for whatever value the
+    // client sent — agents commonly send placeholders (e.g. Claude Code's
+    // dummy ANTHROPIC_AUTH_TOKEN) and expect the proxy to hold the real key.
+    // The client's auth style is preserved (Authorization keeps its scheme,
+    // x-api-key/api-key take the raw key), so both OpenAI-style Bearer and
+    // Anthropic-style x-api-key upstreams work without agent sniffing. If the
+    // client sent no credential header at all, default to Authorization:
+    // Bearer as before.
+    auto isCredentialHeader = [](const std::wstring& lowerName) {
+        return lowerName == L"authorization" || lowerName == L"x-api-key" || lowerName == L"api-key";
+    };
+    auto substituteKey = [](const std::wstring& lowerName, const std::wstring& value, const std::wstring& key) {
+        if (lowerName == L"authorization") {
+            size_t sp = value.find(L' ');
+            if (sp != std::wstring::npos) {
+                // Preserve the client's scheme (e.g. Bearer) when present.
+                return value.substr(0, sp) + L" " + key;
+            }
+        }
+        return key;
+    };
 
-    // Build log-safe headers (API key masked unless show-sensitive mode is on)
-    std::wstring logHeaderString;
+    std::wstring headerString;
+    std::wstring logHeaderString; // log-safe headers (API key masked unless show-sensitive mode is on)
+    bool clientSentCredential = false;
     for (const auto& [name, value] : headers) {
         std::wstring lowerName = Utils::ToLower(name);
-        if (lowerName == L"host" || lowerName == L"authorization" || lowerName == L"proxy-authorization") continue;
+        if (lowerName == L"host" || lowerName == L"proxy-authorization") continue;
         if (lowerName == L"connection" || lowerName == L"keep-alive" || lowerName == L"proxy-connection" || lowerName == L"content-length" || lowerName == L"accept-encoding") continue;
+        if (isCredentialHeader(lowerName)) {
+            clientSentCredential = true;
+            headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
+            logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            continue;
+        }
+        headerString += name + L": " + value + L"\r\n";
         logHeaderString += name + L": " + value + L"\r\n";
     }
-    logHeaderString += L"Authorization: Bearer <REDACTED>\r\n";
+    if (!clientSentCredential) {
+        headerString += L"Authorization: Bearer " + apiKey + L"\r\n";
+        logHeaderString += L"Authorization: Bearer <REDACTED>\r\n";
+    }
     const std::wstring& headersForLog = logManager_->IsShowSensitive() ? headerString : logHeaderString;
 
     // Log what we're about to send upstream
