@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 1.1.0). Must match AgentRedactor/version.txt.'
+        description: 'Version to release (e.g. 1.1.0). Must match windows/version.txt.'
         required: true
         type: string
       publish:
@@ -110,7 +110,7 @@ jobs:
         if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: |
-          $fileVersion = (Get-Content -Raw repo/AgentRedactor/version.txt).Trim()
+          $fileVersion = (Get-Content -Raw repo/windows/version.txt).Trim()
           $expected = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
           if (-not $expected) {
             $expected = $fileVersion
@@ -132,7 +132,7 @@ jobs:
             exit 1
           }
           if ('${{ github.event_name }}' -ne 'pull_request' -and $fileVersion -ne $expected) {
-            Write-Error ("Version mismatch: tag/input is 'v{0}' but AgentRedactor/version.txt contains '{1}'. " +
+            Write-Error ("Version mismatch: tag/input is 'v{0}' but windows/version.txt contains '{1}'. " +
               "Bump version.txt to '$expected' and re-tag (see scripts/new-release.ps1)." -f $expected, $fileVersion)
             exit 1
           }
@@ -152,7 +152,7 @@ jobs:
           path: |
             vcpkg/installed
             vcpkg/downloads
-          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('repo/AgentRedactor/vcpkg.json') }}
+          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('repo/windows/vcpkg.json') }}
           restore-keys: vcpkg-${{ matrix.arch }}-
 
       - name: Install vcpkg dependencies (first run per arch is slow, then cached)
@@ -192,7 +192,7 @@ jobs:
         shell: pwsh
         run: |
           $v = $env:EXPECTED_VERSION.Trim().TrimStart('v', 'V')
-          repo/AgentRedactor/build-selfrelease.ps1 -Platform ${{ matrix.arch }} -Version $v
+          repo/windows/build-selfrelease.ps1 -Platform ${{ matrix.arch }} -Version $v
 
       # Cheap sanity check that vpk produced a usable feed before spending
       # time on install tests: feed file, full nupkg and Setup.exe must exist.
@@ -200,7 +200,7 @@ jobs:
         if: env.RUN_BUILD == 'true'
         shell: pwsh
         run: |
-          $dir = if ('${{ matrix.arch }}' -eq 'x64') { 'repo/AgentRedactor/build/velopack' } else { 'repo/AgentRedactor/build/velopack-arm64' }
+          $dir = if ('${{ matrix.arch }}' -eq 'x64') { 'repo/windows/build/velopack' } else { 'repo/windows/build/velopack-arm64' }
           $channel = if ('${{ matrix.arch }}' -eq 'x64') { 'win' } else { 'win-arm64' }
           $feed = Join-Path $dir "releases.$channel.json"
           if (-not (Test-Path $feed)) { throw "Missing feed file: $feed" }
@@ -229,7 +229,7 @@ jobs:
         if: env.RUN_BUILD == 'true'
         shell: pwsh
         env:
-          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactor.exe
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactor.exe
         run: python -m pytest repo/tests/migration/test_settings_migration.py -v
 
       # Fresh-install E2E: silent-install THIS build's Setup.exe, verify the
@@ -244,10 +244,10 @@ jobs:
         shell: pwsh
         env:
           AGENTREDACTOR_INSTALL_TEST: "1"
-          AGENTREDACTOR_SETUP: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}/AgentRedactor-${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}-Setup.exe
+          AGENTREDACTOR_SETUP: ${{ github.workspace }}/repo/windows/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}/AgentRedactor-${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}-Setup.exe
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
           AGENTREDACTOR_EXPECT_MACHINE: ${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
-          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/windows/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
           AGENTREDACTOR_CHANNEL: ${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}
           AGENTREDACTOR_MODEL_SMOKE: "1"
         run: python -m pytest repo/tests/migration/test_selfrelease_install.py -v
@@ -303,7 +303,7 @@ jobs:
           AGENTREDACTOR_UPGRADE_TEST: "1"
           AGENTREDACTOR_CHANNEL: ${{ matrix.arch == 'x64' && 'win' || 'win-arm64' }}
           AGENTREDACTOR_PREV_SETUP: ${{ steps.prevsetup.outputs.setup_path }}
-          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/repo/windows/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
         run: python -m pytest repo/tests/migration/test_selfrelease_upgrade.py -v
 
@@ -316,7 +316,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AgentRedactor-velopack-${{ env.EXPECTED_VERSION }}-${{ matrix.arch }}
-          path: repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
+          path: repo/windows/build/${{ matrix.arch == 'x64' && 'velopack' || 'velopack-arm64' }}
           retention-days: 30
 
       # Upload the unpackaged SelfRelease build so the reusable GUI-test jobs
@@ -329,10 +329,10 @@ jobs:
         with:
           name: ${{ matrix.arch == 'x64' && 'AgentRedactor-selfrelease-bin' || 'AgentRedactor-selfrelease-bin-arm64' }}
           path: |
-            repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release
-            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/models
-            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/obj
-            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/*.pdb
+            repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release
+            !repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/models
+            !repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/obj
+            !repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/*.pdb
           compression-level: 0
           retention-days: 7
 

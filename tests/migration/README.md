@@ -30,7 +30,7 @@ exit code, the `SETTINGS_MIGRATION_OK` stdout marker, and the resulting file:
   `settings_version`, and defaults applied for missing keys.
 
 The exe is resolved from `AGENTREDACTOR_EXE`, falling back to
-`AgentRedactor/build/x64/Release/AgentRedactor.exe`. The module skips with a
+`windows/build/x64/Release/AgentRedactor.exe`. The module skips with a
 clear message when no exe is found. Run it with:
 
 ```powershell
@@ -73,7 +73,7 @@ It is **opt-in** and skipped unless `AGENTREDACTOR_INSTALL_TEST=1`:
 
 ```powershell
 $env:AGENTREDACTOR_INSTALL_TEST = "1"
-$env:AGENTREDACTOR_SETUP = "...\AgentRedactor\build\velopack\AgentRedactor-win-Setup.exe"
+$env:AGENTREDACTOR_SETUP = "...\windows\build\velopack\AgentRedactor-win-Setup.exe"
 $env:AGENTREDACTOR_EXPECT_VERSION = "1.1.0"   # optional
 $env:AGENTREDACTOR_EXPECT_MACHINE = "AMD64"   # optional; ARM64 for the arm64 build
 cd tests
@@ -107,7 +107,7 @@ It is **opt-in** and skipped unless `AGENTREDACTOR_UPGRADE_TEST=1`:
 ```powershell
 $env:AGENTREDACTOR_UPGRADE_TEST = "1"
 $env:AGENTREDACTOR_PREV_SETUP = "C:\dl\AgentRedactor-win-Setup.exe"     # previous release
-$env:AGENTREDACTOR_FEED_DIR = "...\AgentRedactor\build\velopack"        # vNext vpk output
+$env:AGENTREDACTOR_FEED_DIR = "...\windows\build\velopack"        # vNext vpk output
 $env:AGENTREDACTOR_CHANNEL = "win"          # optional; win-arm64 for the ARM64 leg
 $env:AGENTREDACTOR_EXPECT_VERSION = "1.1.0"   # optional; default = newest in feed
 cd tests
@@ -128,7 +128,7 @@ Caveats for local runs:
 
 ## Adding a settings fixture when the schema changes
 
-Follow `AgentRedactor/AGENTS.md`, section **"Changing the settings schema"**:
+Follow `windows/AGENTS.md`, section **"Changing the settings schema"**:
 
 1. Bump `SETTINGS_SCHEMA_VERSION` and add the `MigrateNToN+1` step.
 2. Add a pre-migration `settings.json` fixture here as

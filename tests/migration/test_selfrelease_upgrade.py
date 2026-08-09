@@ -126,7 +126,7 @@ def test_selfrelease_upgrade(tmp_path):
     if not feed_dir or not (Path(feed_dir) / feed_file).is_file():
         pytest.skip(
             f"AGENTREDACTOR_FEED_DIR is not set or has no {feed_file} "
-            "(point it at the vpk output folder, e.g. AgentRedactor/build/velopack)"
+            "(point it at the vpk output folder, e.g. windows/build/velopack)"
         )
     feed_dir_path = Path(feed_dir)
     expected = os.environ.get("AGENTREDACTOR_EXPECT_VERSION") or _latest_feed_version(

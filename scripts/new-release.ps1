@@ -3,7 +3,7 @@
     Prepare and publish a Velopack self-release of AgentRedactor.
 
 .DESCRIPTION
-    Bumps AgentRedactor/version.txt to the given version, commits it, creates
+    Bumps windows/version.txt to the given version, commits it, creates
     tag v<Version>, and pushes the commit + tag to origin. Pushing the tag
     triggers the release-selfrelease.yml workflow, which builds x64+arm64,
     runs the full test suite (incl. GUI tests) and publishes both Velopack
@@ -37,7 +37,7 @@ $tag = "v$Version"
 
 # Resolve repo paths relative to this script (scripts/ lives at repo root).
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$versionFile = Join-Path $repoRoot 'AgentRedactor/version.txt'
+$versionFile = Join-Path $repoRoot 'windows/version.txt'
 
 Push-Location $repoRoot
 try {
@@ -78,7 +78,7 @@ try {
     if ($remoteTags) { Fail "Tag '$tag' already exists on origin. Pick a different version." }
     Write-Host "Tag $tag is free locally and on origin."
 
-    Write-Step "Updating AgentRedactor/version.txt"
+    Write-Step "Updating windows/version.txt"
 
     $oldVersion = if (Test-Path $versionFile) { (Get-Content -Raw $versionFile).Trim() } else { '(file missing)' }
     Write-Host "Version: $oldVersion -> $Version"
@@ -95,7 +95,7 @@ try {
     $fixtureOriginal = $null
     if (-not $DryRun) {
         Write-Step "Snapshotting default settings fixture (best effort)"
-        $selftestExe = Join-Path $repoRoot 'AgentRedactor/build/x64/Release/AgentRedactor.exe'
+        $selftestExe = Join-Path $repoRoot 'windows/build/x64/Release/AgentRedactor.exe'
         $fixtureRelPath = "tests/migration/fixtures/settings/v$Version.json"
         if (Test-Path $selftestExe) {
             $tempConfigDir = Join-Path ([System.IO.Path]::GetTempPath()) ("agentredactor-fixture-" + [guid]::NewGuid().ToString('N'))
@@ -135,13 +135,13 @@ try {
     Write-Host "  Version : $Version"
     Write-Host "  Tag     : $tag"
     Write-Host "  Branch  : $defaultBranch"
-    Write-Host "  File    : AgentRedactor/version.txt ($oldVersion -> $Version)"
+    Write-Host "  File    : windows/version.txt ($oldVersion -> $Version)"
     if ($fixturePath) {
         Write-Host "  Fixture : tests/migration/fixtures/settings/v$Version.json (refreshed)"
     }
     Write-Host ""
     Write-Host "This will run:"
-    Write-Host "  git add AgentRedactor/version.txt"
+    Write-Host "  git add windows/version.txt"
     if ($fixturePath) {
         Write-Host "  git add tests/migration/fixtures/settings/v$Version.json"
     }
@@ -167,7 +167,7 @@ try {
     if ($answer -ne 'yes') {
         # version.txt was already updated above; restore it so an aborted run
         # leaves the tree exactly as it found it.
-        git checkout -- AgentRedactor/version.txt 2>$null
+        git checkout -- windows/version.txt 2>$null
         if ($fixturePath) {
             if ($fixturePreExisted) {
                 [System.IO.File]::WriteAllBytes($fixturePath, $fixtureOriginal)
@@ -180,7 +180,7 @@ try {
     }
 
     Write-Step "Committing and pushing"
-    git add AgentRedactor/version.txt
+    git add windows/version.txt
     if ($fixturePath) { git add $fixturePath }
     git commit -m "chore: bump self-release version to $Version"
     git tag $tag

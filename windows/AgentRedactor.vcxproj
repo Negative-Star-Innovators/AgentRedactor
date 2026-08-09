@@ -116,7 +116,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)..\core\include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)..\core\include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -144,7 +144,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)..\core\include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -158,7 +158,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include;$(ProjectDir)..\core\include;$(ProjectDir)resources;$(IntDir);$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include\onnxruntime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -189,25 +189,25 @@
     <ClInclude Include="SettingsPage.h" />
     <ClInclude Include="AppState.h" />
 
-    <ClInclude Include="include\pii_detector.h" />
-    <ClInclude Include="include\bpe_tokenizer.h" />
-    <ClInclude Include="include\redactor.h" />
-    <ClInclude Include="include\settings_manager.h" />
+    <ClInclude Include="..\core\include\pii_detector.h" />
+    <ClInclude Include="..\core\include\bpe_tokenizer.h" />
+    <ClInclude Include="..\core\include\redactor.h" />
+    <ClInclude Include="..\core\include\settings_manager.h" />
     <ClInclude Include="include\system_tray.h" />
-    <ClInclude Include="include\utils.h" />
-    <ClInclude Include="include\constants.h" />
-    <ClInclude Include="include\localization.h" />
-    <ClInclude Include="include\logging.h" />
-    <ClInclude Include="include\api_key_profile.h" />
-    <ClInclude Include="include\log_manager.h" />
-    <ClInclude Include="include\http_server.h" />
-    <ClInclude Include="include\proxy_engine.h" />
-    <ClInclude Include="include\regex_engine.h" />
-    <ClInclude Include="include\keyword_engine.h" />
+    <ClInclude Include="..\core\include\utils.h" />
+    <ClInclude Include="..\core\include\constants.h" />
+    <ClInclude Include="..\core\include\localization.h" />
+    <ClInclude Include="..\core\include\logging.h" />
+    <ClInclude Include="..\core\include\api_key_profile.h" />
+    <ClInclude Include="..\core\include\log_manager.h" />
+    <ClInclude Include="..\core\include\http_server.h" />
+    <ClInclude Include="..\core\include\proxy_engine.h" />
+    <ClInclude Include="..\core\include\regex_engine.h" />
+    <ClInclude Include="..\core\include\keyword_engine.h" />
     <ClInclude Include="include\secure_storage.h" />
     <ClInclude Include="include\update_manager.h" />
-    <ClInclude Include="include\model_downloader.h" />
-    <ClInclude Include="include\migrations\settings_migrator.h" />
+    <ClInclude Include="..\core\include\model_downloader.h" />
+    <ClInclude Include="..\core\include\migrations\settings_migrator.h" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -222,23 +222,23 @@
     <ClCompile Include="SettingsPage.cpp" />
     <ClCompile Include="AppState.cpp" />
     <ClCompile Include="XamlMetaDataProvider.cpp" />
-    <ClCompile Include="src\pii_detector.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\bpe_tokenizer.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\redactor.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\settings_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\pii_detector.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\bpe_tokenizer.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\redactor.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\settings_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="src\system_tray.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\utils.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\api_key_profile.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\log_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\http_server.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\localization.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\proxy_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\regex_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\keyword_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\utils.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\api_key_profile.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\log_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\http_server.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\localization.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\proxy_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\regex_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\keyword_engine.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="src\secure_storage.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="src\update_manager.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\model_downloader.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
-    <ClCompile Include="src\migrations\settings_migrator.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\model_downloader.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
+    <ClCompile Include="..\core\src\migrations\settings_migrator.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="$(IntDir)XamlTypeInfo.g.cpp" />
     <ClCompile Include="$(IntDir)XamlTypeInfo.Impl.g.cpp" />
   </ItemGroup>

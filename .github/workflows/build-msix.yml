@@ -89,7 +89,7 @@ jobs:
           path: |
             vcpkg/installed
             vcpkg/downloads
-          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('repo/AgentRedactor/vcpkg.json') }}
+          key: vcpkg-${{ matrix.arch }}-${{ hashFiles('repo/windows/vcpkg.json') }}
           restore-keys: vcpkg-${{ matrix.arch }}-
 
       - name: Install vcpkg dependencies (first run per arch is slow, then cached)
@@ -114,19 +114,19 @@ jobs:
       - name: Download ONNX model weights
         if: env.RUN_BUILD == 'true'
         shell: pwsh
-        run: curl.exe -L --fail -o repo/AgentRedactor/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
+        run: curl.exe -L --fail -o repo/windows/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
 
       - name: Build MSIX (build.ps1)
         if: env.RUN_BUILD == 'true'
         shell: pwsh
-        run: repo/AgentRedactor/build.ps1 -Platform ${{ matrix.arch }}
+        run: repo/windows/build.ps1 -Platform ${{ matrix.arch }}
 
       - name: Upload MSIX artifact
         if: env.RUN_BUILD == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: AgentRedactor-msix-${{ matrix.arch }}
-          path: repo/AgentRedactor/build/AgentRedactor-${{ matrix.arch }}.msix
+          path: repo/windows/build/AgentRedactor-${{ matrix.arch }}.msix
           retention-days: 30
 
       # Upload the unpackaged Release build so the GUI test jobs can reuse it
@@ -141,10 +141,10 @@ jobs:
         with:
           name: ${{ matrix.arch == 'x64' && 'AgentRedactor-release-bin' || 'AgentRedactor-release-bin-arm64' }}
           path: |
-            repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release
-            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/models
-            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/obj
-            !repo/AgentRedactor/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/*.pdb
+            repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release
+            !repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/models
+            !repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/obj
+            !repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/*.pdb
           compression-level: 0
           retention-days: 7
 
@@ -169,8 +169,8 @@ jobs:
     timeout-minutes: 20
     steps:
       # scripts/sign-agentredactor-msix.ps1 reads the Publisher from
-      # AgentRedactor/Package.appxmanifest relative to the script, so the
-      # checkout layout must keep scripts/ and AgentRedactor/ siblings.
+      # windows/Package.appxmanifest relative to the script, so the
+      # checkout layout must keep scripts/ and windows/ siblings.
       - name: Checkout
         uses: actions/checkout@v4
         with:

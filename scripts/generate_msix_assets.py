@@ -7,7 +7,7 @@ Rules (per maintainer):
   icon_resources/fox_logo_high_quality_enhanced.png.
 - Wide tiles are composed by centering the fox on a transparent canvas.
 
-Outputs land in AgentRedactor/resources/assets/ and follow the MSIX
+Outputs land in windows/resources/assets/ and follow the MSIX
 naming conventions: base + .scale-{100,125,150,200,400} variants, plus
 Square44x44Logo .targetsize-* unplated variants for the taskbar.
 """
@@ -20,7 +20,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "icon_resources"
-OUT_DIR = ROOT / "AgentRedactor" / "resources" / "assets"
+OUT_DIR = ROOT / "windows" / "resources" / "assets"
 
 BEST = SRC_DIR / "fox_logo_high_quality_enhanced.png"
 EXACT = {
