@@ -95,11 +95,11 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/AgentRedactor/models/onnx --clobber
+        run: gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/windows/models/onnx --clobber
 
       - name: Build app (buildquick.ps1)
         shell: pwsh
-        run: repo/AgentRedactor/buildquick.ps1 -Configuration Release
+        run: repo/windows/buildquick.ps1 -Configuration Release
 
       - name: Build FlaUI helper
         shell: pwsh

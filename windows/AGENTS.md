@@ -5,7 +5,8 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 ## Project Layout
 
 - `AgentRedactor.vcxproj` — Main MSBuild project (WinUI 3 / C++/WinRT).
-- `src/` / `include/` — Core C++ sources (proxy, PII detector, settings, tray icon, etc.).
+- `../core/src/` / `../core/include/` — OS-agnostic C++ core (proxy, PII detector, settings, redaction engines, etc.), compiled directly by the vcxproj; `core/CMakeLists.txt` is scaffolding for future platform builds.
+- `src/` / `include/` — Windows-only sources (system tray, secure storage/DPAPI, update manager).
 - `HomePage.xaml` / `MainWindow.xaml` — WinUI 3 UI.
 - `buildquick.ps1` — Fast local build (EXE + copy models/resources).
 - `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
@@ -14,7 +15,7 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 
 ## Quick Build (for testing)
 
-Run from the `AgentRedactor` folder:
+Run from the `windows` folder:
 
 ```powershell
 .\buildquick.ps1
@@ -64,14 +65,14 @@ The app ships through two channels from the same codebase, both versioned from
 - **Self-release (Velopack)** — `.\build-selfrelease.ps1 [-Platform x64|ARM64]`.
   Compiles with `AGENTREDACTOR_SELFRELEASE` (via `-p:SelfRelease=true
   -p:AppVersion=<version.txt>`), excludes `*.onnx_data` from the model copy
-  (weights download on first run to `%LOCALAPPDATA%\AgentRedactor\models`),
+  (weights download on first run to `%LOCALAPPDATA%\windows\models`),
   skips MSIX packing, and runs `vpk pack` into `build\velopack\` (x64,
   channel `win`) or `build\velopack-arm64\` (ARM64, channel `win-arm64`).
 
 Key pieces of the self-release channel:
 
 - `version.txt` is the version source of truth; it becomes `AR_VERSION_STRING`
-  → `APP_VERSION` (`include/constants.h`) and the `vpk pack` version. For the
+  → `APP_VERSION` (`../core/include/constants.h`) and the `vpk pack` version. For the
   exe's VERSIONINFO resource, the vcxproj passes `ResourceCompile` a separate
   quote-free define set (`AR_VERSION_TEXT` + `AR_VERSION_QUAD`, stringized in
   `resources/app.rc`) because embedded quotes do not survive the MSBuild →
@@ -86,7 +87,7 @@ Key pieces of the self-release channel:
   downloads newer full packages, and applies them via the bundled
   `Update.exe apply --package <nupkg> --waitPid <pid>` after a restart prompt.
   `App.cpp` exits immediately on `--veloapp-*` lifecycle args.
-- `src/model_downloader.cpp` (both channels): first-run download of
+- `../core/src/model_downloader.cpp` (both channels): first-run download of
   `model_quantized.onnx_data` exclusively from the Cloudflare R2 endpoint
   (`https://api.agentredactor.negativestarinnovators.com/models/...`; R2 is
   the single host for model downloads — no fallback). The download is parallel
@@ -116,22 +117,22 @@ Key pieces of the self-release channel:
 
 | Area | Key files |
 |------|-----------|
-| Startup / tray-only launch | `App.cpp`, `include/constants.h` (`RegisterStartupTask`) |
+| Startup / tray-only launch | `App.cpp`, `../core/include/constants.h` (`RegisterStartupTask`) |
 | Main window sizing | `MainWindow.cpp` |
 | Home page UI layout | `HomePage.xaml`, `HomePage.cpp` |
 | Settings / start-on-boot | `SettingsPage.xaml`, `SettingsPage.cpp`, `AppState.cpp` |
-| Proxy engine | `src/proxy_engine.cpp`, `src/http_server.cpp` |
-| Settings persistence | `src/settings_manager.cpp`, `src/migrations/settings_migrator.cpp` |
+| Proxy engine | `../core/src/proxy_engine.cpp`, `../core/src/http_server.cpp` |
+| Settings persistence | `../core/src/settings_manager.cpp`, `../core/src/migrations/settings_migrator.cpp` |
 
 ## Changing the settings schema
 
 `settings.json` is versioned via `settings_version` (absent == 1, the original
 unversioned layout). The current version is `SETTINGS_SCHEMA_VERSION` in
-`include/migrations/settings_migrator.h`. To change the schema:
+`../core/include/migrations/settings_migrator.h`. To change the schema:
 
 1. Bump `SETTINGS_SCHEMA_VERSION` by one.
 2. Add a `MigrateNToN+1` step to the ordered table in
-   `src/migrations/settings_migrator.cpp` (marked "ADD FUTURE MIGRATIONS
+   `../core/src/migrations/settings_migrator.cpp` (marked "ADD FUTURE MIGRATIONS
    HERE"). Never edit or reorder steps that have shipped — older installs
    replay them verbatim.
 3. Add a fixture under `tests/migration/fixtures/settings/` (a pre-migration
@@ -195,7 +196,7 @@ cd tests\gui\windows
 .\build.ps1
 ```
 
-This uses the existing `AgentRedactor\build\tools\nuget.exe` to restore `FlaUI.Core`, `FlaUI.UIA3`, and `Microsoft.NETFramework.ReferenceAssemblies.net48`, then compiles with MSBuild.
+This uses the existing `windows\build\tools\nuget.exe` to restore `FlaUI.Core`, `FlaUI.UIA3`, and `Microsoft.NETFramework.ReferenceAssemblies.net48`, then compiles with MSBuild.
 
 ### Run the GUI tests
 
@@ -229,7 +230,7 @@ Each test:
 - The build scripts configure `makepri.exe` with default qualifiers for all supported
   languages so every translation is included in the generated `resources.pri`.
 - At runtime the app applies the saved language by setting the MRT `ResourceContext` `Language` qualifier (`Windows.ApplicationModel.Resources.Core.ResourceManager.Current.DefaultContext().QualifierValues()["Language"]`); this is the supported mechanism for unpackaged desktop apps. `PrimaryLanguageOverride` is also attempted but may be ignored on unpackaged apps.
-- Supported languages are declared once in `include/constants.h` (`SUPPORTED_LANGUAGES`).
+- Supported languages are declared once in `../core/include/constants.h` (`SUPPORTED_LANGUAGES`).
   See `docs/languages.md` for the full list, RTL/LTR direction, and script families.
   The Settings language `ComboBox` and the tray Language submenu are built dynamically
   from this list, so adding a new language only requires a new `Strings/<tag>/Resources.resw`
@@ -238,6 +239,6 @@ Each test:
 - Right-to-left (RTL) layout is supported for Arabic (`ar-SA`), Hebrew (`he-IL`), and Urdu (`ur-PK`). The app sets `FlowDirection="RightToLeft"` on the main window frame and on each page when the current language is RTL.
 - To regenerate all `.resw` and `.wxl` files (including the existing German file), run:
   ```powershell
-  python AgentRedactor/generate_localizations.py
+  python windows/generate_localizations.py
   ```
-- A helper script, `AgentRedactor/generate_new_languages.py`, can translate the English `.resw` strings into new languages using Google Translate via `deep-translator`. It is intended for bootstrapping translations and should be reviewed by native speakers before release.
+- A helper script, `windows/generate_new_languages.py`, can translate the English `.resw` strings into new languages using Google Translate via `deep-translator`. It is intended for bootstrapping translations and should be reviewed by native speakers before release.

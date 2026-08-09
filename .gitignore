@@ -1,9 +1,9 @@
 # Build outputs
-AgentRedactor/build/
-AgentRedactor/packages/
+windows/build/
+windows/packages/
 
 # Large ONNX model weights (distributed via GitHub Release asset, see README)
-AgentRedactor/models/onnx/model_quantized.onnx_data
+windows/models/onnx/model_quantized.onnx_data
 
 # Test artifacts
 third_party_tests/.logs/
@@ -18,4 +18,7 @@ cloudflare/.wrangler/
 cloudflare/.dev.vars
 
 # Store submission content (kept out of the repo)
-AgentRedactor/store-listing/
+windows/store-listing/
+
+# Internal planning docs (not for public release)
+docs/linux-port-plan.md

@@ -45,7 +45,8 @@ Windows SmartScreen may warn on first run.
 
 | Path | Contents |
 |---|---|
-| `AgentRedactor/` | The WinUI 3 app (C++), build scripts, models, resources |
+| `windows/` | The WinUI 3 app (C++), build scripts, models, resources |
+| `core/` | OS-agnostic C++ core (HTTP proxy, ONNX NER, regex/redaction engines) shared by all platform frontends; CMake scaffolding, currently built via the Windows project |
 | `cloudflare/` | The Cloudflare worker + R2 behind the self-release channel (`/install.ps1`, `/updates`, `/models`) |
 | `tests/` | GUI end-to-end tests (FlaUI + pytest + mock LLM) and self-release install/upgrade E2E |
 | `third_party_tests/` | Integration tests driving real third-party agent CLIs through the proxy |
@@ -67,21 +68,21 @@ Windows SmartScreen may warn on first run.
 - The ONNX model weights. `model_quantized.onnx_data` (~1.6 GB) is **not in the
   repo**; download it from the
   [Releases](https://github.com/Negative-Star-Innovators/AgentRedactor/releases) page and
-  place it in `AgentRedactor\models\onnx\`.
+  place it in `windows\models\onnx\`.
 
 ## Building
 
 Quick build for local development (EXE only, no packaging):
 
 ```powershell
-cd AgentRedactor
+cd windows
 .\buildquick.ps1
 ```
 
-Release build producing the per-architecture MSIX package (`AgentRedactor\build\AgentRedactor-x64.msix`; pass `-Platform ARM64` for the ARM64 build):
+Release build producing the per-architecture MSIX package (`windows\build\AgentRedactor-x64.msix`; pass `-Platform ARM64` for the ARM64 build):
 
 ```powershell
-cd AgentRedactor
+cd windows
 .\build.ps1
 ```
 
@@ -95,10 +96,10 @@ The MSIX packages are unsigned; the Microsoft Store signs them on submission. To
 locally you must sign with your own certificate first.
 
 Self-release (Velopack) build producing the installer, feed and full package under
-`AgentRedactor\build\velopack\` (pass `-Platform ARM64` for the ARM64 channel):
+`windows\build\velopack\` (pass `-Platform ARM64` for the ARM64 channel):
 
 ```powershell
-cd AgentRedactor
+cd windows
 .\build-selfrelease.ps1 -Version 1.1.1
 ```
 

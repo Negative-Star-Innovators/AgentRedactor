@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Creates (or reuses) a self-signed code-signing certificate whose subject
-    matches the Publisher in AgentRedactor\Package.appxmanifest, then signs
+    matches the Publisher in windows\Package.appxmanifest, then signs
     build\AgentRedactor.msixbundle with signtool.exe from the Windows SDK
     (signtool signs .msix and .msixbundle identically).
 
@@ -16,13 +16,13 @@
     .\sign-agentredactor-msix.ps1 -TrustCert
 
 .EXAMPLE
-    .\sign-agentredactor-msix.ps1 -MsixPath "..\AgentRedactor\build\AgentRedactor-x64.msix"
+    .\sign-agentredactor-msix.ps1 -MsixPath "..\windows\build\AgentRedactor-x64.msix"
 #>
 [CmdletBinding()]
 param(
     # Path to the package to sign. Defaults to the bundle produced by
-    # AgentRedactor\build.ps1 (per arch) + buildbundle.ps1.
-    [string]$MsixPath = (Join-Path $PSScriptRoot '..\AgentRedactor\build\AgentRedactor.msixbundle'),
+    # windows\build.ps1 (per arch) + buildbundle.ps1.
+    [string]$MsixPath = (Join-Path $PSScriptRoot '..\windows\build\AgentRedactor.msixbundle'),
 
     # Certificate subject. Defaults to the Publisher from Package.appxmanifest.
     [string]$CertSubject,
@@ -40,7 +40,7 @@ Write-Host "MSIX: $MsixPath"
 
 # --- Determine certificate subject (must match the package Publisher) -------
 if (-not $CertSubject) {
-    $manifestPath = Join-Path $PSScriptRoot '..\AgentRedactor\Package.appxmanifest'
+    $manifestPath = Join-Path $PSScriptRoot '..\windows\Package.appxmanifest'
     [xml]$manifest = Get-Content $manifestPath
     $CertSubject = $manifest.Package.Identity.Publisher
     if (-not $CertSubject) {

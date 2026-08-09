@@ -10,7 +10,7 @@ $root = $PSScriptRoot
 $projectDir = "$root\FlaUIHelper"
 $project = "$projectDir\FlaUIHelper.csproj"
 $nugetCandidates = @(
-    "$root\..\..\..\AgentRedactor\build\tools\nuget.exe",
+    "$root\..\..\..\windows\build\tools\nuget.exe",
     "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\NuGet.exe",
     "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\NuGet.exe",
     "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\NuGet.exe",
@@ -22,8 +22,8 @@ if (-not $nuget) {
 }
 if (-not $nuget) {
     # Last resort: download to the shared tools folder (same location
-    # AgentRedactor\buildquick.ps1 uses)
-    $nuget = "$root\..\..\..\AgentRedactor\build\tools\nuget.exe"
+    # windows\buildquick.ps1 uses)
+    $nuget = "$root\..\..\..\windows\build\tools\nuget.exe"
     New-Item -ItemType Directory -Force -Path (Split-Path $nuget) | Out-Null
     Write-Host "Downloading NuGet..." -ForegroundColor Green
     Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nuget

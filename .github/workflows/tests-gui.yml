@@ -38,7 +38,7 @@ jobs:
     runs-on: ${{ inputs.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
     timeout-minutes: 60
     env:
-      RELEASE_DIR: repo/AgentRedactor/build/${{ inputs.arch == 'x64' && 'x64' || 'ARM64' }}/Release
+      RELEASE_DIR: repo/windows/build/${{ inputs.arch == 'x64' && 'x64' || 'ARM64' }}/Release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,21 +67,21 @@ jobs:
       - name: Cache ONNX model weights
         uses: actions/cache@v4
         with:
-          path: repo/AgentRedactor/models/onnx
+          path: repo/windows/models/onnx
           key: onnx-models-v1
 
       - name: Download ONNX model weights
         shell: pwsh
         run: |
-          if (-not (Test-Path repo/AgentRedactor/models/onnx/model_quantized.onnx_data)) {
-            curl.exe -L --fail -o repo/AgentRedactor/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
+          if (-not (Test-Path repo/windows/models/onnx/model_quantized.onnx_data)) {
+            curl.exe -L --fail -o repo/windows/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
           }
 
       # The binaries artifact excludes models/; copy the cached model in.
       - name: Restore ONNX model into build output
         shell: pwsh
         run: |
-          robocopy repo/AgentRedactor/models ${{ env.RELEASE_DIR }}/models /E /NFL /NDL /NJH /NJS | Out-Null
+          robocopy repo/windows/models ${{ env.RELEASE_DIR }}/models /E /NFL /NDL /NJH /NJS | Out-Null
           if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
           exit 0
 

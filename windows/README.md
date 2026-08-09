@@ -27,7 +27,7 @@ A native Windows C++ desktop application that acts as an intelligent HTTP proxy 
 ## Project Structure
 
 ```
-AgentRedactor/
+windows/
 ├── src/              # C++ source files
 ├── include/          # C++ headers
 ├── resources/        # Icons, manifest, RC file
@@ -47,7 +47,7 @@ AgentRedactor/
 - **Self-release (Velopack)** — built with `.\build-selfrelease.ps1` (x64).
   The installer is produced by `vpk pack` into `build\velopack\`; the large
   model weights are downloaded on first run from the `models-v1` GitHub
-  release into `%LOCALAPPDATA%\AgentRedactor\models`, and app updates are
+  release into `%LOCALAPPDATA%\windows\models`, and app updates are
   delivered from `api.agentredactor.negativestarinnovators.com` via the
   bundled Velopack `Update.exe`. The version comes from `version.txt`.
 
@@ -75,13 +75,13 @@ AgentRedactor/
 Copy or symlink the ONNX model from the existing project:
 
 ```powershell
-Copy-Item -Recurse ..\windows-app-openai\models .\AgentRedactor\models
+Copy-Item -Recurse ..\windows-app-openai\models .\windows\models
 ```
 
 ### 2. Configure with CMake
 
 ```powershell
-cd AgentRedactor
+cd windows
 mkdir build && cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake
 ```
