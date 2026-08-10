@@ -92,7 +92,10 @@
   <PropertyGroup>
     <OutDir>$(ProjectDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)build\$(Platform)\$(Configuration)\obj\</IntDir>
-    <TargetName>AgentRedactor</TargetName>
+    <!-- AgentRedactorUI: must differ from the engine's agentredactor.exe by
+         more than case — Windows filesystems are case-insensitive, so the two
+         outputs cannot share a directory otherwise. -->
+    <TargetName>AgentRedactorUI</TargetName>
   </PropertyGroup>
   <!-- Self-release (Velopack) channel: enabled with -p:SelfRelease=true.
        Kept as an MSBuild property (not command-line PreprocessorDefinitions)
@@ -188,6 +191,7 @@
     <ClInclude Include="KeywordsPage.h" />
     <ClInclude Include="SettingsPage.h" />
     <ClInclude Include="AppState.h" />
+    <ClInclude Include="EngineClient.h" />
 
     <ClInclude Include="..\core\include\pii_detector.h" />
     <ClInclude Include="..\core\include\bpe_tokenizer.h" />
@@ -221,6 +225,7 @@
     <ClCompile Include="KeywordsPage.cpp" />
     <ClCompile Include="SettingsPage.cpp" />
     <ClCompile Include="AppState.cpp" />
+    <ClCompile Include="EngineClient.cpp" />
     <ClCompile Include="XamlMetaDataProvider.cpp" />
     <ClCompile Include="..\core\src\pii_detector.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="..\core\src\bpe_tokenizer.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>

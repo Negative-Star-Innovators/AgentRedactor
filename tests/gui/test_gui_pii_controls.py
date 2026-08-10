@@ -18,6 +18,7 @@ from windows.gui_driver import (
     set_pii_master,
     set_pii_type,
     set_show_sensitive,
+    wait_until,
 )
 
 
@@ -221,8 +222,11 @@ async def test_gui_pii_toggle_via_ui(
     _assert_reconstructed(response_json2, request_text2)
 
     # Session redactions list should contain the match.
-    session = get_session_redactions()
-    assert any("private_person" in entry or secret2 in entry for entry in session)
+    session = wait_until(
+        "session redactions after traffic",
+        get_session_redactions,
+        lambda entries: any("private_person" in entry or secret2 in entry for entry in entries),
+    )
 
 
 @pytest.mark.asyncio
@@ -292,12 +296,17 @@ async def test_gui_pii_stats_and_session(
     _assert_redacted_pii(upstream_body, secret)
     _assert_reconstructed(response_json, request_text)
 
-    stats = get_statistics()
-    assert "Requests: 1" in stats
-    assert "PII: 1" in stats
+    stats = wait_until(
+        "statistics after traffic",
+        get_statistics,
+        lambda s: "Requests: 1" in s and "PII: 1" in s,
+    )
 
-    session = get_session_redactions()
-    assert any(secret in entry or "private_person" in entry for entry in session)
+    session = wait_until(
+        "session redactions after traffic",
+        get_session_redactions,
+        lambda entries: any(secret in entry or "private_person" in entry for entry in entries),
+    )
 
 
 @pytest.mark.asyncio

@@ -19,6 +19,7 @@ from windows.gui_driver import (
     save_profile,
     set_keyword_case,
     set_keyword_text,
+    wait_until,
 )
 
 
@@ -255,12 +256,17 @@ async def test_gui_keyword_stats_and_session(
     _assert_redacted(upstream_body, secret)
     _assert_reconstructed(response_json, request_text)
 
-    stats = get_statistics()
-    assert "Requests: 1" in stats
-    assert "Keywords: 1" in stats
+    stats = wait_until(
+        "statistics after traffic",
+        get_statistics,
+        lambda s: "Requests: 1" in s and "Keywords: 1" in s,
+    )
 
-    redactions = get_session_redactions()
-    assert any(secret in entry or "REDACTED_KEYWORD" in entry for entry in redactions)
+    redactions = wait_until(
+        "session redactions after traffic",
+        get_session_redactions,
+        lambda entries: any(secret in entry or "REDACTED_KEYWORD" in entry for entry in entries),
+    )
 
 
 @pytest.mark.asyncio

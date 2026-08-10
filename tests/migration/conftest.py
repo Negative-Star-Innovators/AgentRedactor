@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_EXE = REPO_ROOT / "AgentRedactor" / "build" / "x64" / "Release" / "AgentRedactor.exe"
+DEFAULT_EXE = REPO_ROOT / "windows" / "build" / "x64" / "Release" / "AgentRedactorUI.exe"
 
 
 def resolve_exe() -> Path | None:
@@ -24,11 +24,11 @@ def resolve_exe() -> Path | None:
 @pytest.fixture(scope="session")
 def agentredactor_exe() -> Path:
     if sys.platform != "win32":
-        pytest.skip("AgentRedactor.exe is Windows-only")
+        pytest.skip("AgentRedactorUI.exe is Windows-only")
     exe = resolve_exe()
     if exe is None or not exe.is_file():
         pytest.skip(
-            "AgentRedactor.exe not found (looked at "
+            "AgentRedactorUI.exe not found (looked at "
             f"{DEFAULT_EXE}). Build the Release configuration or point "
             "AGENTREDACTOR_EXE at a built exe."
         )

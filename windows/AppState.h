@@ -3,22 +3,27 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <unordered_set>
 #include <functional>
 #include <mutex>
+#include <thread>
+#include <atomic>
 #include <windows.h>
-#include "settings_manager.h"
-#include "pii_detector.h"
 #include "system_tray.h"
 #include "log_manager.h"
-#include "proxy_engine.h"
-#include "http_server.h"
+#include "EngineClient.h"
 
 namespace AgentRedactor { class AppState; }
 extern ::AgentRedactor::AppState* g_appState;
 
 namespace AgentRedactor {
 
+// Thin GUI-side state holder. The heavy services (settings, PII detection,
+// proxy data plane) live in the engine process (agentredactor.exe); AppState
+// owns the EngineClient used to reach them, the system tray, the hidden
+// message window, and the engine lifecycle (spawn on startup, stop on quit
+// when this GUI started it). Pages keep calling the same accessors — the
+// facades returned by Settings()/Logs()/Proxy() mirror the old in-process
+// interfaces and forward to the engine over the localhost control API.
 class AppState {
 public:
     static AppState* Instance();
@@ -36,12 +41,9 @@ public:
     void SetOnLogAdded(std::function<void()> cb);
     void SetOnStatsUpdated(std::function<void()> cb);
 
-    // Blocking first-run model download (fires only when the model weights are
-    // missing, e.g. a fresh self-release install; compiled into both channels
-    // but never triggers in MSIX builds, which always ship the weights).
-    // While IsModelDownloadRequired() is true the detector is uninitialized
-    // and the proxy servers are NOT started; MainWindow shows a modal download
-    // dialog and only a successful download + detector init unblocks the app.
+    // Blocking first-run model download. The state machine lives in the
+    // engine; these accessors read the /status snapshot refreshed by the
+    // 1-second poll thread, and Start/Retry forward to the engine.
     void StartModelDownloadIfNeeded();
     void RetryModelDownload();
     bool IsModelDownloadRequired() const;
@@ -52,19 +54,17 @@ public:
     void SetOnModelDownloadStatus(std::function<void()> cb);
     void NotifyModelDownloadStatus();
 
-    // Called from background threads; posts to message window
+    // Called from the poll thread; posts to message window
     void NotifyLogAdded();
     void NotifyStatsUpdated();
 
-    // Services
-    SettingsManager* Settings() { return settings_.get(); }
-    ProxyEngine* Proxy() { return proxyEngine_.get(); }
-    LogManager* Logs() { return logManager_.get(); }
+    // Services (engine-backed facades; tray remains in-process)
+    SettingsFacade* Settings() { return &settingsFacade_; }
+    LogsFacade* Logs() { return &logsFacade_; }
+    ProxyFacade* Proxy() { return &proxyFacade_; }
     SystemTray* Tray() { return systemTray_.get(); }
 
-    // Proxy management
-    void StartProxyServers();
-    void StopProxyServers();
+    // Proxy management (engine-side; forwarded over the control API)
     void RestartProxyServers();
     bool IsProxyRunning(int port) const;
     std::vector<int> GetRunningPorts() const;
@@ -84,35 +84,38 @@ private:
     HWND CreateMessageWindow();
     static LRESULT CALLBACK MessageWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    HttpResponse HandleProxyRequest(int port, const std::string& method, const std::wstring& path,
-        const std::unordered_map<std::wstring, std::wstring>& headers, const std::string& body);
+    // Engine lifecycle: connect to a running engine via control.json, spawn
+    // agentredactor.exe hidden when unreachable, and wait for /status.
+    bool EnsureEngineRunning(const std::filesystem::path& configDir);
+    bool SpawnEngine();
+    void StatusPollLoop();
 
-    std::unique_ptr<SettingsManager> settings_;
-    std::unique_ptr<PIIDetector> detector_;
-    std::unique_ptr<LogManager> logManager_;
-    std::unique_ptr<ProxyEngine> proxyEngine_;
+    EngineClient engineClient_;
+    LogManager logManager_; // GUI-local file-logging mirror for LogsFacade
+    SettingsFacade settingsFacade_{ &engineClient_ };
+    LogsFacade logsFacade_{ &engineClient_, &logManager_ };
+    ProxyFacade proxyFacade_{ &engineClient_ };
     std::unique_ptr<SystemTray> systemTray_;
-    std::vector<std::unique_ptr<HttpServer>> servers_;
 
     HWND messageHwnd_ = nullptr;
     HWND mainHwnd_ = nullptr;
-
-    std::unordered_set<int> runningPorts_;
 
     std::function<void()> onLogAdded_;
     std::function<void()> onStatsUpdated_;
     std::function<void()> onMainWindowClose_;
     std::function<void()> localizationReloadCallback_;
+    std::function<void()> onModelDownloadStatus_;
     bool restarting_ = false;
     mutable std::mutex callbackMutex_;
 
-    // First-run model download state (guarded by callbackMutex_)
-    std::function<void()> onModelDownloadStatus_;
-    std::wstring modelDownloadStatus_;
-    int modelDownloadPercent_ = -1;
-    bool modelDownloadRequired_ = false;
-    bool modelDownloadInProgress_ = false;
-    bool modelDownloadFailed_ = false;
+    // Last /status snapshot from the engine (guarded by statusMutex_)
+    mutable std::mutex statusMutex_;
+    json statusCache_;
+    bool statusValid_ = false;
+
+    std::thread pollThread_;
+    std::atomic<bool> pollStop_{ false };
+    bool engineSpawned_ = false;
 };
 
 } // namespace AgentRedactor

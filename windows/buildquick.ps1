@@ -12,10 +12,10 @@ $root = $PSScriptRoot
 $outDir = "$root\build\$Platform\$Configuration"
 
 # Stop any running instance so the build can overwrite the EXE
-$proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
+$proc = Get-Process -Name "AgentRedactorUI","agentredactor" -ErrorAction SilentlyContinue
 if ($proc) {
-    Write-Host "Stopping running AgentRedactor.exe..." -ForegroundColor Yellow
-    Stop-Process -Name "AgentRedactor" -Force -ErrorAction SilentlyContinue
+    Write-Host "Stopping running AgentRedactorUI.exe / agentredactor.exe..." -ForegroundColor Yellow
+    Stop-Process -Name "AgentRedactorUI","agentredactor" -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
 }
 
@@ -89,6 +89,15 @@ $msbuildArgs = @("$root\AgentRedactor.vcxproj", "-p:Configuration=$Configuration
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
+# Engine process (agentredactor.exe): the GUI spawns it from the same output
+# folder, so local dev/test runs need it built too.
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Building AgentRedactorEngine ($Configuration|$Platform)..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+& $msbuild "$root\AgentRedactorEngine.vcxproj" "-p:Configuration=$Configuration" "-p:Platform=$Platform" "-m" "-verbosity:minimal"
+if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
+
 # Copy model files required at runtime
 if (Test-Path "$root\models") {
     Write-Host "Copying model files..." -ForegroundColor Cyan
@@ -132,5 +141,5 @@ Write-Host "Generated resources.pri" -ForegroundColor Green
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "Quick build complete!" -ForegroundColor Green
-Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+Write-Host "EXE output: $outDir\AgentRedactorUI.exe (+ agentredactor.exe engine/CLI)" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green

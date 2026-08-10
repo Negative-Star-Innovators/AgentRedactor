@@ -7,6 +7,8 @@
 #include "api_key_profile.h"
 #include "constants.h"
 #include "utils.h"
+#include "http_server.h"
+#include <winhttp.h>
 #include <winrt/Windows.UI.ViewManagement.h>
 #include <winrt/Microsoft.UI.Xaml.Input.h>
 #include <winrt/Microsoft.UI.Xaml.Automation.h>
@@ -881,7 +883,13 @@ namespace winrt::AgentRedactor::implementation
             return;
         }
         for (auto it = matches.rbegin(); it != matches.rend(); ++it) {
-            std::wstring line = L"[" + it->timestamp + L"] " + it->type;
+            // The engine serves match types via an English-only shim (it cannot
+            // link MRT localization); map them back to the localized strings.
+            std::wstring type = it->type;
+            if (type == L"PII") type = ::AgentRedactor::LocString(L"MatchType_PII");
+            else if (type == L"Regex") type = ::AgentRedactor::LocString(L"MatchType_Regex");
+            else if (type == L"Keyword") type = ::AgentRedactor::LocString(L"MatchType_Keyword");
+            std::wstring line = L"[" + it->timestamp + L"] " + type;
             if (!it->detail.empty()) line += L" (" + it->detail + L")";
             line += L": " + it->matchedText;
             list.Items().Append(box_value(line));

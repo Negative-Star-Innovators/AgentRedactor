@@ -4,14 +4,83 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 
 ## Project Layout
 
+Two executables are built from this folder (both land in `build\<Platform>\Release`):
+
+- `AgentRedactorUI.exe` — the WinUI 3 GUI (`AgentRedactor.vcxproj`). A thin frontend:
+  it owns the tray, windows, and an `EngineClient` that talks to the engine.
+  (Named `...UI` on purpose: the engine's `agentredactor.exe` differs only by
+  case from the old name, and Windows filesystems are case-insensitive — the
+  two outputs cannot share a directory otherwise.)
+- `agentredactor.exe` — the engine (`AgentRedactorEngine.vcxproj`, console subsystem,
+  dual-mode). Owns settings, PII detection, the proxy data plane, and a localhost
+  control API (127.0.0.1 only, bearer token in `<configDir>/control.json`).
+  Run `agentredactor engine run --console` for a foreground debug run.
+  The same binary is also the CLI: `agentredactor <subcommand>` (status,
+  get/set, profiles, regex, keywords, unlock, password, engine stop) talks to
+  the running engine over the control API — see "CLI" below.
+
+Key sources:
+
+- `engine/` — engine host: `main.cpp` (entry, mutex, console handling, CLI
+  console/pipe plumbing), `EngineApp.*` (owns SettingsManager/PIIDetector/
+  ProxyEngine/proxy HttpServers + the whole data plane moved out of the old
+  AppState, plus the control-API router), `control_api_client.*` (WinHTTP
+  client for the CLI subcommands; the engine-side mirror of the GUI's
+  EngineClient — not shared because the GUI build requires pch.h as the
+  unconditional first include), `engine_loc.cpp` (English-only LocString
+  shim; the engine can't link MRT localization).
+- `../core/src/cli.cpp` (+ `../core/include/cli.h`) — OS-agnostic CLI command
+  logic: parsing, password gating, output formatting. The OS layer supplies a
+  `CliTransport` (control-API calls) and `CliConsole` (print + no-echo
+  password prompt); Linux will reuse this file with its own transport.
+- `../core/src/control_server.cpp` — localhost-only control API server (bind + token
+  auth + control.json). `../core/src/http_server.cpp` has a `loopbackOnly` bind mode.
+- `EngineClient.*` — GUI-side WinHTTP client + `SettingsFacade`/`LogsFacade`/
+  `ProxyFacade` mirroring the old in-process interfaces so pages barely changed.
+- `AppState.*` — now a thin GUI-side holder: EngineClient, tray, message window,
+  engine lifecycle (spawn hidden via CreateProcess when /status is unreachable,
+  POST /engine/stop on quit if this GUI spawned it), 1-second /status poll thread.
 - `AgentRedactor.vcxproj` — Main MSBuild project (WinUI 3 / C++/WinRT).
-- `../core/src/` / `../core/include/` — OS-agnostic C++ core (proxy, PII detector, settings, redaction engines, etc.), compiled directly by the vcxproj; `core/CMakeLists.txt` is scaffolding for future platform builds.
+- `../core/src/` / `../core/include/` — OS-agnostic C++ core (proxy, PII detector, settings, redaction engines, etc.), compiled directly by both vcxprojs; `core/CMakeLists.txt` is scaffolding for future platform builds.
 - `src/` / `include/` — Windows-only sources (system tray, secure storage/DPAPI, update manager).
 - `HomePage.xaml` / `MainWindow.xaml` — WinUI 3 UI.
-- `buildquick.ps1` — Fast local build (EXE + copy models/resources).
+- `buildquick.ps1` — Fast local build (builds BOTH vcxprojs + copies models/resources).
 - `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
 - `build-selfrelease.ps1` — Self-release wrapper: reads `version.txt`, calls `build.ps1 -SelfRelease`, then runs `vpk pack`.
 - `version.txt` — Single version source of truth for BOTH release channels. For the self-release channel it is stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION` for C++ and as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the VERSIONINFO resource; for the Store channel, `build.ps1` stamps the MSIX `Identity Version` from it at pack time (3-part `x.y.z` → 4-part `x.y.z.0`; the hardcoded version in `Package.appxmanifest` is only a fallback when version.txt is absent).
+
+## CLI
+
+`agentredactor.exe` doubles as the CLI; every subcommand talks to the running
+engine over the control API (so CLI and GUI always agree). Output goes to the
+inherited console, or UTF-8 to stdout when piped (script/AI-agent friendly);
+exit codes are 0 success, 1 runtime error, 2 usage.
+
+```
+agentredactor status                          engine + profile overview (ungated)
+agentredactor get <key> [--profile P]         read a setting
+agentredactor set <key> <value> [--profile P] change a setting
+agentredactor profiles list                   table incl. request/redaction stats
+agentredactor regex list|add <p>|remove <n|p>
+agentredactor keywords list|add <t>|remove <n|t> [--ignore-case]
+agentredactor unlock [--password PW]
+agentredactor password enable [PW] | change [OLD NEW] | disable
+agentredactor engine run [--console] | stop
+```
+
+Global keys: `start-on-boot`, `onnx-provider`, `logging`, `show-sensitive`,
+`app-language`, `master-password-enabled`/`unlocked` (read-only). Profile keys:
+`alias`, `upstream-url`, `api-key`, `port`, `enabled`, `confidence-threshold`,
+`pii-types`, `use-openai-model`. `--profile P` selects by list number, id, or
+alias (optional when only one profile exists).
+
+Password model: with no master password everything is open. When one is
+enabled and the session is locked, every command except `status`,
+`engine stop`, and `help` requires it — `--password PW` for scripts, or a
+no-echo prompt on an interactive console. The lock is UX-level (as in the
+GUI); the only server-side enforcement is `GET /profiles/<id>/apikey`
+(403 while locked), the one endpoint returning a secret — `GET /profiles`
+always masks keys as `abc...****`.
 
 ## Quick Build (for testing)
 
@@ -22,11 +91,11 @@ Run from the `windows` folder:
 ```
 
 This will:
-1. Stop any running `AgentRedactor.exe`.
+1. Stop any running `AgentRedactorUI.exe` / `agentredactor.exe`.
 2. Find MSBuild (BuildTools / Enterprise / Professional).
-3. Build `Release|x64` (change with `-Configuration Debug` if needed).
+3. Build `Release|x64` for the GUI and the engine (change with `-Configuration Debug` if needed).
 4. Copy the `models\` folder and icon resources to `build\x64\Release\`.
-5. Produce `build\x64\Release\AgentRedactor.exe`.
+5. Produce `build\x64\Release\AgentRedactorUI.exe` and `agentredactor.exe`.
 
 The EXE can be run directly from that folder for rapid iteration.
 
@@ -152,7 +221,7 @@ is first backed up to `<name>.corrupt-<timestamp>.bak` and only then reset.
 
 ## End-to-End Tests
 
-Testing is done through the GUI E2E suite in `tests/gui/`. It drives the **real** `AgentRedactor.exe` Windows UI with a FlaUI/C# helper and verifies proxy behaviour against an `aiohttp` mock LLM.
+Testing is done through the GUI E2E suite in `tests/gui/`. It drives the **real** `AgentRedactorUI.exe` Windows UI with a FlaUI/C# helper and verifies proxy behaviour against an `aiohttp` mock LLM. The CLI suite in `tests/cli/` runs `agentredactor.exe` standalone against an isolated config dir (`AGENTREDACTOR_CONFIG_DIR`) and drives the CLI subcommands as subprocesses — fast, no GUI, no FlaUI helper needed (`pytest -v cli/`).
 
 ### Build for testing
 
@@ -179,7 +248,7 @@ A small FlaUI/C# helper drives the real Windows UI from Python. The goal is to e
 - `tests/gui/windows/FlaUIHelper/` — C# console app using **FlaUI.UIA3**.
 - `tests/gui/windows/build.ps1` — builds the helper with the same MSBuild toolchain used for AgentRedactor.
 - `tests/gui/windows/gui_driver.py` — Python wrapper that invokes `FlaUIHelper.exe`.
-- `tests/gui/gui_process.py` — starts/stops `AgentRedactor.exe` using the real `%APPDATA%` / `%LOCALAPPDATA%` directories.
+- `tests/gui/gui_process.py` — starts/stops `AgentRedactorUI.exe` (and the `agentredactor.exe` engine it spawns) using the real `%APPDATA%` / `%LOCALAPPDATA%` directories.
 - `tests/gui/conftest.py` — backs up the user's real `AgentRedactor` data, creates a clean test profile, and restores the original data after the test.
 - `tests/gui/test_gui_keyword_redaction.py` — focused keyword scenarios: case-insensitive/case-sensitive matching, deletion, toggling case sensitivity, modifying keyword text, statistics/session redactions, and log output.
 - `tests/gui/test_gui_regex_redaction.py` — focused regex scenarios: adding, deleting, modifying, enabling/disabling, statistics/session redactions, and log output.
@@ -208,7 +277,7 @@ pytest -v gui/
 Each test:
 1. Backs up `%APPDATA%\AgentRedactor` and `%LOCALAPPDATA%\AgentRedactor`.
 2. Writes a clean test `settings.json` into `%APPDATA%\AgentRedactor`.
-3. Starts the normal `AgentRedactor.exe` window.
+3. Starts the normal `AgentRedactorUI.exe` window.
 4. Uses the FlaUI helper to drive the UI (add keywords/regex/PII toggles/profiles).
 5. Sends OpenAI and/or Anthropic requests through the proxy and asserts redaction and statistics.
 6. Stops the app and restores the original user data.

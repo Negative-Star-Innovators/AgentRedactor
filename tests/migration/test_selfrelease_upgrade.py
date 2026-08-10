@@ -97,7 +97,7 @@ def _latest_feed_version(feed_dir: Path, channel: str) -> str:
 
 
 def _kill_install_processes(install_root: Path) -> None:
-    """Kill AgentRedactor.exe / Update.exe instances running from the install."""
+    """Kill AgentRedactorUI.exe / agentredactor.exe / Update.exe instances running from the install."""
     root = str(install_root).lower()
     for proc in psutil.process_iter(["exe"]):
         try:
@@ -134,7 +134,7 @@ def test_selfrelease_upgrade(tmp_path):
     )
 
     install_root = Path(os.environ["LOCALAPPDATA"]) / INSTALL_DIR_NAME
-    current_exe = install_root / "current" / "AgentRedactor.exe"
+    current_exe = install_root / "current" / "AgentRedactorUI.exe"
     update_exe = install_root / "Update.exe"
 
     server: subprocess.Popen | None = None
@@ -150,7 +150,7 @@ def test_selfrelease_upgrade(tmp_path):
         #    FindUpdateExe expects (Update.exe at root, app under current\).
         assert update_exe.is_file() and current_exe.is_file(), (
             "Unexpected Velopack install layout; expected Update.exe and "
-            f"current\\AgentRedactor.exe under {install_root}.\n"
+            f"current\\AgentRedactorUI.exe under {install_root}.\n"
             + _layout_listing(install_root)
         )
 
@@ -197,7 +197,7 @@ def test_selfrelease_upgrade(tmp_path):
         )
         subprocess.Popen([str(current_exe)], env=env)
 
-        # 6. Poll until the installed current\AgentRedactor.exe is the vNext
+        # 6. Poll until the installed current\AgentRedactorUI.exe is the vNext
         #    build (Update.exe apply swaps it and restarts the app).
         deadline = time.monotonic() + POLL_TIMEOUT_S
         seen = prev_version

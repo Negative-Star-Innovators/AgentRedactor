@@ -26,11 +26,11 @@ if ($SelfRelease -and -not $PSBoundParameters.ContainsKey('Version')) {
     }
 }
 
-# Stop any running instance
-$proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
+# Stop any running instance (GUI and engine/CLI)
+$proc = Get-Process -Name "AgentRedactorUI", "agentredactor" -ErrorAction SilentlyContinue
 if ($proc) {
-    Write-Host "Stopping running AgentRedactor.exe..." -ForegroundColor Yellow
-    Stop-Process -Name "AgentRedactor" -Force -ErrorAction SilentlyContinue
+    Write-Host "Stopping running AgentRedactorUI.exe / agentredactor.exe..." -ForegroundColor Yellow
+    Stop-Process -Name "AgentRedactorUI", "agentredactor" -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
 }
 
@@ -169,6 +169,23 @@ if ($SelfRelease) {
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
+# --- Build the engine (headless proxy process, no NuGet) ---------------------
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Building AgentRedactorEngine (Release|$Platform)..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+$engineBuildArgs = @(
+    "$root\AgentRedactorEngine.vcxproj",
+    "-p:Configuration=Release",
+    "-p:Platform=$Platform"
+)
+if ($SelfRelease) {
+    $engineBuildArgs += "-p:SelfRelease=true"
+    $engineBuildArgs += "-p:AppVersion=$Version"
+}
+& $msbuild @engineBuildArgs
+if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
+
 # Copy models and resources
 if (Test-Path "$root\models") {
     Write-Host "Copying model files..." -ForegroundColor Cyan
@@ -271,7 +288,7 @@ if ($SelfRelease) {
     $velopackOut = if ($Platform -eq "ARM64") { "$buildDir\velopack-arm64" } else { "$buildDir\velopack" }
     # -s: language-neutral splash shown by Setup.exe during install (fox logo
     # on dark background, no text — Velopack's own Setup UI text is English).
-    & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
+    & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactorUI.exe `
         -r $rid -c $channel `
         --packTitle "Agent Redactor" -i "$root\resources\app.ico" `
         -s "$root\resources\splash.png" -o $velopackOut
@@ -280,7 +297,7 @@ if ($SelfRelease) {
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Green
     Write-Host "Self-release build complete!" -ForegroundColor Green
-    Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+    Write-Host "EXE output: $outDir\AgentRedactorUI.exe" -ForegroundColor Green
     Write-Host "Velopack output: $velopackOut" -ForegroundColor Green
     Write-Host "========================================" -ForegroundColor Green
     return
@@ -356,6 +373,6 @@ Write-Host "MSIX created: $msixPath" -ForegroundColor Green
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "Build complete!" -ForegroundColor Green
-Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+Write-Host "EXE output: $outDir\AgentRedactorUI.exe" -ForegroundColor Green
 Write-Host "MSIX output: $msixPath" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green

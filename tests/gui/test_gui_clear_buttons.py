@@ -17,6 +17,7 @@ from windows.gui_driver import (
     get_statistics,
     save_profile,
     set_enable_logging,
+    wait_until,
 )
 
 
@@ -53,17 +54,22 @@ async def test_gui_clear_statistics(
         assert resp.status == 200
         await resp.json()
 
-    stats = get_statistics()
-    assert _extract_stat(stats, "Requests") >= 1
-    assert _extract_stat(stats, "Keywords") >= 1
+    stats = wait_until(
+        "statistics after traffic",
+        get_statistics,
+        lambda s: _extract_stat(s, "Requests") >= 1 and _extract_stat(s, "Keywords") >= 1,
+    )
 
     clear_statistics()
 
-    stats = get_statistics()
-    assert _extract_stat(stats, "Requests") == 0
-    assert _extract_stat(stats, "Keywords") == 0
-    assert _extract_stat(stats, "PII") == 0
-    assert _extract_stat(stats, "Regex") == 0
+    stats = wait_until(
+        "statistics cleared",
+        get_statistics,
+        lambda s: _extract_stat(s, "Requests") == 0
+        and _extract_stat(s, "Keywords") == 0
+        and _extract_stat(s, "PII") == 0
+        and _extract_stat(s, "Regex") == 0,
+    )
 
 
 @pytest.mark.asyncio
@@ -80,14 +86,20 @@ async def test_gui_clear_session_redactions(
         assert resp.status == 200
         await resp.json()
 
-    session = get_session_redactions()
-    assert any(secret in entry or "REDACTED_KEYWORD" in entry for entry in session)
+    session = wait_until(
+        "session redactions after traffic",
+        get_session_redactions,
+        lambda entries: any(secret in entry or "REDACTED_KEYWORD" in entry for entry in entries),
+    )
 
     clear_session_redactions()
 
-    session = get_session_redactions()
-    assert not any(
-        secret in entry or "REDACTED_KEYWORD" in entry for entry in session
+    session = wait_until(
+        "session redactions cleared",
+        get_session_redactions,
+        lambda entries: not any(
+            secret in entry or "REDACTED_KEYWORD" in entry for entry in entries
+        ),
     )
 
 
@@ -105,11 +117,16 @@ async def test_gui_clear_logs(
         assert resp.status == 200
         await resp.json()
 
-    log_text = get_log_text()
-    assert "[Upstream] Request" in log_text
+    log_text = wait_until(
+        "request logged",
+        get_log_text,
+        lambda text: "[Upstream] Request" in text,
+    )
 
     clear_logs()
 
-    log_text = get_log_text()
-    assert "[Upstream] Request" not in log_text
-    assert len(log_text.strip()) == 0
+    log_text = wait_until(
+        "logs cleared",
+        get_log_text,
+        lambda text: "[Upstream] Request" not in text and len(text.strip()) == 0,
+    )

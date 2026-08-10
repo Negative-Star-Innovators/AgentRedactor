@@ -120,7 +120,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path C:\dumps | Out-Null
-          $k = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\AgentRedactor.exe"
+          $k = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\AgentRedactorUI.exe"
           New-Item -Path $k -Force | Out-Null
           Set-ItemProperty -Path $k -Name DumpFolder -Value "C:\dumps"
           Set-ItemProperty -Path $k -Name DumpCount -Value 5
@@ -144,7 +144,7 @@ jobs:
         if: inputs.run-migration
         shell: pwsh
         env:
-          AGENTREDACTOR_EXE: ${{ github.workspace }}/${{ env.RELEASE_DIR }}/AgentRedactor.exe
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/${{ env.RELEASE_DIR }}/AgentRedactorUI.exe
         run: |
           cd repo/tests
           pytest -v migration/test_settings_migration.py

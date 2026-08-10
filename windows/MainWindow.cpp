@@ -4,6 +4,7 @@
 #include "AppState.h"
 #include "localization.h"
 #include "logging.h"
+#include "utils.h"
 #include "update_manager.h"
 #include "HomePage.h"
 #include "SettingsPage.h"

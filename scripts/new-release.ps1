@@ -95,7 +95,7 @@ try {
     $fixtureOriginal = $null
     if (-not $DryRun) {
         Write-Step "Snapshotting default settings fixture (best effort)"
-        $selftestExe = Join-Path $repoRoot 'windows/build/x64/Release/AgentRedactor.exe'
+        $selftestExe = Join-Path $repoRoot 'windows/build/x64/Release/AgentRedactorUI.exe'
         $fixtureRelPath = "tests/migration/fixtures/settings/v$Version.json"
         if (Test-Path $selftestExe) {
             $tempConfigDir = Join-Path ([System.IO.Path]::GetTempPath()) ("agentredactor-fixture-" + [guid]::NewGuid().ToString('N'))

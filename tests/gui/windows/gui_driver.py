@@ -62,6 +62,26 @@ def _run_helper(*args: str, timeout: float = 120.0) -> str:
     return ""
 
 
+def wait_until(description, getter, predicate, timeout: float = 15.0, interval: float = 0.5):
+    """Poll `getter()` until `predicate(value)` is true and return that value.
+
+    The GUI learns about engine-side changes (stats, session redactions, logs)
+    through a 1-second /status poll, so reads taken right after proxy traffic
+    need eventual-consistency waits instead of a single immediate read.
+    Raises AssertionError with the last seen value on timeout.
+    """
+    deadline = time.monotonic() + timeout
+    last = None
+    while True:
+        last = getter()
+        if predicate(last):
+            return last
+        if time.monotonic() >= deadline:
+            raise AssertionError(
+                f"timed out ({timeout}s) waiting for {description}; last value: {last!r}"
+            )
+        time.sleep(interval)
+
 def add_keyword(text: str, case_sensitive: bool = False) -> None:
     """Add a keyword via the AgentRedactor UI."""
     _run_helper(

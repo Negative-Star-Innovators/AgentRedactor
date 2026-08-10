@@ -18,7 +18,7 @@ namespace FlaUIHelper
 {
     internal static class Program
     {
-        private const string ProcessName = "AgentRedactor";
+        private const string ProcessName = "AgentRedactorUI";
         private static readonly TimeSpan ProcessFindTimeout = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan ControlFindTimeout = TimeSpan.FromSeconds(10);
         private static readonly TimeSpan DialogFindTimeout = TimeSpan.FromSeconds(5);
@@ -389,7 +389,7 @@ namespace FlaUIHelper
 
             if (result == null)
             {
-                throw new InvalidOperationException("AgentRedactor.exe process not found.");
+                throw new InvalidOperationException("AgentRedactorUI.exe process not found.");
             }
             return result;
         }
@@ -2234,7 +2234,7 @@ namespace FlaUIHelper
         {
             try
             {
-                int count = Process.GetProcessesByName("AgentRedactor").Length;
+                int count = Process.GetProcessesByName("AgentRedactorUI").Length;
                 Console.WriteLine($"DIAG liveness: AgentRedactor processes={count} ({context})");
             }
             catch { }
@@ -2242,7 +2242,7 @@ namespace FlaUIHelper
 
         private static int AgentRedactorProcessCount()
         {
-            try { return Process.GetProcessesByName("AgentRedactor").Length; }
+            try { return Process.GetProcessesByName("AgentRedactorUI").Length; }
             catch { return -1; }
         }
 
@@ -2325,7 +2325,7 @@ namespace FlaUIHelper
             // (a) Process state.
             try
             {
-                var processes = Process.GetProcessesByName("AgentRedactor");
+                var processes = Process.GetProcessesByName("AgentRedactorUI");
                 if (processes.Length == 0)
                     Console.WriteLine("DIAG AgentRedactor processes: 0 (app exited or crashed)");
                 else
