@@ -170,6 +170,15 @@ jobs:
             pytest -v gui/
           }
 
+      # CLI tests: headless (no GUI session needed) — they drive
+      # agentredactor.exe subcommands as subprocesses against an isolated
+      # config dir, using the same release binaries as the GUI suite.
+      - name: Run CLI tests
+        shell: pwsh
+        run: |
+          cd repo/tests
+          pytest -v cli/
+
       - name: Show crash event-log entries (arm64)
         if: always() && inputs.arch == 'arm64'
         shell: pwsh
