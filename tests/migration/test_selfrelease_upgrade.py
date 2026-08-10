@@ -136,6 +136,9 @@ def test_selfrelease_upgrade(tmp_path):
     install_root = Path(os.environ["LOCALAPPDATA"]) / INSTALL_DIR_NAME
     current_exe = install_root / "current" / "AgentRedactorUI.exe"
     update_exe = install_root / "Update.exe"
+    # Previous live releases predate the AgentRedactor.exe -> AgentRedactorUI.exe
+    # rename, so the freshly installed previous build may carry the old name.
+    legacy_exe = install_root / "current" / "AgentRedactor.exe"
 
     server: subprocess.Popen | None = None
     try:
@@ -148,13 +151,14 @@ def test_selfrelease_upgrade(tmp_path):
 
         # 2. Verify the installed layout matches what update_manager.cpp's
         #    FindUpdateExe expects (Update.exe at root, app under current\).
-        assert update_exe.is_file() and current_exe.is_file(), (
+        installed_exe = current_exe if current_exe.is_file() else legacy_exe
+        assert update_exe.is_file() and installed_exe.is_file(), (
             "Unexpected Velopack install layout; expected Update.exe and "
-            f"current\\AgentRedactorUI.exe under {install_root}.\n"
+            f"current\\AgentRedactorUI.exe (or legacy AgentRedactor.exe) under {install_root}.\n"
             + _layout_listing(install_root)
         )
 
-        prev_version = _file_version(current_exe)
+        prev_version = _file_version(installed_exe)
         assert _version_key(prev_version) < _version_key(expected), (
             f"installed previous version '{prev_version}' is not older than "
             f"the expected upgrade target '{expected}'"
@@ -195,7 +199,7 @@ def test_selfrelease_upgrade(tmp_path):
                 "AGENTREDACTOR_CONFIG_DIR": str(config_dir),
             }
         )
-        subprocess.Popen([str(current_exe)], env=env)
+        subprocess.Popen([str(installed_exe)], env=env)
 
         # 6. Poll until the installed current\AgentRedactorUI.exe is the vNext
         #    build (Update.exe apply swaps it and restarts the app).

@@ -153,6 +153,12 @@ $msbuildArgs = @(
     "-p:Platform=$Platform",
     "-p:RestorePackages=false"
 )
+if ($Platform -eq "ARM64") {
+    # The default HostX86\arm64 cross-compiler is a 32-bit process and runs
+    # out of address space on the WinUI-sized PCH (C3859/C1076); force the
+    # 64-bit host tools (engine build further down gets the same flag).
+    $msbuildArgs += "-p:PreferredToolArchitecture=x64"
+}
 if ($SelfRelease) {
     # Stamps AGENTREDACTOR_SELFRELEASE + AR_VERSION_STRING (see vcxproj)
     $msbuildArgs += "-p:SelfRelease=true"
@@ -179,6 +185,10 @@ $engineBuildArgs = @(
     "-p:Configuration=Release",
     "-p:Platform=$Platform"
 )
+if ($Platform -eq "ARM64") {
+    # See the GUI build above: force 64-bit host tools for ARM64.
+    $engineBuildArgs += "-p:PreferredToolArchitecture=x64"
+}
 if ($SelfRelease) {
     $engineBuildArgs += "-p:SelfRelease=true"
     $engineBuildArgs += "-p:AppVersion=$Version"
