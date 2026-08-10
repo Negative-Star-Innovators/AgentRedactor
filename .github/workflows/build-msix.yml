@@ -232,7 +232,10 @@ jobs:
         shell: pwsh
         run: |
           $pkg = Get-AppxPackage -Name '*AgentRedactor*'
-          $appId = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Id
+          # Two Application entries exist (GUI + hidden engine alias entry);
+          # .Id alone would return an array and break the AUMID.
+          $appId = ((Get-AppxPackageManifest $pkg).Package.Applications.Application |
+            Where-Object { $_.Id -eq 'AgentRedactor' }).Id
           $aumid = "$($pkg.PackageFamilyName)!$appId"
           Write-Host "Activating $aumid"
 

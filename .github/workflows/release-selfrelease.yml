@@ -476,8 +476,13 @@ jobs:
         if: steps.live.outputs.live == 'true'
         shell: pwsh
         run: |
-          $exe = "$env:LOCALAPPDATA\AgentRedactor\current\AgentRedactorUI.exe"
-          if (-not (Test-Path $exe)) { throw "one-line installer finished but $exe does not exist" }
+          # The live release may predate the AgentRedactor.exe ->
+          # AgentRedactorUI.exe rename; accept either (same as install.ps1.js).
+          $exe = @("AgentRedactorUI.exe", "AgentRedactor.exe") |
+            ForEach-Object { "$env:LOCALAPPDATA\AgentRedactor\current\$_" } |
+            Where-Object { Test-Path $_ } |
+            Select-Object -First 1
+          if (-not $exe) { throw "one-line installer finished but no app exe exists under $env:LOCALAPPDATA\AgentRedactor\current" }
 
           # PE machine type: the installed build decides which channel's feed
           # to compare against (ARM64 runners legitimately get the x64 fallback
