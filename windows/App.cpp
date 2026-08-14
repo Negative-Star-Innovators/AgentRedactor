@@ -105,6 +105,7 @@ LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS info)
                 - reinterpret_cast<ULONG_PTR>(self));
         DbgLog(buf);
         if (info->ContextRecord) {
+#if defined(_M_X64)
             swprintf_s(buf, L"regs: rax=0x%llX rbx=0x%llX rcx=0x%llX rdx=0x%llX rsp=0x%llX rbp=0x%llX rsi=0x%llX rdi=0x%llX rip=0x%llX",
                 info->ContextRecord->Rax, info->ContextRecord->Rbx,
                 info->ContextRecord->Rcx, info->ContextRecord->Rdx,
@@ -112,6 +113,14 @@ LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS info)
                 info->ContextRecord->Rsi, info->ContextRecord->Rdi,
                 info->ContextRecord->Rip);
             DbgLog(buf);
+#elif defined(_M_ARM64)
+            swprintf_s(buf, L"regs: x0=0x%llX fp=0x%llX lr=0x%llX sp=0x%llX pc=0x%llX cpsr=0x%08X",
+                info->ContextRecord->X[0], info->ContextRecord->Fp,
+                info->ContextRecord->Lr, info->ContextRecord->Sp,
+                info->ContextRecord->Pc,
+                static_cast<DWORD>(info->ContextRecord->Cpsr));
+            DbgLog(buf);
+#endif
         }
         {
             const unsigned char* p = static_cast<const unsigned char*>(
