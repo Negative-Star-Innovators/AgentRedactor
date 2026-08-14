@@ -19,6 +19,7 @@ instead of driving a dialog.
 from __future__ import annotations
 
 import os
+import platform
 import subprocess
 import time
 from pathlib import Path
@@ -50,11 +51,16 @@ os.environ["AGENTREDACTOR_HELLO_SUPPRESS_PROMPT"] = "1"
 # hanging 60 s per call.
 os.environ["AGENTREDACTOR_HELLO_TIMEOUT_MS"] = "1500"
 
+# The vcxproj outputs to build/<Platform>/Release where <Platform> is the
+# MSBuild platform name (x64 / ARM64). Match the host architecture, like
+# gui_process.py and tests/cli/conftest.py do — the ARM64 CI leg only has
+# windows/build/ARM64/Release/, so a hardcoded x64 path would not exist there.
+_BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
 ENGINE_EXE = (
     Path(__file__).resolve().parent.parent.parent
     / "windows"
     / "build"
-    / "x64"
+    / _BUILD_PLATFORM
     / "Release"
     / "agentredactor.exe"
 )
