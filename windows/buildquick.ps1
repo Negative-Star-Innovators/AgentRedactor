@@ -85,7 +85,16 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Building AgentRedactor ($Configuration|$Platform)..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-$msbuildArgs = @("$root\AgentRedactor.vcxproj", "-p:Configuration=$Configuration", "-p:Platform=$Platform", "-p:RestorePackages=false", "-m", "-verbosity:minimal")
+# Stamp the version from version.txt (same as build.ps1) so dev/quick builds
+# identify themselves in `agentredactor status` / the exe's file version.
+$versionFile = "$root\version.txt"
+$buildVersion = "1.0.0"
+if (Test-Path $versionFile) {
+    $buildVersion = (Get-Content $versionFile -Raw).Trim()
+}
+$versionCore = ($buildVersion -split '[-+]')[0]
+$appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
+$msbuildArgs = @("$root\AgentRedactor.vcxproj", "-p:Configuration=$Configuration", "-p:Platform=$Platform", "-p:RestorePackages=false", "-p:AppVersion=$buildVersion", "-p:AppVersionQuad=`"$appVersionQuad`"", "-m", "-verbosity:minimal")
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
@@ -95,7 +104,7 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Building AgentRedactorEngine ($Configuration|$Platform)..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-& $msbuild "$root\AgentRedactorEngine.vcxproj" "-p:Configuration=$Configuration" "-p:Platform=$Platform" "-m" "-verbosity:minimal"
+& $msbuild "$root\AgentRedactorEngine.vcxproj" "-p:Configuration=$Configuration" "-p:Platform=$Platform" "-p:AppVersion=$buildVersion" "-m" "-verbosity:minimal"
 if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
 
 # Copy model files required at runtime

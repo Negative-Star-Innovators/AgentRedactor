@@ -97,22 +97,31 @@
          outputs cannot share a directory otherwise. -->
     <TargetName>AgentRedactorUI</TargetName>
   </PropertyGroup>
-  <!-- Self-release (Velopack) channel: enabled with -p:SelfRelease=true.
-       Kept as an MSBuild property (not command-line PreprocessorDefinitions)
-       so it composes with the per-config ItemDefinitionGroups and the
-       FixClCompilePreprocessorDefinitions target. -->
-  <PropertyGroup Condition="'$(SelfRelease)'=='true'">
+  <!-- Version identity for EVERY build: build.ps1 passes
+       -p:AppVersion=<version.txt>, which becomes AR_VERSION_STRING (reported
+       by `agentredactor status` as engineVersion and as APP_VERSION in C++)
+       and the VERSIONINFO resource. A bare msbuild invocation falls back to
+       1.0.0. -->
+  <PropertyGroup>
     <AppVersion Condition="'$(AppVersion)'==''">1.0.0</AppVersion>
     <!-- 4-part comma form of AppVersion for the VERSIONINFO resource; the rc
          preprocessor cannot split strings, so build.ps1 passes
          -p:AppVersionQuad=x,y,z,0 (fallback here when unset). -->
     <AppVersionQuad Condition="'$(AppVersionQuad)'==''">1,0,0,0</AppVersionQuad>
-    <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE;AR_VERSION_STRING=&quot;$(AppVersion)&quot;;AR_VERSION_QUAD=$(AppVersionQuad)</SelfReleaseDefines>
+    <VersionDefines>AR_VERSION_STRING=&quot;$(AppVersion)&quot;;AR_VERSION_QUAD=$(AppVersionQuad)</VersionDefines>
     <!-- rc.exe gets its own set: embedded quotes (AR_VERSION_STRING) do not
          survive the MSBuild -> tracker -> rc.exe command line (the value
          silently compiled in empty, producing a corrupt VERSIONINFO that
          reads as 0.0.0.0). AR_VERSION_TEXT is unquoted; app.rc stringizes it. -->
-    <SelfReleaseRcDefines>AGENTREDACTOR_SELFRELEASE;AR_VERSION_TEXT=$(AppVersion);AR_VERSION_QUAD=$(AppVersionQuad)</SelfReleaseRcDefines>
+    <VersionRcDefines>AR_VERSION_TEXT=$(AppVersion);AR_VERSION_QUAD=$(AppVersionQuad)</VersionRcDefines>
+  </PropertyGroup>
+  <!-- Self-release (Velopack) channel: enabled with -p:SelfRelease=true.
+       Kept as an MSBuild property (not command-line PreprocessorDefinitions)
+       so it composes with the per-config ItemDefinitionGroups and the
+       FixClCompilePreprocessorDefinitions target. -->
+  <PropertyGroup Condition="'$(SelfRelease)'=='true'">
+    <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE</SelfReleaseDefines>
+    <SelfReleaseRcDefines>AGENTREDACTOR_SELFRELEASE</SelfReleaseRcDefines>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -172,14 +181,14 @@
   </ItemDefinitionGroup>
   <!-- Appended after the per-config groups so %(PreprocessorDefinitions) picks up
        their values; when SelfReleaseDefines is empty this expands to nothing and the
-       Store/MSIX build is unchanged. Applies to all four configurations. ResourceCompile
-       uses the quote-free SelfReleaseRcDefines (see above). -->
+       Store/MSIX build only gets the version defines. Applies to all four
+       configurations. ResourceCompile uses the quote-free VersionRcDefines (see above). -->
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>$(SelfReleaseDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(SelfReleaseDefines);$(VersionDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>$(SelfReleaseRcDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(SelfReleaseRcDefines);$(VersionRcDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -187,6 +196,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="HomePage.h" />
+    <ClInclude Include="engine\hello_unlock.h" />
     <ClInclude Include="RegexPage.h" />
     <ClInclude Include="KeywordsPage.h" />
     <ClInclude Include="SettingsPage.h" />
@@ -221,6 +231,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="HomePage.cpp" />
+    <ClCompile Include="engine\hello_unlock.cpp"><PrecompiledHeader>NotUsing</PrecompiledHeader></ClCompile>
     <ClCompile Include="RegexPage.cpp" />
     <ClCompile Include="KeywordsPage.cpp" />
     <ClCompile Include="SettingsPage.cpp" />

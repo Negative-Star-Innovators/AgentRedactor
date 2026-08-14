@@ -424,7 +424,7 @@
     <value>A chọrọ Master Password</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Mepee</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Pụọ</value>

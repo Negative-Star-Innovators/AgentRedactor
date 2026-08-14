@@ -424,7 +424,7 @@
     <value>Mot de passe maître requis</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Déverrouiller</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Quitter</value>

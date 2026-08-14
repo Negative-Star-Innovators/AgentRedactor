@@ -424,7 +424,7 @@
     <value>Негізгі құпия сөз қажет</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Құлыпты ашу</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Шығу</value>

@@ -424,7 +424,7 @@
     <value>Yêu cầu mật khẩu chính</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Mở khóa</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Thoát</value>

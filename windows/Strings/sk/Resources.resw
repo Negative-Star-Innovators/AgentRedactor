@@ -424,7 +424,7 @@
     <value>Vyžaduje sa hlavné heslo</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Odomknúť</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Ukončiť</value>

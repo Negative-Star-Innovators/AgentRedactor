@@ -98,7 +98,14 @@ bool EngineClient::Request(const std::wstring& method, const std::wstring& path,
     if (!hSession) return false;
 
     // Short timeouts: the engine is localhost; a hang means it is not running.
-    WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 3000);
+    // /unlock/hello holds the request while the user answers the Windows Hello
+    // consent prompt (the engine cancels it after 60s), so it gets a long
+    // receive timeout.
+    if (path == L"/unlock/hello") {
+        WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 90000);
+    } else {
+        WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 3000);
+    }
 
     HINTERNET hConnect = WinHttpConnect(hSession, L"127.0.0.1", (INTERNET_PORT)port_, 0);
     if (hConnect) {
@@ -218,28 +225,60 @@ bool SettingsFacade::IsUnlocked() const {
     return GetSettingsJson(j) && j.value("unlocked", true);
 }
 
-bool SettingsFacade::UnlockWithPassword(const std::wstring& password) {
-    if (!client_) return false;
-    json body;
-    body["password"] = Utils::WideToUtf8(password);
+HelloUnlockOutcome SettingsFacade::UnlockWithHello() const {
+    HelloUnlockOutcome outcome;
+    if (!client_) return outcome;
     json out;
-    return client_->Post(L"/unlock", body, &out) && out.value("ok", false);
+    if (!client_->Post(L"/unlock/hello", json::object(), &out)) return outcome;
+    outcome.ok = out.value("ok", false);
+    outcome.canceled = out.value("canceled", false);
+    outcome.retriesExhausted = out.value("retriesExhausted", false);
+    outcome.unavailable = out.value("unavailable", false);
+    outcome.helloNotEnabled = out.value("helloNotEnabled", false);
+    return outcome;
 }
 
-bool SettingsFacade::EnableMasterPassword(const std::wstring& password) {
-    return PutValue(L"enableMasterPassword", Utils::WideToUtf8(password));
-}
-
-bool SettingsFacade::ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword) {
+bool SettingsFacade::UnlockEngine() const {
     if (!client_) return false;
+    json out;
+    return client_->Post(L"/unlock", json::object(), &out) && out.value("ok", false);
+}
+
+// Locks the session (PUT /settings/lock): proxies keep running, only
+// sensitive reads/settings are gated until the next Hello unlock.
+void SettingsFacade::LockSession() const {
+    if (!client_) return;
+    client_->Put(L"/settings/lock", json::object());
+}
+
+std::wstring SettingsFacade::GetProfileApiKey(const std::wstring& id) const {
+    if (!client_) return L"";
+    json out;
+    if (!client_->Get(L"/profiles/" + id + L"/apikey", out)) return L"";
+    return Utils::Utf8ToWide(out.value("apiKey", std::string("")));
+}
+
+bool SettingsFacade::HelloVerify() const {
+    if (!client_) return false;
+    json out;
+    return client_->Post(L"/hello/verify", json::object(), &out) && out.value("ok", false);
+}
+
+// Enables Windows-Hello-only protection: no typed password exists.
+bool SettingsFacade::EnableMasterPassword() {
     json body;
-    body["oldValue"] = Utils::WideToUtf8(oldPassword);
-    body["value"] = Utils::WideToUtf8(newPassword);
-    return client_->Put(L"/settings/changeMasterPassword", body);
+    body["value"] = "";
+    body["hello"] = true;
+    return client_ && client_->Put(L"/settings/enableMasterPassword", body);
 }
 
 void SettingsFacade::DisableMasterPassword() {
     PutValue(L"disableMasterPassword", false);
+}
+
+bool SettingsFacade::IsHelloEnabled() const {
+    json j;
+    return GetSettingsJson(j) && j.value("helloEnabled", false);
 }
 
 bool SettingsFacade::IsLoggingEnabled() const {

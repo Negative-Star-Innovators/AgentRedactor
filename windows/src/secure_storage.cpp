@@ -16,33 +16,38 @@ namespace AgentRedactor {
 // Public API
 // ============================================================================
 
-bool SecureStorage::Initialize(const json& config, const std::wstring& masterPassword) {
+bool SecureStorage::Initialize(const json& config) {
     initialized_ = false;
     masterPasswordEnabled_ = false;
+    helloEnabled_ = false;
     aesKey_.clear();
-    salt_.clear();
-    encryptedAesKey_.clear();
-    keyIv_.clear();
-    keyTag_.clear();
+    helloBlob_.clear();
 
     if (config.contains("enabled") && config["enabled"].get<bool>()) {
-        masterPasswordEnabled_ = true;
-        salt_ = Base64Decode(config.value("salt", ""));
-        iterations_ = config.value("iterations", 100000);
-        encryptedAesKey_ = Base64Decode(config.value("encrypted_key", ""));
-        keyIv_ = Base64Decode(config.value("key_iv", ""));
-        keyTag_ = Base64Decode(config.value("key_tag", ""));
-
-        if (!masterPassword.empty()) {
-            return Unlock(masterPassword);
+        // Windows-Hello-only protection. A legacy typed-password config with
+        // no Hello blob cannot be unlocked by anyone anymore — it degrades to
+        // unprotected so the user can re-enable with Windows Hello; a config
+        // that has a Hello blob keeps working (unlock needs the consent).
+        if (config.contains("hello") && config["hello"].is_object()) {
+            const auto& hello = config["hello"];
+            if (hello.value("enabled", false)) {
+                masterPasswordEnabled_ = true;
+                helloEnabled_ = true;
+                helloBlob_ = Base64Decode(hello.value("blob", ""));
+            }
         }
-        // Config loaded, waiting for password
-        return true;
+        if (!masterPasswordEnabled_) {
+            // Legacy typed-password-only config (or empty hello block):
+            // treat as unprotected.
+            helloBlob_.clear();
+        }
     }
 
-    // DPAPI mode - always ready
-    masterPasswordEnabled_ = false;
-    initialized_ = true;
+    // No typed password: the storage is ready to encrypt/decrypt in the
+    // current mode (DPAPI when unprotected; a protected session stays
+    // locked until UnlockWithHello). Sensitive fields stay encrypted until
+    // the session is unlocked.
+    initialized_ = !masterPasswordEnabled_;
     return true;
 }
 
@@ -114,98 +119,59 @@ json SecureStorage::GetConfig() const {
     json config;
     config["enabled"] = masterPasswordEnabled_;
     if (masterPasswordEnabled_) {
-        config["salt"] = Base64Encode(salt_);
-        config["iterations"] = iterations_;
-        config["encrypted_key"] = Base64Encode(encryptedAesKey_);
-        config["key_iv"] = Base64Encode(keyIv_);
-        config["key_tag"] = Base64Encode(keyTag_);
+        if (helloEnabled_ && !helloBlob_.empty()) {
+            config["hello"] = json{
+                {"enabled", true},
+                {"blob", Base64Encode(helloBlob_)}
+            };
+        }
     }
     return config;
 }
 
-bool SecureStorage::EnableMasterPassword(const std::wstring& password) {
-    if (password.empty()) return false;
-
-    // Generate random AES key
+bool SecureStorage::EnableMasterPassword() {
+    if (masterPasswordEnabled_ || helloEnabled_) return false;
     aesKey_ = GenerateRandomBytes(32);
-    salt_ = GenerateRandomBytes(16);
-    iterations_ = 100000;
-
-    // Derive KEK from password
-    auto kek = Pbkdf2DeriveKey(password, salt_, iterations_, 32);
-
-    // Encrypt AES key with KEK
-    if (!AesGcmEncrypt(aesKey_, kek, encryptedAesKey_, keyIv_, keyTag_)) {
+    auto blob = DpapiProtect(aesKey_);
+    if (!blob || blob->empty()) {
         aesKey_.clear();
-        salt_.clear();
-        encryptedAesKey_.clear();
-        keyIv_.clear();
-        keyTag_.clear();
         return false;
     }
-
+    helloBlob_ = *blob;
+    helloEnabled_ = true;
     masterPasswordEnabled_ = true;
     initialized_ = true;
     return true;
 }
 
-bool SecureStorage::ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword) {
-    if (!masterPasswordEnabled_ || newPassword.empty()) return false;
+void SecureStorage::Lock() {
+    initialized_ = false;
+}
 
-    // Verify old password by unlocking
-    if (!Unlock(oldPassword)) return false;
-
-    // Now aesKey_ is decrypted. Re-encrypt with new password.
-    salt_ = GenerateRandomBytes(16);
-    auto kek = Pbkdf2DeriveKey(newPassword, salt_, iterations_, 32);
-
-    if (!AesGcmEncrypt(aesKey_, kek, encryptedAesKey_, keyIv_, keyTag_)) {
-        return false;
-    }
-
-    // aesKey_ stays in memory, initialized_ stays true
+bool SecureStorage::UnlockWithHello() {
+    if (!masterPasswordEnabled_ || !helloEnabled_ || helloBlob_.empty()) return false;
+    auto blob = DpapiUnprotect(helloBlob_);
+    if (!blob || blob->size() != 32) return false;
+    aesKey_ = *blob;
+    initialized_ = true;
     return true;
 }
 
 void SecureStorage::DisableMasterPassword() {
     masterPasswordEnabled_ = false;
+    helloEnabled_ = false;
     initialized_ = true;
     aesKey_.clear();
-    salt_.clear();
-    encryptedAesKey_.clear();
-    keyIv_.clear();
-    keyTag_.clear();
-}
-
-bool SecureStorage::Unlock(const std::wstring& password) {
-    if (!masterPasswordEnabled_) {
-        initialized_ = true;
-        return true;
-    }
-
-    if (salt_.empty() || encryptedAesKey_.empty() || keyIv_.empty() || keyTag_.empty()) {
-        return false;
-    }
-
-    auto kek = Pbkdf2DeriveKey(password, salt_, iterations_, 32);
-    auto decrypted = AesGcmDecrypt(encryptedAesKey_, kek, keyIv_, keyTag_);
-    if (!decrypted) {
-        initialized_ = false;
-        return false;
-    }
-
-    aesKey_ = *decrypted;
-    initialized_ = true;
-    return true;
+    helloBlob_.clear();
 }
 
 // ============================================================================
 // DPAPI
 // ============================================================================
 
-std::optional<std::vector<BYTE>> SecureStorage::DpapiEncrypt(const std::wstring& plaintext) {
-    std::string utf8 = Utils::WideToUtf8(plaintext);
-    DATA_BLOB inBlob = { static_cast<DWORD>(utf8.size()), reinterpret_cast<BYTE*>(const_cast<char*>(utf8.data())) };
+std::optional<std::vector<BYTE>> SecureStorage::DpapiProtect(const std::vector<BYTE>& data) {
+    if (data.empty()) return std::nullopt;
+    DATA_BLOB inBlob = { static_cast<DWORD>(data.size()), const_cast<BYTE*>(data.data()) };
     DATA_BLOB outBlob = {};
 
     if (CryptProtectData(&inBlob, L"AgentRedactorApiKey", nullptr, nullptr, nullptr,
@@ -217,17 +183,31 @@ std::optional<std::vector<BYTE>> SecureStorage::DpapiEncrypt(const std::wstring&
     return std::nullopt;
 }
 
-std::optional<std::wstring> SecureStorage::DpapiDecrypt(const std::vector<BYTE>& ciphertext) {
-    DATA_BLOB inBlob = { static_cast<DWORD>(ciphertext.size()), const_cast<BYTE*>(ciphertext.data()) };
+std::optional<std::vector<BYTE>> SecureStorage::DpapiUnprotect(const std::vector<BYTE>& data) {
+    if (data.empty()) return std::nullopt;
+    DATA_BLOB inBlob = { static_cast<DWORD>(data.size()), const_cast<BYTE*>(data.data()) };
     DATA_BLOB outBlob = {};
 
     if (CryptUnprotectData(&inBlob, nullptr, nullptr, nullptr, nullptr,
             CRYPTPROTECT_UI_FORBIDDEN, &outBlob)) {
-        std::string utf8(reinterpret_cast<char*>(outBlob.pbData), outBlob.cbData);
+        std::vector<BYTE> result(outBlob.pbData, outBlob.pbData + outBlob.cbData);
         LocalFree(outBlob.pbData);
-        return Utils::Utf8ToWide(utf8);
+        return result;
     }
     return std::nullopt;
+}
+
+std::optional<std::vector<BYTE>> SecureStorage::DpapiEncrypt(const std::wstring& plaintext) {
+    std::string utf8 = Utils::WideToUtf8(plaintext);
+    std::vector<BYTE> bytes(utf8.begin(), utf8.end());
+    return DpapiProtect(bytes);
+}
+
+std::optional<std::wstring> SecureStorage::DpapiDecrypt(const std::vector<BYTE>& ciphertext) {
+    auto bytes = DpapiUnprotect(ciphertext);
+    if (!bytes) return std::nullopt;
+    std::string utf8(bytes->begin(), bytes->end());
+    return Utils::Utf8ToWide(utf8);
 }
 
 // ============================================================================
@@ -372,36 +352,6 @@ std::optional<std::vector<BYTE>> SecureStorage::AesGcmDecrypt(const std::vector<
     BCryptDestroyKey(hKey);
     BCryptCloseAlgorithmProvider(hAlg, 0);
     return plaintext;
-}
-
-// ============================================================================
-// PBKDF2-HMAC-SHA256
-// ============================================================================
-
-std::vector<BYTE> SecureStorage::Pbkdf2DeriveKey(const std::wstring& password,
-    const std::vector<BYTE>& salt, int iterations, size_t keyLen) {
-
-    std::vector<BYTE> result;
-    if (password.empty() || salt.empty() || iterations <= 0 || keyLen == 0) return result;
-
-    std::string utf8Password = Utils::WideToUtf8(password);
-
-    BCRYPT_ALG_HANDLE hPrf = nullptr;
-    NTSTATUS status = BCryptOpenAlgorithmProvider(&hPrf, BCRYPT_SHA256_ALGORITHM, nullptr, BCRYPT_ALG_HANDLE_HMAC_FLAG);
-    if (!BCRYPT_SUCCESS(status)) return result;
-
-    result.resize(keyLen);
-    status = BCryptDeriveKeyPBKDF2(hPrf,
-        reinterpret_cast<PUCHAR>(const_cast<char*>(utf8Password.data())), static_cast<ULONG>(utf8Password.size()),
-        const_cast<PUCHAR>(salt.data()), static_cast<ULONG>(salt.size()),
-        iterations, result.data(), static_cast<ULONG>(keyLen), 0);
-
-    BCryptCloseAlgorithmProvider(hPrf, 0);
-
-    if (!BCRYPT_SUCCESS(status)) {
-        result.clear();
-    }
-    return result;
 }
 
 // ============================================================================

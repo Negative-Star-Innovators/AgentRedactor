@@ -290,6 +290,17 @@ def add_profile(alias: str) -> None:
     _run_helper("add-profile", "--alias", alias)
 
 
+def set_profile_alias(alias: str) -> None:
+    """Rename the currently selected profile (sets the alias in the form).
+
+    Intended to be called immediately before save_profile(): typing the alias
+    last minimises the window in which the app's 1-second settings poll could
+    revert an unsaved edit (the alias-typing race that made profile tests
+    flaky under load).
+    """
+    _run_helper("set-profile-alias", "--alias", alias)
+
+
 def select_profile(alias: str) -> None:
     """Select the profile with the given alias in the profile list."""
     _run_helper("select-profile", "--alias", alias)
@@ -409,43 +420,16 @@ def toggle_show_api_key() -> None:
     _run_helper("toggle-show-api-key")
 
 
-def set_master_password(enabled: bool, password: str, confirm: str | None = None) -> None:
-    """Enable or disable the master password through the Home page Password card."""
-    confirm = confirm if confirm is not None else password
-    _run_helper(
-        "set-master-password",
-        "--enabled",
-        "true" if enabled else "false",
-        "--password",
-        password,
-        "--confirm",
-        confirm,
-    )
+def get_require_password_state() -> bool:
+    """Return whether the Lock with Windows Hello checkbox is checked."""
+    output = _run_helper("get-require-password-state").strip()
+    return output == "CHECKED:True"
 
 
-def change_master_password(old: str, new: str, confirm: str | None = None) -> None:
-    """Change the master password using the Change password button."""
-    confirm = confirm if confirm is not None else new
-    _run_helper(
-        "change-master-password",
-        "--old",
-        old,
-        "--new",
-        new,
-        "--confirm",
-        confirm,
-    )
-
-
-def unlock_master_password(password: str) -> None:
-    """Unlock the app on startup when a master password is required."""
-    _run_helper("unlock-master-password", "--password", password)
-
-
-def get_change_password_button_state() -> bool:
-    """Return whether the Change password button is enabled."""
-    output = _run_helper("get-change-password-button-state").strip()
-    return output == "ENABLED:True"
+def toggle_require_password() -> None:
+    """Toggle the Lock with Windows Hello checkbox (enable is direct;
+    disable asks for Windows Hello consent)."""
+    _run_helper("toggle-require-password")
 
 
 def get_content_dialog_text() -> list[str]:

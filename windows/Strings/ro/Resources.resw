@@ -424,7 +424,7 @@
     <value>Parola principală este necesară</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Deblochează</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Ieșire</value>

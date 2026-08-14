@@ -424,7 +424,7 @@
     <value>Kata Laluan Induk Diperlukan</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Buka kunci</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Keluar</value>

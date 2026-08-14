@@ -252,10 +252,7 @@
     <value>Password</value>
   </data>
   <data name="HomePage_RequirePasswordCheck.Content" xml:space="preserve">
-    <value>Require password on startup</value>
-  </data>
-  <data name="HomePage_ChangePasswordButton.Content" xml:space="preserve">
-    <value>Change password</value>
+    <value>Lock with Windows Hello</value>
   </data>
 
   <!-- HomePage: Statistics -->
@@ -471,111 +468,51 @@
     <value>Retry</value>
   </data>
 
-  <!-- Dialogs: Master password -->
-  <data name="Dialog_MasterPasswordRequired_Title" xml:space="preserve">
-    <value>Master Password Required</value>
+  <!-- Dialogs: Windows Hello protection -->
+  <data name="Dialog_ExitButton" xml:space="preserve">
+    <value>Exit</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
     <value>Unlock</value>
   </data>
-  <data name="Dialog_ExitButton" xml:space="preserve">
-    <value>Exit</value>
-  </data>
-  <data name="Dialog_EnterPasswordPlaceholder" xml:space="preserve">
-    <value>Enter password</value>
-  </data>
-  <data name="Dialog_IncorrectPassword_Title" xml:space="preserve">
-    <value>Incorrect Password</value>
-  </data>
-  <data name="Dialog_IncorrectPassword_Message" xml:space="preserve">
-    <value>The password you entered is incorrect. Please try again.</value>
-  </data>
-  <data name="Dialog_TooManyAttempts_Title" xml:space="preserve">
-    <value>Too Many Attempts</value>
-  </data>
-  <data name="Dialog_TooManyAttempts_Message" xml:space="preserve">
-    <value>Maximum password attempts reached. The application will now exit.</value>
-  </data>
   <data name="Dialog_SetMasterPassword_Title" xml:space="preserve">
-    <value>Set Master Password</value>
+    <value>Lock with Windows Hello</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello will be used to unlock the app. You will be asked to verify with Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello verification was not completed, so protection was not enabled. Try again.</value>
   </data>
   <data name="Dialog_SetPasswordButton" xml:space="preserve">
-    <value>Set Password</value>
-  </data>
-  <data name="Dialog_PasswordPlaceholder" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="Dialog_ConfirmPasswordPlaceholder" xml:space="preserve">
-    <value>Confirm password</value>
-  </data>
-  <data name="Dialog_PasswordEmpty_Title" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="Dialog_PasswordEmpty_Message" xml:space="preserve">
-    <value>Password cannot be empty.</value>
-  </data>
-  <data name="Dialog_PasswordMismatch_Title" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="Dialog_PasswordMismatch_Message" xml:space="preserve">
-    <value>Passwords do not match.</value>
+    <value>Enable</value>
   </data>
   <data name="Dialog_EnableMasterPasswordFailed_Title" xml:space="preserve">
     <value>Error</value>
   </data>
   <data name="Dialog_EnableMasterPasswordFailed_Message" xml:space="preserve">
-    <value>Failed to enable master password.</value>
+    <value>Failed to enable Windows Hello protection.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello required</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello verification did not succeed. Try again, or exit the app.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Try again</value>
   </data>
   <data name="Dialog_DisableMasterPassword_Title" xml:space="preserve">
-    <value>Disable Master Password</value>
+    <value>Disable Windows Hello protection</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>You will be asked to verify with Windows Hello before protection is disabled.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello verification was not completed, so protection is still enabled.</value>
   </data>
   <data name="Dialog_DisableButton" xml:space="preserve">
     <value>Disable</value>
-  </data>
-  <data name="Dialog_CurrentPasswordPlaceholder" xml:space="preserve">
-    <value>Current password</value>
-  </data>
-  <data name="Dialog_IncorrectCurrentPassword_Title" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="Dialog_IncorrectCurrentPassword_Message" xml:space="preserve">
-    <value>Incorrect password.</value>
-  </data>
-  <data name="Dialog_ChangeMasterPassword_Title" xml:space="preserve">
-    <value>Change Master Password</value>
-  </data>
-  <data name="Dialog_ChangePasswordButton" xml:space="preserve">
-    <value>Change</value>
-  </data>
-  <data name="Dialog_NewPasswordPlaceholder" xml:space="preserve">
-    <value>New password</value>
-  </data>
-  <data name="Dialog_ConfirmNewPasswordPlaceholder" xml:space="preserve">
-    <value>Confirm new password</value>
-  </data>
-  <data name="Dialog_NewPasswordEmpty_Title" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="Dialog_NewPasswordEmpty_Message" xml:space="preserve">
-    <value>New password cannot be empty.</value>
-  </data>
-  <data name="Dialog_NewPasswordMismatch_Title" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="Dialog_NewPasswordMismatch_Message" xml:space="preserve">
-    <value>New passwords do not match.</value>
-  </data>
-  <data name="Dialog_ChangePasswordSuccess_Title" xml:space="preserve">
-    <value>Success</value>
-  </data>
-  <data name="Dialog_ChangePasswordSuccess_Message" xml:space="preserve">
-    <value>Master password changed successfully.</value>
-  </data>
-  <data name="Dialog_ChangePasswordFailed_Title" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="Dialog_ChangePasswordFailed_Message" xml:space="preserve">
-    <value>Failed to change password. Make sure your current password is correct.</value>
   </data>
 
   <!-- Dialogs: General -->

@@ -424,7 +424,7 @@
     <value>Peaparool on nõutav</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Ava lukk</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Välju</value>

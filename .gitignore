@@ -2,6 +2,9 @@
 windows/build/
 windows/packages/
 
+# Temporary scripts and artifacts
+temp/
+
 # Large ONNX model weights (distributed via GitHub Release asset, see README)
 windows/models/onnx/model_quantized.onnx_data
 

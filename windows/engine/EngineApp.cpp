@@ -3,6 +3,8 @@
 #include "api_key_profile.h"
 #include "logging.h"
 #include "model_downloader.h"
+#include "hello_unlock.h"
+#include <winnls.h>
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <chrono>
@@ -847,7 +849,9 @@ HttpResponse EngineApp::HandleControlRequest(const HttpRequest& request) {
         if (path == L"/settings" && method == "GET") return ApiGetSettings();
         if (path == L"/profiles" && method == "GET") return ApiGetProfiles();
         if (path == L"/profiles" && method == "POST") return ApiPostProfile(request.body);
-        if (path == L"/unlock" && method == "POST") return ApiUnlock(request.body);
+        if (path == L"/hello/verify" && method == "POST") return ApiHelloVerify(query);
+        if (path == L"/unlock/hello" && method == "POST") return ApiUnlockHello(query);
+        if (path == L"/unlock" && method == "POST") return ApiUnlock();
         if (path == L"/logs" && method == "GET") {
             std::wstring profileParam;
             const std::wstring prefix = L"profile=";
@@ -914,6 +918,7 @@ HttpResponse EngineApp::ApiGetStatus() {
 #endif
     j["unlocked"] = settings_->IsUnlocked();
     j["masterPasswordEnabled"] = settings_->IsMasterPasswordEnabled();
+    j["helloEnabled"] = settings_->IsHelloEnabled();
     j["modelDownloadRequired"] = modelDownloadRequired_;
     j["modelDownloadInProgress"] = modelDownloadInProgress_;
     j["modelDownloadFailed"] = modelDownloadFailed_;
@@ -938,9 +943,20 @@ HttpResponse EngineApp::ApiGetSettings() {
     j["onnxProvider"] = Utils::WideToUtf8(settings_->GetOnnxProvider());
     j["loggingEnabled"] = settings_->IsLoggingEnabled();
     j["showSensitive"] = logManager_->IsShowSensitive();
-    j["appLanguage"] = Utils::WideToUtf8(settings_->GetAppLanguage());
+    // With no saved override the GUI falls back to the OS UI language;
+    // report that effective value so consumers (e.g. `get app-language`)
+    // never print a blank line on a fresh install.
+    std::wstring appLanguage = settings_->GetAppLanguage();
+    if (appLanguage.empty()) {
+        wchar_t langBuf[LOCALE_NAME_MAX_LENGTH] = {};
+        LCIDToLocaleName(GetUserDefaultUILanguage(), langBuf, LOCALE_NAME_MAX_LENGTH, 0);
+        appLanguage = langBuf;
+    }
+    j["appLanguage"] = Utils::WideToUtf8(appLanguage);
     j["masterPasswordEnabled"] = settings_->IsMasterPasswordEnabled();
+    j["helloEnabled"] = settings_->IsHelloEnabled();
     j["unlocked"] = settings_->IsUnlocked();
+    j["profilesRevision"] = profilesRevision_;
     return JsonResponse(200, j.dump());
 }
 
@@ -960,15 +976,14 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::string
     } else if (key == L"appLanguage") {
         settings_->SetAppLanguage(Utils::Utf8ToWide(j.at("value").get<std::string>()));
     } else if (key == L"enableMasterPassword") {
-        if (!settings_->EnableMasterPassword(Utils::Utf8ToWide(j.at("value").get<std::string>()))) {
-            return JsonResponse(400, "{\"error\": \"failed to enable master password\"}");
+        // Windows-Hello-only protection: no typed password exists; the AES
+        // key lives only in the DPAPI-wrapped Hello blob. The GUI prompts
+        // for consent (POST /hello/verify) before sending this.
+        if (!settings_->EnableMasterPassword()) {
+            return JsonResponse(500, "{\"error\": \"failed to enable windows hello\"}");
         }
-    } else if (key == L"changeMasterPassword") {
-        auto oldPassword = Utils::Utf8ToWide(j.at("oldValue").get<std::string>());
-        auto newPassword = Utils::Utf8ToWide(j.at("value").get<std::string>());
-        if (!settings_->ChangeMasterPassword(oldPassword, newPassword)) {
-            return JsonResponse(400, "{\"error\": \"failed to change master password\"}");
-        }
+    } else if (key == L"lock") {
+        settings_->Lock();
     } else if (key == L"disableMasterPassword") {
         settings_->DisableMasterPassword();
     } else if (key == L"clearLogs") {
@@ -977,6 +992,22 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::string
         return JsonResponse(404, "{\"error\": \"unknown setting\"}");
     }
     return JsonResponse(200, "{\"ok\": true}");
+}
+
+HttpResponse EngineApp::ApiUnlock() {
+    // Same unlock as /unlock/hello but WITHOUT the consent prompt — the
+    // caller (the GUI) has already verified the user with its own
+    // in-process Windows Hello prompt, so this only decrypts and unlocks.
+    if (!settings_->IsMasterPasswordEnabled()) {
+        return JsonResponse(200, "{\"ok\": false, \"error\": \"master password not enabled\"}");
+    }
+    if (!settings_->IsHelloEnabled()) {
+        return JsonResponse(200, "{\"ok\": false, \"helloNotEnabled\": true}");
+    }
+    if (settings_->UnlockWithHello()) {
+        return JsonResponse(200, "{\"ok\": true}");
+    }
+    return JsonResponse(200, "{\"ok\": false, \"error\": \"unlock failed\"}");
 }
 
 HttpResponse EngineApp::ApiGetProfiles() {
@@ -1013,8 +1044,10 @@ HttpResponse EngineApp::ApiPostProfile(const std::string& body) {
     json j = json::parse(body.empty() ? std::string("{}") : body);
     ApiKeyProfile profile = ApiKeyProfile::FromJson(j);
     settings_->AddProfile(profile);
+    ++profilesRevision_;
     RestartProxyServers();
-    return JsonResponse(200, "{\"ok\": true}");
+    // The CLI prints the created profile's id on success.
+    return JsonResponse(200, "{\"ok\": true, \"id\": \"" + Utils::WideToUtf8(profile.id) + "\"}");
 }
 
 HttpResponse EngineApp::ApiPutProfile(const std::wstring& id, const std::string& body) {
@@ -1028,7 +1061,16 @@ HttpResponse EngineApp::ApiPutProfile(const std::wstring& id, const std::string&
     if (profile.apiKey.find(L"...****") != std::wstring::npos) {
         profile.apiKey = settings_->GetProfileById(id)->apiKey;
     }
+    // While locked the sensitive fields are encrypted and read back empty;
+    // never let a locked save wipe the stored api key / keywords / regex.
+    if (settings_->IsMasterPasswordEnabled() && !settings_->IsUnlocked()) {
+        auto stored = settings_->GetProfileById(id);
+        profile.apiKey = stored->apiKey;
+        profile.keywords = stored->keywords;
+        profile.regexPatterns = stored->regexPatterns;
+    }
     settings_->UpdateProfile(profile);
+    ++profilesRevision_;
     RestartProxyServers();
     return JsonResponse(200, "{\"ok\": true}");
 }
@@ -1038,6 +1080,7 @@ HttpResponse EngineApp::ApiDeleteProfile(const std::wstring& id) {
         return JsonResponse(404, "{\"error\": \"unknown profile\"}");
     }
     settings_->RemoveProfile(id);
+    ++profilesRevision_;
     RestartProxyServers();
     return JsonResponse(200, "{\"ok\": true}");
 }
@@ -1060,10 +1103,65 @@ HttpResponse EngineApp::ApiDeleteMatches(const std::wstring& id) {
     return JsonResponse(200, "{\"ok\": true}");
 }
 
-HttpResponse EngineApp::ApiUnlock(const std::string& body) {
-    json j = json::parse(body);
-    bool ok = settings_->UnlockWithPassword(Utils::Utf8ToWide(j.at("password").get<std::string>()));
-    return JsonResponse(200, std::string("{\"ok\": ") + (ok ? "true" : "false") + "}");
+// The CLI's transport tags the hello consent requests with the console HWND
+// (?hwnd=<decimal>) so the prompt is owned by the CLI's window and comes to
+// the foreground. HWND values are valid across processes for real top-level
+// windows on the same desktop, so reinterpreting the decimal is safe.
+static HWND ParseHwndQuery(const std::wstring& query) {
+    const std::wstring prefix = L"hwnd=";
+    if (Utils::StartsWith(query, prefix)) {
+        try {
+            return reinterpret_cast<HWND>(static_cast<uintptr_t>(std::stoull(query.substr(prefix.size()))));
+        } catch (...) {
+        }
+    }
+    return nullptr;
+}
+
+HttpResponse EngineApp::ApiHelloVerify(const std::wstring& query) {
+    // Standalone consent prompt (no state change): the CLI asks before
+    // reading the API key / disabling protection. Always 200 with outcome fields.
+    if (!IsWindowsHelloAvailable()) {
+        return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+    }
+    switch (RequestHelloUnlock(ParseHwndQuery(query), L"Agent Redactor") ) {
+    case HelloUnlockResult::Verified:
+        return JsonResponse(200, "{\"ok\": true}");
+    case HelloUnlockResult::Canceled:
+        return JsonResponse(200, "{\"ok\": false, \"canceled\": true}");
+    case HelloUnlockResult::RetriesExhausted:
+        return JsonResponse(200, "{\"ok\": false, \"retriesExhausted\": true}");
+    case HelloUnlockResult::Unavailable:
+        return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+    default:
+        return JsonResponse(200, "{\"ok\": false, \"error\": \"windows hello failed\"}");
+    }
+}
+
+HttpResponse EngineApp::ApiUnlockHello(const std::wstring& query) {
+    // Always 200 with outcome fields (the CLI/GUI transports fail on non-200).
+    if (!settings_->IsMasterPasswordEnabled()) {
+        return JsonResponse(200, "{\"ok\": false, \"error\": \"master password not enabled\"}");
+    }
+    if (!settings_->IsHelloEnabled()) {
+        return JsonResponse(200, "{\"ok\": false, \"helloNotEnabled\": true}");
+    }
+    if (!IsWindowsHelloAvailable()) {
+        return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+    }
+    switch (RequestHelloUnlock(ParseHwndQuery(query), L"Unlock Agent Redactor with Windows Hello")) {
+    case HelloUnlockResult::Verified:
+        return JsonResponse(200, std::string("{\"ok\": ") +
+            (settings_->UnlockWithHello() ? "true" : "false") + "}");
+    case HelloUnlockResult::Canceled:
+        return JsonResponse(200, "{\"ok\": false, \"canceled\": true}");
+    case HelloUnlockResult::RetriesExhausted:
+        return JsonResponse(200, "{\"ok\": false, \"retriesExhausted\": true}");
+    case HelloUnlockResult::Unavailable:
+        return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+    default:
+        return JsonResponse(200, "{\"ok\": false, \"error\": \"windows hello failed\"}");
+    }
 }
 
 HttpResponse EngineApp::ApiGetLogs(const std::wstring& profileParam) {

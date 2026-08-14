@@ -85,11 +85,24 @@ bool ControlApiClient::Request(const std::wstring& method, const std::wstring& p
     if (!hSession) return false;
 
     // Short timeouts: the engine is localhost; a hang means it is not running.
-    WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 3000);
+    // /unlock/hello and /hello/verify hold the request while the user answers
+    // the Windows Hello consent prompt (the engine cancels it after 60s), so
+    // they get a long receive timeout.
+    if (path == L"/unlock/hello" || path == L"/hello/verify") {
+        WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 90000);
+    } else {
+        WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 3000);
+    }
 
     HINTERNET hConnect = WinHttpConnect(hSession, L"127.0.0.1", (INTERNET_PORT)port_, 0);
     if (hConnect) {
-        HINTERNET hRequest = WinHttpOpenRequest(hConnect, method.c_str(), path.c_str(),
+        // Tag the hello consent calls with this process's console HWND so the
+        // engine can own the Windows Hello prompt on our window (foreground).
+        std::wstring effPath = path;
+        if (path == L"/unlock/hello" || path == L"/hello/verify") {
+            effPath += L"?hwnd=" + std::to_wstring(reinterpret_cast<uintptr_t>(::GetConsoleWindow()));
+        }
+        HINTERNET hRequest = WinHttpOpenRequest(hConnect, method.c_str(), effPath.c_str(),
             nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
         if (hRequest) {
             std::wstring headers = L"Authorization: Bearer " + token_ + L"\r\nContent-Type: application/json";

@@ -424,7 +424,7 @@
     <value>Ana Bukata Babban Kalmar wucewa</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Buɗe</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Fita</value>

@@ -424,7 +424,7 @@
     <value>Nepieciešama galvenā parole</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Atbloķēt</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Iziet</value>

@@ -64,7 +64,9 @@ private:
     HttpResponse ApiDeleteProfile(const std::wstring& id);
     HttpResponse ApiGetMatches(const std::wstring& id);
     HttpResponse ApiDeleteMatches(const std::wstring& id);
-    HttpResponse ApiUnlock(const std::string& body);
+    HttpResponse ApiUnlockHello(const std::wstring& query);
+    HttpResponse ApiUnlock();
+    HttpResponse ApiHelloVerify(const std::wstring& query);
     HttpResponse ApiGetLogs(const std::wstring& profileParam);
 
     static HttpResponse JsonResponse(int statusCode, const std::string& body);
@@ -86,6 +88,11 @@ private:
     bool modelDownloadRequired_ = false;
     bool modelDownloadInProgress_ = false;
     bool modelDownloadFailed_ = false;
+
+    // Monotonic counter bumped on every profile mutation; exposed via
+    // /settings so the GUI poll can detect CLI-side profile changes
+    // (aliases, api keys) and refresh without a restart.
+    unsigned long long profilesRevision_ = 0;
 };
 
 } // namespace AgentRedactor

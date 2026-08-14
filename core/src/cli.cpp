@@ -1,8 +1,10 @@
 // OS-agnostic CLI command implementation. See cli.h for the design notes.
 #include "cli.h"
 #include "utils.h"
+#include "constants.h"
 
 #include <cwctype>
+#include <regex>
 #include <sstream>
 #include <iomanip>
 
@@ -73,6 +75,26 @@ std::wstring JoinCsv(const json& arr) {
     return out;
 }
 
+// Mirrors the GUI's upstream URL validation: non-empty, http(s) scheme, and a
+// real host. Returns the error message (labelled for the input's name), or an
+// empty string when valid.
+std::wstring ValidateUpstreamUrl(const std::wstring& raw, const std::wstring& label) {
+    std::wstring url = Trim(raw);
+    if (url.empty()) return label + L" must not be empty";
+    std::wstring lowerUrl = WideLower(url);
+    if (!Utils::StartsWith(lowerUrl, L"http://") && !Utils::StartsWith(lowerUrl, L"https://")) {
+        return label + L" must start with http:// or https://";
+    }
+    size_t schemeEnd = lowerUrl.find(L"://");
+    size_t hostStart = schemeEnd + 3;
+    size_t hostEnd = lowerUrl.find_first_of(L"/?", hostStart);
+    if (hostEnd == std::wstring::npos) hostEnd = lowerUrl.size();
+    if (lowerUrl.substr(hostStart, hostEnd - hostStart).empty()) {
+        return label + L" has no host";
+    }
+    return L"";
+}
+
 // ---------------------------------------------------------------------------
 // Invocation context
 // ---------------------------------------------------------------------------
@@ -80,7 +102,9 @@ std::wstring JoinCsv(const json& arr) {
 struct CliOptions {
     std::vector<std::wstring> positional;
     std::optional<std::wstring> profile;
-    std::optional<std::wstring> password;
+    std::optional<std::wstring> port;        // profiles add --port
+    std::optional<std::wstring> upstreamUrl; // profiles add --upstream-url
+    std::optional<std::wstring> apiKey;      // profiles add --api-key
     bool ignoreCase = false;
 };
 
@@ -103,7 +127,13 @@ bool ParseOptions(const std::vector<std::wstring>& args, CliOptions& opts, std::
         int r = flagged(L"--profile", opts.profile);
         if (r < 0) return false;
         if (r > 0) continue;
-        r = flagged(L"--password", opts.password);
+        r = flagged(L"--port", opts.port);
+        if (r < 0) return false;
+        if (r > 0) continue;
+        r = flagged(L"--upstream-url", opts.upstreamUrl);
+        if (r < 0) return false;
+        if (r > 0) continue;
+        r = flagged(L"--api-key", opts.apiKey);
         if (r < 0) return false;
         if (r > 0) continue;
         if (a == L"--ignore-case") { opts.ignoreCase = true; continue; }
@@ -127,45 +157,39 @@ struct Ctx {
     // Fetches /status; false means the engine is unreachable.
     bool EngineStatus(json& status) const {
         if (t.get(L"/status", status)) return true;
-        Error(L"engine is not running (start it with 'agentredactor engine run')");
+        Error(L"engine is not running (launch the Agent Redactor app to start it)");
         return false;
     }
 
-    std::optional<std::wstring> GetPassword() const {
-        if (opts.password) return opts.password;
-        if (c.promptPassword) {
-            auto pw = c.promptPassword();
-            if (pw) return pw;
-        }
-        Error(L"password required and no interactive console available; pass --password <pw>");
-        return std::nullopt;
-    }
-
-    bool UnlockWith(const std::wstring& password) const {
-        json out;
-        if (!t.post(L"/unlock", json{{"password", Utils::WideToUtf8(password)}}, &out)) {
-            Error(L"unlock request failed");
+    // Protection gate for every settings/profile command. Open when no
+    // protection is enabled. With Windows Hello enabled, EVERY gated command
+    // demands a fresh consent prompt right there (there is no `unlock`
+    // command anymore): the session state only decides whether the prompt
+    // also unlocks the engine or just verifies. `status`/`help` stay open so
+    // the CLI remains introspectable; disabling protection is the recovery
+    // path (kept ungated in CmdPassword).
+    bool EnsureConsent(const json& status) const {
+        if (!status.value("masterPasswordEnabled", false)) return true;
+        if (!status.value("helloEnabled", false)) {
+            Error(L"windows hello is not configured on this device");
             return false;
         }
-        if (out.value("ok", false)) return true;
-        Error(L"wrong password");
+        json out;
+        const bool ok = status.value("unlocked", false)
+            ? (t.post(L"/hello/verify", json::object(), &out) && out.value("ok", false))
+            : (t.post(L"/unlock/hello", json::object(), &out) && out.value("ok", false));
+        if (ok) return true;
+        if (out.value("canceled", false)) { Error(L"windows hello consent canceled"); return false; }
+        if (out.value("retriesExhausted", false)) { Error(L"too many windows hello attempts"); return false; }
+        if (out.value("unavailable", false)) { Error(L"windows hello is not available on this device"); return false; }
+        Error(L"windows hello consent required");
         return false;
-    }
-
-    // Master-password gate for every settings/profile command. Open when no
-    // password is set; otherwise unlocks the session first.
-    bool EnsureUnlocked(const json& status) const {
-        if (!status.value("masterPasswordEnabled", false)) return true;
-        if (status.value("unlocked", false)) return true;
-        auto pw = GetPassword();
-        if (!pw) return false;
-        return UnlockWith(*pw);
     }
 
     // Combined precondition used by all gated commands.
     bool Gate(json& status) const {
         if (!EngineStatus(status)) return false;
-        return EnsureUnlocked(status);
+        return EnsureConsent(status);
     }
 
     // Resolves --profile against GET /profiles. Without --profile a single
@@ -214,7 +238,7 @@ struct Ctx {
 };
 
 // ---------------------------------------------------------------------------
-// status / engine stop / unlock / password
+// status / password
 // ---------------------------------------------------------------------------
 
 int CmdStatus(const Ctx& ctx) {
@@ -222,7 +246,7 @@ int CmdStatus(const Ctx& ctx) {
     if (!ctx.EngineStatus(status)) return 1;
 
     ctx.Print(L"engine:          " + Utils::Utf8ToWide(status.value("engineVersion", std::string("?"))));
-    ctx.Print(L"master password: " + BoolStr(status.value("masterPasswordEnabled", false)));
+    ctx.Print(L"windows hello:   " + BoolStr(status.value("helloEnabled", false)));
     ctx.Print(L"session:         " + std::wstring(status.value("unlocked", false) ? L"unlocked" : L"locked"));
     if (status.value("modelDownloadInProgress", false)) {
         ctx.Print(L"model download:  in progress (" + std::to_wstring(status.value("modelDownloadPercent", 0)) + L"%)");
@@ -261,7 +285,6 @@ int CmdStatus(const Ctx& ctx) {
             }
             std::wstring line = L"  " + std::to_wstring(i) + L"  " + (alias.empty() ? id : alias)
                 + L"  port " + std::to_wstring(sp.value("port", 0))
-                + (sp.value("enabled", false) ? L"  enabled" : L"  disabled")
                 + (sp.value("proxyRunning", false) ? L"  proxy running" : L"  proxy stopped")
                 + L"  requests=" + std::to_wstring(requests)
                 + L"  redactions=" + std::to_wstring(redactions);
@@ -271,37 +294,9 @@ int CmdStatus(const Ctx& ctx) {
     return 0;
 }
 
-int CmdEngineStop(const Ctx& ctx) {
-    json out;
-    if (!ctx.t.post(L"/engine/stop", json::object(), &out)) {
-        ctx.Error(L"engine is not running (or stop request failed)");
-        return 1;
-    }
-    ctx.Print(L"engine stopping");
-    return 0;
-}
-
-int CmdUnlock(const Ctx& ctx) {
-    json status;
-    if (!ctx.EngineStatus(status)) return 1;
-    if (!status.value("masterPasswordEnabled", false)) {
-        ctx.Print(L"master password is not enabled");
-        return 0;
-    }
-    if (status.value("unlocked", false)) {
-        ctx.Print(L"already unlocked");
-        return 0;
-    }
-    auto pw = ctx.GetPassword();
-    if (!pw) return 1;
-    if (!ctx.UnlockWith(*pw)) return 1;
-    ctx.Print(L"unlocked");
-    return 0;
-}
-
 int CmdPassword(const Ctx& ctx) {
     if (ctx.opts.positional.size() < 2) {
-        ctx.Error(L"usage: agentredactor password enable [pw] | change [old new] | disable");
+        ctx.Error(L"usage: agentredactor password enable | disable");
         return 2;
     }
     const std::wstring action = WideLower(ctx.opts.positional[1]);
@@ -310,63 +305,32 @@ int CmdPassword(const Ctx& ctx) {
 
     if (action == L"enable") {
         if (status.value("masterPasswordEnabled", false)) {
-            ctx.Error(L"master password is already enabled (use 'password change')");
+            ctx.Error(L"windows hello protection is already enabled");
             return 1;
         }
-        std::wstring pw;
-        if (ctx.opts.positional.size() >= 3) pw = ctx.opts.positional[2];
-        else {
-            auto prompted = ctx.GetPassword();
-            if (!prompted) return 1;
-            pw = *prompted;
-        }
-        if (pw.empty()) { ctx.Error(L"password must not be empty"); return 2; }
-        if (!ctx.t.put(L"/settings/enableMasterPassword", json{{"value", Utils::WideToUtf8(pw)}}, nullptr)) {
-            ctx.Error(L"failed to enable the master password");
+        // Windows-Hello-only protection: no typed password exists. The GUI
+        // asks for the consent prompt before enabling; the CLI (a headless
+        // tool) enables directly — the locked session still demands the Hello
+        // prompt before anything sensitive is readable.
+        if (!ctx.t.put(L"/settings/enableMasterPassword", json{{"value", ""}, {"hello", true}}, nullptr)) {
+            ctx.Error(L"failed to enable windows hello protection");
             return 1;
         }
-        ctx.Print(L"master password enabled");
-        return 0;
-    }
-
-    if (action == L"change") {
-        if (!ctx.EnsureUnlocked(status)) return 1;
-        std::wstring oldPw, newPw;
-        if (ctx.opts.positional.size() >= 4) {
-            oldPw = ctx.opts.positional[2];
-            newPw = ctx.opts.positional[3];
-        } else {
-            auto p1 = ctx.GetPassword();
-            if (!p1) return 1;
-            auto p2 = ctx.GetPassword();
-            if (!p2) return 1;
-            oldPw = *p1; newPw = *p2;
-        }
-        if (newPw.empty()) { ctx.Error(L"new password must not be empty"); return 2; }
-        json body{{"oldValue", Utils::WideToUtf8(oldPw)}, {"value", Utils::WideToUtf8(newPw)}};
-        if (!ctx.t.put(L"/settings/changeMasterPassword", body, nullptr)) {
-            ctx.Error(L"failed to change the master password (wrong current password?)");
-            return 1;
-        }
-        ctx.Print(L"master password changed");
+        ctx.Print(L"windows hello protection enabled");
         return 0;
     }
 
     if (action == L"disable") {
         if (!status.value("masterPasswordEnabled", false)) {
-            ctx.Print(L"master password is not enabled");
+            ctx.Print(L"windows hello protection is not enabled");
             return 0;
         }
-        if (!ctx.EnsureUnlocked(status)) return 1;
-        if (!ctx.t.put(L"/settings/disableMasterPassword", json{{"value", true}}, nullptr)) {
-            ctx.Error(L"failed to disable the master password");
-            return 1;
-        }
-        ctx.Print(L"master password disabled");
+        ctx.t.put(L"/settings/disableMasterPassword", json{{"value", true}}, nullptr);
+        ctx.Print(L"windows hello protection disabled");
         return 0;
     }
 
-    ctx.Error(L"unknown password action: " + action + L" (enable|change|disable)");
+    ctx.Error(L"unknown password action: " + action + L" (enable|disable)");
     return 2;
 }
 
@@ -382,7 +346,6 @@ struct GlobalKey {
 
 constexpr GlobalKey kGlobalKeys[] = {
     {L"start-on-boot", "startOnBoot", 'b'},
-    {L"onnx-provider", "onnxProvider", 's'},
     {L"logging", "loggingEnabled", 'b'},
     {L"show-sensitive", "showSensitive", 'b'},
     {L"app-language", "appLanguage", 's'},
@@ -400,10 +363,9 @@ constexpr ProfileKey kProfileKeys[] = {
     {L"alias", "alias", 's'},
     {L"upstream-url", "upstream_url", 's'},
     {L"port", "port", 'i'},
-    {L"enabled", "enabled", 'b'},
     {L"confidence-threshold", "pii_confidence_threshold", 'f'},
     {L"pii-types", "enabled_pii_types", 'l'},
-    {L"use-openai-model", "use_openai_model", 'b'},
+    {L"use-ai-model", "use_openai_model", 'b'},
 };
 
 const GlobalKey* FindGlobalKey(const std::wstring& name) {
@@ -417,10 +379,14 @@ const ProfileKey* FindProfileKey(const std::wstring& name) {
 }
 
 void PrintValidKeys(const Ctx& ctx) {
-    ctx.Print(L"global keys:  start-on-boot, onnx-provider, logging, show-sensitive, app-language,");
+    ctx.Print(L"global keys:  start-on-boot, logging, show-sensitive, app-language,");
     ctx.Print(L"              master-password-enabled, unlocked (read-only)");
-    ctx.Print(L"profile keys: alias, upstream-url, api-key, port, enabled,");
-    ctx.Print(L"              confidence-threshold, pii-types, use-openai-model");
+    ctx.Print(L"profile keys: alias, upstream-url, api-key, port,");
+    ctx.Print(L"              confidence-threshold, pii-types, use-ai-model");
+    ctx.Print(L"PII types: account_number, private_address, private_date, private_email,");
+    ctx.Print(L"           private_person, private_phone, private_url, secret");
+    ctx.Print(L"           (toggle per profile with 'pii-types enable|disable <type>',");
+    ctx.Print(L"           or set the full list with 'set pii-types <csv>')");
 }
 
 int CmdGet(const Ctx& ctx) {
@@ -431,11 +397,14 @@ int CmdGet(const Ctx& ctx) {
     const std::wstring key = WideLower(ctx.opts.positional[1]);
 
     // Every read is gated when a master password is set (the engine lock is
-    // UX-level, mirroring the GUI); only status/engine-stop/help stay open.
+    // UX-level, mirroring the GUI); only status and help stay open.
     json status;
     if (!ctx.Gate(status)) return 1;
 
     if (key == L"api-key") {
+        // Gate() above already demanded a fresh Windows Hello consent on
+        // protected sessions (verifying when unlocked, unlocking + verifying
+        // when locked); the engine's apikey endpoint then serves the key.
         json profile;
         if (!ctx.SelectProfile(profile)) return 1;
         json out;
@@ -450,7 +419,7 @@ int CmdGet(const Ctx& ctx) {
     if (const GlobalKey* gk = FindGlobalKey(key)) {
         json settings;
         if (!ctx.t.get(L"/settings", settings)) {
-            ctx.Error(L"engine is not running (start it with 'agentredactor engine run')");
+            ctx.Error(L"engine is not running (launch the Agent Redactor app to start it)");
             return 1;
         }
         const json& v = settings[gk->apiName];
@@ -487,7 +456,7 @@ int CmdSet(const Ctx& ctx) {
     const std::wstring& value = ctx.opts.positional[2];
 
     if (key == L"master-password-enabled" || key == L"unlocked") {
-        ctx.Error(key + L" is read-only (use 'agentredactor password ...' / 'unlock')");
+        ctx.Error(key + L" is read-only (use 'agentredactor password ...')");
         return 2;
     }
 
@@ -528,6 +497,17 @@ int CmdSet(const Ctx& ctx) {
     }
     if (!ctx.SelectProfile(profile)) return 1;
 
+    // Mirror the GUI's upstream URL validation (non-empty, http/https, and a
+    // real host). Kept OS-agnostic (no WinHTTP) but covers the same inputs.
+    if (key == L"upstream-url") {
+        std::wstring urlErr = ValidateUpstreamUrl(value, L"upstream-url");
+        if (!urlErr.empty()) { ctx.Error(urlErr); return 2; }
+        profile["upstream_url"] = Utils::WideToUtf8(Trim(value));
+        if (!ctx.PutProfile(profile)) return 1;
+        ctx.Print(L"ok");
+        return 0;
+    }
+
     switch (pk->type) {
     case 'b': {
         bool b;
@@ -537,7 +517,25 @@ int CmdSet(const Ctx& ctx) {
     }
     case 'i': {
         if (!IsInteger(value)) { ctx.Error(L"expected an integer, got: " + value); return 2; }
-        profile[pk->jsonName] = std::stoi(value);
+        int port = 0;
+        try { port = std::stoi(value); }
+        catch (...) { ctx.Error(L"port out of range: " + value); return 2; }
+        if (port < 1024 || port > 65535) {
+            ctx.Error(L"port must be between 1024 and 65535");
+            return 2;
+        }
+        // Mirror the GUI: a proxy port must not be shared with another profile.
+        std::wstring myId = JStr(profile, "id");
+        json allProfiles;
+        if (ctx.t.get(L"/profiles", allProfiles) && allProfiles.is_array()) {
+            for (const auto& o : allProfiles) {
+                if (o.contains("port") && o.value("port", 0) == port && JStr(o, "id") != myId) {
+                    ctx.Error(L"port " + value + L" is already used by profile '" + JStr(o, "alias") + L"'");
+                    return 2;
+                }
+            }
+        }
+        profile[pk->jsonName] = port;
         break;
     }
     case 'f': {
@@ -566,11 +564,24 @@ int CmdSet(const Ctx& ctx) {
 // profiles list
 // ---------------------------------------------------------------------------
 
+int CmdProfilesList(const Ctx& ctx);
+int CmdProfilesAdd(const Ctx& ctx);
+int CmdProfilesDelete(const Ctx& ctx);
+
 int CmdProfiles(const Ctx& ctx) {
-    if (ctx.opts.positional.size() < 2 || WideLower(ctx.opts.positional[1]) != L"list") {
-        ctx.Error(L"usage: agentredactor profiles list");
+    if (ctx.opts.positional.size() < 2) {
+        ctx.Error(L"usage: agentredactor profiles list|add <alias>|delete <id>");
         return 2;
     }
+    const std::wstring action = WideLower(ctx.opts.positional[1]);
+    if (action == L"list") return CmdProfilesList(ctx);
+    if (action == L"add") return CmdProfilesAdd(ctx);
+    if (action == L"delete") return CmdProfilesDelete(ctx);
+    ctx.Error(L"unknown profiles action: " + action + L" (list|add|delete)");
+    return 2;
+}
+
+int CmdProfilesList(const Ctx& ctx) {
     json status;
     if (!ctx.Gate(status)) return 1;
     json profiles;
@@ -584,7 +595,7 @@ int CmdProfiles(const Ctx& ctx) {
     }
 
     std::vector<std::vector<std::wstring>> rows;
-    rows.push_back({L"#", L"alias", L"id", L"port", L"enabled", L"running", L"requests", L"redactions"});
+    rows.push_back({L"#", L"alias", L"id", L"port", L"running", L"requests", L"redactions"});
     int i = 0;
     for (const auto& p : profiles) {
         uint64_t requests = 0, redactions = 0;
@@ -600,7 +611,6 @@ int CmdProfiles(const Ctx& ctx) {
             JStr(p, "alias"),
             JStr(p, "id"),
             std::to_wstring(p.value("port", 0)),
-            BoolStr(p.value("enabled", false)),
             BoolStr(p.value("proxyRunning", false)),
             std::to_wstring(requests),
             std::to_wstring(redactions),
@@ -619,6 +629,222 @@ int CmdProfiles(const Ctx& ctx) {
         }
         ctx.Print(line);
     }
+    return 0;
+}
+
+int CmdProfilesAdd(const Ctx& ctx) {
+    if (ctx.opts.positional.size() < 3) {
+        ctx.Error(L"usage: agentredactor profiles add <alias> [--port N] [--upstream-url U] [--api-key K]");
+        return 2;
+    }
+    const std::wstring alias = Trim(ctx.opts.positional[2]);
+    if (alias.empty()) {
+        ctx.Error(L"profile alias must not be empty");
+        return 2;
+    }
+
+    json status;
+    if (!ctx.Gate(status)) return 1;
+    json profiles;
+    if (!ctx.t.get(L"/profiles", profiles) || !profiles.is_array()) {
+        ctx.Error(L"could not read profiles from the engine");
+        return 1;
+    }
+
+    // Port: explicit --port (validated, incl. the GUI's "used by another
+    // profile" check) or the first free port from 8080, like the GUI.
+    int port = 0;
+    if (ctx.opts.port) {
+        const std::wstring v = *ctx.opts.port;
+        if (!IsInteger(v)) { ctx.Error(L"expected an integer for --port, got: " + v); return 2; }
+        try { port = std::stoi(v); }
+        catch (...) { ctx.Error(L"port out of range: " + v); return 2; }
+        if (port < 1024 || port > 65535) { ctx.Error(L"port must be between 1024 and 65535"); return 2; }
+        for (const auto& o : profiles) {
+            if (o.value("port", 0) == port) {
+                ctx.Error(L"port " + v + L" is already used by profile '" + JStr(o, "alias") + L"'");
+                return 2;
+            }
+        }
+    } else {
+        for (int candidate = 8080; candidate <= 65535; ++candidate) {
+            bool used = false;
+            for (const auto& o : profiles) {
+                if (o.value("port", 0) == candidate) { used = true; break; }
+            }
+            if (!used) { port = candidate; break; }
+        }
+        if (port == 0) {
+            ctx.Error(L"no free proxy port available");
+            return 1;
+        }
+    }
+
+    json body{
+        {"alias", Utils::WideToUtf8(alias)},
+        {"port", port},
+    };
+    if (ctx.opts.upstreamUrl) {
+        std::wstring urlErr = ValidateUpstreamUrl(*ctx.opts.upstreamUrl, L"--upstream-url");
+        if (!urlErr.empty()) { ctx.Error(urlErr); return 2; }
+        body["upstream_url"] = Utils::WideToUtf8(Trim(*ctx.opts.upstreamUrl));
+    }
+    if (ctx.opts.apiKey) {
+        body["api_key"] = Utils::WideToUtf8(*ctx.opts.apiKey);
+    }
+    json out;
+    if (!ctx.t.post(L"/profiles", body, &out) || !out.value("ok", false)) {
+        ctx.Error(L"failed to create the profile");
+        return 1;
+    }
+    ctx.Print(L"created profile " + Utils::Utf8ToWide(out.value("id", std::string("")))
+        + L" (" + alias + L")");
+    return 0;
+}
+
+int CmdProfilesDelete(const Ctx& ctx) {
+    if (ctx.opts.positional.size() < 3) {
+        ctx.Error(L"usage: agentredactor profiles delete <id>");
+        return 2;
+    }
+    json status;
+    if (!ctx.Gate(status)) return 1;
+    json profiles;
+    if (!ctx.t.get(L"/profiles", profiles) || !profiles.is_array()) {
+        ctx.Error(L"could not read profiles from the engine");
+        return 1;
+    }
+    if (profiles.empty()) {
+        ctx.Error(L"no profiles configured");
+        return 1;
+    }
+    // Deletion is deliberately strict: only the profile id is accepted (an
+    // alias or list number could point at a different profile later).
+    const std::wstring sel = ctx.opts.positional[2];
+    const std::wstring selLower = WideLower(sel);
+    json target;
+    bool found = false;
+    for (const auto& p : profiles) {
+        if (WideLower(JStr(p, "id")) == selLower) {
+            target = p;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        ctx.Error(L"profile not found: " + sel);
+        return 1;
+    }
+    if (profiles.size() <= 1) {
+        ctx.Error(L"cannot delete the last profile");
+        return 2;
+    }
+    if (!ctx.t.del(L"/profiles/" + JStr(target, "id"))) {
+        ctx.Error(L"failed to delete the profile");
+        return 1;
+    }
+    ctx.Print(L"deleted profile " + JStr(target, "id") + L" (" + JStr(target, "alias") + L")");
+    return 0;
+}
+
+// ---------------------------------------------------------------------------
+// pii-types list / enable / disable (per profile, single PII type only)
+// ---------------------------------------------------------------------------
+
+// Resolves a PII type id (e.g. secret, private_email) to a one-element list.
+// Empty = unknown. The GUI only deals with individual types (no categories),
+// so the CLI does too.
+std::vector<std::wstring> ResolvePiiTypes(const std::wstring& sel) {
+    const std::wstring s = WideLower(sel);
+    for (const auto& t : DEFAULT_PII_TYPES) {
+        if (WideLower(t) == s) return {t};
+    }
+    return {};
+}
+
+std::vector<std::wstring> EnabledPiiTypes(const json& profile) {
+    std::vector<std::wstring> out;
+    if (profile.contains("enabled_pii_types") && profile["enabled_pii_types"].is_array()) {
+        for (const auto& v : profile["enabled_pii_types"]) {
+            if (v.is_string()) out.push_back(Utils::Utf8ToWide(v.get<std::string>()));
+        }
+    }
+    return out;
+}
+
+bool HasPiiType(const std::vector<std::wstring>& list, const std::wstring& type) {
+    const std::wstring t = WideLower(type);
+    for (const auto& e : list) if (WideLower(e) == t) return true;
+    return false;
+}
+
+int CmdPiiTypes(const Ctx& ctx) {
+    if (ctx.opts.positional.size() < 2) {
+        ctx.Error(L"usage: agentredactor pii-types list|enable|disable <type> [--profile P]");
+        return 2;
+    }
+    const std::wstring action = WideLower(ctx.opts.positional[1]);
+    if (action != L"list" && action != L"enable" && action != L"disable") {
+        ctx.Error(L"unknown pii-types action: " + action + L" (list|enable|disable)");
+        return 2;
+    }
+
+    json status;
+    if (!ctx.Gate(status)) return 1;
+    json profile;
+    if (!ctx.SelectProfile(profile)) return 1;
+    std::vector<std::wstring> enabled = EnabledPiiTypes(profile);
+
+    if (action == L"list") {
+        if (enabled.empty()) {
+            ctx.Print(L"(all PII types disabled for this profile)");
+        }
+        // Types not in our known list are listed as "other".
+        std::vector<std::wstring> shown;
+        for (const auto& t : DEFAULT_PII_TYPES) {
+            ctx.Print(std::wstring(HasPiiType(enabled, t) ? L"[x] " : L"[ ] ") + t);
+            shown.push_back(t);
+        }
+        for (const auto& t : enabled) {
+            if (std::find(shown.begin(), shown.end(), t) == shown.end()) {
+                ctx.Print(L"  OTHER: [x] " + t);
+                shown.push_back(t);
+            }
+        }
+        return 0;
+    }
+
+    const bool wantEnabled = (action == L"enable");
+    const std::wstring sel = ctx.opts.positional.size() >= 3 ? ctx.opts.positional[2] : L"";
+    if (sel.empty()) {
+        ctx.Error(L"pii-types " + action + L" requires a PII type name");
+        return 2;
+    }
+    std::vector<std::wstring> targets = ResolvePiiTypes(sel);
+    if (targets.empty()) {
+        ctx.Error(L"unknown PII type: " + sel);
+        return 2;
+    }
+
+    bool changed = false;
+    for (const auto& t : targets) {
+        bool on = HasPiiType(enabled, t);
+        if (wantEnabled && !on) {
+            enabled.push_back(t);
+            changed = true;
+        } else if (!wantEnabled && on) {
+            enabled.erase(std::remove_if(enabled.begin(), enabled.end(),
+                [&t](const std::wstring& e) { return WideLower(e) == WideLower(t); }), enabled.end());
+            changed = true;
+        }
+    }
+    if (changed) {
+        json arr = json::array();
+        for (const auto& t : enabled) arr.push_back(Utils::WideToUtf8(t));
+        profile["enabled_pii_types"] = arr;
+        if (!ctx.PutProfile(profile)) return 1;
+    }
+    ctx.Print(L"ok");
     return 0;
 }
 
@@ -698,6 +924,15 @@ int CmdRegex(const Ctx& ctx) {
     if (action == L"add") {
         if (ctx.opts.positional.size() < 3) { ctx.Error(L"regex add requires a pattern"); return 2; }
         const std::wstring pattern = ctx.opts.positional[2];
+        if (Trim(pattern).empty()) { ctx.Error(L"regex pattern must not be empty"); return 2; }
+        // Mirror the GUI's ValidateRegex: reject an unparseable pattern before
+        // it reaches the engine/pipeline.
+        try {
+            std::wregex re(pattern, std::regex_constants::ECMAScript);
+        } catch (const std::regex_error& e) {
+            ctx.Error(L"invalid regex: " + Utils::Utf8ToWide(e.what()));
+            return 2;
+        }
         return MutateList(ctx, "regex_patterns", [&](json& entries) {
             entries.push_back({{"pattern", Utils::WideToUtf8(pattern)}, {"enabled", true}});
             ctx.Print(L"ok");
@@ -761,29 +996,40 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"Agent Redactor CLI");
     ctx.Print(L"usage: agentredactor <command> [options]");
     ctx.Print(L"");
-    ctx.Print(L"engine:");
-    ctx.Print(L"  (no args) | engine run [--console]   run the engine (hidden / foreground)");
-    ctx.Print(L"  engine stop                          stop the running engine");
+    ctx.Print(L"overview:");
     ctx.Print(L"  status                               engine + profile overview");
     ctx.Print(L"");
     ctx.Print(L"settings:");
     ctx.Print(L"  get <key> [--profile P]              read a setting");
     ctx.Print(L"  set <key> <value> [--profile P]      change a setting");
     ctx.Print(L"  profiles list                        list profiles");
+    ctx.Print(L"  profiles add <alias> [--port N] [--upstream-url U] [--api-key K]");
+    ctx.Print(L"  profiles delete <id>");
     ctx.Print(L"");
     PrintValidKeys(ctx);
     ctx.Print(L"");
     ctx.Print(L"redaction lists (profile-scoped):");
     ctx.Print(L"  regex list | add <pattern> | remove <n|pattern>");
     ctx.Print(L"  keywords list | add <text> | remove <n|text> [--ignore-case]");
+    ctx.Print(L"  pii-types list [--profile P]");
+    ctx.Print(L"  pii-types enable | disable <type> [--profile P]");
+    ctx.Print(L"              PII types (single type only): account_number,");
+    ctx.Print(L"              private_address, private_date, private_email, private_person,");
+    ctx.Print(L"              private_phone, private_url, secret");
+    ctx.Print(L"              (set the full list with 'set pii-types <type,type,...>')");
     ctx.Print(L"");
-    ctx.Print(L"security:");
-    ctx.Print(L"  unlock [--password PW]");
-    ctx.Print(L"  password enable [PW] | change [OLD NEW] | disable");
+    ctx.Print(L"security (Windows Hello only, no typed password):");
+    ctx.Print(L"  password enable         enable Windows Hello protection");
+    ctx.Print(L"  password disable        disable Windows Hello protection");
+    ctx.Print(L"  With protection enabled every read/write command demands a");
+    ctx.Print(L"  fresh Windows Hello consent prompt (status/help stay open).");
     ctx.Print(L"");
     ctx.Print(L"options:");
     ctx.Print(L"  --profile P     profile selector: list number, id, or alias");
-    ctx.Print(L"  --password PW   master password (skips the interactive prompt)");
+    ctx.Print(L"  --port N        profiles add: explicit proxy port");
+    ctx.Print(L"  --upstream-url U profiles add: upstream endpoint");
+    ctx.Print(L"  --api-key K     profiles add: API key");
+    ctx.Print(L"  --ignore-case   keywords add: case-insensitive matching");
 }
 
 } // namespace
@@ -814,21 +1060,15 @@ int AgentRedactor::RunCli(const std::vector<std::wstring>& args,
         return 0;
     }
     if (cmd == L"status") return CmdStatus(ctx);
-    if (cmd == L"unlock") return CmdUnlock(ctx);
     if (cmd == L"password") return CmdPassword(ctx);
     if (cmd == L"get") return CmdGet(ctx);
     if (cmd == L"set") return CmdSet(ctx);
     if (cmd == L"profiles") return CmdProfiles(ctx);
     if (cmd == L"regex") return CmdRegex(ctx);
     if (cmd == L"keywords") return CmdKeywords(ctx);
-    if (cmd == L"engine") {
-        if (ctx.opts.positional.size() >= 2 && WideLower(ctx.opts.positional[1]) == L"stop") {
-            return CmdEngineStop(ctx);
-        }
-        // `engine run` is handled by the OS entry point before reaching here.
-        ctx.Error(L"usage: agentredactor engine run [--console] | stop");
-        return 2;
-    }
+    if (cmd == L"pii-types") return CmdPiiTypes(ctx);
+    // `engine run` / `engine stop` were removed from the CLI surface entirely;
+    // engine lifecycle belongs to the GUI (spawn on startup, stop/lock on quit).
 
     ctx.Error(L"unknown command: " + cmd);
     PrintUsage(ctx);

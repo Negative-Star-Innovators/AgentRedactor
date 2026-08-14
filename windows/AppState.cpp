@@ -14,6 +14,7 @@ namespace {
     constexpr UINT WM_APP_NOTIFY_LOG = WM_APP + 1;
     constexpr UINT WM_APP_NOTIFY_STATS = WM_APP + 2;
     constexpr UINT WM_APP_NOTIFY_MODEL = WM_APP + 3;
+    constexpr UINT WM_APP_NOTIFY_SETTINGS = WM_APP + 4;
     constexpr wchar_t MSG_WND_CLASS[] = L"AgentRedactorMsgWindow";
 }
 
@@ -81,6 +82,11 @@ void AppState::Shutdown() {
     if (engineSpawned_) {
         engineClient_.Post(L"/engine/stop", json::object());
         engineSpawned_ = false;
+    } else if (Settings()->IsMasterPasswordEnabled()) {
+        // The engine outlives this GUI: lock the session so the next open
+        // must authenticate (Windows Hello or password) again — proxies keep
+        // running, only sensitive reads/settings are gated.
+        engineClient_.Put(L"/settings/lock", json::object());
     }
     if (systemTray_) systemTray_->Destroy();
     if (messageHwnd_) {
@@ -99,6 +105,25 @@ void AppState::SetOnStatsUpdated(std::function<void()> cb) {
     onStatsUpdated_ = std::move(cb);
 }
 
+void AppState::SetOnSettingsChanged(std::function<void()> cb) {
+    std::lock_guard lock(callbackMutex_);
+    onSettingsChanged_ = std::move(cb);
+}
+
+void AppState::SetOnSessionLockOverlay(std::function<void(bool visible)> cb) {
+    std::lock_guard lock(callbackMutex_);
+    onSessionLockOverlay_ = std::move(cb);
+}
+
+void AppState::SetSessionLockOverlay(bool visible) {
+    std::function<void(bool)> cb;
+    {
+        std::lock_guard lock(callbackMutex_);
+        cb = onSessionLockOverlay_;
+    }
+    if (cb) cb(visible);
+}
+
 void AppState::NotifyLogAdded() {
     if (messageHwnd_) {
         PostMessage(messageHwnd_, WM_APP_NOTIFY_LOG, 0, 0);
@@ -109,6 +134,19 @@ void AppState::NotifyStatsUpdated() {
     if (messageHwnd_) {
         PostMessage(messageHwnd_, WM_APP_NOTIFY_STATS, 0, 0);
     }
+}
+
+void AppState::NotifySettingsChanged() {
+    if (messageHwnd_) {
+        PostMessage(messageHwnd_, WM_APP_NOTIFY_SETTINGS, 0, 0);
+    }
+}
+
+bool AppState::GetSettingsSnapshot(json& out) const {
+    std::lock_guard lock(settingsMutex_);
+    if (!settingsValid_) return false;
+    out = settingsCache_;
+    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -195,6 +233,11 @@ LRESULT CALLBACK AppState::MessageWndProc(HWND hwnd, UINT msg, WPARAM wParam, LP
     if (msg == WM_APP_NOTIFY_MODEL) {
         std::lock_guard lock(app->callbackMutex_);
         if (app->onModelDownloadStatus_) app->onModelDownloadStatus_();
+        return 0;
+    }
+    if (msg == WM_APP_NOTIFY_SETTINGS) {
+        std::lock_guard lock(app->callbackMutex_);
+        if (app->onSettingsChanged_) app->onSettingsChanged_();
         return 0;
     }
     if (msg == WM_TRAYICON) {
@@ -291,6 +334,25 @@ void AppState::StatusPollLoop() {
             // 1-second poll replacing the old ProxyEngine onUpdate_ push:
             // HomePage re-reads profiles (stats) through the client.
             NotifyStatsUpdated();
+        }
+
+        // Settings are engine-owned; the GUI may change them in-session (live
+        // language switch) or the CLI may (set <key>). Diff the snapshot so
+        // the UI refreshes without a restart, mirroring the in-GUI path.
+        json sj;
+        if (engineClient_.Get(L"/settings", sj)) {
+            bool settingsChanged = false;
+            {
+                std::lock_guard lock(settingsMutex_);
+                if (!settingsValid_ || settingsCache_.dump() != sj.dump()) {
+                    settingsChanged = true;
+                }
+                settingsCache_ = std::move(sj);
+                settingsValid_ = true;
+            }
+            if (settingsChanged) {
+                NotifySettingsChanged();
+            }
         }
         for (int i = 0; i < 10 && !pollStop_; ++i) {
             Sleep(100);

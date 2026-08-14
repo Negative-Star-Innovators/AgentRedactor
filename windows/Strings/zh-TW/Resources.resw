@@ -424,7 +424,7 @@
     <value>需要主密碼</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>解除鎖定</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>結束</value>

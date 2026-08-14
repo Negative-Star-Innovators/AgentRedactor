@@ -424,7 +424,7 @@
     <value>ماسٹر پاس ورڈ درکار ہے</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>غیر مقفل کریں</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>بند کریں</value>

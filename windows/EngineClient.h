@@ -32,6 +32,15 @@ struct SessionMatch {
     std::wstring timestamp;
 };
 
+// Outcome of a POST /unlock/hello (Windows Hello consent) call.
+struct HelloUnlockOutcome {
+    bool ok = false;
+    bool canceled = false;
+    bool retriesExhausted = false;
+    bool unavailable = false;
+    bool helloNotEnabled = false;
+};
+
 class EngineClient {
 public:
     EngineClient() = default;
@@ -75,10 +84,18 @@ public:
     void SetOnnxProvider(const std::wstring& provider);
     bool IsMasterPasswordEnabled() const;
     bool IsUnlocked() const;
-    bool UnlockWithPassword(const std::wstring& password);
-    bool EnableMasterPassword(const std::wstring& password);
-    bool ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword);
+    HelloUnlockOutcome UnlockWithHello() const;
+    // Unlocks a Windows-Hello session WITHOUT a consent prompt: the caller
+    // (the GUI) has already verified the user in-process (POST /unlock).
+    bool UnlockEngine() const;
+    // Locks the session without stopping the proxies (PUT /settings/lock).
+    void LockSession() const;
+    // Fetches the real (unmasked) API key for a profile; empty on failure.
+    std::wstring GetProfileApiKey(const std::wstring& id) const;
+    bool HelloVerify() const;
+    bool EnableMasterPassword();
     void DisableMasterPassword();
+    bool IsHelloEnabled() const;
     bool IsLoggingEnabled() const;
     void SetLoggingEnabled(bool enabled);
     std::wstring GetAppLanguage() const;

@@ -20,9 +20,13 @@ using namespace Microsoft::UI::Xaml;
 
 static void DbgLog(const wchar_t* msg)
 {
-    wchar_t path[MAX_PATH];
-    GetModuleFileNameW(nullptr, path, MAX_PATH);
-    auto logPath = std::filesystem::path(path).parent_path() / L"debug.log";
+    // Under %APPDATA%\AgentRedactor (writable on every install — the MSIX
+    // install dir is read-only, so the old exe-dir debug.log silently did not
+    // exist for packaged builds and crash details were lost).
+    std::error_code ec;
+    auto logDir = ::AgentRedactor::Utils::GetAppDataPath();
+    std::filesystem::create_directories(logDir, ec);
+    auto logPath = logDir / L"debug.log";
     std::wofstream f(logPath, std::ios::app);
     if (f) f << msg << L"\n";
 }
@@ -86,9 +90,53 @@ namespace winrt::AgentRedactor::implementation
     }
 }
 
-LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS)
+LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS info)
 {
     DbgLog(L"!!! FATAL SEH EXCEPTION CAUGHT !!!");
+    if (info) {
+        wchar_t buf[512];
+        swprintf_s(buf, L"code: 0x%08X at address: 0x%p",
+            info->ExceptionRecord->ExceptionCode,
+            info->ExceptionRecord->ExceptionAddress);
+        DbgLog(buf);
+        HMODULE self = GetModuleHandleW(nullptr);
+        swprintf_s(buf, L"module base: 0x%p, offset: 0x%llX",
+            self, reinterpret_cast<ULONG_PTR>(info->ExceptionRecord->ExceptionAddress)
+                - reinterpret_cast<ULONG_PTR>(self));
+        DbgLog(buf);
+        if (info->ContextRecord) {
+            swprintf_s(buf, L"regs: rax=0x%llX rbx=0x%llX rcx=0x%llX rdx=0x%llX rsp=0x%llX rbp=0x%llX rsi=0x%llX rdi=0x%llX rip=0x%llX",
+                info->ContextRecord->Rax, info->ContextRecord->Rbx,
+                info->ContextRecord->Rcx, info->ContextRecord->Rdx,
+                info->ContextRecord->Rsp, info->ContextRecord->Rbp,
+                info->ContextRecord->Rsi, info->ContextRecord->Rdi,
+                info->ContextRecord->Rip);
+            DbgLog(buf);
+        }
+        {
+            const unsigned char* p = static_cast<const unsigned char*>(
+                info->ExceptionRecord->ExceptionAddress);
+            const unsigned char* q = p - 8;
+            wchar_t bytes[128] = {};
+            int used = 0;
+            for (int i = 0; i < 16 && q; i++) {
+                used += swprintf_s(bytes + used, 16, L"%02X ", q[i]);
+            }
+            DbgLog(bytes);
+        }
+        void* frames[32] = {};
+        USHORT n = CaptureStackBackTrace(0, 32, frames, nullptr);
+        for (USHORT i = 0; i < n; i++) {
+            HMODULE mod = nullptr;
+            GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
+                | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                static_cast<LPCWSTR>(frames[i]), &mod);
+            wchar_t modName[MAX_PATH] = L"?";
+            if (mod) GetModuleFileNameW(mod, modName, MAX_PATH);
+            swprintf_s(buf, L"  frame %u: 0x%p  %s", i, frames[i], modName);
+            DbgLog(buf);
+        }
+    }
     MessageBoxW(nullptr, ::AgentRedactor::LocString(L"FatalError_Message").c_str(), ::AgentRedactor::LocString(L"FatalError_Caption").c_str(), MB_OK | MB_ICONERROR);
     return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -126,12 +174,15 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
 #endif
 
     {
-        wchar_t path[MAX_PATH];
-        GetModuleFileNameW(nullptr, path, MAX_PATH);
-        auto logPath = std::filesystem::path(path).parent_path() / L"debug.log";
-        // When installed as MSIX the install directory is read-only; never throw here.
+        // Keep the previous run's crash details: rotate debug.log ->
+        // debug.prev.log instead of deleting it (the "Fatal error" dialog
+        // points at debug.log, so wiping it on startup hid the crash). The
+        // log lives under %APPDATA%\AgentRedactor (writable even for
+        // packaged MSIX installs).
         std::error_code ec;
-        std::filesystem::remove(logPath, ec);
+        auto logDir = ::AgentRedactor::Utils::GetAppDataPath();
+        std::filesystem::create_directories(logDir, ec);
+        std::filesystem::rename(logDir / L"debug.log", logDir / L"debug.prev.log", ec);
     }
     DbgLog(L"wWinMain: started");
 

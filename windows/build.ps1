@@ -17,12 +17,12 @@ $buildDir = "$root\build"
 $outDir = "$buildDir\$Platform\Release"
 $archLower = $Platform.ToLower()
 
-# Self-release builds are versioned from version.txt unless -Version is given
-if ($SelfRelease -and -not $PSBoundParameters.ContainsKey('Version')) {
+# Both channels are versioned from version.txt unless -Version is given.
+if (-not $PSBoundParameters.ContainsKey('Version')) {
     $versionFile = "$root\version.txt"
     if (Test-Path $versionFile) {
         $Version = (Get-Content $versionFile -Raw).Trim()
-        Write-Host "Self-release version from version.txt: $Version" -ForegroundColor Cyan
+        Write-Host "Version from version.txt: $Version" -ForegroundColor Cyan
     }
 }
 
@@ -151,8 +151,19 @@ $msbuildArgs = @(
     "$root\AgentRedactor.vcxproj",
     "-p:Configuration=Release",
     "-p:Platform=$Platform",
-    "-p:RestorePackages=false"
+    "-p:RestorePackages=false",
+    # Version identity for BOTH channels (AR_VERSION_STRING / VERSIONINFO):
+    # `agentredactor status` then reports the real version, and the exe's
+    # file version identifies which build is installed.
+    "-p:AppVersion=$Version"
 )
+# 4-part comma form for the VERSIONINFO resource (AR_VERSION_QUAD); the rc
+# preprocessor cannot split strings, so the quad is computed here. Embedded
+# quotes: without them PowerShell's native-argument passing splits the
+# comma-separated value into separate msbuild arguments (MSB1006).
+$versionCore = ($Version -split '[-+]')[0]
+$appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
+$msbuildArgs += "-p:AppVersionQuad=`"$appVersionQuad`""
 if ($Platform -eq "ARM64") {
     # The default HostX86\arm64 cross-compiler is a 32-bit process and runs
     # out of address space on the WinUI-sized PCH (C3859/C1076); force the
@@ -160,17 +171,8 @@ if ($Platform -eq "ARM64") {
     $msbuildArgs += "-p:PreferredToolArchitecture=x64"
 }
 if ($SelfRelease) {
-    # Stamps AGENTREDACTOR_SELFRELEASE + AR_VERSION_STRING (see vcxproj)
+    # Stamps AGENTREDACTOR_SELFRELEASE (update manager + Velo lifecycle)
     $msbuildArgs += "-p:SelfRelease=true"
-    $msbuildArgs += "-p:AppVersion=$Version"
-    # 4-part comma form for the VERSIONINFO resource (AR_VERSION_QUAD); the rc
-    # preprocessor cannot split strings, so the quad is computed here.
-    $versionCore = ($Version -split '[-+]')[0]
-    $appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
-    # Embedded quotes: without them PowerShell's native-argument passing
-    # splits the comma-separated value into separate msbuild arguments
-    # (MSB1006 "Property is not valid").
-    $msbuildArgs += "-p:AppVersionQuad=`"$appVersionQuad`""
 }
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
@@ -183,7 +185,8 @@ Write-Host "========================================" -ForegroundColor Cyan
 $engineBuildArgs = @(
     "$root\AgentRedactorEngine.vcxproj",
     "-p:Configuration=Release",
-    "-p:Platform=$Platform"
+    "-p:Platform=$Platform",
+    "-p:AppVersion=$Version"
 )
 if ($Platform -eq "ARM64") {
     # See the GUI build above: force 64-bit host tools for ARM64.
@@ -191,10 +194,30 @@ if ($Platform -eq "ARM64") {
 }
 if ($SelfRelease) {
     $engineBuildArgs += "-p:SelfRelease=true"
-    $engineBuildArgs += "-p:AppVersion=$Version"
 }
 & $msbuild @engineBuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
+
+# ============================================================================
+# VERIFY FRESH OUTPUTS
+# ============================================================================
+# Guard against a stale incremental build: MSBuild skips TUs whose source
+# timestamps are older than the outputs (e.g. after a git checkout that
+# restores old mtimes), which would silently package yesterday's code. The
+# produced exes must be newer than every source file.
+$newestSource = Get-ChildItem -Path "$root", "$root\..\core" -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -notmatch '\\(build|packages|\.git|\.vs)\\' -and $_.Extension -in @('.cpp', '.h', '.hpp', '.idl', '.xaml', '.vcxproj', '.resw', '.rc', '.txt', '.manifest') } |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+foreach ($c in @(
+        @{ Path = "$outDir\AgentRedactorUI.exe"; Label = "GUI" },
+        @{ Path = "$outDir\agentredactor.exe"; Label = "engine" })) {
+    if (-not (Test-Path $c.Path)) { throw "Build did not produce $($c.Label): $($c.Path)" }
+    $exeTime = (Get-Item $c.Path).LastWriteTime
+    if ($newestSource -and $exeTime -lt $newestSource.LastWriteTime) {
+        throw "STALE $($c.Label) build: $($c.Path) ($exeTime) is older than source $($newestSource.FullName) ($($newestSource.LastWriteTime)). Rerun with -Clean."
+    }
+    Write-Host "$($c.Label) built fresh: $($c.Path) @ $exeTime" -ForegroundColor Green
+}
 
 # Copy models and resources
 if (Test-Path "$root\models") {
@@ -351,6 +374,16 @@ if (Test-Path $versionFile) {
         Write-Host "MSIX package version from version.txt: $msixVersion" -ForegroundColor Cyan
     } else {
         Write-Warning "version.txt contains '$msixVersion' (expected x.y.z); keeping the manifest's Identity Version."
+    }
+    # Sideload installs of the SAME version are rejected by Add-AppxPackage,
+    # so the running app would silently stay on the previous build. Warn so a
+    # "same version" build cannot masquerade as a fresh install.
+    $installed = Get-AppxPackage -Name "NegativeStarInnovators.AgentRedactor" -ErrorAction SilentlyContinue
+    if ($installed -and $installed.Version -eq $msixVersion) {
+        # NOTE: keep this string ASCII-only. The file is UTF-8 without BOM,
+        # which PowerShell 5.1 reads as ANSI; a non-ASCII char here (e.g. an
+        # em-dash) decodes to a curly quote byte and terminates the string.
+        Write-Warning "Version $msixVersion is already installed - sideloading this MSIX will be REJECTED and the old build stays active. Bump version.txt before installing."
     }
 }
 $resourcesNode = $manifestXml.Package.Resources

@@ -424,7 +424,7 @@
     <value>マスター パスワードが必要</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>ロック解除</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>終了</value>

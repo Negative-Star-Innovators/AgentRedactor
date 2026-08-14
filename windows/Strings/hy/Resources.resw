@@ -424,7 +424,7 @@
     <value>Պահանջվում է հիմնական գաղտնաբառ</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Արգելափակել</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Ելք</value>

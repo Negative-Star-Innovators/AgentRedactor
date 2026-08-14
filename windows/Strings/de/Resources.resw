@@ -424,7 +424,7 @@
     <value>Hauptpasswort erforderlich</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Entsperren</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Beenden</value>

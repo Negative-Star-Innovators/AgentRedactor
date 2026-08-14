@@ -424,7 +424,7 @@
     <value>ต้องการรหัสผ่านหลัก</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>ปลดล็อก</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>ออก</value>

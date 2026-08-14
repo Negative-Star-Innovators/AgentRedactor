@@ -424,7 +424,7 @@
     <value>كلمة المرور الرئيسية مطلوبة</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>فتح</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>مخرج</value>

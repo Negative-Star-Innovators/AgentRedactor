@@ -424,7 +424,7 @@
     <value>Kailangan ang Master Password</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>I-unlock</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Lumabas</value>

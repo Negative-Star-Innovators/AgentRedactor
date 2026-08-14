@@ -82,10 +82,16 @@
     <IntDir>$(ProjectDir)build\$(Platform)\$(Configuration)\obj-engine\</IntDir>
     <TargetName>agentredactor</TargetName>
   </PropertyGroup>
+  <!-- Version identity for every build (build.ps1 passes -p:AppVersion, which
+       becomes AR_VERSION_STRING — `agentredactor status` reports it as the
+       engine version). A bare msbuild invocation falls back to 1.0.0. -->
+  <PropertyGroup>
+    <AppVersion Condition="'$(AppVersion)'==''">1.0.0</AppVersion>
+    <VersionDefines>AR_VERSION_STRING=&quot;$(AppVersion)&quot;</VersionDefines>
+  </PropertyGroup>
   <!-- Self-release (Velopack) channel defines, mirroring AgentRedactor.vcxproj. -->
   <PropertyGroup Condition="'$(SelfRelease)'=='true'">
-    <AppVersion Condition="'$(AppVersion)'==''">1.0.0</AppVersion>
-    <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE;AR_VERSION_STRING=&quot;$(AppVersion)&quot;</SelfReleaseDefines>
+    <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE</SelfReleaseDefines>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -97,7 +103,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -110,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -123,7 +129,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -136,18 +142,19 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\$(VcpkgTriplet)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onnxruntime.lib;user32.lib;shell32.lib;ole32.lib;uuid.lib;Rpcrt4.lib;winhttp.lib;ws2_32.lib;crypt32.lib;bcrypt.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>$(SelfReleaseDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(SelfReleaseDefines);$(VersionDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="engine\main.cpp" />
     <ClCompile Include="engine\EngineApp.cpp" />
     <ClCompile Include="engine\engine_loc.cpp" />
+    <ClCompile Include="engine\hello_unlock.cpp" />
     <ClCompile Include="engine\control_api_client.cpp" />
     <ClCompile Include="..\core\src\cli.cpp" />
     <ClCompile Include="..\core\src\control_server.cpp" />

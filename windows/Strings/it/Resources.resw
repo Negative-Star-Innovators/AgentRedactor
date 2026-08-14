@@ -424,7 +424,7 @@
     <value>Password principale richiesta</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Sblocca</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Esci</value>

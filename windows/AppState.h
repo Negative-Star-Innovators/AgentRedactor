@@ -40,6 +40,12 @@ public:
     // UI callbacks (called on UI thread)
     void SetOnLogAdded(std::function<void()> cb);
     void SetOnStatsUpdated(std::function<void()> cb);
+    void SetOnSettingsChanged(std::function<void()> cb);
+    // Show/hide the MainWindow lock overlay on demand. Used by the
+    // disable-protection Hello prompt (and any future prompt) so the app
+    // content is never visible behind the Windows Security dialog.
+    void SetOnSessionLockOverlay(std::function<void(bool visible)> cb);
+    void SetSessionLockOverlay(bool visible);
 
     // Blocking first-run model download. The state machine lives in the
     // engine; these accessors read the /status snapshot refreshed by the
@@ -57,6 +63,11 @@ public:
     // Called from the poll thread; posts to message window
     void NotifyLogAdded();
     void NotifyStatsUpdated();
+    void NotifySettingsChanged();
+
+    // Latest /settings snapshot from the engine (guarded by settingsMutex_);
+    // false when no snapshot has been fetched yet.
+    bool GetSettingsSnapshot(json& out) const;
 
     // Services (engine-backed facades; tray remains in-process)
     SettingsFacade* Settings() { return &settingsFacade_; }
@@ -102,6 +113,8 @@ private:
 
     std::function<void()> onLogAdded_;
     std::function<void()> onStatsUpdated_;
+    std::function<void()> onSettingsChanged_;
+    std::function<void(bool)> onSessionLockOverlay_;
     std::function<void()> onMainWindowClose_;
     std::function<void()> localizationReloadCallback_;
     std::function<void()> onModelDownloadStatus_;
@@ -112,6 +125,13 @@ private:
     mutable std::mutex statusMutex_;
     json statusCache_;
     bool statusValid_ = false;
+
+    // Last /settings snapshot from the engine (guarded by settingsMutex_);
+    // the poll thread diffs it so the GUI can refresh live when the CLI (or
+    // any other control-API client) changes a setting.
+    mutable std::mutex settingsMutex_;
+    json settingsCache_;
+    bool settingsValid_ = false;
 
     std::thread pollThread_;
     std::atomic<bool> pollStop_{ false };

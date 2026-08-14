@@ -1,12 +1,14 @@
 // agentredactor.exe — engine/CLI process (console subsystem, dual-mode).
 //
-// Engine mode: invoked with no arguments (or `engine run`) it hides the
-// console window and runs the engine (settings, PII detection, proxy data
-// plane, and the localhost control API).
+// Engine mode: invoked with no arguments (or `engine run`, internal/dev-only)
+// it hides the console window and runs the engine (settings, PII detection,
+// proxy data plane, and the localhost control API).
 //
 // CLI mode: `agentredactor <subcommand> ...` (status, get/set, profiles,
-// regex, keywords, unlock, password, engine stop) talks to the running
-// engine over the control API. Command logic lives in core/src/cli.cpp;
+// regex, keywords, unlock, password) talks to the running engine over the
+// control API. The former `engine run` / `engine stop` CLI commands were
+// removed: engine lifecycle belongs to the GUI. Command logic lives in
+// core/src/cli.cpp;
 // this file only supplies the Windows console plumbing and the WinHTTP
 // transport (control_api_client, the engine-side mirror of the GUI's
 // EngineClient).
@@ -87,23 +89,6 @@ void CliPrintRaw(const CliChannel& ch, const std::wstring& s, bool newline) {
     }
 }
 
-// No-echo prompt; nullopt when there is no interactive console.
-std::optional<std::wstring> CliPromptPassword(const CliChannel& ch) {
-    if (!ch.inIsConsole) return std::nullopt;
-    CliPrintRaw(ch, L"Master password: ", false);
-    DWORD mode = 0;
-    GetConsoleMode(ch.in, &mode);
-    SetConsoleMode(ch.in, (mode & ~ENABLE_ECHO_INPUT) | ENABLE_LINE_INPUT);
-    wchar_t buf[512];
-    DWORD read = 0;
-    BOOL ok = ReadConsoleW(ch.in, buf, 511, &read, nullptr);
-    SetConsoleMode(ch.in, mode);
-    CliPrintRaw(ch, L"", true);
-    if (!ok || read == 0) return std::nullopt;
-    while (read > 0 && (buf[read - 1] == L'\r' || buf[read - 1] == L'\n')) --read;
-    return std::wstring(buf, read);
-}
-
 int RunCliCommand(const std::vector<std::wstring>& args) {
     CliChannel ch = SetupCliChannel();
 
@@ -118,7 +103,6 @@ int RunCliCommand(const std::vector<std::wstring>& args) {
     };
     CliConsole console{
         [&ch](const std::wstring& line) { CliPrintRaw(ch, line, true); },
-        [&ch]() { return CliPromptPassword(ch); },
     };
 
     return RunCli(args, transport, console);
@@ -233,23 +217,15 @@ int wmain(int argc, wchar_t* argv[]) {
     }
 
     const std::wstring& command = args[0];
-    if (command == L"engine") {
-        bool console = false;
-        bool stop = false;
-        for (size_t i = 1; i < args.size(); ++i) {
-            if (args[i] == L"--console") console = true;
-            if (args[i] == L"stop") stop = true;
-        }
-        if (!stop && (args.size() == 1 || args[1] == L"run" || console)) {
-            return RunEngine(console);
-        }
-        // `engine stop` (or anything else) falls through to the CLI layer.
-    } else if (command == L"--console") {
+    // `engine run` / `engine stop` were removed from the CLI surface; engine
+    // lifecycle belongs to the GUI (spawn on startup, stop/lock on quit).
+    // Only the bare --console launch flag survives as a dev convenience.
+    if (command == L"--console") {
         return RunEngine(true);
     }
 
     // CLI mode: status / get / set / profiles / regex / keywords / unlock /
-    // password / engine stop / help.
+    // password / help.
     return RunCliCommand(args);
 }
 

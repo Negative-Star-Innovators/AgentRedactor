@@ -424,7 +424,7 @@
     <value>मास्टर पासवर्ड आवश्यक</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>अनलॉक करें</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>बाहर निकलें</value>

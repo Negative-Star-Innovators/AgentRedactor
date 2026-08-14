@@ -26,6 +26,7 @@ from windows.gui_driver import (
     set_forward_url,
     set_api_key,
     set_port,
+    set_profile_alias,
 )
 
 
@@ -62,6 +63,9 @@ async def test_gui_save_profile_rejects_port_used_by_another_profile(
     set_forward_url(mock_llm.base_url)
     set_api_key("test-api-key-second")
     set_port(second_port)
+    # Type the alias last (immediately before the save) so the app's 1-second
+    # settings poll cannot revert an unsaved alias edit in between.
+    set_profile_alias("second-profile")
     save_profile()
 
     wait_for_port(second_port)
@@ -153,6 +157,9 @@ async def test_gui_port_status_used_by_another_profile_shows_red_text(
     set_forward_url(mock_llm.base_url)
     set_api_key("test-api-key-second")
     set_port(second_port)
+    # Type the alias last (immediately before the save) so the app's 1-second
+    # settings poll cannot revert an unsaved alias edit in between.
+    set_profile_alias("second-profile")
     save_profile()
     wait_for_port(second_port)
 

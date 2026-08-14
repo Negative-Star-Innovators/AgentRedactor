@@ -424,7 +424,7 @@
     <value>Ana Parola Gerekli</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Kilidi Aç</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Çıkış</value>

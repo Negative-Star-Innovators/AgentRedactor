@@ -424,7 +424,7 @@
     <value>마스터 암호 필요</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>잠금 해제</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>종료</value>

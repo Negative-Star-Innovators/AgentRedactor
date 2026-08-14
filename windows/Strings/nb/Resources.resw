@@ -424,7 +424,7 @@
     <value>Hovedpassord kreves</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Lås opp</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Avslutt</value>

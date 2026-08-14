@@ -424,7 +424,7 @@
     <value>Требуется мастер-пароль</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Разблокировать</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Выход</value>

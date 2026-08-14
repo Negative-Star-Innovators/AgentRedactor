@@ -424,7 +424,7 @@
     <value>Potrebno je glavno geslo</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Odkleni</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Izhod</value>

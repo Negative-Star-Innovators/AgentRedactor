@@ -10,6 +10,7 @@
 #include "SettingsPage.h"
 #include "RegexPage.h"
 #include "KeywordsPage.h"
+#include "engine/hello_unlock.h"
 #include <winrt/Microsoft.UI.Windowing.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
 #include <winrt/Microsoft.UI.Xaml.Media.h>
@@ -17,6 +18,7 @@
 #include <dwmapi.h>
 #include <commctrl.h>
 #include <algorithm>
+#include <chrono>
 
 using namespace winrt;
 using namespace Microsoft::UI::Xaml;
@@ -61,11 +63,26 @@ namespace winrt::AgentRedactor::implementation
     {
         auto* self = reinterpret_cast<MainWindow*>(dwRefData);
         if (uMsg == WM_CLOSE && self && !self->allowClose_) {
+            // Close-to-tray: hide the window and lock the session so the next
+            // appearance (tray -> Open) demands Windows Hello again.
+            self->hiddenToTray_ = true;
+            self->OnWindowHidden();
             ShowWindow(hWnd, SW_HIDE);
             return 0;
         }
+        if (uMsg == WM_SHOWWINDOW && wParam && self) {
+            self->OnWindowShown();
+        }
         if (uMsg == WM_NCDESTROY && self) {
+            // Stop the dispatcher timers before the window goes away: a tick
+            // after destruction would run on a dangling `this` and crash.
+            if (self->inactivityTimer_) self->inactivityTimer_.Stop();
+            if (self->lockStateRetryTimer_) self->lockStateRetryTimer_.Stop();
+            self->windowDestroyed_ = true;
             RemoveWindowSubclass(hWnd, &SubclassProc, uIdSubclass);
+        }
+        if (self && IsActivityMessage(uMsg)) {
+            self->ResetActivityTimer();
         }
         return DefSubclassProc(hWnd, uMsg, wParam, lParam);
     }
@@ -79,6 +96,7 @@ namespace winrt::AgentRedactor::implementation
     winrt::fire_and_forget MainWindow::ShowQuitConfirmationAsync()
     {
         auto lifetime = get_strong();
+        lifetime->quitPromptInFlight_ = true;
         bool dark = IsSystemDarkMode();
 
         if (lifetime->hwnd_) {
@@ -121,6 +139,7 @@ namespace winrt::AgentRedactor::implementation
             lifetime->allowClose_ = true;
             lifetime->Close();
         }
+        lifetime->quitPromptInFlight_ = false;
     }
 
     // Shows / updates / dismisses the blocking first-run model-download dialog
@@ -241,8 +260,8 @@ namespace winrt::AgentRedactor::implementation
     // Awaits the one and only ShowAsync call of a model-download dialog
     // instance. A failure (e.g. another ContentDialog managed to open first,
     // or the window was not ready) is caught and logged here instead of
-    // escaping into the XAML framework. Once the dialog closes — normally or
-    // after a failed show — the member references are dropped so a later
+    // escaping into the XAML framework. Once the dialog closes â€” normally or
+    // after a failed show â€” the member references are dropped so a later
     // status update can cleanly re-create it.
     winrt::fire_and_forget MainWindow::ShowModelDownloadDialogAsync(Controls::ContentDialog dialog)
     {
@@ -443,6 +462,16 @@ namespace winrt::AgentRedactor::implementation
                     this->ShowQuitConfirmationAsync();
                 });
             });
+            // Any in-app Windows Hello prompt (e.g. the disable-protection
+            // consent) must never reveal the app content behind the system
+            // dialog: show the opaque padlock overlay for its duration.
+            app->SetOnSessionLockOverlay([this](bool visible) {
+                if (visible) {
+                    ShowLockOverlay();
+                } else {
+                    HideLockOverlay();
+                }
+            });
             app->SetLocalizationReloadCallback([this]() {
                 LOG(L"[MainWindow] Localization reload callback invoked");
                 this->DispatcherQueue().TryEnqueue([this]() {
@@ -452,6 +481,14 @@ namespace winrt::AgentRedactor::implementation
             app->SetOnModelDownloadStatus([this]() {
                 this->DispatcherQueue().TryEnqueue([this]() {
                     this->UpdateModelDownloadDialog();
+                });
+            });
+            // Live sync for engine-side settings changes (e.g. the CLI's
+            // `set <key>`): re-apply language in-session and refresh the
+            // settings-driven controls of the active page.
+            app->SetOnSettingsChanged([this]() {
+                this->DispatcherQueue().TryEnqueue([this]() {
+                    this->RefreshFromEngineSettings();
                 });
             });
 
@@ -492,10 +529,12 @@ namespace winrt::AgentRedactor::implementation
 
         colorValuesChangedToken_ = uiSettings_.ColorValuesChanged({ this, &MainWindow::OnColorValuesChanged });
 
-        auto frame = Frame();
-        frame.Padding(Thickness{ 0 });
-        ::AgentRedactor::ApplyCurrentFlowDirection(frame);
-        frame.NavigationFailed([](IInspectable const&, Navigation::NavigationFailedEventArgs const& args) {
+        // The page frame lives inside RootGrid so the lock overlay can sit
+        // above every page (Window.Content stays the XAML root grid).
+        frame_ = Frame();
+        frame_.Padding(Thickness{ 0 });
+        ::AgentRedactor::ApplyCurrentFlowDirection(frame_);
+        frame_.NavigationFailed([](IInspectable const&, Navigation::NavigationFailedEventArgs const& args) {
             try {
                 auto hr = args.Exception();
                 ::AgentRedactor::Utils::LogMessage(L"NavigationFailed: hresult=" + std::to_wstring(static_cast<int32_t>(hr)));
@@ -503,8 +542,19 @@ namespace winrt::AgentRedactor::implementation
                 ::AgentRedactor::Utils::LogMessage(L"NavigationFailed: unknown error");
             }
         });
-        Content(frame);
-        frame.Navigate(xaml_typename<AgentRedactor::HomePage>());
+        RootGrid().Children().Append(frame_);
+        frame_.Navigate(xaml_typename<AgentRedactor::HomePage>());
+
+        // Windows Hello session lock: overlay, prompt-on-show and the 10-minute
+        // inactivity re-lock. Wired here (not XAML) to keep the Window XAML
+        // free of code-behind handlers.
+        UnlockBtn().Click({ this, &MainWindow::OnUnlockBtnClick });
+        LocalizeLockOverlay();
+        inactivityTimer_ = DispatcherQueue().CreateTimer();
+        inactivityTimer_.Interval(std::chrono::minutes(10));
+        inactivityTimer_.IsRepeating(true);
+        inactivityTimer_.Tick([this](auto&&, auto&&) { OnInactivityTimeout(); });
+        inactivityTimer_.Start();
     }
 
     void MainWindow::ReloadLocalization()
@@ -521,8 +571,8 @@ namespace winrt::AgentRedactor::implementation
             LOG(L"[MainWindow] AppWindow was null");
         }
 
-        // Retrieve the Frame that was set as the window content.
-        auto frame = Content().try_as<Microsoft::UI::Xaml::Controls::Frame>();
+        // Retrieve the Frame that lives inside RootGrid (below the lock overlay).
+        auto frame = frame_;
         if (!frame) {
             LOG(L"[MainWindow] No Frame found in window content");
             return;
@@ -552,5 +602,232 @@ namespace winrt::AgentRedactor::implementation
         ::AgentRedactor::ApplyCurrentFlowDirection(frame);
 
         LOG(L"[MainWindow] ReloadLocalization complete");
+    }
+
+    void MainWindow::RefreshFromEngineSettings()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        json snap;
+        if (!app->GetSettingsSnapshot(snap)) return;
+
+        // Language changed outside the GUI (CLI `set app-language`): apply it
+        // through the same in-session path the GUI itself uses, which
+        // re-localizes the current page without a restart.
+        std::wstring lang = ::AgentRedactor::Utils::Utf8ToWide(snap.value("appLanguage", std::string()));
+        if (!lang.empty() && lang != ::AgentRedactor::GetLanguageOverride()) {
+            LOG(L"[MainWindow] Applying app-language change from the engine: " + lang);
+            app->SetLanguage(lang);
+        }
+
+        // Protection disabled outside the GUI (CLI `password disable`): lift
+        // the padlock overlay so the user is not stuck on a locked screen.
+        if (!snap.value("masterPasswordEnabled", false) && lockOverlayShown_) {
+            LOG(L"[MainWindow] Protection disabled externally: lifting the lock overlay");
+            HideLockOverlay();
+        }
+
+        // Refresh the settings-driven controls of whichever page is active.
+        auto frame = frame_;
+        if (!frame) return;
+        if (auto content = frame.Content()) {
+            if (auto home = content.try_as<winrt::AgentRedactor::HomePage>()) {
+                winrt::get_self<winrt::AgentRedactor::implementation::HomePage>(home)->RefreshFromEngine();
+            } else if (auto settings = content.try_as<winrt::AgentRedactor::SettingsPage>()) {
+                winrt::get_self<winrt::AgentRedactor::implementation::SettingsPage>(settings)->LoadSettings();
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Windows Hello session lock
+    // -------------------------------------------------------------------------
+
+    void MainWindow::LocalizeLockOverlay()
+    {
+        LockTitleText().Text(::AgentRedactor::LocString(L"AppDisplayName"));
+        UnlockBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"Dialog_UnlockButton")));
+    }
+
+    void MainWindow::OnUnlockBtnClick(IInspectable const&, RoutedEventArgs const&)
+    {
+        PromptUnlockAsync();
+    }
+
+    bool MainWindow::IsActivityMessage(UINT uMsg)
+    {
+        switch (uMsg) {
+        case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_XBUTTONDOWN:
+        case WM_NCLBUTTONDOWN:
+        case WM_NCRBUTTONDOWN:
+        case WM_MOUSEWHEEL:
+        case WM_MOUSEHWHEEL:
+        case WM_TOUCH:
+        case WM_GESTURE:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    void MainWindow::OnWindowShown()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        if (quitPromptInFlight_) return; // tray "Quit" is showing its confirm
+        const bool firstShow = !firstShowHandled_;
+        firstShowHandled_ = true;
+        const bool trayReopen = hiddenToTray_;
+        hiddenToTray_ = false;
+        // Restore-from-minimize does not re-lock; a first appearance and a
+        // close-to-tray re-open do.
+        if (!firstShow && !trayReopen) return;
+        EnsureLockState(true);
+    }
+
+    void MainWindow::OnWindowHidden()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        json snap;
+        if (!app->GetSettingsSnapshot(snap)) return;
+        if (!snap.value("masterPasswordEnabled", false)) return;
+        // The next appearance must authenticate again.
+        LockSession();
+    }
+
+    void MainWindow::EnsureLockState(bool autoPrompt)
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        json snap;
+        if (!app->GetSettingsSnapshot(snap)) {
+            // First launch: the engine has not served a /status snapshot yet.
+            // Retry shortly instead of skipping the startup prompt. Stop once
+            // the window is hidden (closed to tray) â€” the next appearance
+            // triggers the flow again â€” and never run after destruction.
+            if (windowDestroyed_ || !hwnd_ || !IsWindowVisible(hwnd_)) return;
+            LOG(L"[MainWindow] Lock state: engine snapshot not ready, retrying");
+            lockStatePendingPrompt_ = autoPrompt;
+            if (!lockStateRetryTimer_) {
+                lockStateRetryTimer_ = DispatcherQueue().CreateTimer();
+                lockStateRetryTimer_.Interval(std::chrono::seconds(1));
+                lockStateRetryTimer_.IsRepeating(false);
+                lockStateRetryTimer_.Tick([this](auto&&, auto&&) {
+                    lockStateRetryTimer_ = nullptr;
+                    if (!windowDestroyed_) {
+                        EnsureLockState(lockStatePendingPrompt_);
+                    }
+                });
+            }
+            lockStateRetryTimer_.Start();
+            return;
+        }
+        lockStatePendingPrompt_ = false;
+        if (!snap.value("masterPasswordEnabled", false)) {
+            HideLockOverlay();
+            return;
+        }
+        UpdateLockState(autoPrompt);
+    }
+
+    void MainWindow::UpdateLockState(bool autoPrompt)
+    {
+        LOGF(L"[MainWindow] Lock state: overlay shown, autoPrompt=%d", autoPrompt ? 1 : 0);
+        LockSession();
+        ShowLockOverlay();
+        if (autoPrompt) {
+            PromptUnlockAsync();
+        }
+    }
+
+    void MainWindow::LockSession()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        app->Settings()->LockSession();
+    }
+
+    void MainWindow::ShowLockOverlay()
+    {
+        lockOverlayShown_ = true;
+        LockOverlay().Visibility(Visibility::Visible);
+        // Hard privacy guarantee: the content frame (profiles, regex,
+        // keywords, PII grid â€” everything sensitive) is removed from the
+        // visual tree while locked. Even if the overlay itself ever failed to
+        // render, NOTHING of the app content can be visible behind the
+        // Windows Hello dialog.
+        if (frame_) frame_.Visibility(Visibility::Collapsed);
+    }
+
+    void MainWindow::HideLockOverlay()
+    {
+        lockOverlayShown_ = false;
+        LockOverlay().Visibility(Visibility::Collapsed);
+        if (frame_) frame_.Visibility(Visibility::Visible);
+    }
+
+    void MainWindow::ResetActivityTimer()
+    {
+        if (inactivityTimer_) inactivityTimer_.Start();
+    }
+
+    void MainWindow::OnInactivityTimeout()
+    {
+        if (windowDestroyed_) return;
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        if (!hwnd_ || !IsWindowVisible(hwnd_)) return; // hidden to tray: already locked
+        if (lockOverlayShown_) return;                 // already locked
+        json snap;
+        if (!app->GetSettingsSnapshot(snap)) return;
+        if (!snap.value("masterPasswordEnabled", false)) return;
+        // 10 minutes without input: re-authenticate.
+        LOG(L"[MainWindow] Locking session after 10 minutes of inactivity");
+        UpdateLockState(true);
+    }
+
+    winrt::fire_and_forget MainWindow::PromptUnlockAsync()
+    {
+        if (unlockPromptInFlight_) co_return;
+        unlockPromptInFlight_ = true;
+        auto lifetime = get_strong();
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app || lifetime->windowDestroyed_) {
+            unlockPromptInFlight_ = false;
+            co_return;
+        }
+        LOG(L"[MainWindow] Windows Hello prompt requested");
+        auto message = ::AgentRedactor::LocString(L"Dialog_EnableHello_Message");
+        bool verified = false;
+        try {
+            // Runs on the UI thread: the window-owned consent prompt is
+            // created where this window's message pump lives, and the
+            // coroutine resumes here without blocking the window.
+            verified = co_await ::AgentRedactor::RequestHelloUnlockAsync(lifetime->hwnd_, message);
+        } catch (...) {
+            verified = false;
+        }
+        unlockPromptInFlight_ = false;
+        // The window may have been closed while the prompt was up; never
+        // touch the overlay or dialogs on a destroyed window.
+        if (lifetime->windowDestroyed_) {
+            co_return;
+        }
+        if (verified) {
+            LOG(L"[MainWindow] Windows Hello verified: unlocking session");
+            app->Settings()->UnlockEngine();
+            HideLockOverlay();
+            ResetActivityTimer();
+            co_return;
+        }
+        // Failed/cancelled verification: stay on the padlock overlay. The
+        // Unlock button re-runs the prompt; no message, no dialog.
+        LOG(L"[MainWindow] Windows Hello not verified: staying on the padlock");
     }
 }

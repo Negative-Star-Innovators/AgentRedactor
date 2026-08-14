@@ -56,6 +56,15 @@ class CliEngine:
     def _env(self) -> dict[str, str]:
         env = dict(os.environ)
         env["AGENTREDACTOR_CONFIG_DIR"] = str(self.config_dir)
+        # Cancel-equivalent test hook: the Windows Hello prompt never shows
+        # and can never verify. This keeps gated commands deterministic on any
+        # machine (CI included) — it grants nothing, exactly like a user
+        # pressing cancel. The invariant is asserted by
+        # test_hello_suppress_prompt_flag_never_grants_access.
+        env["AGENTREDACTOR_HELLO_SUPPRESS_PROMPT"] = "1"
+        # Shorten the Windows Hello prompt watchdog so any non-suppressed
+        # consent path also fails fast instead of hanging 60 s per call.
+        env["AGENTREDACTOR_HELLO_TIMEOUT_MS"] = "1000"
         return env
 
     def start(self) -> None:

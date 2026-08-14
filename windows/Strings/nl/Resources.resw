@@ -424,7 +424,7 @@
     <value>Hoofdwachtwoord vereist</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Ontgrendelen</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Afsluiten</value>

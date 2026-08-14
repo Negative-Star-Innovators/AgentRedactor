@@ -424,7 +424,7 @@
     <value>Reikalingas pagrindinis slaptažodis</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Atrakinti</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Išeiti</value>

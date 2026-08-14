@@ -424,7 +424,7 @@
     <value>முதன்மை கடவுச்சொல் தேவை</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>பூட்டைத் திற</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>வெளியேறு</value>

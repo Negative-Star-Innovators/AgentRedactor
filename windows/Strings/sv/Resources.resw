@@ -424,7 +424,7 @@
     <value>Huvudlösenord krävs</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Lås upp</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Avsluta</value>

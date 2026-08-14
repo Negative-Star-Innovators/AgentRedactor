@@ -424,7 +424,7 @@
     <value>Palavra-passe mestra necessária</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Desbloquear</value>
+    <value>Unlock</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Sair</value>
