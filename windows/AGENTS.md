@@ -74,6 +74,7 @@ exit codes are 0 success, 1 runtime error, 2 usage.
 
 ```
 agentredactor status                          engine + profile overview (ungated)
+agentredactor languages                       list supported language codes (ungated)
 agentredactor get <key> [--profile P]         read a setting
 agentredactor set <key> <value> [--profile P] change a setting
 agentredactor profiles list                   table incl. request/redaction stats
@@ -92,9 +93,12 @@ process. (For a foreground debug engine run, launch the bare exe with
 `--console`.)
 
 Global keys: `start-on-boot`, `logging`, `show-sensitive`,
-`app-language`, `master-password-enabled`/`unlocked` (read-only). Profile keys:
+`app-language`. Password state is NOT a get/set key: read it via `status`
+(`password enabled:`), change it via `password enable|disable`. PII types are
+NOT get/set keys either — they are owned by the `pii-types` command. Profile
+keys:
 `alias`, `upstream-url`, `api-key`, `port`, `confidence-threshold`,
-`pii-types`, `use-ai-model`. `--profile P` selects by list number, id, or
+`use-ai-model`. `--profile P` selects by list number, id, or
 alias (optional when only one profile exists). `onnx-provider` and profile
 `enabled` remain engine/GUI-only for now (not exposed on the CLI); profile
 `enabled` no longer appears in `status` / `profiles list` output either.
@@ -102,9 +106,13 @@ alias (optional when only one profile exists). `onnx-provider` and profile
 CLI input validation mirrors the GUI, so a bad value is rejected before it
 reaches the engine/proxy: `port` must be 1024..65535 and not already used by
 another profile; `upstream-url` must be non-empty, start with `http://` or
-`https://`, and have a real host; `confidence-threshold` must be 0..1; and
-`regex add` validates the pattern (invalid regex is rejected) as well as
-rejecting an empty one. The CLI deals only in **single PII types** (e.g.
+`https://`, and have a real host; `confidence-threshold` must be 0..1;
+`app-language` must be an exact supported BCP-47 tag (from `SUPPORTED_LANGUAGES`
+in `core/include/constants.h`, listed by `agentredactor languages` — a partial
+tag like `zh` is rejected instead of silently selecting nothing) and `set
+show-sensitive true` is rejected while logging is disabled (the engine
+enforces it, mirroring the GUI checkbox); `regex add` validates the pattern
+(invalid regex is rejected) as well as rejecting an empty one. The CLI deals only in **single PII types** (e.g.
 `secret`, `private_email`) — there are no PII categories on the CLI, matching
 the GUI; a category name like `CONTACT` is rejected as an unknown type.
 
@@ -117,19 +125,25 @@ different profile later) and refuses to delete the last profile.
 Password model: with no master password everything is open. With Windows
 Hello enabled there is **no `unlock` command and no session-wide unlock
 step**: every gated command (get/set/profiles/regex/keywords/pii-types)
-demands a fresh Windows Hello consent on the spot — `/hello/verify` when the
-engine session is already unlocked, `/unlock/hello` when locked (the consent
-then also unlocks the engine). `status` and bare `agentredactor` (help) stay
-open; `password disable` is the ungated recovery path. The engine lock itself
-remains UX-level; the only server-side enforcement is
-`GET /profiles/<id>/apikey` (403 while locked) — `GET /profiles` always masks
-keys as `abc...****`.
+demands a fresh Windows Hello consent on the spot. The consent runs
+**IN-PROCESS in the client** (the CLI via the transport's `consent` hook, the
+GUI via `RequestHelloUnlockAsync`): Windows attaches the dialog to the window
+of the ACTIVE application, so an engine-owned prompt would always land in the
+background. On Verified the client unlocks the engine via `POST /unlock` (the
+documented "caller has already verified in-process" path). `status` and bare
+`agentredactor` (help) stay open; `password disable` is gated the same way —
+consent, then `PUT /settings/disableMasterPassword`, which the engine only
+accepts on an unlocked session. The engine lock itself remains UX-level; the
+only server-side enforcement is `GET /profiles/<id>/apikey` AND
+`PUT /settings/disableMasterPassword` (both 403 while locked) — `GET
+/profiles` always masks keys as `abc...****`.
 
 Windows Hello unlock (Windows only; Linux/CLI core stays password-only):
 - Engine: `POST /unlock/hello` (always 200 with `ok`/`canceled`/
   `retriesExhausted`/`unavailable`/`helloNotEnabled`/`error` fields) and
   `POST /unlock` (SAME unlock but WITHOUT a consent prompt — the caller has
-  already verified in-process), `POST /hello/verify` (standalone consent, no
+  already verified in-process; the GUI and the CLI transport both use this
+  after their in-process prompts), `POST /hello/verify` (standalone consent, no
   state change), `PUT /settings/lock`
   (locks the session — the GUI sends it on quit when the engine survives),
   `enableMasterPassword` accepts `hello: true` (with an empty `value` it
@@ -141,26 +155,33 @@ Windows Hello unlock (Windows only; Linux/CLI core stays password-only):
   `UnlockWithHello`/`EnableMasterPasswordHelloOnly`/`Lock`/`DpapiProtect`).
 - CLI: `password enable` (no password anywhere) prints "windows hello
   protection enabled" and no typed password exists. With protection on, every
-  gated command prompts for a fresh Hello consent (see "Password model"
-  above); `get api-key` therefore works like any other gated read. `password
-  disable` stays usable on a locked session (the recovery path).
+  gated command prompts for a fresh Hello consent IN-PROCESS (the transport's
+  `ConsentWithHello`, which is the ACTIVE application when run from a
+  terminal, so the dialog comes to the foreground) and then unlocks via
+  `POST /unlock`; `get api-key` therefore works like any other gated read.
+  `password disable` is gated the same way: consent → `POST /unlock` →
+  `PUT /settings/disableMasterPassword` (the endpoint 403s while the session
+  is locked).
 - GUI: ALL consent prompts are in-process (the GUI compiles
   `engine/hello_unlock.cpp` too, so the Windows Security dialog belongs to
-  the GUI process and stays in front — no more background prompt from the
-  engine process). Enabling protection is DIRECT (checkbox → engine, no
-  dialog, no consent); disabling keeps a Hello consent before the engine
-  call. When protection is on, the window shows a **lock overlay** (opaque
+  the GUI process, attaches to the active window, and stays in front).
+  Enabling protection is DIRECT (checkbox → engine, no
+  dialog, no consent); disabling keeps that in-process prompt, then unlocks
+  via `POST /unlock` and disables (the engine's disable endpoint requires an
+  unlocked session) — all under the padlock overlay. When
+  protection is on, the window shows a **lock overlay** (opaque
   black scrim + lock icon + "Windows Hello required" + Try again button) and
   the Windows Hello prompt runs immediately on every appearance: first start,
   and close-to-tray → tray Open re-open. The engine is locked on window hide
   and after **10 minutes without input** (any keyboard/mouse/touch activity
   resets the timer), at which point the overlay + prompt re-appear. A failed
-  or cancelled prompt leaves the retry/exit dialog; `AppState::Shutdown`
+  or cancelled prompt simply stays on the padlock overlay (no retry/exit
+  dialog); `AppState::Shutdown`
   locks the engine (`PUT /settings/lock`) when it is left running so the next
   open must authenticate again. The overlay lives in MainWindow (covers all
   pages); `HomePage` no longer runs any startup lock flow. The overlay is
-  ALSO shown for the duration of every other in-app Hello prompt (the
-  disable-protection consent via `AppState::SetSessionLockOverlay`), so the
+  ALSO shown for the duration of the disable-protection consent
+  (`AppState::SetSessionLockOverlay`), so the
   regex/keywords/profile content is never visible behind the Windows Security
   dialog — the window always shows the padlock while Hello is on screen. As a
   hard privacy guarantee, `ShowLockOverlay`/`HideLockOverlay` ALSO collapse
@@ -170,10 +191,13 @@ Windows Hello unlock (Windows only; Linux/CLI core stays password-only):
 - `windows/engine/hello_unlock.cpp` drives `UserConsentVerifier`
   (`IsWindowsHelloAvailable` + blocking `RequestHelloUnlock` for the engine's
   control-API handlers + coroutine `RequestHelloUnlockAsync` for the GUI):
-  the consent prompt is real system UI and waits for the user, so the call
-  runs a watchdog (default 60 s, overridable via `AGENTREDACTOR_HELLO_TIMEOUT_MS`
-  so test harnesses fail fast) that cancels the operation and reports
-  `Unavailable` instead of hanging.
+  the consent prompt is real system UI and waits for the user. The BLOCKING
+  path keeps a watchdog (default 60 s, overridable via
+  `AGENTREDACTOR_HELLO_TIMEOUT_MS`) so a script can never hang on the prompt;
+  the GUI ASYNC path has **no watchdog by default** — the prompt is a lock
+  screen and waits for the user, and the only early cancels are the caller's
+  shared cancel flag (the window hiding or being destroyed, so no orphaned
+  system dialog survives) and the same env override for test harnesses.
   **`AGENTREDACTOR_HELLO_SUPPRESS_PROMPT` (test-only, runtime env var, no
   compile-time gate)** makes every consent prompt behave exactly as if the
   user pressed cancel: no system UI is ever shown and the result can NEVER be
@@ -184,39 +208,44 @@ Windows Hello unlock (Windows only; Linux/CLI core stays password-only):
   Canceled/false). SECURITY INVARIANT, enforced by the CLI test
   `test_hello_suppress_prompt_flag_never_grants_access` (runs against the
   release binary): the flag must never return Verified, never reach the
-  engine's real unlock, and never serve the API key. Any change that lets it
+  engine's real unlock, never serve the API key, and never pass the
+  disable-protection consent. Any change that lets it
   grant access is a critical vulnerability. The real unlock path (successful
   Windows Hello verification) is inherently interactive and is never
   automated by the test suite.
-  `RequestHelloUnlock(HWND hwnd, msg)` attaches the prompt to `hwnd` via the
-  desktop interop interface `IUserConsentVerifierInterop`
-  (`RequestVerificationForWindowAsync`) — this is what makes the Windows
-  Security dialog come to the foreground of the calling app instead of opening
-  in the background. The HWND is supplied by whoever initiated the prompt:
-  the GUI passes its main window (`AppState::MainWindow()`); the CLI transport
-  passes the console window (`GetConsoleWindow()`) by tagging `?hwnd=<decimal>`
-  onto `/unlock/hello` and `/hello/verify`, which `EngineApp::ParseHwndQuery`
-  reads back (HWND values are valid cross-process on the same desktop). The
-  window-attached interop call must run where the window's message pump lives,
-  so the GUI uses the async variant on the UI thread; the engine's blocking
-  variant falls back to unowned `RequestVerificationAsync` when the interop
-  call fails from a worker thread. The interop COM calls are wrapped in SEH
+  The Windows Security dialog only comes to the FOREGROUND when the consent
+  is attached to a window of the ACTIVE application (`RequestVerificationForWindowAsync`,
+  `IUserConsentVerifierInterop`): the GUI attaches to its own main window on
+  the UI thread (`RequestHelloUnlockAsync`), and the CLI transport attaches
+  to a 1x1 window it owns in the CLI process (`ControlApiClient::ConsentWithHello`
+  → blocking `RequestHelloUnlock` → `TryWindowedPrompt`/`RunWindowedPrompt`
+  in `hello_unlock.cpp`, which creates the window on a dedicated message-pump
+  thread, shows it and tries to make it the active window). Both clients then
+  report the verified result to the engine via `POST /unlock`. An engine-owned
+  prompt — even window-attached to an engine window — belongs to a BACKGROUND
+  process and always lands behind other windows; the engine's blocking
+  `RequestHelloUnlock` still makes that best-effort attempt for raw API
+  callers (`/unlock/hello`, `/hello/verify`) and otherwise falls back to
+  unowned `RequestVerificationAsync`. The interop COM calls are wrapped in SEH
   (raw COM only, `CreateWindowedVerification`) so a broken consent service
   degrades to the unowned fallback instead of an access violation. The async
-  variant's prompt watchdog is a detached `std::thread` holding shared_ptr
+  variant's prompt canceller is a detached `std::thread` holding shared_ptr
   ownership — the earlier `fire_and_forget` + `winrt::resume_after` watchdog
   coroutine raced its own frame teardown and crashed (SEH 0xC0000005 at the
   `xchg` of `done->exchange` after `CloseThreadpoolTimer`, fault offset
   0x930EE in the 1.1.3 build) — do NOT reintroduce a coroutine watchdog here.
-  The CLI transport special-cases `/unlock/hello` and `/hello/verify` with a
+  The CLI transport special-cases `/unlock/hello`, `/hello/verify` and
+  `/settings/disableMasterPassword` with a
   90 s WinHTTP receive timeout (the usual 3 s would abort mid-prompt):
   `windows/engine/control_api_client.cpp`.
 - Reminder: availability is NOT enrollment — `CheckAvailabilityAsync` returns
   Available on machines with no Hello configured; a headless run leaves an
-  unanswered "Windows Security" prompt on the desktop until the watchdog
-  fires. The GUI stays on the padlock overlay after any failed/cancelled
-  attempt (no dialog, no exit); the CLI reports exit code 1 + message
-  ("windows hello consent canceled", "...not available on this device", ...).
+  unanswered "Windows Security" prompt on the desktop until the blocking
+  path's watchdog fires. The GUI stays on the padlock overlay after any
+  failed/cancelled attempt (no dialog, no exit); the CLI reports exit code 1 +
+  message ("windows hello consent canceled", "windows hello consent timed out
+  (no answer)", "...not available on this
+  device", ...).
 
 ## Quick Build (for testing)
 
@@ -394,8 +423,10 @@ A small FlaUI/C# helper drives the real Windows UI from Python. The goal is to e
 - `tests/gui/test_gui_profiles.py` — adds a second profile through the UI.
 - `tests/gui/test_gui_verbose_logging.py` — toggles verbose logging through the UI.
 - `tests/gui/test_gui_master_password.py` — the Windows-Hello lock scenarios
-  (enable direct, startup lock padlock overlay, disable via CLI while
-  locked). These tests set `AGENTREDACTOR_HELLO_SUPPRESS_PROMPT=1` (plus
+  (enable direct, startup lock padlock overlay, CLI disable rejected while
+  locked — the engine runs the consent inside the disable call, so without a
+  real verification the protection stays on). These tests set
+  `AGENTREDACTOR_HELLO_SUPPRESS_PROMPT=1` (plus
   `AGENTREDACTOR_HELLO_TIMEOUT_MS=1500` as belt-and-braces) so the auto-run
   Hello prompt behaves as cancelled: no system "Windows Security" dialog ever
   appears, so the harness is never blocked by it on Hello-enabled machines

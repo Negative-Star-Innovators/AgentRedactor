@@ -54,27 +54,6 @@ std::wstring FormatFloat(float f) {
     return oss.str();
 }
 
-std::vector<std::wstring> SplitCsv(const std::wstring& s) {
-    std::vector<std::wstring> out;
-    std::wstringstream ss(s);
-    std::wstring item;
-    while (std::getline(ss, item, L',')) {
-        item = Trim(item);
-        if (!item.empty()) out.push_back(item);
-    }
-    return out;
-}
-
-std::wstring JoinCsv(const json& arr) {
-    std::wstring out;
-    if (!arr.is_array()) return out;
-    for (const auto& v : arr) {
-        if (!out.empty()) out += L", ";
-        out += Utils::Utf8ToWide(v.get<std::string>());
-    }
-    return out;
-}
-
 // Mirrors the GUI's upstream URL validation: non-empty, http(s) scheme, and a
 // real host. Returns the error message (labelled for the input's name), or an
 // empty string when valid.
@@ -164,26 +143,40 @@ struct Ctx {
     // Protection gate for every settings/profile command. Open when no
     // protection is enabled. With Windows Hello enabled, EVERY gated command
     // demands a fresh consent prompt right there (there is no `unlock`
-    // command anymore): the session state only decides whether the prompt
-    // also unlocks the engine or just verifies. `status`/`help` stay open so
-    // the CLI remains introspectable; disabling protection is the recovery
-    // path (kept ungated in CmdPassword).
+    // command anymore). The consent runs IN-PROCESS via the transport (the
+    // client is the active application, so the Windows dialog comes to the
+    // foreground) and on success unlocks the engine session (POST /unlock),
+    // exactly like the GUI after its in-process prompt. `status`/`help` stay
+    // open so the CLI remains introspectable.
     bool EnsureConsent(const json& status) const {
         if (!status.value("masterPasswordEnabled", false)) return true;
         if (!status.value("helloEnabled", false)) {
             Error(L"windows hello is not configured on this device");
             return false;
         }
-        json out;
-        const bool ok = status.value("unlocked", false)
-            ? (t.post(L"/hello/verify", json::object(), &out) && out.value("ok", false))
-            : (t.post(L"/unlock/hello", json::object(), &out) && out.value("ok", false));
-        if (ok) return true;
-        if (out.value("canceled", false)) { Error(L"windows hello consent canceled"); return false; }
-        if (out.value("retriesExhausted", false)) { Error(L"too many windows hello attempts"); return false; }
-        if (out.value("unavailable", false)) { Error(L"windows hello is not available on this device"); return false; }
-        Error(L"windows hello consent required");
-        return false;
+        if (!t.consent) {
+            Error(L"windows hello is not available on this device");
+            return false;
+        }
+        switch (t.consent()) {
+        case HelloConsentOutcome::Granted:
+            return true;
+        case HelloConsentOutcome::Canceled:
+            Error(L"windows hello consent canceled");
+            return false;
+        case HelloConsentOutcome::RetriesExhausted:
+            Error(L"too many windows hello attempts");
+            return false;
+        case HelloConsentOutcome::TimedOut:
+            Error(L"windows hello consent timed out (no answer)");
+            return false;
+        case HelloConsentOutcome::Unavailable:
+            Error(L"windows hello is not available on this device");
+            return false;
+        default:
+            Error(L"windows hello consent required");
+            return false;
+        }
     }
 
     // Combined precondition used by all gated commands.
@@ -238,7 +231,7 @@ struct Ctx {
 };
 
 // ---------------------------------------------------------------------------
-// status / password
+// status / password / languages
 // ---------------------------------------------------------------------------
 
 int CmdStatus(const Ctx& ctx) {
@@ -246,8 +239,7 @@ int CmdStatus(const Ctx& ctx) {
     if (!ctx.EngineStatus(status)) return 1;
 
     ctx.Print(L"engine:          " + Utils::Utf8ToWide(status.value("engineVersion", std::string("?"))));
-    ctx.Print(L"windows hello:   " + BoolStr(status.value("helloEnabled", false)));
-    ctx.Print(L"session:         " + std::wstring(status.value("unlocked", false) ? L"unlocked" : L"locked"));
+    ctx.Print(L"password enabled: " + BoolStr(status.value("helloEnabled", false)));
     if (status.value("modelDownloadInProgress", false)) {
         ctx.Print(L"model download:  in progress (" + std::to_wstring(status.value("modelDownloadPercent", 0)) + L"%)");
     } else if (status.value("modelDownloadFailed", false)) {
@@ -294,6 +286,15 @@ int CmdStatus(const Ctx& ctx) {
     return 0;
 }
 
+int CmdLanguages(const Ctx& ctx) {
+    // One code per line, nothing else: the same list the Settings page and
+    // tray menu are built from (core/include/constants.h SUPPORTED_LANGUAGES).
+    for (const auto& lang : ::AgentRedactor::SUPPORTED_LANGUAGES) {
+        ctx.Print(lang.tag);
+    }
+    return 0;
+}
+
 int CmdPassword(const Ctx& ctx) {
     if (ctx.opts.positional.size() < 2) {
         ctx.Error(L"usage: agentredactor password enable | disable");
@@ -325,7 +326,17 @@ int CmdPassword(const Ctx& ctx) {
             ctx.Print(L"windows hello protection is not enabled");
             return 0;
         }
-        ctx.t.put(L"/settings/disableMasterPassword", json{{"value", true}}, nullptr);
+        // Disabling strips ALL protection, so it demands the same fresh
+        // Windows Hello consent as every other gated command; the engine's
+        // disable endpoint only accepts an unlocked session, and the consent
+        // above unlocked it. A raw API caller cannot disable without either a
+        // Hello consent or the trusted /unlock path.
+        if (!ctx.EnsureConsent(status)) return 1;
+        json out;
+        if (!ctx.t.put(L"/settings/disableMasterPassword", json{{"value", true}}, &out) || !out.value("ok", false)) {
+            ctx.Error(L"failed to disable windows hello protection");
+            return 1;
+        }
         ctx.Print(L"windows hello protection disabled");
         return 0;
     }
@@ -349,14 +360,12 @@ constexpr GlobalKey kGlobalKeys[] = {
     {L"logging", "loggingEnabled", 'b'},
     {L"show-sensitive", "showSensitive", 'b'},
     {L"app-language", "appLanguage", 's'},
-    {L"master-password-enabled", "masterPasswordEnabled", 'r'},
-    {L"unlocked", "unlocked", 'r'},
 };
 
 struct ProfileKey {
     const wchar_t* cliName;
     const char* jsonName;
-    char type; // 'b' bool, 's' string, 'i' int, 'f' float, 'l' csv list
+    char type; // 'b' bool, 's' string, 'i' int, 'f' float
 };
 
 constexpr ProfileKey kProfileKeys[] = {
@@ -364,7 +373,6 @@ constexpr ProfileKey kProfileKeys[] = {
     {L"upstream-url", "upstream_url", 's'},
     {L"port", "port", 'i'},
     {L"confidence-threshold", "pii_confidence_threshold", 'f'},
-    {L"pii-types", "enabled_pii_types", 'l'},
     {L"use-ai-model", "use_openai_model", 'b'},
 };
 
@@ -380,13 +388,8 @@ const ProfileKey* FindProfileKey(const std::wstring& name) {
 
 void PrintValidKeys(const Ctx& ctx) {
     ctx.Print(L"global keys:  start-on-boot, logging, show-sensitive, app-language,");
-    ctx.Print(L"              master-password-enabled, unlocked (read-only)");
     ctx.Print(L"profile keys: alias, upstream-url, api-key, port,");
-    ctx.Print(L"              confidence-threshold, pii-types, use-ai-model");
-    ctx.Print(L"PII types: account_number, private_address, private_date, private_email,");
-    ctx.Print(L"           private_person, private_phone, private_url, secret");
-    ctx.Print(L"           (toggle per profile with 'pii-types enable|disable <type>',");
-    ctx.Print(L"           or set the full list with 'set pii-types <csv>')");
+    ctx.Print(L"              confidence-threshold, use-ai-model");
 }
 
 int CmdGet(const Ctx& ctx) {
@@ -409,7 +412,7 @@ int CmdGet(const Ctx& ctx) {
         if (!ctx.SelectProfile(profile)) return 1;
         json out;
         if (!ctx.t.get(L"/profiles/" + JStr(profile, "id") + L"/apikey", out)) {
-            ctx.Error(L"failed to read the API key (session locked?)");
+            ctx.Error(L"failed to read the API key");
             return 1;
         }
         ctx.Print(Utils::Utf8ToWide(out.value("apiKey", std::string(""))));
@@ -437,7 +440,6 @@ int CmdGet(const Ctx& ctx) {
         case 'b': ctx.Print(BoolStr(v.is_boolean() && v.get<bool>())); return 0;
         case 'i': ctx.Print(std::to_wstring(v.get<int>())); return 0;
         case 'f': ctx.Print(FormatFloat(v.get<float>())); return 0;
-        case 'l': ctx.Print(JoinCsv(v)); return 0;
         default: ctx.Print(JStr(profile, pk->jsonName)); return 0;
         }
     }
@@ -455,11 +457,6 @@ int CmdSet(const Ctx& ctx) {
     const std::wstring key = WideLower(ctx.opts.positional[1]);
     const std::wstring& value = ctx.opts.positional[2];
 
-    if (key == L"master-password-enabled" || key == L"unlocked") {
-        ctx.Error(key + L" is read-only (use 'agentredactor password ...')");
-        return 2;
-    }
-
     json status;
     if (!ctx.Gate(status)) return 1;
 
@@ -470,7 +467,28 @@ int CmdSet(const Ctx& ctx) {
             if (!ParseBool(value, b)) { ctx.Error(L"expected a boolean (true/false), got: " + value); return 2; }
             body["value"] = b;
         } else {
-            body["value"] = Utils::WideToUtf8(value);
+            if (key == L"app-language") {
+                // Only exact supported BCP-47 tags work: MRT matches exact
+                // candidates, so a partial tag like "zh" selects nothing
+                // (silently staying on the OS language) and an unknown tag is
+                // never applied. Canonicalize the case from the supported list.
+                bool found = false;
+                const std::wstring want = WideLower(value);
+                for (const auto& lang : ::AgentRedactor::SUPPORTED_LANGUAGES) {
+                    if (WideLower(lang.tag) == want) {
+                        body["value"] = Utils::WideToUtf8(lang.tag);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    ctx.Error(L"unsupported language: " + value
+                        + L" (run 'agentredactor languages' for the supported codes)");
+                    return 2;
+                }
+            } else {
+                body["value"] = Utils::WideToUtf8(value);
+            }
         }
         if (!ctx.t.put(L"/settings/" + Utils::Utf8ToWide(gk->apiName), body, nullptr)) {
             ctx.Error(L"failed to update setting: " + key);
@@ -543,12 +561,6 @@ int CmdSet(const Ctx& ctx) {
         try { f = std::stof(value); } catch (...) { ctx.Error(L"expected a number, got: " + value); return 2; }
         if (f < 0.0f || f > 1.0f) { ctx.Error(L"confidence-threshold must be between 0 and 1"); return 2; }
         profile[pk->jsonName] = f;
-        break;
-    }
-    case 'l': {
-        json arr = json::array();
-        for (const auto& item : SplitCsv(value)) arr.push_back(Utils::WideToUtf8(item));
-        profile[pk->jsonName] = arr;
         break;
     }
     default:
@@ -923,10 +935,13 @@ int CmdRegex(const Ctx& ctx) {
     }
     if (action == L"add") {
         if (ctx.opts.positional.size() < 3) { ctx.Error(L"regex add requires a pattern"); return 2; }
-        const std::wstring pattern = ctx.opts.positional[2];
+        std::wstring pattern = ctx.opts.positional[2];
         if (Trim(pattern).empty()) { ctx.Error(L"regex pattern must not be empty"); return 2; }
         // Mirror the GUI's ValidateRegex: reject an unparseable pattern before
-        // it reaches the engine/pipeline.
+        // it reaches the engine/pipeline. The "{,N}" shorthand is normalized
+        // (see Utils::NormalizeRegexBraces) so it is accepted and stored in
+        // the form the runtime engine can compile.
+        pattern = Utils::NormalizeRegexBraces(pattern);
         try {
             std::wregex re(pattern, std::regex_constants::ECMAScript);
         } catch (const std::regex_error& e) {
@@ -998,6 +1013,7 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"");
     ctx.Print(L"overview:");
     ctx.Print(L"  status                               engine + profile overview");
+    ctx.Print(L"  languages                            list supported language codes");
     ctx.Print(L"");
     ctx.Print(L"settings:");
     ctx.Print(L"  get <key> [--profile P]              read a setting");
@@ -1016,7 +1032,6 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"              PII types (single type only): account_number,");
     ctx.Print(L"              private_address, private_date, private_email, private_person,");
     ctx.Print(L"              private_phone, private_url, secret");
-    ctx.Print(L"              (set the full list with 'set pii-types <type,type,...>')");
     ctx.Print(L"");
     ctx.Print(L"security (Windows Hello only, no typed password):");
     ctx.Print(L"  password enable         enable Windows Hello protection");
@@ -1060,6 +1075,7 @@ int AgentRedactor::RunCli(const std::vector<std::wstring>& args,
         return 0;
     }
     if (cmd == L"status") return CmdStatus(ctx);
+    if (cmd == L"languages") return CmdLanguages(ctx);
     if (cmd == L"password") return CmdPassword(ctx);
     if (cmd == L"get") return CmdGet(ctx);
     if (cmd == L"set") return CmdSet(ctx);

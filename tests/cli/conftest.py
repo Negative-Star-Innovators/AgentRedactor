@@ -8,6 +8,7 @@ the same way a script or AI agent would.
 
 from __future__ import annotations
 
+import json
 import os
 import platform
 import subprocess
@@ -114,6 +115,19 @@ class CliEngine:
         finally:
             self.process = None
             _kill_existing_agent_redactor()
+
+    def strip_protection(self) -> None:
+        """Turn Windows-Hello protection off for the test without passing the
+        consent: `password disable` now demands a real Windows Hello
+        verification (the engine enforces it), which the harness cannot
+        provide, so tests remove the master_password block from settings.json
+        and restart the engine."""
+        self.stop()
+        settings_path = self.config_dir / "settings.json"
+        data = json.loads(settings_path.read_text(encoding="utf-8"))
+        data.pop("master_password", None)
+        settings_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        self.start()
 
 
 @pytest.fixture(scope="module")

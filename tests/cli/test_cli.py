@@ -18,7 +18,7 @@ def test_status(engine: CliEngine) -> None:
     r = engine.run_cli("status")
     assert r.returncode == 0, r.stderr + r.stdout
     assert "engine:" in r.stdout
-    assert "windows hello:   false" in r.stdout
+    assert "password enabled: false" in r.stdout
     assert "profiles:" in r.stdout
     assert "test-profile" in r.stdout
     assert f"port {engine.proxy_port}" in r.stdout
@@ -58,6 +58,58 @@ def test_set_rejects_bad_bool(engine: CliEngine) -> None:
     r = engine.run_cli("set", "logging", "maybe")
     assert r.returncode == 2
     assert "expected a boolean" in r.stdout
+
+
+def test_languages_command_and_app_language_validation(engine: CliEngine) -> None:
+    """`languages` lists the supported BCP-47 codes; `set app-language` accepts
+    only exact supported codes (a partial or unknown tag is rejected instead of
+    silently falling back to English)."""
+    r = engine.run_cli("languages")
+    assert r.returncode == 0, r.stdout
+    codes = r.stdout.split()
+    for expected in ("en", "de", "es", "zh-CN", "zh-TW", "sr-Latn"):
+        assert expected in codes, (expected, codes)
+
+    # Unknown and partial tags are rejected.
+    for bad in ("zz", "zh", "en-US"):
+        r = engine.run_cli("set", "app-language", bad)
+        assert r.returncode == 2, (bad, r.stdout)
+        assert "unsupported language" in r.stdout, (bad, r.stdout)
+
+    # An exact supported code applies (case-insensitive input is canonicalized).
+    r = engine.run_cli("set", "app-language", "zh-CN")
+    assert r.returncode == 0, r.stdout
+    r = engine.run_cli("get", "app-language")
+    assert r.returncode == 0 and r.stdout.strip() == "zh-CN", r.stdout
+    r = engine.run_cli("set", "app-language", "de")
+    assert r.returncode == 0, r.stdout
+    r = engine.run_cli("get", "app-language")
+    assert r.returncode == 0 and r.stdout.strip() == "de", r.stdout
+
+
+def test_show_sensitive_rejected_while_logging_disabled(engine: CliEngine) -> None:
+    """Mirrors the GUI: sensitive logging may only be switched on while logging
+    is enabled; arming it silently would activate it the moment logging is
+    turned on, without the GUI's warning dialog."""
+    try:
+        r = engine.run_cli("set", "logging", "false")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("set", "show-sensitive", "true")
+        assert r.returncode == 1, r.stdout
+        assert "failed to update setting" in r.stdout, r.stdout
+        r = engine.run_cli("get", "show-sensitive")
+        assert r.returncode == 0 and r.stdout.strip() == "false", r.stdout
+
+        # With logging on, the same set succeeds.
+        r = engine.run_cli("set", "logging", "true")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("set", "show-sensitive", "true")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("get", "show-sensitive")
+        assert r.returncode == 0 and r.stdout.strip() == "true", r.stdout
+    finally:
+        engine.run_cli("set", "logging", "true")
+        engine.run_cli("set", "show-sensitive", "false")
 
 
 def test_profiles_list(engine: CliEngine) -> None:
@@ -144,8 +196,9 @@ def test_remove_missing_entry(engine: CliEngine) -> None:
 
 
 def test_removed_cli_keys_are_unknown(engine: CliEngine) -> None:
-    """onnx-provider, the profile `enabled` key, and the old use-openai-model
-    name are engine/GUI-only and must be rejected as unknown keys."""
+    """onnx-provider, the profile `enabled` key, the old use-openai-model
+    name, and pii-types (owned by the `pii-types` command) are not get/set
+    keys and must be rejected as unknown keys."""
     for args in (
         ("get", "onnx-provider"),
         ("set", "onnx-provider", "cpu"),
@@ -153,6 +206,8 @@ def test_removed_cli_keys_are_unknown(engine: CliEngine) -> None:
         ("set", "enabled", "true"),
         ("get", "use-openai-model"),
         ("set", "use-openai-model", "true"),
+        ("get", "pii-types"),
+        ("set", "pii-types", "secret"),
     ):
         r = engine.run_cli(*args)
         assert r.returncode == 2, (args, r.stdout)
@@ -202,18 +257,13 @@ def test_pii_types_disable_enable_type(engine: CliEngine) -> None:
     try:
         r = engine.run_cli("pii-types", "disable", "secret")
         assert r.returncode == 0, r.stdout
-        r = engine.run_cli("get", "pii-types")
-        assert r.returncode == 0, r.stdout
-        assert "secret" not in r.stdout
-
         r = engine.run_cli("pii-types", "list")
         assert "[ ] secret" in r.stdout
 
         r = engine.run_cli("pii-types", "enable", "secret")
         assert r.returncode == 0, r.stdout
-        r = engine.run_cli("get", "pii-types")
-        assert r.returncode == 0
-        assert "secret" in r.stdout
+        r = engine.run_cli("pii-types", "list")
+        assert "[x] secret" in r.stdout
     finally:
         engine.run_cli("pii-types", "enable", "secret")
 
@@ -258,8 +308,7 @@ def test_unlock_command_removed(engine: CliEngine) -> None:
 
     r = engine.run_cli("status")
     assert r.returncode == 0
-    assert "windows hello:   false" in r.stdout
-    assert "session:         unlocked" in r.stdout
+    assert "password enabled: false" in r.stdout
 
 
 def test_password_hello_consent_gate(engine: CliEngine) -> None:
@@ -267,7 +316,9 @@ def test_password_hello_consent_gate(engine: CliEngine) -> None:
     a fresh engine session starts locked, and EVERY gated command demands a
     fresh Windows Hello consent on the spot (the AGENTREDACTOR_HELLO_TIMEOUT_MS
     harness override makes the prompt fail fast when no user answers). Only
-    status/help stay open. `password disable` is the ungated recovery path."""
+    status/help stay open. `password disable` is gated the same way: the
+    engine runs the consent inside the disable call, so without a Verified
+    result the protection stays on (tests strip it via settings surgery)."""
     r = engine.run_cli("password", "enable")
     assert r.returncode == 0, r.stdout
     assert "windows hello protection enabled" in r.stdout
@@ -279,64 +330,70 @@ def test_password_hello_consent_gate(engine: CliEngine) -> None:
 
     r = engine.run_cli("status")
     assert r.returncode == 0
-    assert "windows hello:   true" in r.stdout
-    assert "session:         unlocked" in r.stdout
+    assert "password enabled: true" in r.stdout
 
     # Restart the engine: a fresh session starts locked, like a real app open.
     engine.stop()
     engine.start()
     try:
-        # status stays ungated and reports the locked session.
+        # status stays ungated; the locked session is verified through the
+        # gated-command failures below.
         r = engine.run_cli("status")
         assert r.returncode == 0, r.stdout
-        assert "windows hello:   true" in r.stdout
-        assert "session:         locked" in r.stdout
+        assert "password enabled: true" in r.stdout
 
         # Reads and writes are gated behind a fresh Hello consent; with no one
         # answering the prompt the command fails fast with a hello error.
         for args in (("get", "logging"), ("get", "api-key"), ("set", "logging", "false"),
                      ("regex", "list"), ("keywords", "list"), ("pii-types", "list"),
-                     ("profiles", "list"), ("get", "pii-types")):
+                     ("profiles", "list"), ("get", "confidence-threshold")):
             r = engine.run_cli(*args)
             assert r.returncode == 1, (args, r.stdout)
             assert "windows hello" in r.stdout, (args, r.stdout)
 
-        # password disable is the recovery path and stays usable while locked.
+        # `password disable` is gated like every other protected action: the
+        # engine runs the Windows Hello consent inside the disable call and
+        # only disables on Verified. Under the suppress hook the consent
+        # cancels, so disable fails and protection stays on.
         r = engine.run_cli("password", "disable")
-        assert r.returncode == 0, r.stdout
-        assert "windows hello protection disabled" in r.stdout
-    finally:
-        engine.run_cli("password", "disable")
+        assert r.returncode == 1, r.stdout
+        assert "windows hello consent canceled" in r.stdout, r.stdout
         r = engine.run_cli("status")
         assert r.returncode == 0
-        assert "windows hello:   false" in r.stdout
-        assert "session:         unlocked" in r.stdout
+        assert "password enabled: true" in r.stdout
+    finally:
+        engine.strip_protection()
+        r = engine.run_cli("status")
+        assert r.returncode == 0
+        assert "password enabled: false" in r.stdout
 
 
 def test_hello_suppress_prompt_flag_never_grants_access(engine: CliEngine) -> None:
     """SECURITY INVARIANT for the AGENTREDACTOR_HELLO_SUPPRESS_PROMPT test
     hook (set in conftest for the whole suite): the flag must behave exactly
     like the user pressing cancel — it never shows the prompt, never verifies,
-    never unlocks, and never serves the API key. If this test ever fails, the
-    flag has become a bypass and must be treated as a critical vulnerability.
+    never unlocks, never serves the API key, and never disables protection. If
+    this test ever fails, the flag has become a bypass and must be treated as
+    a critical vulnerability.
 
     The session below is locked and the flag is set: every gated command must
-    fail with a Windows Hello error, the session must stay locked, and the
-    API key must never be returned."""
+    fail with a Windows Hello error, the session must stay locked, the API key
+    must never be returned, and `password disable` must be rejected (the
+    engine runs the consent inside the disable call)."""
     r = engine.run_cli("password", "enable")
     assert r.returncode == 0, r.stdout
     try:
-        # A fresh engine session starts locked (like a real app open).
+        # A fresh engine session starts locked (like a real app open); the
+        # gated-command failures below verify the locked state.
         engine.stop()
         engine.start()
         r = engine.run_cli("status")
         assert r.returncode == 0, r.stdout
-        assert "session:         locked" in r.stdout
 
         # Every gated command fails; none succeeds via the flag.
         for args in (("get", "api-key"), ("get", "logging"), ("set", "logging", "false"),
                      ("regex", "list"), ("keywords", "list"), ("pii-types", "list"),
-                     ("profiles", "list"), ("get", "pii-types")):
+                     ("profiles", "list"), ("get", "confidence-threshold")):
             r = engine.run_cli(*args)
             assert r.returncode == 1, (args, r.stdout)
             assert "windows hello" in r.stdout, (args, r.stdout)
@@ -345,14 +402,22 @@ def test_hello_suppress_prompt_flag_never_grants_access(engine: CliEngine) -> No
         r = engine.run_cli("get", "api-key")
         assert r.stdout.strip() != TEST_API_KEY, r.stdout
 
+        # Disabling protection is gated too: the engine's consent inside the
+        # disable call can never be passed by the flag, so protection stays on.
+        r = engine.run_cli("password", "disable")
+        assert r.returncode == 1, r.stdout
+        assert "windows hello consent canceled" in r.stdout, r.stdout
+        r = engine.run_cli("status")
+        assert "password enabled: true" in r.stdout
+
         # status/help stay open (ungated by design).
         r = engine.run_cli("status")
         assert r.returncode == 0
         r = engine.run_cli("help")
         assert r.returncode == 0
     finally:
-        # The recovery path still works: disable is deliberately ungated.
-        engine.run_cli("password", "disable")
+        # Tests cannot pass Windows Hello; strip protection via settings.
+        engine.strip_protection()
 
 
 def test_engine_commands_removed(engine: CliEngine) -> None:
@@ -404,6 +469,22 @@ def test_regex_add_invalid_pattern_rejected(engine: CliEngine) -> None:
     r = engine.run_cli("regex", "add", "")
     assert r.returncode == 2, r.stdout
     assert "must not be empty" in r.stdout
+
+
+def test_regex_add_accepts_brace_shorthand(engine: CliEngine) -> None:
+    """The "{,N}" / "{,}" quantifier shorthand is accepted and normalized to
+    "{0,N}" / "{0,}" (valid in .NET/PCRE/JS Annex-B; std::regex rejects the
+    raw form) — matching the GUI's validation."""
+    for pattern in ("a[a-z]{,10}", "a[a-z]{,}", "a{1,3}"):
+        r = engine.run_cli("regex", "add", pattern)
+        assert r.returncode == 0, (pattern, r.stdout)
+
+    r = engine.run_cli("regex", "list")
+    assert r.returncode == 0, r.stdout
+    assert "a[a-z]{0,10}" in r.stdout, r.stdout
+    assert "a[a-z]{0,}" in r.stdout, r.stdout
+    assert "a{1,3}" in r.stdout, r.stdout
+
 
 
 def test_profiles_add_returns_id_and_delete(engine: CliEngine) -> None:
