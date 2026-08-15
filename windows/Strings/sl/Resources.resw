@@ -424,7 +424,7 @@
     <value>Potrebno je glavno geslo</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Odkleni</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Izhod</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Ključne besede: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Omogoči beleženje</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Prikaži občutljive podatke</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Dnevniki so shranjeni na tem računalniku. Redigirani dnevniki lahko še vedno vsebujejo občutljive podatke, ki jih zaznavanje ni zaznalo.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Omogoči beleženje</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Prikaži občutljive informacije</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Opozorilo</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Beleženje občutljivih informacij je omogočeno. Dnevniki bodo vsebovali neredigirane podatke, vključno s telesi izvirne zahteve in vašim ključem API. To se ponastavi, ko zaprete aplikacijo.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Za odklepanje aplikacije bo uporabljen Windows Hello. Pozvani boste k potrditvi s programom Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Preverjanje Windows Hello ni bilo dokončano, zato zaščita ni bila omogočena. poskusi ponovno</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Potreben je Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Preverjanje Windows Hello ni uspelo. Poskusite znova ali zaprite aplikacijo.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>poskusi ponovno</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Preden bo zaščita onemogočena, boste morali preveriti s programom Windows Hello.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Preverjanje Windows Hello ni bilo dokončano, zato je zaščita še vedno omogočena.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Prikaži občutljive podatke?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>To bo zapisalo neredigirane občutljive vrednosti (imena, e-poštna sporočila, telefonske številke itd.) in vaš API ključ v vašo dnevniško datoteko na disku. Tega ne omogočite, če imajo drugi dostop do tega računalnika. Nastavitev se ponastavi, ko zaprete aplikacijo.</value>
   </data>
 </root>

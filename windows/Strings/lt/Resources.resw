@@ -424,7 +424,7 @@
     <value>Reikalingas pagrindinis slaptažodis</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Atrakinti</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Išeiti</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Raktiniai žodžiai: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Įjungti registravimą</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Rodyti neskelbtiną informaciją</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Žurnalai saugomi šiame kompiuteryje. Redaguotuose žurnaluose vis tiek gali būti neskelbtinų duomenų, kurių aptikti nepavyko.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Įjungti registravimą</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Rodyti jautrią informaciją</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Įspėjimas</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Įjungtas neskelbtinos informacijos registravimas. Žurnaluose bus neredaguoti duomenys, įskaitant pradinius užklausų elementus ir jūsų API raktą. Tai nustatoma iš naujo, kai uždarote programą.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Programai atrakinti bus naudojama „Windows Hello“. Jūsų bus paprašyta patvirtinti naudojant „Windows Hello“.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>„Windows Hello“ patvirtinimas nebuvo baigtas, todėl apsauga neįjungta. Bandykite dar kartą.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Reikalingas Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>„Windows Hello“ patvirtinimas nepavyko. Bandykite dar kartą arba išeikite iš programos.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Bandykite dar kartą</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Prieš išjungdami apsaugą, būsite paprašyti patvirtinti naudodami „Windows Hello“.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>„Windows Hello“ patvirtinimas nebuvo baigtas, todėl apsauga vis dar įjungta.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Rodyti neskelbtiną informaciją?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Taip į žurnalo failą diske bus įrašytos neredaguotos jautrios reikšmės (vardai, el. pašto adresai, telefono numeriai ir kt.) ir API raktas. Neįjunkite šios funkcijos, jei kiti turi prieigą prie šio kompiuterio. Nustatymas iš naujo nustatomas uždarius programą.</value>
   </data>
 </root>

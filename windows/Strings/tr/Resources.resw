@@ -424,7 +424,7 @@
     <value>Ana Parola Gerekli</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Kilidi Aç</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Çıkış</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Anahtar Kelimeler: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Günlüğe kaydetmeyi etkinleştir</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Hassas bilgileri göster</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Günlükler bu bilgisayarda depolanır. Düzenlenen günlükler hâlâ algılamanın gözden kaçırdığı hassas verileri içerebilir.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Günlük Kaydını Etkinleştir</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Hassas Bilgileri Göster</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Uyarı</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Hassas bilgi kaydı etkinleştirildi. Günlükler, orijinal istek gövdeleri ve API anahtarınız dahil, düzenlenmemiş verileri içerecektir. Bu, uygulamayı kapattığınızda sıfırlanır.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Uygulamanın kilidini açmak için Windows Hello kullanılacaktır. Windows Hello ile doğrulamanız istenecektir.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello doğrulaması tamamlanmadığından koruma etkinleştirilmedi. Tekrar deneyin.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Merhaba gerekli</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello doğrulaması başarısız oldu. Tekrar deneyin veya uygulamadan çıkın.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Tekrar deneyin</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Koruma devre dışı bırakılmadan önce Windows Hello ile doğrulama yapmanız istenecektir.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello doğrulaması tamamlanmadığından koruma hâlâ etkindir.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Hassas Bilgiler Gösterilsin mi?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Bu, hassas değerleri (isimler, e-postalar, telefon numaraları vb.) ve API anahtarınızı diskteki günlük dosyanıza düzenlenmemiş olarak yazacaktır. Başkalarının bu bilgisayara erişimi varsa bunu etkinleştirmeyin. Uygulamayı kapattığınızda ayar sıfırlanır.</value>
   </data>
 </root>

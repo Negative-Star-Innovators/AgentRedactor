@@ -424,7 +424,7 @@
     <value>ماسٹر پاس ورڈ درکار ہے</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>غیر مقفل کریں</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>بند کریں</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>مطلوبہ الفاظ: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>لاگنگ کو فعال کریں۔</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>حساس معلومات دکھائیں۔</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>نوشتہ جات اس پی سی پر محفوظ ہیں۔ ترمیم شدہ لاگز میں اب بھی حساس ڈیٹا ہو سکتا ہے جس کا پتہ لگانا چھوٹ گیا ہے۔</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>لاگنگ کو فعال کریں۔</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>حساس معلومات دکھائیں۔</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>وارننگ</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>حساس معلومات کی لاگنگ فعال ہے۔ لاگز میں غیر ترمیم شدہ ڈیٹا شامل ہوگا جس میں اصل درخواست کی باڈیز اور آپ کی API کلید شامل ہے۔ جب آپ ایپ بند کرتے ہیں تو یہ ری سیٹ ہو جاتا ہے۔</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>ونڈوز ہیلو ایپ کو غیر مقفل کرنے کے لیے استعمال کیا جائے گا۔ آپ سے ونڈوز ہیلو سے تصدیق کرنے کو کہا جائے گا۔</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>ونڈوز ہیلو کی توثیق مکمل نہیں ہوئی تھی، اس لیے تحفظ فعال نہیں تھا۔ دوبارہ کوشش کریں۔</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>ونڈوز ہیلو کی ضرورت ہے۔</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>ونڈوز ہیلو کی تصدیق کامیاب نہیں ہوئی۔ دوبارہ کوشش کریں، یا ایپ سے باہر نکلیں۔</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>دوبارہ کوشش کریں۔</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>تحفظ کو غیر فعال کرنے سے پہلے آپ سے ونڈوز ہیلو سے تصدیق کرنے کو کہا جائے گا۔</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>ونڈوز ہیلو کی توثیق مکمل نہیں ہوئی تھی، لہذا تحفظ اب بھی فعال ہے۔</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>حساس معلومات دکھائیں؟</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>یہ غیر ترمیم شدہ حساس اقدار (نام، ای میلز، فون نمبر وغیرہ) اور آپ کی API کلید کو ڈسک پر موجود آپ کی لاگ فائل میں لکھے گا۔ اگر دوسروں کو اس کمپیوٹر تک رسائی حاصل ہے تو اسے فعال نہ کریں۔ جب آپ ایپ کو بند کرتے ہیں تو ترتیب دوبارہ سیٹ ہوجاتی ہے۔</value>
   </data>
 </root>

@@ -424,7 +424,7 @@
     <value>საჭიროა მთავარი პაროლი</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>გახსნა</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>გამოსვლა</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>საკვანძო სიტყვები: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>ჩართეთ ჟურნალი</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>სენსიტიური ინფორმაციის ჩვენება</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>ჟურნალები ინახება ამ კომპიუტერზე. რედაქტირებული ჟურნალები შეიძლება კვლავ შეიცავდეს სენსიტიურ მონაცემებს, რომლებიც გამოტოვებულია.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>შესვლის ჩართვა</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>სენსიტიური ინფორმაციის ჩვენება</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>გაფრთხილება</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>სენსიტიური ინფორმაციის აღრიცხვა ჩართულია. ჟურნალი შეიცავს დაურედაქტირებულ მონაცემებს, მათ შორის ორიგინალური მოთხოვნის ორგანოებსა და თქვენს API გასაღებს. ეს აღდგება აპის დახურვისას.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello გამოყენებული იქნება აპის განბლოკვისთვის. თქვენ მოგეთხოვებათ გადამოწმება Windows Hello-ით.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-ის დადასტურება არ დასრულებულა, ამიტომ დაცვა არ იყო ჩართული. სცადეთ ხელახლა.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>საჭიროა Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello დადასტურება ვერ მოხერხდა. სცადეთ ხელახლა ან გამოდით აპიდან.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>სცადეთ ხელახლა</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>დაცვის გათიშვამდე მოგეთხოვებათ Windows Hello-ით გადამოწმება.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello დადასტურება არ დასრულებულა, ამიტომ დაცვა კვლავ ჩართულია.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>სენსიტიური ინფორმაციის ჩვენება?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>ეს ჩაწერს არარედაქტირებულ მგრძნობიარე მნიშვნელობებს (სახელები, ელფოსტა, ტელეფონის ნომრები და ა.შ.) და თქვენს API გასაღებს თქვენს ჟურნალის ფაილზე დისკზე. არ ჩართოთ ეს, თუ სხვებს აქვთ წვდომა ამ კომპიუტერზე. პარამეტრი აღდგება აპის დახურვისას.</value>
   </data>
 </root>

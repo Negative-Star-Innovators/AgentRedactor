@@ -424,7 +424,7 @@
     <value>Password principale richiesta</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Sblocca</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Esci</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Parole chiave: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Abilita la registrazione</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Mostra informazioni sensibili</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>I registri vengono archiviati su questo PC. I log redatti potrebbero contenere ancora dati sensibili non rilevati.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Abilita registrazione</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Mostra informazioni sensibili</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Avvertimento</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Registrazione di informazioni sensibili abilitata. I log conterranno dati non oscurati, inclusi i corpi delle richieste originali e la chiave API. Questo si ripristina quando chiudi l&apos;app.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello verrà utilizzato per sbloccare l&apos;app. Ti verrà chiesto di verificare con Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>La verifica di Windows Hello non è stata completata, quindi la protezione non è stata abilitata. Riprova.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello richiesto</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>La verifica di Windows Hello non è riuscita. Riprova o esci dall&apos;app.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Riprova</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Ti verrà chiesto di verificare con Windows Hello prima che la protezione venga disabilitata.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>La verifica di Windows Hello non è stata completata, quindi la protezione è ancora abilitata.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Mostrare informazioni sensibili?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Ciò scriverà i valori sensibili non oscurati (nomi, e-mail, numeri di telefono, ecc.) e la chiave API nel file di registro su disco. Non abilitarlo se altri hanno accesso a questo computer. L&apos;impostazione si ripristina quando chiudi l&apos;app.</value>
   </data>
 </root>

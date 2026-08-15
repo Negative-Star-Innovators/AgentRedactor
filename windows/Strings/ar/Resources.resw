@@ -424,7 +424,7 @@
     <value>كلمة المرور الرئيسية مطلوبة</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>فتح</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>مخرج</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>الكلمات الرئيسية: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>تمكين التسجيل</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>إظهار المعلومات الحساسة</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>يتم تخزين السجلات على هذا الكمبيوتر. ربما لا تزال السجلات المنقحة تحتوي على بيانات حساسة لم يتم الكشف عنها.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>تمكين التسجيل</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>عرض المعلومات الحساسة</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>تحذير</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>تم تمكين تسجيل المعلومات الحساسة. ستحتوي السجلات على بيانات غير منقحة بما في ذلك نصوص الطلب الأصلية ومفتاح واجهة برمجة التطبيقات (API) الخاص بك. تتم إعادة التعيين عند إغلاق التطبيق.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>سيتم استخدام Windows Hello لفتح التطبيق. سيُطلب منك التحقق باستخدام Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>لم يتم إكمال التحقق من Windows Hello، لذا لم يتم تمكين الحماية. حاول ثانية.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello مطلوب</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>لم ينجح التحقق من Windows Hello. حاول مرة أخرى، أو قم بالخروج من التطبيق.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>حاول مرة أخرى</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>سيُطلب منك التحقق باستخدام Windows Hello قبل تعطيل الحماية.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>لم يتم إكمال التحقق من Windows Hello، لذا لا تزال الحماية ممكنة.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>هل تريد عرض معلومات حساسة؟</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>سيؤدي هذا إلى كتابة قيم حساسة غير منقحة (الأسماء ورسائل البريد الإلكتروني وأرقام الهواتف وما إلى ذلك) ومفتاح واجهة برمجة التطبيقات (API) الخاص بك إلى ملف السجل الخاص بك على القرص. لا تقم بتمكين هذا إذا كان لدى الآخرين حق الوصول إلى هذا الكمبيوتر. تتم إعادة ضبط الإعداد عند إغلاق التطبيق.</value>
   </data>
 </root>

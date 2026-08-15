@@ -424,7 +424,7 @@
     <value>A chọrọ Master Password</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Mepee</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Pụọ</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Keywords: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Kwado ịde osisi</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Gosi ozi nwere mmetụta</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>A na-echekwa ndekọ na PC a. Ndekọ ndị emegharịrị ka nwere ike ịnwe data nwere mmetụta nke furu efu.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Kwado nbanye</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Gosi ozi nwere mmetụta</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Ịdọ aka ná ntị</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Agbanyere mbanye ozi nwere mmetụta. Ndekọ ga-enwe data emebeghị nke ọma gụnyere ozu arịrịọ mbụ yana igodo API gị. Nke a na-atọgharị mgbe imechi ngwa ahụ.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>A ga-eji Windows Hello kpọghee ngwa ahụ. A ga-ajụ gị ka ị jiri Windows Hello nyochaa ya.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Emechabeghị nkwenye Windows Hello, yabụ agbanyeghi nchedo. Nwaa ọzọ.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello chọrọ</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Nkwenye Windows Hello emebeghị nke ọma. Gbalịa ọzọ, ma ọ bụ pụọ na ngwa.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Nwaa ọzọ</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>A ga-ajụ gị ka ị jiri Windows Hello nyochaa tupu nchedo adịghị.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello emechabeghị nkwenye, yabụ na-akwado nchekwa.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Gosi ozi nwere mmetụta?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Nke a ga-ede ụkpụrụ nwere mmetụta na-adịghị edozi (aha, ozi-e, nọmba ekwentị, wdg) yana igodo API gị na faịlụ log gị na diski. Emela nke a ma ọ bụrụ na ndị ọzọ nwere ohere na kọmputa a. Ntọala ahụ na-atọgharị mgbe imechi ngwa ahụ.</value>
   </data>
 </root>

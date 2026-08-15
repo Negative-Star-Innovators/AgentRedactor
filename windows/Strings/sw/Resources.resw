@@ -424,7 +424,7 @@
     <value>Nenosiri Kuu Linahitajika</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Fungua</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Toka</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Maneno Muhimu: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Washa kumbukumbu</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Onyesha taarifa nyeti</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Kumbukumbu zimehifadhiwa kwenye Kompyuta hii. Kumbukumbu zilizorekebishwa bado zinaweza kuwa na data nyeti ambayo utambuzi ulikosa.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Washa Kuingia</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Onyesha Taarifa Nyeti</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Onyo</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Uwekaji kumbukumbu wa maelezo nyeti umewezeshwa. Kumbukumbu zitakuwa na data ambayo haijaratibiwa ikijumuisha miili ya ombi asili na ufunguo wako wa API. Hii huwekwa upya unapofunga programu.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello itatumika kufungua programu. Utaulizwa uthibitishe na Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Uthibitishaji wa Windows Hello haujakamilika, kwa hivyo ulinzi haukuwezeshwa. Jaribu tena.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello inahitajika</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Uthibitishaji wa Windows Hello haukufaulu. Jaribu tena, au uondoke kwenye programu.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Jaribu tena</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Utaulizwa uthibitishe na Windows Hello kabla ulinzi haujazimwa.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Uthibitishaji wa Windows Hello haujakamilika, kwa hivyo ulinzi bado umewezeshwa.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Ungependa Kuonyesha Taarifa Nyeti?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Hii itaandika thamani nyeti ambazo hazijarekebishwa (majina, barua pepe, nambari za simu, n.k.) na ufunguo wako wa API kwenye faili yako ya kumbukumbu kwenye diski. Usiruhusu hii ikiwa wengine wanaweza kufikia kompyuta hii. Mpangilio huwekwa upya unapofunga programu.</value>
   </data>
 </root>

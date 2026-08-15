@@ -424,7 +424,7 @@
     <value>Password Prinċipali Meħtieġa</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Iftaħ</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Oħroġ</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Kelmiet Muftieħa: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Ippermetti l-illoggjar</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Uri informazzjoni sensittiva</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Iz-zkuk huma maħżuna fuq dan il-PC. Ir-reġistri skambjati xorta jista&apos; jkun fihom dejta sensittiva li s-sejbien insejt.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Ippermetti l-Logging</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Uri Informazzjoni Sensittiva</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Twissija</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Logging ta&apos; informazzjoni sensittiva attivat. Ir-reġistri se jkun fihom dejta mhux redattata inklużi l-korpi tar-rikjesta oriġinali u ċ-ċavetta API tiegħek. Dan reset meta tagħlaq l-app.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello se jintuża biex jinfetaħ l-app. Inti tintalab tivverifika bil-Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Il-verifika tal-Windows Hello ma tlestietx, għalhekk il-protezzjoni ma kinitx attivata. Erġa&apos; pprova.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello meħtieġ</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Il-verifika tal-Windows Hello ma rnexxietx. Erġa&apos; pprova, jew oħroġ mill-app.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Erġa&apos; pprova</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Inti tintalab tivverifika bil-Windows Hello qabel ma tiġi diżattivata l-protezzjoni.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Il-verifika tal-Windows Hello ma tlestietx, għalhekk il-protezzjoni għadha attivata.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Uri Informazzjoni Sensittiva?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Dan se jikteb valuri sensittivi mhux redattati (ismijiet, emails, numri tat-telefon, eċċ.) u ċ-ċavetta API tiegħek fil-log file tiegħek fuq disk. Tippermettix dan jekk ħaddieħor ikollu aċċess għal dan il-kompjuter. L-issettjar mill-ġdid meta tagħlaq l-app.</value>
   </data>
 </root>

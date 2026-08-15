@@ -424,7 +424,7 @@
     <value>需要主密码</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>解锁</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>退出</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>关键词：{0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>启用日志记录</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>显示敏感信息</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>日志存储在此 PC 上。编辑后的日志可能仍包含检测遗漏的敏感数据。</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>启用日志记录</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>显示敏感信息</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>启用敏感信息记录。日志将包含未经编辑的数据，包括原始请求正文和您的 API 密钥。当您关闭应用程序时，此设置会重置。</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello 将用于解锁应用程序。系统会要求您使用 Windows Hello 进行验证。</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello 验证未完成，因此未启用保护。再试一次。</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>需要 Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello 验证未成功。请重试，或退出应用程序。</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>再试一次</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>在禁用保护之前，系统会要求您使用 Windows Hello 进行验证。</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello 验证尚未完成，因此保护仍处于启用状态。</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>显示敏感信息？</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>这会将未编辑的敏感值（姓名、电子邮件、电话号码等）和 API 密钥写入磁盘上的日志文件。如果其他人有权访问此计算机，请勿启用此功能。当您关闭应用程序时，该设置将重置。</value>
   </data>
 </root>

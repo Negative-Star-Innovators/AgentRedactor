@@ -424,7 +424,7 @@
     <value>Hovedadgangskode påkrævet</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Lås op</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Afslut</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Nøgleord: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Aktiver logning</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Vis følsomme oplysninger</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Logs gemmes på denne pc. Redakterede logfiler kan stadig indeholde følsomme data, som registreringen er gået glip af.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktiver logning</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Vis følsomme oplysninger</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Advarsel</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Logning af følsomme oplysninger aktiveret. Logfiler vil indeholde uredigerede data inklusive originale anmodningstekster og din API-nøgle. Dette nulstilles, når du lukker appen.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello vil blive brugt til at låse appen op. Du bliver bedt om at bekræfte med Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-bekræftelse blev ikke fuldført, så beskyttelsen var ikke aktiveret. Prøv igen.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello påkrævet</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-bekræftelse lykkedes ikke. Prøv igen, eller afslut appen.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Prøv igen</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Du bliver bedt om at bekræfte med Windows Hello, før beskyttelsen deaktiveres.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-bekræftelse blev ikke fuldført, så beskyttelsen er stadig aktiveret.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Vis følsomme oplysninger?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Dette vil skrive uredigerede følsomme værdier (navne, e-mails, telefonnumre osv.) og din API-nøgle til din logfil på disken. Aktiver ikke dette, hvis andre har adgang til denne computer. Indstillingen nulstilles, når du lukker appen.</value>
   </data>
 </root>

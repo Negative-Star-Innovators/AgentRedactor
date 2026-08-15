@@ -424,7 +424,7 @@
     <value>Pääsalasana vaaditaan</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Avaa lukitus</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Poistu</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Avainsanat: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Ota kirjaus käyttöön</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Näytä arkaluontoiset tiedot</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Lokit tallennetaan tälle tietokoneelle. Muokatut lokit voivat silti sisältää arkaluontoisia tietoja, jotka tunnistus ei onnistunut.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Ota kirjaus käyttöön</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Näytä arkaluonteiset tiedot</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Varoitus</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Arkaluonteisten tietojen kirjaus käytössä. Lokit sisältävät muokkaamattomia tietoja, mukaan lukien alkuperäiset pyynnöt ja API-avaimesi. Tämä nollautuu, kun suljet sovelluksen.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Sovelluksen lukituksen avaamiseen käytetään Windows Hellota. Sinua pyydetään vahvistamaan Windows Hellolla.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hellon vahvistusta ei suoritettu loppuun, joten suojausta ei otettu käyttöön. Yritä uudelleen.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello vaaditaan</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello -vahvistus ei onnistunut. Yritä uudelleen tai sulje sovellus.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Yritä uudelleen</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Sinua pyydetään vahvistamaan Windows Hellolla, ennen kuin suojaus poistetaan käytöstä.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hellon vahvistusta ei suoritettu loppuun, joten suojaus on edelleen käytössä.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Näytä arkaluonteiset tiedot?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Tämä kirjoittaa muokkaamattomia arkaluonteisia arvoja (nimet, sähköpostiosoitteet, puhelinnumerot jne.) ja API-avaimesi lokitiedostoosi levylle. Älä ota tätä käyttöön, jos muilla on pääsy tähän tietokoneeseen. Asetus nollautuu, kun suljet sovelluksen.</value>
   </data>
 </root>

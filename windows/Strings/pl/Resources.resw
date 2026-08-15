@@ -424,7 +424,7 @@
     <value>Wymagane jest hasło główne</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Odblokuj</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Wyjdź</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Słowa kluczowe: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Włącz rejestrowanie</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Pokaż poufne informacje</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Dzienniki są przechowywane na tym komputerze. Zredagowane dzienniki mogą nadal zawierać poufne dane, które zostały pominięte podczas wykrywania.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Włącz rejestrowanie</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Pokaż poufne informacje</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Ostrzeżenie</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Włączono rejestrowanie poufnych informacji. Dzienniki będą zawierać niezredagowane dane, w tym oryginalne treści żądań i klucz API. Resetuje się to po zamknięciu aplikacji.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Do odblokowania aplikacji zostanie użyty system Windows Hello. Zostaniesz poproszony o weryfikację za pomocą Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Weryfikacja Windows Hello nie została ukończona, więc ochrona nie została włączona. Spróbuj ponownie.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Wymagana funkcja Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Weryfikacja Windows Hello nie powiodła się. Spróbuj ponownie lub zamknij aplikację.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Spróbuj ponownie</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Zanim ochrona zostanie wyłączona, zostaniesz poproszony o weryfikację za pomocą Windows Hello.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Weryfikacja Windows Hello nie została ukończona, więc ochrona jest nadal włączona.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Pokazać poufne informacje?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Spowoduje to zapisanie niezredagowanych poufnych wartości (imion i nazwisk, adresów e-mail, numerów telefonów itp.) oraz klucza API w pliku dziennika na dysku. Nie włączaj tej opcji, jeśli inni mają dostęp do tego komputera. Ustawienie zostanie zresetowane po zamknięciu aplikacji.</value>
   </data>
 </root>

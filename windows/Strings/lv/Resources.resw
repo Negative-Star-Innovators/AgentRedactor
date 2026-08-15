@@ -424,7 +424,7 @@
     <value>Nepieciešama galvenā parole</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Atbloķēt</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Iziet</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Atslēgvārdi: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Iespējot reģistrēšanu</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Rādīt sensitīvu informāciju</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Žurnāli tiek glabāti šajā datorā. Rediģētajos žurnālos joprojām var būt ietverti sensitīvi dati, kas netika atklāti.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Iespējot reģistrēšanu</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Rādīt sensitīvu informāciju</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Brīdinājums</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Sensitīvas informācijas reģistrēšana ir iespējota. Žurnālos būs nerediģēti dati, tostarp sākotnējā pieprasījuma struktūra un jūsu API atslēga. Tas tiek atiestatīts, kad aizverat lietotni.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Programmas atbloķēšanai tiks izmantota sistēma Windows Hello. Jums tiks lūgts pārbaudīt, izmantojot Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello pārbaude netika pabeigta, tāpēc aizsardzība nebija iespējota. Mēģiniet vēlreiz.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Nepieciešama Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello pārbaude neizdevās. Mēģiniet vēlreiz vai izejiet no lietotnes.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Mēģiniet vēlreiz</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Pirms aizsardzības atspējošanas jums tiks lūgts pārbaudīt, izmantojot Windows Hello.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello pārbaude netika pabeigta, tāpēc aizsardzība joprojām ir iespējota.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Vai rādīt sensitīvu informāciju?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Tādējādi jūsu žurnālfailā diskā tiks ierakstītas nerediģētas sensitīvas vērtības (vārdi, e-pasta adreses, tālruņu numuri utt.) un jūsu API atslēga. Neiespējojiet to, ja citiem ir piekļuve šim datoram. Iestatījums tiek atiestatīts, aizverot lietotni.</value>
   </data>
 </root>

@@ -424,7 +424,7 @@
     <value>Meesterwagwoord vereis</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Ontsluit</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Gaan uit</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Sleutelwoorde: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Aktiveer aanteken</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Wys sensitiewe inligting</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Logs word op hierdie rekenaar gestoor. Geredigeerde logs kan steeds sensitiewe data bevat wat opsporing gemis het.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktiveer aantekening</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Wys sensitiewe inligting</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Waarskuwing</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Aantekening van sensitiewe inligting is geaktiveer. Logs sal ongeredigeerde data bevat, insluitend oorspronklike versoekliggame en jou API-sleutel. Dit word teruggestel wanneer jy die toepassing toemaak.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello sal gebruik word om die toepassing te ontsluit. U sal gevra word om met Windows Hello te verifieer.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifikasie is nie voltooi nie, dus is beskerming nie geaktiveer nie. Probeer weer.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello vereis</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifikasie het nie geslaag nie. Probeer weer, of verlaat die toepassing.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Probeer weer</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>U sal gevra word om met Windows Hello te verifieer voordat beskerming gedeaktiveer word.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifikasie is nie voltooi nie, so beskerming is steeds geaktiveer.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Wys sensitiewe inligting?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Dit sal ongeredigeerde sensitiewe waardes (name, e-pos, telefoonnommers, ens.) en jou API-sleutel na jou loglêer op skyf skryf. Moenie dit aktiveer as ander toegang tot hierdie rekenaar het nie. Die instelling word teruggestel wanneer jy die toepassing toemaak.</value>
   </data>
 </root>

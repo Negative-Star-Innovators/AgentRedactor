@@ -424,7 +424,7 @@
     <value>Huvudlösenord krävs</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Lås upp</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Avsluta</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Nyckelord: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Aktivera loggning</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Visa känslig information</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Loggar lagras på den här datorn. Redakterade loggar kan fortfarande innehålla känslig data som missade upptäckten.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktivera loggning</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Visa känslig information</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Varning</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Loggning av känslig information aktiverad. Loggar kommer att innehålla oredigerade data inklusive ursprungliga begäranden och din API-nyckel. Detta återställs när du stänger appen.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello kommer att användas för att låsa upp appen. Du kommer att bli ombedd att verifiera med Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifiering slutfördes inte, så skyddet var inte aktiverat. Försök igen.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello krävs</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifiering lyckades inte. Försök igen eller avsluta appen.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Försök igen</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Du kommer att bli ombedd att verifiera med Windows Hello innan skyddet inaktiveras.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifiering slutfördes inte, så skyddet är fortfarande aktiverat.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Visa känslig information?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Detta kommer att skriva oredigerade känsliga värden (namn, e-post, telefonnummer, etc.) och din API-nyckel till din loggfil på disken. Aktivera inte detta om andra har tillgång till den här datorn. Inställningen återställs när du stänger appen.</value>
   </data>
 </root>

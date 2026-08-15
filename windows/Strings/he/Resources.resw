@@ -424,7 +424,7 @@
     <value>נדרשת סיסמת מנהל</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>בטל נעילה</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>יציאה</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>מילות מפתח: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>אפשר רישום</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>הצג מידע רגיש</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>יומנים שעברו עריכה עשויים עדיין להכיל נתונים רגישים שפספס הזיהוי. היומנים נשמרים על מחשב זה.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>אפשר רישום</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>הצג מידע רגיש</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>אזהרה</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>רישום מידע רגיש מופעל. יומנים יכילו נתונים שלא נערכו, כולל גופי בקשה מקוריים ומפתח ה-API שלך. זה מתאפס כאשר אתה סוגר את האפליקציה.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello ישמש לביטול נעילת האפליקציה. תתבקש לאמת עם Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>אימות Windows Hello לא הושלם, ולכן ההגנה לא הופעלה. נסה שוב.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>נדרש Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>אימות Windows Hello לא הצליח. נסה שוב, או צא מהאפליקציה.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>נסה שוב</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>תתבקש לאמת עם Windows Hello לפני שההגנה תושבת.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>אימות Windows Hello לא הושלם, כך שההגנה עדיין מופעלת.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>להציג מידע רגיש?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>פעולה זו תכתוב ערכים רגישים שלא הוסתרו (שמות, אימיילים, מספרי טלפון וכו&apos;) ואת מפתח ה-API שלך לקובץ היומן על הדיסק. אל תפעיל זאת אם לאחרים יש גישה למחשב זה. ההגדרה מתאפסת בעת סגירת האפליקציה.</value>
   </data>
 </root>

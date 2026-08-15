@@ -424,7 +424,7 @@
     <value>Yêu cầu mật khẩu chính</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Mở khóa</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Thoát</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Từ khóa: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Bật ghi nhật ký</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Hiển thị thông tin nhạy cảm</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Nhật ký được lưu trữ trên PC này. Nhật ký được xử lý lại có thể vẫn chứa dữ liệu nhạy cảm mà việc phát hiện bị bỏ sót.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Bật ghi nhật ký</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Hiển thị thông tin nhạy cảm</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Cảnh báo</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Đã bật ghi nhật ký thông tin nhạy cảm. Nhật ký sẽ chứa dữ liệu chưa được xử lý, bao gồm nội dung yêu cầu ban đầu và khóa API của bạn. Điều này sẽ đặt lại khi bạn đóng ứng dụng.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello sẽ được sử dụng để mở khóa ứng dụng. Bạn sẽ được yêu cầu xác minh bằng Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Quá trình xác minh Windows Hello chưa hoàn tất nên tính năng bảo vệ không được bật. Hãy thử lại.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Cần có Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Xác minh Windows Hello không thành công. Hãy thử lại hoặc thoát khỏi ứng dụng.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Thử lại</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Bạn sẽ được yêu cầu xác minh bằng Windows Hello trước khi tắt tính năng bảo vệ.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Quá trình xác minh Windows Hello chưa hoàn tất nên tính năng bảo vệ vẫn được bật.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Hiển thị thông tin nhạy cảm?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Thao tác này sẽ ghi các giá trị nhạy cảm chưa được xác minh (tên, email, số điện thoại, v.v.) và khóa API vào tệp nhật ký của bạn trên đĩa. Không kích hoạt tính năng này nếu người khác có quyền truy cập vào máy tính này. Cài đặt sẽ đặt lại khi bạn đóng ứng dụng.</value>
   </data>
 </root>

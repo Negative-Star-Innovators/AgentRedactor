@@ -424,7 +424,7 @@
     <value>Потрібен головний пароль</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Розблокувати</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Вийти</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Ключові слова: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Увімкнути журналювання</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Показати конфіденційну інформацію</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Журнали зберігаються на цьому ПК. Відредаговані журнали все ще можуть містити конфіденційні дані, які не були виявлені.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Увімкнути журналювання</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Показати конфіденційну інформацію</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>УВАГА</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Увімкнено реєстрацію конфіденційної інформації. Журнали міститимуть невідредаговані дані, включаючи оригінальні тіла запиту та ваш ключ API. Це скидається, коли ви закриваєте програму.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Для розблокування програми використовуватиметься Windows Hello. Вам буде запропоновано підтвердити за допомогою Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Перевірку Windows Hello не було завершено, тому захист не було ввімкнено. Спробуйте знову.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Потрібен Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Перевірка Windows Hello не вдалася. Повторіть спробу або вийдіть із програми.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Спробуйте знову</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Перш ніж вимкнути захист, вам буде запропоновано перевірити за допомогою Windows Hello.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Перевірку Windows Hello не завершено, тому захист усе ще ввімкнено.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Показувати конфіденційну інформацію?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Це запише невідредаговані конфіденційні значення (імена, електронні адреси, номери телефонів тощо) і ваш ключ API до вашого журналу на диску. Не вмикайте це, якщо інші мають доступ до цього комп’ютера. Налаштування скидається, коли ви закриваєте програму.</value>
   </data>
 </root>

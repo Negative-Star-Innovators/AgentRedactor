@@ -424,7 +424,7 @@
     <value>Hauptpasswort erforderlich</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Entsperren</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Beenden</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Schlüsselwörter: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Protokollierung aktivieren</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Sensible Informationen anzeigen</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Auf diesem PC werden Protokolle gespeichert. Geschwärzte Protokolle enthalten möglicherweise immer noch vertrauliche Daten, die bei der Erkennung übersehen wurden.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktivieren Sie die Protokollierung</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Vertrauliche Informationen anzeigen</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Warnung</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Protokollierung vertraulicher Informationen aktiviert. Protokolle enthalten nicht redigierte Daten, einschließlich der ursprünglichen Anfragetexte und Ihres API-Schlüssels. Dies wird zurückgesetzt, wenn Sie die App schließen.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Zum Entsperren der App wird Windows Hello verwendet. Sie werden aufgefordert, die Überprüfung mit Windows Hello durchzuführen.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Die Windows Hello-Überprüfung wurde nicht abgeschlossen, daher wurde der Schutz nicht aktiviert. Versuchen Sie es erneut.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello erforderlich</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Die Windows Hello-Überprüfung war nicht erfolgreich. Versuchen Sie es erneut oder beenden Sie die App.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Versuchen Sie es erneut</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Sie werden aufgefordert, dies mit Windows Hello zu überprüfen, bevor der Schutz deaktiviert wird.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Die Windows Hello-Überprüfung wurde nicht abgeschlossen, daher ist der Schutz weiterhin aktiviert.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Vertrauliche Informationen anzeigen?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Dadurch werden nicht geschwärzte vertrauliche Werte (Namen, E-Mails, Telefonnummern usw.) und Ihr API-Schlüssel in Ihre Protokolldatei auf der Festplatte geschrieben. Aktivieren Sie dies nicht, wenn andere Zugriff auf diesen Computer haben. Die Einstellung wird zurückgesetzt, wenn Sie die App schließen.</value>
   </data>
 </root>

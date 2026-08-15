@@ -424,7 +424,7 @@
     <value>Palavra-passe mestra necessária</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Desbloquear</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Sair</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Palavras-chave: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Habilitar registro</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Mostrar informações confidenciais</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Os logs são armazenados neste PC. Os logs redigidos ainda podem conter dados confidenciais que não foram detectados pela detecção.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Habilitar registro em log</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Mostrar informações confidenciais</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Aviso</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Registro de informações confidenciais ativado. Os registros conterão dados não editados, incluindo corpos de solicitação originais e sua chave de API. Isso é redefinido quando você fecha o aplicativo.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>O Windows Hello será usado para desbloquear o aplicativo. Você será solicitado a verificar com o Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>A verificação do Windows Hello não foi concluída, portanto a proteção não foi habilitada. Tente novamente.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello necessário</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>A verificação do Windows Hello não foi bem-sucedida. Tente novamente ou saia do aplicativo.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Tente novamente</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Você será solicitado a verificar o Windows Hello antes que a proteção seja desativada.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>A verificação do Windows Hello não foi concluída, portanto a proteção ainda está habilitada.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Mostrar informações confidenciais?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Isso gravará valores confidenciais não editados (nomes, e-mails, números de telefone, etc.) e sua chave de API em seu arquivo de log no disco. Não ative esta opção se outras pessoas tiverem acesso a este computador. A configuração é redefinida quando você fecha o aplicativo.</value>
   </data>
 </root>

@@ -424,7 +424,7 @@
     <value>Peaparool on nõutav</value>
   </data>
   <data name="Dialog_UnlockButton" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Ava lukk</value>
   </data>
   <data name="Dialog_ExitButton" xml:space="preserve">
     <value>Välju</value>
@@ -671,5 +671,54 @@
   </data>
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Märksõnad: {0}</value>
+  </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Luba logimine</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Näita tundlikku teavet</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Logid salvestatakse sellesse arvutisse. Redigeeritud logid võivad endiselt sisaldada tundlikke andmeid, mille tuvastamine ei õnnestunud.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Luba logimine</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Näita tundlikku teavet</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Hoiatus</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Tundliku teabe logimine on lubatud. Logid sisaldavad redigeerimata andmeid, sealhulgas algseid päringu kehasid ja teie API-võtit. See lähtestatakse rakenduse sulgemisel.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Rakenduse avamiseks kasutatakse Windows Hello. Teil palutakse Windows Hello abil kinnitada.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello kinnitamist ei lõpetatud, seega ei olnud kaitse lubatud. Proovi uuesti.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Vajalik on Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello kinnitamine ei õnnestunud. Proovige uuesti või väljuge rakendusest.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Proovi uuesti</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Enne kaitse keelamist palutakse teil Windows Helloga kinnitada.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello kinnitamist ei lõpetatud, seega on kaitse endiselt lubatud.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Kas näidata tundlikku teavet?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>See kirjutab redigeerimata tundlikud väärtused (nimed, meilid, telefoninumbrid jne) ja teie API-võtme teie kettale logifaili. Ärge lubage seda, kui teistel on sellele arvutile juurdepääs. Seade lähtestatakse rakenduse sulgemisel.</value>
   </data>
 </root>
