@@ -15,10 +15,14 @@
 //
 // Password model: protection is Windows-Hello-only and lives entirely in the
 // engine. There is NO `unlock` command: with protection enabled, every gated
-// command demands a fresh Windows Hello consent on the spot (via the
-// transport's post to /hello/verify when the session is already unlocked, or
-// /unlock/hello when locked — the consent then also unlocks the engine).
-// status/help stay open; `password disable` is the ungated recovery path.
+// command demands a fresh Windows Hello consent on the spot. The consent
+// itself runs IN-PROCESS in the client (the transport's `consent` hook) —
+// Windows attaches the dialog to the window of the ACTIVE application, so an
+// engine-owned prompt would always land in the background. On Verified the
+// transport unlocks the engine via POST /unlock (the documented
+// "caller has already verified in-process" path, same as the GUI).
+// status/help stay open; `password disable` is gated the same way (consent,
+// then the engine's disable endpoint, which requires the session unlocked).
 // Enforcement is UX-level, mirroring the GUI: the real access control is the
 // bearer token in control.json, ACL'd to the current user. `engine run` /
 // `engine stop` are NOT CLI commands: engine lifecycle belongs to the GUI
@@ -34,6 +38,16 @@ using json = nlohmann::json;
 
 namespace AgentRedactor {
 
+// Outcome of the transport's Windows Hello consent prompt.
+enum class HelloConsentOutcome {
+    Granted,        // User verified; the engine session is now unlocked
+    Canceled,       // User dismissed the prompt
+    RetriesExhausted, // Too many failed verification attempts
+    TimedOut,       // No answer within the watchdog
+    Unavailable,    // Hello not configured / no hardware / device busy
+    Failed,         // Unexpected error
+};
+
 struct CliTransport {
     // All return false when the engine is unreachable or the call fails;
     // parsed JSON responses are returned via out (when non-null).
@@ -41,6 +55,10 @@ struct CliTransport {
     std::function<bool(const std::wstring& path, const json& body, json* out)> post;
     std::function<bool(const std::wstring& path, const json& body, json* out)> put;
     std::function<bool(const std::wstring& path)> del;
+    // Shows the Windows Hello consent prompt in-process and, on success,
+    // unlocks the engine session (POST /unlock). Falls back to
+    // HelloConsentOutcome::Unavailable on platforms without Windows Hello.
+    std::function<HelloConsentOutcome()> consent;
 };
 
 struct CliConsole {

@@ -2,12 +2,15 @@
 
 There is no typed password anywhere in the product: the "Lock with Windows
 Hello" checkbox toggles protection. Enabling is direct (no dialog, no
-consent - the engine generates a random key wrapped in DPAPI); disabling
-keeps the Windows Hello consent prompt, but that prompt is system UI (the
-Windows Security PIN/biometrics dialog) and cannot be automated, so these
-tests drive the UI up to the consent point, then use the engine CLI against
-the running app's engine to enable/disable protection for the restart
-scenarios.
+consent - the engine generates a random key wrapped in DPAPI); disabling is
+enforced by the ENGINE, which runs the Windows Hello consent inside the
+disable call and only disables on a Verified result. That prompt is system
+UI and cannot be automated, so these tests drive the UI up to the consent
+point and use the engine CLI against the running app's engine to ENABLE
+protection for the restart scenarios — and to verify that `password disable`
+is rejected without a real verification. Tests end with protection on; the
+user_data_backup fixture restores the original (unprotected) data dir
+afterwards.
 
 When the session is locked the window shows ONLY the padlock overlay (lock
 icon + app name + Unlock button). There is no retry/exit dialog, no message
@@ -47,8 +50,9 @@ from windows.gui_driver import (
 # unlock path requires the actual Windows Hello authentication. Inherited by
 # every GUI/engine process these tests spawn.
 os.environ["AGENTREDACTOR_HELLO_SUPPRESS_PROMPT"] = "1"
-# Belt-and-braces: any non-suppressed consent path fails fast instead of
-# hanging 60 s per call.
+# Belt-and-braces: the GUI prompt has no watchdog by default (it waits for
+# the user), so the timeout override makes any non-suppressed consent path
+# fail fast instead of hanging the harness.
 os.environ["AGENTREDACTOR_HELLO_TIMEOUT_MS"] = "1500"
 
 # The vcxproj outputs to build/<Platform>/Release where <Platform> is the
@@ -137,16 +141,16 @@ async def test_gui_hello_enable_direct(
     assert "test-profile" in text, text
     assert "Unlock" not in text, text
 
-    # Restore: protection off via the engine CLI (the GUI-side disable
-    # consent prompt cannot be automated). The checkbox follows the engine
-    # through the 1-second settings poll, so wait for the change.
+    # `password disable` is now gated by a Windows Hello verification that
+    # cannot be automated: the engine runs the consent inside the disable call
+    # and only disables on Verified. Under the suppress hook the consent
+    # cancels, so the CLI disable fails and protection stays on. (The GUI-side
+    # disable consent is equally non-automatable; the fixture restores the
+    # original unprotected data dir after the test.)
     r = _run_cli("password", "disable")
-    assert r.returncode == 0, r.stdout
-    wait_until(
-        "checkbox unchecks after CLI disable",
-        get_require_password_state,
-        lambda state: state is False,
-    )
+    assert r.returncode == 1, r.stdout
+    assert "windows hello consent canceled" in r.stdout, r.stdout
+    assert get_require_password_state()
 
 
 @pytest.mark.asyncio
@@ -187,14 +191,15 @@ async def test_gui_hello_startup_lock_dialog(
 
 
 @pytest.mark.asyncio
-async def test_gui_hello_disable_via_cli_while_locked(
+async def test_gui_hello_disable_rejected_while_locked(
     user_data_backup: Path,
     mock_llm: MockLLM,
 ) -> None:
-    """`password disable` stays safe on a locked session: protection can be
-    removed from the command line while the padlock is up, and the overlay
-    lifts through the 1-second settings poll - no dialog, no exit, the app
-    keeps running."""
+    """`password disable` cannot be automated on a locked session: the engine
+    runs the Windows Hello consent inside the disable call and only disables
+    on a Verified result. Without a real verification (suppressed in tests)
+    the command fails, the padlock overlay stays up, protection stays enabled,
+    and the app keeps running."""
     port = _find_free_port()
     app = _start_app(user_data_backup, port, mock_llm)
     try:
@@ -208,25 +213,14 @@ async def test_gui_hello_disable_via_cli_while_locked(
         _wait_for_locked_overlay()
         assert app.process.poll() is None
         r = _run_cli("password", "disable")
-        assert r.returncode == 0, r.stdout
-        # The settings poll lifts the padlock overlay...
-        wait_until(
-            "overlay lifts after CLI disable",
-            lambda: not _overlay_visible(),
-            lambda lifted: lifted,
-        )
-        # ...and the app content (incl. the Lock checkbox) is back.
-        wait_until(
-            "checkbox unchecks after CLI disable",
-            get_require_password_state,
-            lambda state: state is False,
-        )
+        assert r.returncode == 1, r.stdout
+        assert "windows hello consent canceled" in r.stdout, r.stdout
+        # The padlock overlay stays up, protection is still enabled, and the
+        # app keeps running.
+        assert _overlay_visible()
         assert app.process.poll() is None
-    finally:
-        app.stop()
-
-    app = _start_app(user_data_backup, port, mock_llm, create=False)
-    try:
-        assert not get_require_password_state()
+        r = _run_cli("status")
+        assert r.returncode == 0
+        assert "password enabled: true" in r.stdout
     finally:
         app.stop()

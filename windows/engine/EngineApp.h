@@ -56,7 +56,7 @@ private:
     HttpResponse HandleControlRequest(const HttpRequest& request);
     HttpResponse ApiGetStatus();
     HttpResponse ApiGetSettings();
-    HttpResponse ApiPutSetting(const std::wstring& key, const std::string& body);
+    HttpResponse ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body);
     HttpResponse ApiGetProfiles();
     HttpResponse ApiGetProfileApiKey(const std::wstring& id);
     HttpResponse ApiPostProfile(const std::string& body);

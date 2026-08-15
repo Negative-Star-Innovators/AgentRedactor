@@ -8,10 +8,12 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstdlib>
 #include <cwctype>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <thread>
 
@@ -39,18 +41,26 @@ void EnsureApartment() {
 using UserConsentResultAsync =
     winrt::Windows::Foundation::IAsyncOperation<UserConsentVerificationResult>;
 
-// The consent prompt waits for the user. A watchdog guarantees the caller can
-// never hang: after the timeout the operation is cancelled and the caller gets
-// Unavailable. AGENTREDACTOR_HELLO_TIMEOUT_MS lets test harnesses shorten it.
-std::chrono::milliseconds HelloTimeout() {
-    if (const wchar_t* v = _wgetenv(L"AGENTREDACTOR_HELLO_TIMEOUT_MS")) {
-        try {
-            const long long ms = _wtoi64(v);
-            if (ms > 0 && ms < 3600000) return std::chrono::milliseconds(ms);
-        } catch (...) {
-        }
+// The blocking engine path must never hang a script: the consent prompt waits
+// for the user, so a watchdog guarantees the caller fails fast (default 60 s).
+// The GUI async path deliberately has NO watchdog by default — the prompt is a
+// lock screen and may wait indefinitely; the only early cancels there are the
+// caller's shared cancel flag (window hide/destroy) and the override below.
+// AGENTREDACTOR_HELLO_TIMEOUT_MS (when set) cancels any prompt after the delay
+// so test harnesses fail fast instead of waiting for a human.
+std::optional<std::chrono::milliseconds> HelloTimeoutOverride() {
+    const wchar_t* v = _wgetenv(L"AGENTREDACTOR_HELLO_TIMEOUT_MS");
+    if (!v) return std::nullopt;
+    try {
+        const long long ms = _wtoi64(v);
+        if (ms > 0 && ms < 3600000) return std::chrono::milliseconds(ms);
+    } catch (...) {
     }
-    return std::chrono::milliseconds(60000);
+    return std::nullopt;
+}
+
+std::chrono::milliseconds HelloTimeout() {
+    return HelloTimeoutOverride().value_or(std::chrono::milliseconds(60000));
 }
 
 // Test-only affordance: AGENTREDACTOR_HELLO_SUPPRESS_PROMPT makes every
@@ -164,6 +174,119 @@ UserConsentResultAsync StartOperation(HWND hwnd, const std::wstring& message) {
 
 namespace AgentRedactor {
 
+// ---------------------------------------------------------------------------
+// Window-attached consent prompt (foreground)
+// ---------------------------------------------------------------------------
+// The interop RequestVerificationForWindowAsync only succeeds when it runs on
+// the thread that owns the target window. The engine's control-API handlers
+// run on worker threads (and the caller's window belongs to another process
+// anyway), so the prompt used to fall back to unowned system UI — which pops
+// up in the BACKGROUND. To replicate what the GUI gets from its in-process
+// prompt, the engine creates a hidden top-level window on its OWN thread and
+// attaches the consent operation to it: the Windows Security dialog then
+// comes to the foreground. Falls back to the unowned prompt if the window
+// cannot be created. One short-lived thread per prompt; it exits once the
+// operation completes (or the caller's watchdog cancels it).
+
+namespace {
+
+struct WindowedRequest {
+    std::wstring message;
+    std::mutex mtx;
+    std::condition_variable cv;
+    bool ready = false;
+    bool ok = false;
+    UserConsentResultAsync op;
+};
+
+const wchar_t* kPromptWindowClass = L"AgentRedactorHelloPromptOwner";
+
+LRESULT CALLBACK PromptWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (msg == WM_APP + 2) {
+        PostQuitMessage(0);
+        return 0;
+    }
+    return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
+
+void RunWindowedPrompt(std::shared_ptr<WindowedRequest> req) {
+    // Every thread must initialize its own apartment (EnsureApartment's
+    // call_once only covered the first thread that ran it).
+    try {
+        winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    } catch (...) {
+    }
+    static std::once_flag registerOnce;
+    std::call_once(registerOnce, []() {
+        WNDCLASSEXW wc{};
+        wc.cbSize = sizeof(wc);
+        wc.lpfnWndProc = &PromptWindowProc;
+        wc.hInstance = GetModuleHandleW(nullptr);
+        wc.lpszClassName = kPromptWindowClass;
+        RegisterClassExW(&wc);
+    });
+    HWND wnd = CreateWindowExW(0, kPromptWindowClass, L"", 0, 0, 0, 0, 0,
+        nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+    std::unique_ptr<std::remove_pointer_t<HWND>, decltype(&DestroyWindow)> wndGuard(wnd, &DestroyWindow);
+    auto fail = [&]() {
+        std::lock_guard<std::mutex> lock(req->mtx);
+        req->ready = true;
+        req->ok = false;
+        req->cv.notify_all();
+    };
+    if (!wnd) {
+        fail();
+        return;
+    }
+    // The window is 1x1 and captionless — imperceptible — but VISIBLE and
+    // made the active window (best effort): Windows only brings the consent
+    // dialog to the foreground when it attaches to the window of the ACTIVE
+    // application. When this runs inside the CLI process (the user's
+    // terminal), the process IS the active application and the dialog comes
+    // forward; inside the engine (a background process) it cannot.
+    ::ShowWindow(wnd, SW_SHOWNA);
+    ::SetForegroundWindow(wnd);
+    try {
+        req->op = RequestVerificationWithWindow(wnd, req->message);
+    } catch (...) {
+        fail();
+        return;
+    }
+    {
+        std::lock_guard<std::mutex> lock(req->mtx);
+        req->ready = true;
+        req->ok = true;
+        req->cv.notify_all();
+    }
+    // Pump until the operation finishes: the worker's watchdog cancels it on
+    // timeout, and the Completed handler (fires on the operation's completion,
+    // possibly on a threadpool thread) posts WM_APP+2 to exit the pump.
+    req->op.Completed([wnd](const auto&, winrt::Windows::Foundation::AsyncStatus) {
+        PostMessageW(wnd, WM_APP + 2, 0, 0);
+    });
+    MSG msg;
+    while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
+}
+
+// Returns the window-attached operation, or nullopt when the machinery failed
+// (the caller then falls back to the unowned prompt).
+std::optional<UserConsentResultAsync> TryWindowedPrompt(const std::wstring& message) {
+    auto req = std::make_shared<WindowedRequest>();
+    req->message = message;
+    std::thread(RunWindowedPrompt, req).detach();
+    std::unique_lock<std::mutex> lock(req->mtx);
+    if (!req->cv.wait_for(lock, std::chrono::seconds(10), [&] { return req->ready; })) {
+        return std::nullopt;
+    }
+    if (!req->ok) return std::nullopt;
+    return req->op;
+}
+
+} // namespace
+
 bool IsWindowsHelloAvailable() {
     EnsureApartment();
     try {
@@ -184,6 +307,38 @@ HelloUnlockResult RequestHelloUnlock(HWND hwnd, const std::wstring& message) {
         if (!IsWindowsHelloAvailable()) {
             return HelloUnlockResult::Unavailable;
         }
+        // Best-effort foreground of the caller's window (harmless; the real
+        // foregrounding is the window-attached prompt below).
+        if (hwnd) {
+            if (::IsIconic(hwnd)) ::ShowWindow(hwnd, SW_RESTORE);
+            ::ShowWindow(hwnd, SW_SHOW);
+            if (!::SetForegroundWindow(hwnd)) {
+                FLASHWINFO fi{};
+                fi.cbSize = sizeof(fi);
+                fi.hwnd = hwnd;
+                fi.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
+                fi.uCount = 0;
+                ::FlashWindowEx(&fi);
+            }
+        }
+        // Window-attached prompt on an engine-owned window: the Windows
+        // Security dialog comes to the FOREGROUND (the unowned fallback would
+        // pop up in the background). Falls back to the unowned prompt when the
+        // window machinery fails.
+        if (auto windowed = TryWindowedPrompt(message)) {
+            if (windowed->wait_for(HelloTimeout())
+                != winrt::Windows::Foundation::AsyncStatus::Completed) {
+                try {
+                    windowed->Cancel();
+                } catch (...) {
+                }
+                // The user never answered within the watchdog: distinct from
+                // Unavailable (no Hello on the device), so callers can report
+                // a timeout instead of a misleading "not available" error.
+                return HelloUnlockResult::TimedOut;
+            }
+            return MapResult(windowed->GetResults());
+        }
         auto operation = StartOperation(hwnd, message);
         if (operation.wait_for(HelloTimeout())
             != winrt::Windows::Foundation::AsyncStatus::Completed) {
@@ -191,7 +346,7 @@ HelloUnlockResult RequestHelloUnlock(HWND hwnd, const std::wstring& message) {
                 operation.Cancel();
             } catch (...) {
             }
-            return HelloUnlockResult::Unavailable;
+            return HelloUnlockResult::TimedOut;
         }
         return MapResult(operation.GetResults());
     } catch (...) {
@@ -200,7 +355,8 @@ HelloUnlockResult RequestHelloUnlock(HWND hwnd, const std::wstring& message) {
 }
 
 winrt::Windows::Foundation::IAsyncOperation<bool>
-RequestHelloUnlockAsync(HWND hwnd, const std::wstring& message) {
+RequestHelloUnlockAsync(HWND hwnd, const std::wstring& message,
+                        std::shared_ptr<std::atomic<bool>> cancel) {
     // Test hook: never show the prompt, never verify (cancel-equivalent).
     if (HelloPromptSuppressed()) {
         co_return false;
@@ -215,22 +371,36 @@ RequestHelloUnlockAsync(HWND hwnd, const std::wstring& message) {
         auto operation = std::make_shared<UserConsentResultAsync>(StartOperation(hwnd, message));
         auto done = std::make_shared<std::atomic<bool>>(false);
 
-        // Watchdog: cancel the prompt after the timeout. A detached thread
-        // (NOT a coroutine — the earlier fire_and_forget + resume_after
-        // watchdog raced its own frame teardown and crashed with a
-        // use-after-free at the Cancel path, see the 0x930EE fault) holds the
-        // operation and the flag by shared ownership, so the Cancel can never
-        // touch freed memory: it either sees done=true (the awaiter already
-        // finished) or the operation is still alive.
-        std::thread([operation, done]() {
-            std::this_thread::sleep_for(HelloTimeout());
-            if (!done->exchange(true)) {
-                try {
-                    operation->Cancel();
-                } catch (...) {
+        // No timeout by default: the prompt waits for the user like a lock
+        // screen, and the user closing it cancels. Early cancels: the caller's
+        // shared flag (the window hid or is being destroyed — an orphaned
+        // system dialog must never survive it) and the optional test-harness
+        // timeout override. The canceller is a detached std::thread (NOT a
+        // coroutine — the earlier fire_and_forget + resume_after watchdog
+        // raced its own frame teardown and crashed with a use-after-free at
+        // the Cancel path, see the 0x930EE fault) holding the operation and
+        // the flag by shared ownership, so the Cancel can never touch freed
+        // memory: it either sees done=true (the awaiter already finished) or
+        // the operation is still alive.
+        const auto timeoutOverride = HelloTimeoutOverride();
+        if (cancel || timeoutOverride.has_value()) {
+            std::thread([operation, done, cancel, timeoutOverride]() {
+                const auto deadline = timeoutOverride.has_value()
+                    ? std::chrono::steady_clock::now() + *timeoutOverride
+                    : std::chrono::steady_clock::time_point::max();
+                while (!done->load(std::memory_order_acquire)) {
+                    if (cancel && cancel->load(std::memory_order_acquire)) break;
+                    if (std::chrono::steady_clock::now() >= deadline) break;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
-            }
-        }).detach();
+                if (!done->exchange(true)) {
+                    try {
+                        operation->Cancel();
+                    } catch (...) {
+                    }
+                }
+            }).detach();
+        }
 
         bool verified = false;
         try {

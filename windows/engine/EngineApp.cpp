@@ -878,7 +878,7 @@ HttpResponse EngineApp::HandleControlRequest(const HttpRequest& request) {
 
         static const std::wstring settingsPrefix = L"/settings/";
         if (Utils::StartsWith(path, settingsPrefix) && method == "PUT") {
-            return ApiPutSetting(path.substr(settingsPrefix.size()), request.body);
+            return ApiPutSetting(path.substr(settingsPrefix.size()), query, request.body);
         }
 
         static const std::wstring profilesPrefix = L"/profiles/";
@@ -960,7 +960,11 @@ HttpResponse EngineApp::ApiGetSettings() {
     return JsonResponse(200, j.dump());
 }
 
-HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::string& body) {
+// Defined below (next to the hello endpoints that use it): parses ?hwnd= so
+// engine-owned consent prompts attach to the caller's window where possible.
+static HWND ParseHwndQuery(const std::wstring& query);
+
+HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body) {
     json j = json::parse(body);
     if (key == L"startOnBoot") {
         settings_->SetStartOnBoot(j.at("value").get<bool>());
@@ -971,8 +975,16 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::string
         settings_->SetLoggingEnabled(enabled);
         logManager_->SetLoggingEnabled(enabled);
     } else if (key == L"showSensitive") {
-        // Session-only; intentionally not persisted.
-        logManager_->SetShowSensitive(j.at("value").get<bool>());
+        // Session-only; intentionally not persisted. Mirror the GUI: sensitive
+        // logging may only be switched ON while logging is enabled. The flag
+        // is meaningless while logging is off, and arming it there would
+        // silently activate sensitive logging (unredacted data + API key)
+        // when logging is later enabled — bypassing the GUI's warning dialog.
+        const bool show = j.at("value").get<bool>();
+        if (show && !logManager_->IsLoggingEnabled()) {
+            return JsonResponse(400, "{\"error\": \"enable logging first\"}");
+        }
+        logManager_->SetShowSensitive(show);
     } else if (key == L"appLanguage") {
         settings_->SetAppLanguage(Utils::Utf8ToWide(j.at("value").get<std::string>()));
     } else if (key == L"enableMasterPassword") {
@@ -985,7 +997,21 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::string
     } else if (key == L"lock") {
         settings_->Lock();
     } else if (key == L"disableMasterPassword") {
+        // Security: disabling strips ALL protection (after it, the api-key
+        // endpoint serves the key without any verification), so it is gated
+        // on an UNLOCKED session — the same rule as GET /profiles/<id>/apikey.
+        // The consent itself runs IN-PROCESS in the client (GUI or CLI), which
+        // is the active application and can bring the Windows Hello dialog to
+        // the foreground; an engine-run prompt would belong to a background
+        // process and land behind other windows. The client unlocks via
+        // POST /unlock after a Verified result. A raw control-API caller must
+        // do the same (or pass its own Hello consent) — it cannot disable
+        // while the session is locked.
+        if (settings_->IsMasterPasswordEnabled() && !settings_->IsUnlocked()) {
+            return JsonResponse(403, "{\"error\": \"locked\"}");
+        }
         settings_->DisableMasterPassword();
+        return JsonResponse(200, "{\"ok\": true}");
     } else if (key == L"clearLogs") {
         logManager_->ClearLogs();
     } else {
@@ -1133,6 +1159,8 @@ HttpResponse EngineApp::ApiHelloVerify(const std::wstring& query) {
         return JsonResponse(200, "{\"ok\": false, \"retriesExhausted\": true}");
     case HelloUnlockResult::Unavailable:
         return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+    case HelloUnlockResult::TimedOut:
+        return JsonResponse(200, "{\"ok\": false, \"timedOut\": true}");
     default:
         return JsonResponse(200, "{\"ok\": false, \"error\": \"windows hello failed\"}");
     }
@@ -1159,6 +1187,8 @@ HttpResponse EngineApp::ApiUnlockHello(const std::wstring& query) {
         return JsonResponse(200, "{\"ok\": false, \"retriesExhausted\": true}");
     case HelloUnlockResult::Unavailable:
         return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+    case HelloUnlockResult::TimedOut:
+        return JsonResponse(200, "{\"ok\": false, \"timedOut\": true}");
     default:
         return JsonResponse(200, "{\"ok\": false, \"error\": \"windows hello failed\"}");
     }

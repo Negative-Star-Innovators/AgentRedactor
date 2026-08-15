@@ -15,6 +15,9 @@ void RegexEngine::SetPatterns(const std::vector<RegexEntry>& patterns) {
         if (!p.enabled) continue;
         std::wstring trimmed = Utils::Trim(p.pattern);
         if (trimmed.empty()) continue;
+        // Normalize the "{,N}" shorthand so it compiles (and matches) here —
+        // the same normalization the GUI/CLI validators apply.
+        trimmed = Utils::NormalizeRegexBraces(trimmed);
         try {
             compiledPatterns_.emplace_back(trimmed, std::regex_constants::ECMAScript | std::regex_constants::icase);
             rawPatterns_.push_back(trimmed);

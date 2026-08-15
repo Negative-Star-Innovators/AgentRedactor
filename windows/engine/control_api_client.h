@@ -13,6 +13,8 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
+#include "cli.h"
+
 using json = nlohmann::json;
 
 namespace AgentRedactor {
@@ -31,12 +33,23 @@ public:
     bool Put(const std::wstring& path, const json& body, json* out = nullptr) const;
     bool Delete(const std::wstring& path) const;
 
+    // In-process Windows Hello consent (the CLI process is the ACTIVE
+    // application when run from a terminal, so the dialog comes to the
+    // foreground — an engine-owned prompt belongs to a background process and
+    // always lands in the background). On Verified the engine session is
+    // unlocked via POST /unlock.
+    HelloConsentOutcome ConsentWithHello() const;
+
 private:
     bool Request(const std::wstring& method, const std::wstring& path,
         const std::string* body, long& statusCode, std::string& responseBody) const;
 
     int port_ = 0;
     std::wstring token_;
+    // Engine process id (from control.json): the CLI grants it the foreground
+    // (AllowSetForegroundWindow) before consent prompts so the engine-owned
+    // Windows Hello dialog can take the foreground.
+    unsigned long enginePid_ = 0;
 };
 
 } // namespace AgentRedactor

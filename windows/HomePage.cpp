@@ -146,6 +146,17 @@ namespace winrt::AgentRedactor::implementation
         OpenLogBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Logs_OpenLogButton/Content")));
         OpenFolderBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Logs_OpenFolderButton/Content")));
         ClearLogsBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Logs_ClearButton/Content")));
+        // PII category labels and the session-redactions list are also built
+        // from localized strings, but only at load time; re-localize them on
+        // a language change. The PII checkboxes are updated in place (labels
+        // only) so unsaved toggle state is preserved. No-op until the profile
+        // data has been loaded once (constructor path).
+        if (!currentProfileId_.empty()) {
+            for (uint32_t i = 0; i < piiCheckBoxes_.size() && i < ::AgentRedactor::DEFAULT_PII_TYPES.size(); ++i) {
+                piiCheckBoxes_[i].Content(box_value(::AgentRedactor::LocString(L"PII_Type_" + ::AgentRedactor::DEFAULT_PII_TYPES[i])));
+            }
+            LoadMatchesList(true);
+        }
     }
 
     void HomePage::OnLoaded(IInspectable const&, RoutedEventArgs const&)
@@ -932,7 +943,7 @@ namespace winrt::AgentRedactor::implementation
         UpdateProxyStatus();
     }
 
-    void HomePage::LoadMatchesList()
+    void HomePage::LoadMatchesList(bool force)
     {
         auto app = ::AgentRedactor::AppState::Instance();
         if (!app) return;
@@ -941,11 +952,13 @@ namespace winrt::AgentRedactor::implementation
         // The 1-second stats poll calls this constantly; only rebuild when
         // the content actually changed, or the empty placeholder below would
         // clear + re-append every second (visibly flashing "No Redactions").
+        // `force` (language change) bypasses the guard so the localized
+        // labels are re-rendered once in the new language.
         std::wstring fingerprint;
         for (const auto& m : matches) {
             fingerprint += m.timestamp + L"|" + m.type + L"|" + m.detail + L"|" + m.matchedText + L"\n";
         }
-        if (matchesLoaded_ && fingerprint == matchesFingerprint_) return;
+        if (!force && matchesLoaded_ && fingerprint == matchesFingerprint_) return;
         matchesFingerprint_ = std::move(fingerprint);
         matchesLoaded_ = true;
 
@@ -1208,12 +1221,16 @@ namespace winrt::AgentRedactor::implementation
             lifetime->RequirePasswordCheck().IsChecked(true);
             co_return;
         }
-        // The consent prompt runs in-process (GUI-side system UI owned by the
-        // main window, so it stays in front) via the async coroutine, which
-        // keeps the UI thread pumping. Cover the window with the opaque
-        // padlock overlay for the whole flow: the Windows Security dialog
-        // floats over the app, and the regex/keywords/PII content must never
-        // be visible behind it.
+        // Disabling strips ALL protection, so it demands a fresh Windows Hello
+        // consent BEFORE the engine call. The prompt runs IN-PROCESS attached
+        // to this (active) window, so the Windows Security dialog comes to the
+        // foreground — an engine-owned prompt would belong to a background
+        // process and land behind the app. After a Verified result the engine
+        // session is unlocked via the trusted /unlock path, and only then is
+        // the disable accepted (the engine's disable endpoint requires an
+        // unlocked session, like the api-key endpoint). The padlock overlay
+        // covers the window for the whole flow so the regex/keywords/PII
+        // content is never visible behind the dialog.
         app->SetSessionLockOverlay(true);
         LOG(L"[HomePage] Disable flow: padlock overlay shown, prompt starting");
         auto message = ::AgentRedactor::LocString(L"Dialog_DisableHello_Message");
@@ -1236,9 +1253,24 @@ namespace winrt::AgentRedactor::implementation
             app->SetSessionLockOverlay(false);
             co_return;
         }
-        app->Settings()->DisableMasterPassword();
+        app->Settings()->UnlockEngine();
+        auto outcome = app->Settings()->DisableMasterPassword();
         app->SetSessionLockOverlay(false);
-        lifetime->RequirePasswordCheck().IsChecked(false);
+        if (outcome.ok) {
+            lifetime->RequirePasswordCheck().IsChecked(false);
+            co_return;
+        }
+        ContentDialog err;
+        err.XamlRoot(lifetime->XamlRoot());
+        ThemeContentDialog(err, lifetime->IsDarkMode());
+        err.Title(box_value(::AgentRedactor::LocString(L"Dialog_HelloFailed_Title")));
+        err.Content(box_value(::AgentRedactor::LocString(L"Dialog_DisableHelloFailed_Message")));
+        err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
+        lifetime->activeDialog_ = err;
+        co_await err.ShowAsync();
+        lifetime->activeDialog_ = nullptr;
+        // Protection is still on: re-assert the checked state.
+        lifetime->RequirePasswordCheck().IsChecked(true);
     }
 
     void HomePage::ClearStatisticsBtn_Click(IInspectable const&, RoutedEventArgs const&)
@@ -1402,7 +1434,10 @@ namespace winrt::AgentRedactor::implementation
     std::wstring HomePage::ValidateRegex(const std::wstring& pattern)
     {
         try {
-            std::wregex re(pattern, std::regex_constants::ECMAScript);
+            // The "{,N}" shorthand is normalized so it validates and matches
+            // (see Utils::NormalizeRegexBraces); the runtime engine normalizes
+            // identically.
+            std::wregex re(::AgentRedactor::Utils::NormalizeRegexBraces(pattern), std::regex_constants::ECMAScript);
         } catch (const std::regex_error& e) {
             return ::AgentRedactor::LocFormat(L"Validation_InvalidRegex", { ::AgentRedactor::Utils::Utf8ToWide(e.what()) });
         } catch (...) {

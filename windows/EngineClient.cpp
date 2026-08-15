@@ -25,9 +25,11 @@ bool EngineClient::Connect(const std::filesystem::path& configDir) {
         json j = json::parse(Utils::WideToUtf8(*content));
         port_ = j.at("port").get<int>();
         token_ = Utils::Utf8ToWide(j.at("token").get<std::string>());
+        enginePid_ = j.value("pid", 0UL);
     } catch (...) {
         port_ = 0;
         token_.clear();
+        enginePid_ = 0;
         return false;
     }
     return IsConnected();
@@ -98,11 +100,15 @@ bool EngineClient::Request(const std::wstring& method, const std::wstring& path,
     if (!hSession) return false;
 
     // Short timeouts: the engine is localhost; a hang means it is not running.
-    // /unlock/hello holds the request while the user answers the Windows Hello
-    // consent prompt (the engine cancels it after 60s), so it gets a long
-    // receive timeout.
-    if (path == L"/unlock/hello") {
+    // /unlock/hello and /settings/disableMasterPassword hold the request while
+    // the user answers the Windows Hello consent prompt (the engine cancels it
+    // after 60s), so they get a long receive timeout.
+    if (path == L"/unlock/hello" || path == L"/settings/disableMasterPassword") {
         WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 90000);
+        // Lift the foreground lock for the engine process: its consent dialog
+        // is created from a background process and would otherwise pop up
+        // behind this window.
+        if (enginePid_ != 0) ::AllowSetForegroundWindow(enginePid_);
     } else {
         WinHttpSetTimeouts(hSession, 1500, 1500, 3000, 3000);
     }
@@ -220,11 +226,6 @@ bool SettingsFacade::IsMasterPasswordEnabled() const {
     return GetSettingsJson(j) && j.value("masterPasswordEnabled", false);
 }
 
-bool SettingsFacade::IsUnlocked() const {
-    json j;
-    return GetSettingsJson(j) && j.value("unlocked", true);
-}
-
 HelloUnlockOutcome SettingsFacade::UnlockWithHello() const {
     HelloUnlockOutcome outcome;
     if (!client_) return outcome;
@@ -233,6 +234,7 @@ HelloUnlockOutcome SettingsFacade::UnlockWithHello() const {
     outcome.ok = out.value("ok", false);
     outcome.canceled = out.value("canceled", false);
     outcome.retriesExhausted = out.value("retriesExhausted", false);
+    outcome.timedOut = out.value("timedOut", false);
     outcome.unavailable = out.value("unavailable", false);
     outcome.helloNotEnabled = out.value("helloNotEnabled", false);
     return outcome;
@@ -272,8 +274,20 @@ bool SettingsFacade::EnableMasterPassword() {
     return client_ && client_->Put(L"/settings/enableMasterPassword", body);
 }
 
-void SettingsFacade::DisableMasterPassword() {
-    PutValue(L"disableMasterPassword", false);
+HelloUnlockOutcome SettingsFacade::DisableMasterPassword() {
+    // The engine runs the Windows Hello consent inside this call and only
+    // disables on a Verified result; every failure keeps protection on.
+    HelloUnlockOutcome outcome;
+    if (!client_) return outcome;
+    json out;
+    if (!client_->Put(L"/settings/disableMasterPassword", json{{"value", false}}, &out)) return outcome;
+    outcome.ok = out.value("ok", false);
+    outcome.canceled = out.value("canceled", false);
+    outcome.retriesExhausted = out.value("retriesExhausted", false);
+    outcome.timedOut = out.value("timedOut", false);
+    outcome.unavailable = out.value("unavailable", false);
+    outcome.helloNotEnabled = out.value("helloNotEnabled", false);
+    return outcome;
 }
 
 bool SettingsFacade::IsHelloEnabled() const {

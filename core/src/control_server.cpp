@@ -136,7 +136,8 @@ bool ControlServer::WriteControlFile(const std::filesystem::path& path) const {
                 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
             if (file != INVALID_HANDLE_VALUE) {
                 std::string content = "{\"port\": " + std::to_string(port_) +
-                    ", \"token\": \"" + Utils::WideToUtf8(token_) + "\"}\n";
+                    ", \"token\": \"" + Utils::WideToUtf8(token_) + "\"" +
+                    ", \"pid\": " + std::to_string(GetCurrentProcessId()) + "}\n";
                 DWORD written = 0;
                 ok = WriteFile(file, content.data(), (DWORD)content.size(), &written, nullptr) &&
                     written == content.size();

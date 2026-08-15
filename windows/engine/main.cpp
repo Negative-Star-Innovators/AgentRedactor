@@ -100,6 +100,7 @@ int RunCliCommand(const std::vector<std::wstring>& args) {
         [&client](const std::wstring& path, const json& body, json* out) { return client->Post(path, body, out); },
         [&client](const std::wstring& path, const json& body, json* out) { return client->Put(path, body, out); },
         [&client](const std::wstring& path) { return client->Delete(path); },
+        [&client]() { return client->ConsentWithHello(); },
     };
     CliConsole console{
         [&ch](const std::wstring& line) { CliPrintRaw(ch, line, true); },

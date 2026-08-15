@@ -37,6 +37,7 @@ struct HelloUnlockOutcome {
     bool ok = false;
     bool canceled = false;
     bool retriesExhausted = false;
+    bool timedOut = false;
     bool unavailable = false;
     bool helloNotEnabled = false;
 };
@@ -66,6 +67,10 @@ private:
 
     int port_ = 0;
     std::wstring token_;
+    // Engine process id (from control.json): the GUI grants it the foreground
+    // (AllowSetForegroundWindow) before engine-owned consent calls (e.g. the
+    // gated disable) so the Windows Hello dialog can take the foreground.
+    unsigned long enginePid_ = 0;
 };
 
 class SettingsFacade {
@@ -83,7 +88,6 @@ public:
     std::wstring GetOnnxProvider() const;
     void SetOnnxProvider(const std::wstring& provider);
     bool IsMasterPasswordEnabled() const;
-    bool IsUnlocked() const;
     HelloUnlockOutcome UnlockWithHello() const;
     // Unlocks a Windows-Hello session WITHOUT a consent prompt: the caller
     // (the GUI) has already verified the user in-process (POST /unlock).
@@ -94,7 +98,10 @@ public:
     std::wstring GetProfileApiKey(const std::wstring& id) const;
     bool HelloVerify() const;
     bool EnableMasterPassword();
-    void DisableMasterPassword();
+    // Disables Windows-Hello protection. The ENGINE runs the consent prompt
+    // inside this call (PUT /settings/disableMasterPassword): only a Verified
+    // result disables, so the outcome mirrors HelloUnlockOutcome.
+    HelloUnlockOutcome DisableMasterPassword();
     bool IsHelloEnabled() const;
     bool IsLoggingEnabled() const;
     void SetLoggingEnabled(bool enabled);

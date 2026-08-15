@@ -52,7 +52,7 @@ namespace winrt::AgentRedactor::implementation
         void LoadPIIGrid();
         void LoadRegexList();
         void LoadKeywordList();
-        void LoadMatchesList();
+        void LoadMatchesList(bool force = false);
         void UpdateStats();
         void UpdateProxyStatus();
 

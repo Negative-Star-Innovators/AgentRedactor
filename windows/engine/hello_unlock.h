@@ -10,13 +10,19 @@
 //
 // Two entry points:
 // - RequestHelloUnlock (blocking, watchdog): used by the engine's control-API
-//   handlers (CLI requests), which run on worker threads and must block.
+//   handlers (CLI requests), which run on worker threads and must block. A
+//   watchdog (default 60 s) guarantees a script can never hang on the prompt.
 // - RequestHelloUnlockAsync (coroutine): used by the GUI, where the prompt is
 //   created on the UI thread (the interop operation is window-bound) and the
-//   caller just awaits the outcome without blocking its thread.
+//   caller just awaits the outcome without blocking its thread. NO watchdog by
+//   default: the prompt waits for the user like a lock screen (the user
+//   closing it cancels). The optional shared cancel flag lets the caller
+//   dismiss the prompt early — the window hiding or being destroyed — so no
+//   orphaned system dialog survives the window.
 //
-// Both honour AGENTREDACTOR_HELLO_TIMEOUT_MS (default 60000) — test harnesses
-// shorten the watchdog so the prompt resolves quickly instead of hanging.
+// Test harnesses can force a fail-fast prompt timeout for either entry point
+// via AGENTREDACTOR_HELLO_TIMEOUT_MS: when set, the prompt is cancelled after
+// the delay; unset keeps the default behaviour above.
 //
 // AGENTREDACTOR_HELLO_SUPPRESS_PROMPT (test-only): makes every prompt behave
 // exactly as if the user cancelled it — no system UI, never Verified. It is
@@ -24,6 +30,8 @@
 // test_hello_suppress_prompt_flag_never_grants_access in tests/cli). Never
 // change it to return Verified or to reach the engine's real unlock.
 
+#include <atomic>
+#include <memory>
 #include <string>
 
 #include <winrt/Windows.Foundation.h>
@@ -39,6 +47,7 @@ enum class HelloUnlockResult {
     Canceled,        // User dismissed the consent prompt
     RetriesExhausted, // Too many failed verification attempts
     Unavailable,     // Hello not configured / no hardware / device busy
+    TimedOut,        // Blocking prompt watchdog fired (no answer in time)
     Failed,          // Unexpected error
 };
 
@@ -54,8 +63,12 @@ HelloUnlockResult RequestHelloUnlock(HWND hwnd, const std::wstring& message);
 // thread (the window's owning thread for the GUI), so the consent dialog
 // stays responsive, and the coroutine resumes there too. Returns true only
 // when the user verified with Windows Hello; every other outcome (canceled,
-// timeout, unavailable, error) is false. Never throws.
+// unavailable, error) is false. Never throws. `cancel`, when non-null, is a
+// shared flag the caller may set to dismiss the prompt early (window
+// hide/destroy); without it (and without AGENTREDACTOR_HELLO_TIMEOUT_MS) the
+// prompt waits for the user indefinitely.
 winrt::Windows::Foundation::IAsyncOperation<bool>
-RequestHelloUnlockAsync(HWND hwnd, const std::wstring& message);
+RequestHelloUnlockAsync(HWND hwnd, const std::wstring& message,
+    std::shared_ptr<std::atomic<bool>> cancel = nullptr);
 
 } // namespace AgentRedactor

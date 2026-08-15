@@ -12,6 +12,7 @@
 #include <atomic>
 #include <thread>
 #include <cwchar>
+#include <cwctype>
 
 namespace AgentRedactor {
 namespace Utils {
@@ -218,6 +219,24 @@ std::wstring ReplaceAllCaseInsensitive(const std::wstring& str, const std::wstri
         pos = it - result.begin();
         result.replace(pos, from.size(), to);
         pos += to.size();
+    }
+    return result;
+}
+
+std::wstring NormalizeRegexBraces(const std::wstring& pattern) {
+    std::wstring result = pattern;
+    for (size_t i = 0; i + 1 < result.size(); ++i) {
+        if (result[i] != L'{' || result[i + 1] != L',') continue;
+        if (i > 0 && result[i - 1] == L'\\') continue; // escaped literal brace
+        // The "{," shorthand is only auto-fixed when it closes as "{,}" or
+        // "{,<digits>}" — i.e. exactly the form std::regex rejects but
+        // .NET/PCRE/JS Annex-B accept as "{0,}" / "{0,<digits>}".
+        size_t j = i + 2;
+        while (j < result.size() && std::iswdigit(result[j])) ++j;
+        if (j < result.size() && result[j] == L'}') {
+            result.insert(i + 1, L"0");
+            ++i; // skip the inserted '0'
+        }
     }
     return result;
 }

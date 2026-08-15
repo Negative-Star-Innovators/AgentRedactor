@@ -79,6 +79,7 @@ namespace winrt::AgentRedactor::implementation
             if (self->inactivityTimer_) self->inactivityTimer_.Stop();
             if (self->lockStateRetryTimer_) self->lockStateRetryTimer_.Stop();
             self->windowDestroyed_ = true;
+            if (self->helloPromptCancel_) self->helloPromptCancel_->store(true);
             RemoveWindowSubclass(hWnd, &SubclassProc, uIdSubclass);
         }
         if (self && IsActivityMessage(uMsg)) {
@@ -578,6 +579,10 @@ namespace winrt::AgentRedactor::implementation
             return;
         }
 
+        // Re-localize the session-lock overlay (app name + Unlock button) so
+        // it follows an in-session language change.
+        LocalizeLockOverlay();
+
         // Re-localize whichever page is currently in the frame.
         if (auto content = frame.Content()) {
             if (auto home = content.try_as<winrt::AgentRedactor::HomePage>()) {
@@ -699,6 +704,9 @@ namespace winrt::AgentRedactor::implementation
         if (!snap.value("masterPasswordEnabled", false)) return;
         // The next appearance must authenticate again.
         LockSession();
+        // Dismiss any in-flight Hello prompt: hiding the window (close-to-tray)
+        // must not leave an orphaned system dialog on the desktop.
+        if (helloPromptCancel_) helloPromptCancel_->store(true);
     }
 
     void MainWindow::EnsureLockState(bool autoPrompt)
@@ -804,14 +812,22 @@ namespace winrt::AgentRedactor::implementation
         }
         LOG(L"[MainWindow] Windows Hello prompt requested");
         auto message = ::AgentRedactor::LocString(L"Dialog_EnableHello_Message");
+        // The prompt waits for the user (no watchdog): the window hide /
+        // destroy paths cancel it through this shared flag, so an orphaned
+        // Windows Security dialog never survives the window.
+        auto cancel = std::make_shared<std::atomic<bool>>(false);
+        lifetime->helloPromptCancel_ = cancel;
         bool verified = false;
         try {
             // Runs on the UI thread: the window-owned consent prompt is
             // created where this window's message pump lives, and the
             // coroutine resumes here without blocking the window.
-            verified = co_await ::AgentRedactor::RequestHelloUnlockAsync(lifetime->hwnd_, message);
+            verified = co_await ::AgentRedactor::RequestHelloUnlockAsync(lifetime->hwnd_, message, cancel);
         } catch (...) {
             verified = false;
+        }
+        if (lifetime->helloPromptCancel_.get() == cancel.get()) {
+            lifetime->helloPromptCancel_.reset();
         }
         unlockPromptInFlight_ = false;
         // The window may have been closed while the prompt was up; never

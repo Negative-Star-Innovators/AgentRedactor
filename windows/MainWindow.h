@@ -1,6 +1,8 @@
 #pragma once
 #include "MainWindow.g.h"
 #include "MainWindow.xaml.g.h"
+#include <atomic>
+#include <memory>
 #include <winrt/Windows.UI.ViewManagement.h>
 #include <winrt/Microsoft.UI.Dispatching.h>
 #include <winrt/Microsoft.UI.Xaml.h>
@@ -68,6 +70,11 @@ namespace winrt::AgentRedactor::implementation
         bool hiddenToTray_ = false;
         bool lockOverlayShown_ = false;
         bool unlockPromptInFlight_ = false;
+        // Shared cancel flag for the in-flight Windows Hello prompt: the
+        // window hide/destroy paths set it so the system dialog is dismissed
+        // (no orphaned dialog survives the window). Null while no prompt is
+        // in flight.
+        std::shared_ptr<std::atomic<bool>> helloPromptCancel_;
         bool lockStatePendingPrompt_ = false;
         bool quitPromptInFlight_ = false;
         // Set in WM_NCDESTROY: guards the dispatcher timers and the async
