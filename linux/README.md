@@ -5,7 +5,7 @@ Build the engine/CLI (`agentredactor`) on Linux:
 ```bash
 sudo apt install -y build-essential cmake ninja-build pkg-config \
   libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
-  python3-pytest python3-aiohttp python3-psutil
+  python3-pytest python3-pytest-asyncio python3-aiohttp python3-psutil
 
 # onnxruntime is not packaged in apt; use the official linux-x64 tarball
 # (developed/tested against 1.29.0):
@@ -25,8 +25,12 @@ The engine also needs the NER model files. `config.json`, `tokenizer.json`,
 downloaded automatically on first run (or grab them from the models endpoint
 used by the Windows CI).
 
-Run the tests from the repo root:
+Run the tests from the repo root (one pytest process per suite — the suites
+share the `conftest` module name and cannot be collected together):
 
 ```bash
-python -m pytest tests/cli tests/migration tests/linux -q
+cd tests
+python -m pytest cli -q
+python -m pytest migration/test_settings_migration.py -q
+python -m pytest linux -q
 ```

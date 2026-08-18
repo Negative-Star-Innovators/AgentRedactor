@@ -1,9 +1,10 @@
 """Headless settings-schema migration tests.
 
-Each test drives the real AgentRedactorUI.exe with --selftest-migrate-settings
+Each test drives the real agentredactor binary (AgentRedactorUI.exe on
+Windows, the Linux engine binary elsewhere) with --selftest-migrate-settings
 against an isolated config dir (AGENTREDACTOR_CONFIG_DIR) — no GUI session is
-needed. The exe path comes from AGENTREDACTOR_EXE or the local Release build;
-the whole module skips when no exe is available. See tests/migration/README.md.
+needed. The exe path comes from AGENTREDACTOR_EXE or the local build;
+the whole module skips when no binary is available. See tests/migration/README.md.
 """
 
 from __future__ import annotations

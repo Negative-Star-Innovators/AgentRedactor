@@ -26,8 +26,13 @@ DEFAULT_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" /
 
 # Process image names to clean up between tests: the GUI and the engine it
 # spawns (the engine owns the proxy ports and the control API, so a stale one
-# would leak settings state and ports into the next test).
-_PROCESS_NAMES = ("agentredactorui.exe", "agentredactor.exe")
+# would leak settings state and ports into the next test). On Linux only the
+# headless engine exists (no GUI yet) and binaries carry no .exe suffix.
+_PROCESS_NAMES = (
+    ("agentredactorui.exe", "agentredactor.exe")
+    if sys.platform == "win32"
+    else ("agentredactor",)
+)
 
 
 def _find_free_port() -> int:
