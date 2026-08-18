@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Trefwoorden: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Logboekregistratie inschakelen</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Toon gevoelige informatie</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Logboeken worden op deze pc opgeslagen. Geredigeerde logboeken kunnen nog steeds gevoelige gegevens bevatten die door de detectie zijn gemist.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Logboekregistratie inschakelen</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Toon gevoelige informatie</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Waarschuwing</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Logboekregistratie van gevoelige informatie ingeschakeld. Logboeken bevatten niet-geredigeerde gegevens, waaronder de oorspronkelijke verzoekteksten en uw API-sleutel. Dit wordt gereset wanneer u de app sluit.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello wordt gebruikt om de app te ontgrendelen. U wordt gevraagd om te verifiëren met Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verificatie is niet voltooid, dus de beveiliging is niet ingeschakeld. Probeer het opnieuw.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello vereist</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verificatie is niet gelukt. Probeer het opnieuw of sluit de app.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Probeer het opnieuw</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>U wordt gevraagd om te verifiëren met Windows Hello voordat de bescherming wordt uitgeschakeld.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>De Windows Hello-verificatie is niet voltooid, dus de beveiliging is nog steeds ingeschakeld.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Gevoelige informatie tonen?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Hierdoor worden niet-geredigeerde gevoelige waarden (namen, e-mails, telefoonnummers, enz.) en uw API-sleutel naar uw logbestand op schijf geschreven. Schakel dit niet in als anderen toegang hebben tot deze computer. De instelling wordt gereset wanneer u de app sluit.</value>
+  </data>
 </root>

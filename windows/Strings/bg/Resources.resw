@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Ключови думи: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Активиране на регистриране</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Показване на чувствителна информация</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Регистрационните файлове се съхраняват на този компютър. Редактираните регистрационни файлове може все още да съдържат чувствителни данни, които откриването е пропуснато.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Активиране на регистриране</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Показване на чувствителна информация</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Регистрирането на чувствителна информация е активирано. Регистрационните файлове ще съдържат нередактирани данни, включително оригинални тела на заявки и вашия API ключ. Това се нулира, когато затворите приложението.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello ще се използва за отключване на приложението. Ще бъдете помолени да потвърдите с Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Проверката на Windows Hello не е завършена, така че защитата не е активирана. Опитайте отново.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Изисква се Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Проверката на Windows Hello не успя. Опитайте отново или излезте от приложението.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Опитайте отново</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Ще бъдете помолени да потвърдите с Windows Hello, преди защитата да бъде деактивирана.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Проверката на Windows Hello не е завършена, така че защитата все още е активирана.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Показване на чувствителна информация?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Това ще запише нередактирани чувствителни стойности (имена, имейли, телефонни номера и т.н.) и вашия API ключ във вашия лог файл на диска. Не разрешавайте това, ако други имат достъп до този компютър. Настройката се нулира, когато затворите приложението.</value>
+  </data>
 </root>

@@ -3,17 +3,10 @@
 #include "utils.h"
 #include "localization.h"
 #include "constants.h"
-#include "api_key_profile.h"
 #include "logging.h"
-#include "model_downloader.h"
-#include <nlohmann/json.hpp>
 #include <chrono>
 #include <fstream>
-#include <sstream>
-#include <deque>
 #include <thread>
-
-using json = nlohmann::json;
 
 using namespace AgentRedactor;
 
@@ -21,277 +14,8 @@ namespace {
     constexpr UINT WM_APP_NOTIFY_LOG = WM_APP + 1;
     constexpr UINT WM_APP_NOTIFY_STATS = WM_APP + 2;
     constexpr UINT WM_APP_NOTIFY_MODEL = WM_APP + 3;
-    constexpr UINT WM_TRAYICON = WM_USER + 1;
+    constexpr UINT WM_APP_NOTIFY_SETTINGS = WM_APP + 4;
     constexpr wchar_t MSG_WND_CLASS[] = L"AgentRedactorMsgWindow";
-
-    std::wstring PathWithoutQuery(const std::wstring& path) {
-        size_t q = path.find(L'?');
-        return q == std::wstring::npos ? path : path.substr(0, q);
-    }
-
-    std::wstring CanonicalPathSuffix(const std::wstring& path) {
-        std::wstring p = PathWithoutQuery(path);
-        std::wstring lower = AgentRedactor::Utils::ToLower(p);
-        static const std::wstring messagesSuffix = L"/v1/messages";
-        static const std::wstring chatSuffix = L"/v1/chat/completions";
-        static const std::wstring modelsSuffix = L"/v1/models";
-        static const std::wstring bareMessages = L"/messages";
-        static const std::wstring bareChat = L"/chat/completions";
-        static const std::wstring bareModels = L"/models";
-        if (AgentRedactor::Utils::EndsWith(lower, messagesSuffix)) return messagesSuffix;
-        if (AgentRedactor::Utils::EndsWith(lower, chatSuffix)) return chatSuffix;
-        if (AgentRedactor::Utils::EndsWith(lower, modelsSuffix)) return modelsSuffix;
-        if (AgentRedactor::Utils::EndsWith(lower, bareMessages)) return bareMessages;
-        if (AgentRedactor::Utils::EndsWith(lower, bareChat)) return bareChat;
-        if (AgentRedactor::Utils::EndsWith(lower, bareModels)) return bareModels;
-        return lower;
-    }
-
-    bool IsAnthropicMessagesRequest(const std::wstring& path, const std::string& method) {
-        auto suffix = CanonicalPathSuffix(path);
-        return (suffix == L"/v1/messages" || suffix == L"/messages") && method == "POST";
-    }
-
-    bool IsOpenAIChatCompletionsRequest(const std::wstring& path, const std::string& method) {
-        auto suffix = CanonicalPathSuffix(path);
-        return (suffix == L"/v1/chat/completions" || suffix == L"/chat/completions") && method == "POST";
-    }
-
-    // Streaming SSE unredaction helpers. We accumulate complete SSE events and
-    // emit them once the buffered redactable text contains no incomplete
-    // redaction labels. This prevents labels that are split across upstream
-    // chunks from leaking to the client.
-    struct StreamingSSEUnredactor {
-        StreamingSSEUnredactor(AgentRedactor::ProxyEngine* engine,
-            const AgentRedactor::RedactionState& state,
-            std::function<bool(const std::string&)> emitChunk)
-            : engine_(engine), state_(state), emitChunk_(std::move(emitChunk)) {
-            auto consider = [&](const std::map<std::wstring, std::wstring>& m) {
-                for (const auto& [label, _] : m) {
-                    std::string utf8 = AgentRedactor::Utils::WideToUtf8(label);
-                    maxLabelLen_ = std::max(maxLabelLen_, utf8.size());
-                    for (size_t i = 1; i <= utf8.size(); ++i) {
-                        labelPrefixes_.push_back(utf8.substr(0, i));
-                    }
-                }
-            };
-            consider(state.piiMap);
-            consider(state.regexMap);
-            consider(state.keywordMap);
-            // Sort longest first so a long prefix matches before its own shorter prefix.
-            std::sort(labelPrefixes_.begin(), labelPrefixes_.end(),
-                [](const std::string& a, const std::string& b) { return a.size() > b.size(); });
-            LOGF(L"[StreamingSSEUnredactor] created, maxLabelLen=%zu, prefixes=%zu, pii=%zu, regex=%zu, keyword=%zu",
-                maxLabelLen_, labelPrefixes_.size(), state.piiMap.size(), state.regexMap.size(), state.keywordMap.size());
-            for (const auto& [label, original] : state.keywordMap) {
-                LOGF(L"[StreamingSSEUnredactor] keyword map: [%s] -> [%s]",
-                    label.c_str(), original.c_str());
-            }
-        }
-
-        bool OnChunk(const char* data, size_t len) {
-            rawBuffer_.append(data, len);
-            std::string leftover;
-            if (!ParseCompleteEvents(rawBuffer_, events_, leftover)) return false;
-            rawBuffer_ = std::move(leftover);
-            LOGF(L"[StreamingSSEUnredactor] OnChunk: parsed %zu events, %zu leftover bytes", events_.size(), rawBuffer_.size());
-            return MaybeProcess();
-        }
-
-        bool Flush() {
-            LOGF(L"[StreamingSSEUnredactor] Flush: %zu events, %zu leftover bytes", events_.size(), rawBuffer_.size());
-            // Any incomplete raw bytes are treated as a final event line, but
-            // whitespace-only leftovers (e.g. a stray newline at the end of the
-            // stream) must not become an empty ``data:  `` event that breaks
-            // strict SSE clients such as OpenCode.
-            if (!rawBuffer_.empty()) {
-                size_t start = rawBuffer_.find_first_not_of(" \t\r\n");
-                if (start != std::string::npos) {
-                    events_.push_back(rawBuffer_.substr(start));
-                }
-                rawBuffer_.clear();
-            }
-            return ProcessAll();
-        }
-
-    private:
-        AgentRedactor::ProxyEngine* engine_ = nullptr;
-        AgentRedactor::RedactionState state_;
-        std::function<bool(const std::string&)> emitChunk_;
-        std::vector<std::string> labelPrefixes_;
-        size_t maxLabelLen_ = 0;
-        std::string rawBuffer_;
-        std::deque<std::string> events_;
-
-        static bool ParseCompleteEvents(const std::string& raw,
-            std::deque<std::string>& outEvents, std::string& leftover) {
-            size_t pos = 0;
-            while (pos < raw.size()) {
-                size_t end = raw.find("\n\n", pos);
-                if (end == std::string::npos) break;
-                std::string eventBlock = raw.substr(pos, end - pos);
-                pos = end + 2;
-                if (eventBlock.empty()) continue;
-                std::string eventData;
-                std::istringstream blockStream(eventBlock);
-                std::string line;
-                while (std::getline(blockStream, line)) {
-                    if (!line.empty() && line.back() == '\r') line.pop_back();
-                    if (line.substr(0, 5) == "data:") {
-                        size_t start = line.find_first_not_of(" \t", 5);
-                        if (start != std::string::npos) {
-                            eventData += line.substr(start);
-                        }
-                    }
-                }
-                if (!eventData.empty()) {
-                    outEvents.push_back(std::move(eventData));
-                }
-            }
-            leftover = raw.substr(pos);
-            return true;
-        }
-
-        static std::string SerializeEventsVec(const std::vector<std::string>& events) {
-            std::string out;
-            for (const auto& ev : events) {
-                // Skip whitespace-only events; they would serialize as empty
-                // ``data:`` lines that strict SSE clients reject.
-                if (ev.empty() || ev.find_first_not_of(" \t\r\n") == std::string::npos) {
-                    continue;
-                }
-                if (ev == "[DONE]") {
-                    out += "data: [DONE]\n\n";
-                } else {
-                    out += "data: " + ev + "\n\n";
-                }
-            }
-            return out;
-        }
-
-        // Extract the text that may contain redaction labels from an SSE data
-        // payload. This is the concatenation of content/reasoning/reasoning_details
-        // fields for OpenAI, and text/partial_json fields for Anthropic; labels
-        // never appear in the JSON wrapper itself.
-        static std::string ExtractRedactableText(const std::string& eventData) {
-            try {
-                json j = json::parse(eventData);
-                std::string text;
-                if (j.contains("choices") && j["choices"].is_array()) {
-                    for (const auto& choice : j["choices"]) {
-                        if (!choice.contains("delta") || !choice["delta"].is_object()) continue;
-                        const auto& delta = choice["delta"];
-                        if (delta.contains("content") && delta["content"].is_string()) {
-                            text += delta["content"].get<std::string>();
-                        }
-                        if (delta.contains("reasoning") && delta["reasoning"].is_string()) {
-                            text += delta["reasoning"].get<std::string>();
-                        }
-                        if (delta.contains("reasoning_details") && delta["reasoning_details"].is_array()) {
-                            for (const auto& rd : delta["reasoning_details"]) {
-                                if (rd.contains("text") && rd["text"].is_string()) {
-                                    text += rd["text"].get<std::string>();
-                                }
-                            }
-                        }
-                    }
-                }
-                // Anthropic Messages SSE carries deltas in delta.text and
-                // delta.partial_json (and occasionally content_block.text).
-                std::function<void(const json&)> collectAnthropic = [&](const json& node) {
-                    if (node.is_object()) {
-                        for (const auto& item : node.items()) {
-                            const std::string& key = item.key();
-                            const json& value = item.value();
-                            if ((key == "text" || key == "partial_json") && value.is_string()) {
-                                text += value.get<std::string>();
-                            } else {
-                                collectAnthropic(value);
-                            }
-                        }
-                    } else if (node.is_array()) {
-                        for (const auto& item : node) {
-                            collectAnthropic(item);
-                        }
-                    }
-                };
-                collectAnthropic(j);
-                return text;
-            } catch (...) {
-                return eventData;
-            }
-        }
-
-        // Returns true if text ends with any known redaction label prefix.
-        bool EndsWithLabelPrefix(const std::string& text) const {
-            for (const auto& prefix : labelPrefixes_) {
-                if (prefix.size() <= text.size() &&
-                    std::memcmp(text.data() + text.size() - prefix.size(), prefix.data(), prefix.size()) == 0) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // Build the concatenated redactable text for all buffered events.
-        std::string BuildFullText() const {
-            std::string full;
-            for (const auto& ev : events_) {
-                full += ExtractRedactableText(ev);
-            }
-            return full;
-        }
-
-        // Returns true if the concatenated text contains a redaction label that
-        // has not been completed yet (no closing >> within the maximum label
-        // length), or if it ends with a label prefix.
-        bool HasIncompleteLabel(const std::string& fullText) const {
-            if (fullText.empty()) return false;
-            const std::string marker = "<<REDACTED_";
-            size_t pos = 0;
-            while ((pos = fullText.find(marker, pos)) != std::string::npos) {
-                size_t endSearch = pos + marker.size() + maxLabelLen_;
-                if (endSearch > fullText.size()) endSearch = fullText.size();
-                size_t closePos = fullText.find(">>", pos + marker.size());
-                bool hasClose = closePos != std::string::npos && closePos < endSearch;
-                if (!hasClose) return true;
-                ++pos;
-            }
-            if (!fullText.ends_with(">>") && EndsWithLabelPrefix(fullText)) {
-                return true;
-            }
-            return false;
-        }
-
-        bool MaybeProcess() {
-            if (events_.empty() || maxLabelLen_ == 0) return true;
-
-            // If the concatenated redactable text still contains an incomplete
-            // redaction label, buffer more before emitting so RebuildSSE can
-            // replace the full label when the remainder arrives.
-            std::string fullText = BuildFullText();
-            if (HasIncompleteLabel(fullText)) {
-                LOGF(L"[StreamingSSEUnredactor] MaybeProcess: buffering %zu events, incomplete label present", events_.size());
-                return true;
-            }
-
-            // All labels in the buffered window are complete; safe to emit.
-            std::string sse = SerializeEventsVec({events_.begin(), events_.end()});
-            std::string rebuilt = engine_->RebuildSSE(sse, state_);
-            LOGF(L"[StreamingSSEUnredactor] MaybeProcess: emitting %zu events (%zu bytes)", events_.size(), rebuilt.size());
-            events_.clear();
-            return emitChunk_(rebuilt);
-        }
-
-        bool ProcessAll() {
-            std::string sse = SerializeEventsVec({events_.begin(), events_.end()});
-            LOGF(L"[StreamingSSEUnredactor] ProcessAll: rebuilding %zu events (%zu bytes)", events_.size(), sse.size());
-            events_.clear();
-            std::string rebuilt = engine_->RebuildSSE(sse, state_);
-            LOGF(L"[StreamingSSEUnredactor] ProcessAll: rebuilt %zu bytes", rebuilt.size());
-            return emitChunk_(rebuilt);
-        }
-    };
 }
 
 ::AgentRedactor::AppState* g_appState = nullptr;
@@ -310,45 +34,19 @@ AppState::~AppState() {
 }
 
 bool AppState::Initialize(const std::filesystem::path& dataDir) {
-    settings_ = std::make_unique<SettingsManager>(dataDir);
-    logManager_ = std::make_unique<LogManager>();
+    const auto configDir = dataDir.empty() ? Utils::GetAppDataPath() : dataDir;
+
+    EnsureEngineRunning(configDir);
+
+    // The GUI keeps its own file log; mirror the persisted toggle locally so
+    // LOG writes from this process behave as before. The engine applies the
+    // same setting process-side.
+    logManager_.SetLoggingEnabled(Settings()->IsLoggingEnabled());
+    // Sensitive logging is session-only and always starts off.
+    logManager_.SetShowSensitive(false);
 
     // Apply any saved language override before any UI resources are loaded.
     ::AgentRedactor::InitializeLocalization();
-
-    // MSIX/Store builds ship the weights next to the exe (identical behavior
-    // to before); self-release installs download them on first run into
-    // %LOCALAPPDATA%\AgentRedactor\models.
-    auto modelDir = ModelDownloader::ResolveModelDir();
-    detector_ = std::make_unique<PIIDetector>(modelDir);
-    // Set the provider BEFORE initializing so the model loads with the user's
-    // chosen execution provider (CPU, GPU/Auto/DirectML/CUDA).
-    detector_->SetProvider(settings_->GetOnnxProvider());
-    if (!ModelDownloader::HasModelWeights(modelDir)) {
-        // Blocking first-run download: the app must not run degraded
-        // (regex/keyword-only), so the detector stays uninitialized and the
-        // proxy servers are NOT started below. MainWindow shows a modal
-        // download dialog; StartModelDownloadIfNeeded() initializes the
-        // detector and starts the proxies once the download succeeds.
-        {
-            std::lock_guard lock(callbackMutex_);
-            modelDownloadRequired_ = true;
-        }
-        LOG_LIFECYCLE(L"[AppState] Model weights missing; startup blocked until the first-run download completes");
-    } else if (!detector_->Initialize()) {
-        // Weights are present but the model failed to load. This is the same
-        // degraded fallback the app has always had (regex/keyword-only); the
-        // blocking flow above only covers missing weights.
-        LOG_LIFECYCLE(L"[AppState] WARNING: PII Detector failed to initialize although model weights are present.");
-    }
-
-    logManager_->SetLoggingEnabled(settings_->IsLoggingEnabled());
-    // Sensitive logging is session-only and always starts off.
-    logManager_->SetShowSensitive(false);
-
-    proxyEngine_ = std::make_unique<ProxyEngine>(detector_.get(), logManager_.get(), [this]() {
-        NotifyStatsUpdated();
-    });
 
     messageHwnd_ = CreateMessageWindow();
     if (!messageHwnd_) {
@@ -362,23 +60,34 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
     systemTray_->SetOnLeftClick([this]() { OpenWindow(); });
     systemTray_->SetOnRightClick([this]() { ShowTrayMenu(); });
 
-    if (settings_->IsStartOnBoot()) {
+    if (Settings()->IsStartOnBoot()) {
         RegisterStartupTask();
     } else {
         UnregisterStartupTask();
     }
 
-    // Never serve traffic while the blocking first-run download is pending:
-    // the proxies start only after the download + detector init succeed.
-    if (!IsModelDownloadRequired()) {
-        StartProxyServers();
-    }
+    pollStop_ = false;
+    pollThread_ = std::thread(&AppState::StatusPollLoop, this);
     return true;
 }
 
 void AppState::Shutdown() {
     LOG(L"=== Agent Redactor Shutdown ===");
-    StopProxyServers();
+    pollStop_ = true;
+    if (pollThread_.joinable()) {
+        pollThread_.join();
+    }
+    // Stop only the engine this GUI instance spawned; an engine that was
+    // already running (e.g. left behind by an update) is left alone.
+    if (engineSpawned_) {
+        engineClient_.Post(L"/engine/stop", json::object());
+        engineSpawned_ = false;
+    } else if (Settings()->IsMasterPasswordEnabled()) {
+        // The engine outlives this GUI: lock the session so the next open
+        // must authenticate (Windows Hello or password) again — proxies keep
+        // running, only sensitive reads/settings are gated.
+        engineClient_.Put(L"/settings/lock", json::object());
+    }
     if (systemTray_) systemTray_->Destroy();
     if (messageHwnd_) {
         DestroyWindow(messageHwnd_);
@@ -396,6 +105,25 @@ void AppState::SetOnStatsUpdated(std::function<void()> cb) {
     onStatsUpdated_ = std::move(cb);
 }
 
+void AppState::SetOnSettingsChanged(std::function<void()> cb) {
+    std::lock_guard lock(callbackMutex_);
+    onSettingsChanged_ = std::move(cb);
+}
+
+void AppState::SetOnSessionLockOverlay(std::function<void(bool visible)> cb) {
+    std::lock_guard lock(callbackMutex_);
+    onSessionLockOverlay_ = std::move(cb);
+}
+
+void AppState::SetSessionLockOverlay(bool visible) {
+    std::function<void(bool)> cb;
+    {
+        std::lock_guard lock(callbackMutex_);
+        cb = onSessionLockOverlay_;
+    }
+    if (cb) cb(visible);
+}
+
 void AppState::NotifyLogAdded() {
     if (messageHwnd_) {
         PostMessage(messageHwnd_, WM_APP_NOTIFY_LOG, 0, 0);
@@ -408,11 +136,21 @@ void AppState::NotifyStatsUpdated() {
     }
 }
 
+void AppState::NotifySettingsChanged() {
+    if (messageHwnd_) {
+        PostMessage(messageHwnd_, WM_APP_NOTIFY_SETTINGS, 0, 0);
+    }
+}
+
+bool AppState::GetSettingsSnapshot(json& out) const {
+    std::lock_guard lock(settingsMutex_);
+    if (!settingsValid_) return false;
+    out = settingsCache_;
+    return true;
+}
+
 // ---------------------------------------------------------------------------
-// Blocking first-run model download (fires only when the weights are missing,
-// e.g. a fresh self-release install; never in current MSIX builds, which ship
-// the weights next to the exe). While the download is pending the app is
-// blocked: no detector, no proxy servers.
+// First-run model download state: owned by the engine, polled via /status.
 // ---------------------------------------------------------------------------
 
 void AppState::SetOnModelDownloadStatus(std::function<void()> cb) {
@@ -427,28 +165,29 @@ void AppState::NotifyModelDownloadStatus() {
 }
 
 bool AppState::IsModelDownloadRequired() const {
-    std::lock_guard lock(callbackMutex_);
-    return modelDownloadRequired_;
+    std::lock_guard lock(statusMutex_);
+    return statusValid_ && statusCache_.value("modelDownloadRequired", false);
 }
 
 bool AppState::IsModelDownloadInProgress() const {
-    std::lock_guard lock(callbackMutex_);
-    return modelDownloadInProgress_;
+    std::lock_guard lock(statusMutex_);
+    return statusValid_ && statusCache_.value("modelDownloadInProgress", false);
 }
 
 bool AppState::HasModelDownloadFailed() const {
-    std::lock_guard lock(callbackMutex_);
-    return modelDownloadFailed_;
+    std::lock_guard lock(statusMutex_);
+    return statusValid_ && statusCache_.value("modelDownloadFailed", false);
 }
 
 std::wstring AppState::ModelDownloadStatus() const {
-    std::lock_guard lock(callbackMutex_);
-    return modelDownloadStatus_;
+    std::lock_guard lock(statusMutex_);
+    if (!statusValid_) return L"";
+    return Utils::Utf8ToWide(statusCache_.value("modelDownloadStatus", ""));
 }
 
 int AppState::ModelDownloadPercent() const {
-    std::lock_guard lock(callbackMutex_);
-    return modelDownloadPercent_;
+    std::lock_guard lock(statusMutex_);
+    return statusValid_ ? statusCache_.value("modelDownloadPercent", -1) : -1;
 }
 
 void AppState::RetryModelDownload() {
@@ -456,76 +195,7 @@ void AppState::RetryModelDownload() {
 }
 
 void AppState::StartModelDownloadIfNeeded() {
-    {
-        std::lock_guard lock(callbackMutex_);
-        if (modelDownloadInProgress_) return;
-        modelDownloadInProgress_ = true;
-        modelDownloadFailed_ = false;
-        modelDownloadPercent_ = -1;
-        modelDownloadStatus_.clear();
-    }
-    NotifyModelDownloadStatus();
-
-    const auto fallbackDir = ModelDownloader::GetFallbackModelDir();
-    std::thread([this, fallbackDir]() {
-        auto progress = [this](int percent, const std::wstring& message) {
-            {
-                std::lock_guard lock(callbackMutex_);
-                modelDownloadPercent_ = percent;
-                if (!message.empty()) modelDownloadStatus_ = message;
-            }
-            NotifyModelDownloadStatus();
-        };
-
-        bool ok = false;
-        try {
-            ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
-        } catch (...) {
-            ok = false;
-        }
-
-        if (ok) {
-            // Load the model now that the files exist. Stop the proxy first so
-            // no in-flight request can touch the detector while it initializes
-            // (on the blocking first-run path the proxies were never started,
-            // so Stop is a no-op and Start below unblocks the app).
-            StopProxyServers();
-            bool initOk = false;
-            try {
-                if (detector_) initOk = detector_->Initialize();
-            } catch (...) {
-                initOk = false;
-            }
-            if (initOk) {
-                StartProxyServers();
-            } else if (ModelDownloader::ResolveModelDir() == fallbackDir) {
-                // The weights passed the size check but failed to load (e.g.
-                // a corrupt download from before size verification existed).
-                // Delete them so the next Retry re-downloads instead of
-                // looping on the same bad file — but ONLY in the fallback
-                // dir; exe-dir weights are MSIX package content and are never
-                // touched.
-                std::error_code ec;
-                std::filesystem::remove(ModelDownloader::WeightsFilePath(fallbackDir), ec);
-                LOG_LIFECYCLE(L"[AppState] Deleted corrupt downloaded weights; the next retry will re-download");
-            }
-            LOG_LIFECYCLE(initOk
-                ? L"[AppState] Model downloaded and initialized"
-                : L"[AppState] Model downloaded but detector initialization failed");
-            ok = initOk;
-        } else {
-            LOG_LIFECYCLE(L"[AppState] Model download failed");
-        }
-
-        {
-            std::lock_guard lock(callbackMutex_);
-            modelDownloadInProgress_ = false;
-            modelDownloadFailed_ = !ok;
-            modelDownloadPercent_ = ok ? 100 : -1;
-            if (ok) modelDownloadRequired_ = false;
-        }
-        NotifyModelDownloadStatus();
-    }).detach();
+    engineClient_.Post(L"/engine/download-model", json::object());
 }
 
 HWND AppState::CreateMessageWindow() {
@@ -565,6 +235,11 @@ LRESULT CALLBACK AppState::MessageWndProc(HWND hwnd, UINT msg, WPARAM wParam, LP
         if (app->onModelDownloadStatus_) app->onModelDownloadStatus_();
         return 0;
     }
+    if (msg == WM_APP_NOTIFY_SETTINGS) {
+        std::lock_guard lock(app->callbackMutex_);
+        if (app->onSettingsChanged_) app->onSettingsChanged_();
+        return 0;
+    }
     if (msg == WM_TRAYICON) {
         if (app->systemTray_) {
             app->systemTray_->HandleTrayMessage(lParam);
@@ -575,391 +250,141 @@ LRESULT CALLBACK AppState::MessageWndProc(HWND hwnd, UINT msg, WPARAM wParam, LP
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-void AppState::StartProxyServers() {
-    StopProxyServers();
-    auto profiles = settings_->GetProfiles();
-    for (const auto& profile : profiles) {
-        if (!profile.enabled) continue;
-        int port = profile.port;
-        auto server = std::make_unique<HttpServer>();
-        server->SetLogManager(logManager_.get());
-        auto handler = [this, port](const HttpRequest& req) -> HttpResponse {
-            return this->HandleProxyRequest(port, Utils::WideToUtf8(req.method), req.path, req.headers, req.body);
-        };
-        if (server->Start(port, handler)) {
-            LOGF_LIFECYCLE(L"[AppState] Started proxy on port %d for profile '%s'", port, profile.alias.c_str());
-            runningPorts_.insert(port);
-            servers_.push_back(std::move(server));
-        } else {
-            LOGF_LIFECYCLE(L"[AppState] FAILED to start proxy on port %d for profile '%s'", port, profile.alias.c_str());
+// ---------------------------------------------------------------------------
+// Engine lifecycle + status polling
+// ---------------------------------------------------------------------------
+
+bool AppState::EnsureEngineRunning(const std::filesystem::path& configDir) {
+    engineClient_.Connect(configDir);
+    if (engineClient_.Ping()) {
+        return true;
+    }
+
+    LOG_LIFECYCLE(L"[AppState] Engine not reachable; spawning agentredactor.exe");
+    engineSpawned_ = SpawnEngine();
+    if (!engineSpawned_) {
+        LOG_LIFECYCLE(L"[AppState] Failed to spawn the engine process");
+    }
+
+    // Wait for the control API to answer. The engine loads the ONNX model
+    // during startup, so allow generous time; the GUI keeps working against
+    // cached (default) state if this times out.
+    for (int attempt = 0; attempt < 300; ++attempt) {
+        engineClient_.Connect(configDir);
+        if (engineClient_.Ping()) {
+            json j;
+            if (engineClient_.Get(L"/status", j)) {
+                std::lock_guard lock(statusMutex_);
+                statusCache_ = std::move(j);
+                statusValid_ = true;
+            }
+            LOG_LIFECYCLE(L"[AppState] Connected to the engine control API");
+            return true;
+        }
+        Sleep(100);
+    }
+    LOG_LIFECYCLE(L"[AppState] WARNING: engine did not answer within 30 seconds");
+    return false;
+}
+
+bool AppState::SpawnEngine() {
+    // GetExecutablePath() already returns the exe's directory.
+    std::wstring exeDir = Utils::GetExecutablePath().wstring();
+    std::wstring enginePath = exeDir + L"\\agentredactor.exe";
+    if (!Utils::FileExists(enginePath)) {
+        LOG_LIFECYCLE(L"[AppState] Engine executable not found: " + enginePath);
+        return false;
+    }
+
+    STARTUPINFOW si = { sizeof(si) };
+    PROCESS_INFORMATION pi = {};
+    std::wstring cmdLine = L"\"" + enginePath + L"\"";
+    if (!CreateProcessW(nullptr, cmdLine.data(), nullptr, nullptr, FALSE,
+            CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP,
+            nullptr, exeDir.c_str(), &si, &pi)) {
+        LOG_LIFECYCLE(L"[AppState] CreateProcess for engine failed. Error: " + std::to_wstring(GetLastError()));
+        return false;
+    }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    return true;
+}
+
+void AppState::StatusPollLoop() {
+    while (!pollStop_) {
+        json j;
+        if (engineClient_.Get(L"/status", j)) {
+            bool modelChanged = false;
+            {
+                std::lock_guard lock(statusMutex_);
+                if (!statusValid_ ||
+                    statusCache_.value("modelDownloadRequired", false) != j.value("modelDownloadRequired", false) ||
+                    statusCache_.value("modelDownloadInProgress", false) != j.value("modelDownloadInProgress", false) ||
+                    statusCache_.value("modelDownloadFailed", false) != j.value("modelDownloadFailed", false) ||
+                    statusCache_.value("modelDownloadPercent", -1) != j.value("modelDownloadPercent", -1) ||
+                    statusCache_.value("modelDownloadStatus", std::string()) != j.value("modelDownloadStatus", std::string())) {
+                    modelChanged = true;
+                }
+                statusCache_ = std::move(j);
+                statusValid_ = true;
+            }
+            if (modelChanged) {
+                NotifyModelDownloadStatus();
+            }
+            // 1-second poll replacing the old ProxyEngine onUpdate_ push:
+            // HomePage re-reads profiles (stats) through the client.
+            NotifyStatsUpdated();
+        }
+
+        // Settings are engine-owned; the GUI may change them in-session (live
+        // language switch) or the CLI may (set <key>). Diff the snapshot so
+        // the UI refreshes without a restart, mirroring the in-GUI path.
+        json sj;
+        if (engineClient_.Get(L"/settings", sj)) {
+            bool settingsChanged = false;
+            {
+                std::lock_guard lock(settingsMutex_);
+                if (!settingsValid_ || settingsCache_.dump() != sj.dump()) {
+                    settingsChanged = true;
+                }
+                settingsCache_ = std::move(sj);
+                settingsValid_ = true;
+            }
+            if (settingsChanged) {
+                NotifySettingsChanged();
+            }
+        }
+        for (int i = 0; i < 10 && !pollStop_; ++i) {
+            Sleep(100);
         }
     }
-}
-
-void AppState::StopProxyServers() {
-    for (auto& server : servers_) {
-        if (server) server->Stop();
-    }
-    servers_.clear();
-    runningPorts_.clear();
-    LOG_LIFECYCLE(L"[AppState] All proxy servers stopped");
-}
-
-bool AppState::IsProxyRunning(int port) const {
-    return runningPorts_.find(port) != runningPorts_.end();
-}
-
-std::vector<int> AppState::GetRunningPorts() const {
-    return std::vector<int>(runningPorts_.begin(), runningPorts_.end());
 }
 
 void AppState::RestartProxyServers() {
-    StopProxyServers();
-    StartProxyServers();
+    engineClient_.Post(L"/engine/restart-listeners", json::object());
 }
 
-HttpResponse AppState::HandleProxyRequest(int port, const std::string& method, const std::wstring& path,
-    const std::unordered_map<std::wstring, std::wstring>& headers, const std::string& body) {
-
-    auto requestStart = std::chrono::high_resolution_clock::now();
-
-    HttpResponse clientResp;
-    clientResp.statusCode = 502;
-    clientResp.headers[L"Content-Type"] = L"application/json";
-    clientResp.body = "{\"error\": \"Proxy error\"}";
-
-    auto opt = settings_->GetProfileByPort(port);
-    if (!opt) {
-        clientResp.body = "{\"error\": \"Unknown proxy port\"}";
-        return clientResp;
-    }
-
-    auto profile = *opt;
-    profile.stats.totalRequests++;
-
-    std::vector<std::pair<std::wstring, std::wstring>> headerVec;
-    for (const auto& [name, value] : headers) {
-        headerVec.push_back({name, value});
-    }
-
-    // No protocol translation; the proxy forwards requests unchanged.
-    std::wstring upstreamPath = path;
-    std::string requestBody = body;
-
-    RedactionState state;
-    requestBody = proxyEngine_->ProcessRequest(profile, method, path, headerVec, requestBody, state);
-
-    bool isChatCompletions = Utils::ToLower(upstreamPath).find(L"/chat/completions") != std::wstring::npos;
-    bool isAnthropicMessagesPath = IsAnthropicMessagesRequest(upstreamPath, method);
-    bool stream = false;
-    try {
-        json bodyJson = json::parse(body);
-        if (bodyJson.contains("stream") && bodyJson["stream"].is_boolean()) {
-            stream = bodyJson["stream"].get<bool>();
+bool AppState::IsProxyRunning(int port) const {
+    std::lock_guard lock(statusMutex_);
+    if (!statusValid_ || !statusCache_.contains("profiles")) return false;
+    for (const auto& p : statusCache_["profiles"]) {
+        if (p.value("port", 0) == port) {
+            return p.value("proxyRunning", false);
         }
-    } catch (...) {
-        stream = false;
     }
-    bool canStream = (isChatCompletions || isAnthropicMessagesPath) && stream;
-    LOGF(L"[AppState] Stream eligibility: isChatCompletions=%s, isAnthropicMessages=%s, canStream=%s",
-        isChatCompletions ? L"true" : L"false",
-        isAnthropicMessagesPath ? L"true" : L"false",
-        canStream ? L"true" : L"false");
+    return false;
+}
 
-    int statusCode = 200;
-    std::vector<std::pair<std::wstring, std::wstring>> responseHeaders;
-    std::string responseBody;
-    std::string rawResponseBody;
-    std::string finalBody;
-    std::wstring headerLog;
-    bool isSSE = false;
-
-    if (canStream) {
-        LOGF(L"[AppState] Using chunked streaming proxy on port %d for %s", port, upstreamPath.c_str());
-        clientResp.isStreaming = true;
-        clientResp.streamWriterOwnsHeaders = true;
-        clientResp.streamWriter = [this, profile, method, path, upstreamPath, headerVec, requestBody, state](SOCKET clientSocket) {
-            int upstreamStatus = 0;
-            std::vector<std::pair<std::wstring, std::wstring>> upstreamHeaders;
-            bool headersSent = false;
-            bool isError = false;
-            std::string errorBody;
-
-            // If no labels were inserted into the request, the upstream response
-            // cannot contain any labels to unredact, so pass chunks straight through.
-            bool needsUnredaction = requestBody.find("<<REDACTED_") != std::string::npos;
-
-            auto sendChunk = [&](const std::string& data) -> bool {
-                return HttpServer::SendChunk(clientSocket, data.data(), data.size());
-            };
-
-            // OpenRouter's Anthropic-compatible endpoint sometimes emits SSE events
-            // as bare `data:` lines without the leading `event:` line that the
-            // official Anthropic SDK requires. When we are proxying an Anthropic
-            // Messages request in pass-through mode, inspect each complete SSE block
-            // and synthesize the missing `event:` prefix from the JSON `type` field.
-            bool isAnthropicMessages = IsAnthropicMessagesRequest(path, method);
-            std::string anthropicNormalizeBuffer;
-            auto sendNormalized = [&](const std::string& chunk) -> bool {
-                if (!isAnthropicMessages) {
-                    return sendChunk(chunk);
-                }
-                anthropicNormalizeBuffer += chunk;
-                std::string out;
-                size_t pos = 0;
-                while (pos < anthropicNormalizeBuffer.size()) {
-                    size_t end = anthropicNormalizeBuffer.find("\n\n", pos);
-                    if (end == std::string::npos) break;
-                    std::string block = anthropicNormalizeBuffer.substr(pos, end - pos);
-                    pos = end + 2;
-                    if (block.empty()) {
-                        out += "\n\n";
-                        continue;
-                    }
-                    bool hasEvent = false;
-                    std::string dataLine;
-                    std::istringstream blockStream(block);
-                    std::string line;
-                    while (std::getline(blockStream, line)) {
-                        if (!line.empty() && line.back() == '\r') line.pop_back();
-                        if (line.substr(0, 6) == "event:") {
-                            hasEvent = true;
-                            continue;
-                        }
-                        if (line.substr(0, 5) == "data:" && dataLine.empty()) {
-                            size_t start = line.find_first_not_of(" \t", 5);
-                            if (start != std::string::npos) dataLine = line.substr(start);
-                        }
-                    }
-                    if (!dataLine.empty()) {
-                        // OpenAI-style stream terminators are not valid Anthropic SSE.
-                        std::string trimmed = dataLine;
-                        while (!trimmed.empty() && (trimmed.back() == ' ' || trimmed.back() == '\t' || trimmed.back() == '\r' || trimmed.back() == '\n')) {
-                            trimmed.pop_back();
-                        }
-                        if (trimmed == "[DONE]") {
-                            continue;
-                        }
-                    }
-                    if (!hasEvent && !dataLine.empty()) {
-                        try {
-                            json j = json::parse(dataLine);
-                            if (j.contains("type") && j["type"].is_string()) {
-                                out += "event: " + j["type"].get<std::string>() + "\n";
-                            }
-                        } catch (...) {
-                            // Not JSON or no type; fall through and emit the block as-is.
-                        }
-                    }
-                    out += block + "\n\n";
-                }
-                anthropicNormalizeBuffer = anthropicNormalizeBuffer.substr(pos);
-                if (!out.empty()) {
-                    return sendChunk(out);
-                }
-                return true;
-            };
-
-            std::unique_ptr<StreamingSSEUnredactor> unredactor;
-            if (needsUnredaction) {
-                unredactor = std::make_unique<StreamingSSEUnredactor>(
-                    proxyEngine_.get(), state, sendNormalized);
-            }
-
-            auto sendStreamingHeaders = [&](int code, const std::vector<std::pair<std::wstring, std::wstring>>& hdrs) {
-                upstreamStatus = code;
-                std::string statusText = "OK";
-                switch (code) {
-                    case 200: statusText = "OK"; break;
-                    case 201: statusText = "Created"; break;
-                    case 204: statusText = "No Content"; break;
-                    case 400: statusText = "Bad Request"; break;
-                    case 401: statusText = "Unauthorized"; break;
-                    case 403: statusText = "Forbidden"; break;
-                    case 404: statusText = "Not Found"; break;
-                    case 500: statusText = "Internal Server Error"; break;
-                    case 502: statusText = "Bad Gateway"; break;
-                    case 503: statusText = "Service Unavailable"; break;
-                }
-                std::ostringstream responseStream;
-                responseStream << "HTTP/1.1 " << code << " " << statusText << "\r\n";
-                for (const auto& [name, value] : hdrs) {
-                    std::string lower = Utils::WideToUtf8(Utils::ToLower(name));
-                    if (lower == "content-length" || lower == "transfer-encoding" || lower == "content-encoding"
-                        || lower == "keep-alive" || lower == "proxy-connection" || lower == "connection") {
-                        continue;
-                    }
-                    std::string nameUtf8 = Utils::WideToUtf8(name);
-                    std::string valueUtf8 = Utils::WideToUtf8(value);
-                    while (!valueUtf8.empty() && (valueUtf8.back() == ' ' || valueUtf8.back() == '\t' || valueUtf8.back() == '\r' || valueUtf8.back() == '\n')) {
-                        valueUtf8.pop_back();
-                    }
-                    responseStream << nameUtf8 << ": " << valueUtf8 << "\r\n";
-                }
-                responseStream << "Transfer-Encoding: chunked\r\n";
-                responseStream << "Connection: close\r\n\r\n";
-                std::string headerData = responseStream.str();
-                int totalSent = 0;
-                while (totalSent < (int)headerData.size()) {
-                    int sent = send(clientSocket, headerData.c_str() + totalSent, (int)headerData.size() - totalSent, 0);
-                    if (sent <= 0) return;
-                    totalSent += sent;
-                }
-                headersSent = true;
-                LOGF(L"[AppState] Sent streaming headers: status=%d, %d bytes", code, totalSent);
-            };
-
-            bool ok = proxyEngine_->ForwardToUpstreamStreaming(
-                profile.upstreamUrl, profile.apiKey, profile.alias,
-                method, upstreamPath, headerVec, requestBody,
-                upstreamStatus, upstreamHeaders,
-                [&](const char* data, size_t len) -> bool {
-                    if (isError) {
-                        errorBody.append(data, len);
-                        return true;
-                    }
-                    if (!headersSent) {
-                        LOG(L"[AppState] Upstream body chunk arrived before headers; aborting stream");
-                        return false;
-                    }
-
-                    if (unredactor) {
-                        return unredactor->OnChunk(data, len);
-                    }
-                    return sendNormalized(std::string(data, len));
-                },
-                [&](int code, const std::vector<std::pair<std::wstring, std::wstring>>& hdrs) {
-                    if (code >= 200 && code < 300) {
-                        sendStreamingHeaders(code, hdrs);
-                    } else {
-                        upstreamStatus = code;
-                        isError = true;
-                    }
-                });
-
-            if (isError) {
-                // For error responses, send the raw upstream error body with the
-                // upstream status. Translating error payloads is left for a future
-                // improvement because error bodies are typically small JSON and
-                // rarely cause timeouts.
-                std::string statusText = "OK";
-                switch (upstreamStatus) {
-                    case 400: statusText = "Bad Request"; break;
-                    case 401: statusText = "Unauthorized"; break;
-                    case 403: statusText = "Forbidden"; break;
-                    case 404: statusText = "Not Found"; break;
-                    case 500: statusText = "Internal Server Error"; break;
-                    case 502: statusText = "Bad Gateway"; break;
-                    case 503: statusText = "Service Unavailable"; break;
-                }
-                std::ostringstream responseStream;
-                responseStream << "HTTP/1.1 " << upstreamStatus << " " << statusText << "\r\n";
-                responseStream << "Content-Type: application/json\r\n";
-                responseStream << "Content-Length: " << errorBody.size() << "\r\n";
-                responseStream << "Connection: close\r\n\r\n";
-                responseStream << errorBody;
-                std::string responseData = responseStream.str();
-                send(clientSocket, responseData.data(), (int)responseData.size(), 0);
-                LOGF(L"[AppState] Streaming error response: status=%d, body=%zu bytes", upstreamStatus, errorBody.size());
-            } else if (headersSent) {
-                if (ok) {
-                    bool flushed = unredactor ? unredactor->Flush() : true;
-                    if (flushed) {
-                        HttpServer::SendChunkedEnd(clientSocket);
-                        LOG(L"[AppState] Streaming response completed");
-                    } else {
-                        LOG(L"[AppState] Streaming response failed while flushing unredaction buffer");
-                    }
-                } else {
-                    LOG(L"[AppState] Streaming response failed after headers were sent");
-                }
-            } else {
-                // Upstream failed before we could send headers; send a 502 to the client.
-                std::string err = "HTTP/1.1 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 47\r\nConnection: close\r\n\r\n{\"error\": \"Failed to forward request to upstream\"}";
-                send(clientSocket, err.c_str(), (int)err.size(), 0);
-                LOG(L"[AppState] Streaming response failed before headers; sent 502");
-            }
-        };
-        clientResp.statusCode = 200;
-        // The real status code and headers are emitted by streamWriter; use placeholders for logging.
-        statusCode = 200;
-        headerLog = L"(chunked streaming response)";
-    } else {
-        bool forwarded = proxyEngine_->ForwardToUpstream(profile.upstreamUrl, profile.apiKey, profile.alias,
-            method, upstreamPath, headerVec, requestBody, statusCode, responseHeaders, responseBody);
-
-        if (!forwarded) {
-            clientResp.body = "{\"error\": \"Failed to forward request to upstream\"}";
-            return clientResp;
+std::vector<int> AppState::GetRunningPorts() const {
+    std::vector<int> ports;
+    std::lock_guard lock(statusMutex_);
+    if (!statusValid_ || !statusCache_.contains("profiles")) return ports;
+    for (const auto& p : statusCache_["profiles"]) {
+        if (p.value("proxyRunning", false)) {
+            ports.push_back(p.value("port", 0));
         }
-
-        rawResponseBody = responseBody;
-        finalBody = proxyEngine_->ProcessResponse(profile, responseBody, responseHeaders, state);
-
-        clientResp.statusCode = statusCode;
-        for (const auto& [name, value] : responseHeaders) {
-            std::wstring lowerName = Utils::ToLower(name);
-            if (lowerName == L"content-type" && Utils::ToLower(value).find(L"text/event-stream") != std::wstring::npos) {
-                isSSE = true;
-            }
-            if (lowerName != L"content-length" && lowerName != L"transfer-encoding" && lowerName != L"content-encoding"
-                && lowerName != L"keep-alive" && lowerName != L"proxy-connection") {
-                clientResp.headers[name] = value;
-                headerLog += name + L": " + value + L"; ";
-            }
-        }
-        if (!isSSE) {
-            // Some upstreams (e.g., OpenRouter/NVIDIA) prepend whitespace to the
-            // JSON body. Strip it so JSON clients don't see an unexpected leading
-            // blank sequence. Only do this for JSON payloads to avoid corrupting
-            // other response types.
-            auto ctIt = clientResp.headers.find(L"Content-Type");
-            if (ctIt != clientResp.headers.end() &&
-                Utils::ToLower(ctIt->second).find(L"application/json") != std::wstring::npos) {
-                size_t firstNonWs = finalBody.find_first_not_of(" \t\r\n");
-                if (firstNonWs != std::string::npos && firstNonWs > 0) {
-                    finalBody = finalBody.substr(firstNonWs);
-                }
-            }
-            clientResp.headers[L"Content-Length"] = std::to_wstring(finalBody.size());
-        }
-        clientResp.body = finalBody;
     }
-
-    profile.stats.totalPIIDetected += state.piiMap.size();
-    profile.stats.totalRegexMatches += state.regexMap.size();
-    profile.stats.totalKeywordMatches += state.keywordMap.size();
-    settings_->UpdateProfile(profile);
-
-    NotifyStatsUpdated();
-    NotifyLogAdded();
-
-    if (canStream) {
-        logManager_->AddLog(profile.alias, LogDirection::ProxyToUser,
-            L"HTTP Streaming Response to client: 200 | chunked",
-            L"=== RESPONSE HEADERS ===\n" + headerLog);
-    } else if (logManager_->IsShowSensitive()) {
-        std::wstring responseBodyPreview = Utils::Utf8ToWide(finalBody);
-        if (responseBodyPreview.length() > 50000) responseBodyPreview = responseBodyPreview.substr(0, 50000) + L"...[truncated]";
-        logManager_->AddLog(profile.alias, LogDirection::ProxyToUser,
-            L"HTTP Response to client: " + std::to_wstring(statusCode) + L" | " + std::to_wstring(finalBody.size()) + L" bytes",
-            L"=== RESPONSE HEADERS ===\n" + headerLog +
-            L"\n=== FINAL RESPONSE BODY (to client) ===\n" + responseBodyPreview);
-    } else {
-        std::wstring responseBodyPreview = Utils::Utf8ToWide(rawResponseBody);
-        if (responseBodyPreview.length() > 50000) responseBodyPreview = responseBodyPreview.substr(0, 50000) + L"...[truncated]";
-        logManager_->AddLog(profile.alias, LogDirection::ProxyToUser,
-            L"HTTP Response to client: " + std::to_wstring(statusCode) + L" | " + std::to_wstring(rawResponseBody.size()) + L" bytes",
-            L"=== RESPONSE HEADERS ===\n" + headerLog +
-            L"\n=== REDACTED RESPONSE BODY (from upstream) ===\n" + responseBodyPreview);
-    }
-
-    auto requestEnd = std::chrono::high_resolution_clock::now();
-    auto requestElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(requestEnd - requestStart).count();
-    LOGF(L"[AppState] Request timing: total=%lld ms, port=%d, status=%d, bodyIn=%zu, bodyOut=%zu",
-        requestElapsedMs, port, statusCode, body.size(), finalBody.size());
-
-    return clientResp;
+    return ports;
 }
 
 void AppState::ShowTrayMenu() {
@@ -993,7 +418,7 @@ void AppState::ShowTrayMenu() {
     items.push_back(MenuItem::Submenu(::AgentRedactor::LocString(L"TrayMenu_Language").c_str(), std::move(languageItems)));
     items.push_back(MenuItem::Separator());
     items.push_back(MenuItem::Item(::AgentRedactor::LocString(L"TrayMenu_StartOnBoot").c_str(), ID_TRAY_START_ON_BOOT,
-        [this]() { ToggleStartOnBoot(); }, true, settings_->IsStartOnBoot()));
+        [this]() { ToggleStartOnBoot(); }, true, Settings()->IsStartOnBoot()));
     items.push_back(MenuItem::Separator());
     items.push_back(MenuItem::Item(::AgentRedactor::LocString(L"TrayMenu_Quit").c_str(), ID_TRAY_QUIT, [this]() { Quit(); }));
     systemTray_->ShowMenu(items);
@@ -1027,8 +452,8 @@ void AppState::OpenWindow() {
 }
 
 void AppState::ToggleStartOnBoot() {
-    bool current = settings_->IsStartOnBoot();
-    settings_->SetStartOnBoot(!current);
+    bool current = Settings()->IsStartOnBoot();
+    Settings()->SetStartOnBoot(!current);
     if (!current) {
         RegisterStartupTask();
     } else {

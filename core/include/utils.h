@@ -36,6 +36,12 @@ std::wstring Join(const std::vector<std::wstring>& parts, const std::wstring& de
 std::wstring ReplaceAll(const std::wstring& str, const std::wstring& from, const std::wstring& to);
 std::wstring ReplaceAllCaseInsensitive(const std::wstring& str, const std::wstring& from, const std::wstring& to);
 
+// Rewrites the "{,N}" / "{,}" quantifier shorthand (common user input; valid
+// in .NET/PCRE/JS Annex-B, invalid in std::regex ECMAScript) into "{0,N}" /
+// "{0,}" so validation and the runtime engine agree. Escaped braces are left
+// alone. Anything else is returned unchanged.
+std::wstring NormalizeRegexBraces(const std::wstring& pattern);
+
 size_t HashCombine(size_t seed, size_t value);
 size_t HashWString(const std::wstring& str);
 

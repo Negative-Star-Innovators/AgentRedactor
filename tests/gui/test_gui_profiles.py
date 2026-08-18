@@ -22,6 +22,7 @@ from windows.gui_driver import (
     set_api_key,
     set_forward_url,
     set_port,
+    set_profile_alias,
 )
 
 
@@ -83,6 +84,7 @@ async def test_gui_add_second_profile(
     set_forward_url(mock_llm.base_url)
     set_api_key("test-api-key-second")
     set_port(second_port)
+    set_profile_alias("second-profile")
     save_profile()
 
     _wait_for_port(second_port)
@@ -108,6 +110,7 @@ async def test_gui_second_profile_request_isolation(
     set_forward_url(mock_llm.base_url)
     set_api_key("test-api-key-second")
     set_port(second_port)
+    set_profile_alias("second-profile")
     save_profile()
 
     _wait_for_port(second_port)
@@ -155,6 +158,7 @@ async def test_gui_two_profiles_concurrent_requests(
     set_forward_url(mock_llm.base_url)
     set_api_key("test-api-key-second")
     set_port(second_port)
+    set_profile_alias("second-profile")
     save_profile()
 
     _wait_for_port(second_port)
@@ -197,6 +201,7 @@ async def test_gui_remove_profile(
     set_forward_url(mock_llm.base_url)
     set_api_key("test-api-key-second")
     set_port(second_port)
+    set_profile_alias("second-profile")
     save_profile()
 
     _wait_for_port(second_port)

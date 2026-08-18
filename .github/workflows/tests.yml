@@ -119,3 +119,9 @@ jobs:
         run: |
           cd repo/tests
           pytest -v gui/
+
+      - name: Run CLI tests
+        shell: pwsh
+        run: |
+          cd repo/tests
+          pytest -v cli/

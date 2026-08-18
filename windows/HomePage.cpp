@@ -7,6 +7,9 @@
 #include "api_key_profile.h"
 #include "constants.h"
 #include "utils.h"
+#include "http_server.h"
+#include "engine/hello_unlock.h"
+#include <winhttp.h>
 #include <winrt/Windows.UI.ViewManagement.h>
 #include <winrt/Microsoft.UI.Xaml.Input.h>
 #include <winrt/Microsoft.UI.Xaml.Automation.h>
@@ -69,7 +72,6 @@ namespace winrt::AgentRedactor::implementation
         RemoveProfileBtn().Click({ this, &HomePage::RemoveProfile_Click });
         ProfileList().SelectionChanged({ this, &HomePage::ProfileList_SelectionChanged });
         RequirePasswordCheck().Click({ this, &HomePage::RequirePassword_Click });
-        ChangePasswordBtn().Click({ this, &HomePage::ChangePassword_Click });
         EnableLoggingCheck().Click({ this, &HomePage::EnableLogging_Click });
         ShowSensitiveCheck().Click({ this, &HomePage::ShowSensitive_Click });
         OpenLogBtn().Click({ this, &HomePage::OpenLog_Click });
@@ -132,7 +134,6 @@ namespace winrt::AgentRedactor::implementation
         DetectionConfidenceLabel().Text(::AgentRedactor::LocString(L"HomePage_Detection_ConfidenceLabel/Text").c_str());
         PasswordTitle().Text(::AgentRedactor::LocString(L"HomePage_Password_Title/Text").c_str());
         RequirePasswordCheck().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_RequirePasswordCheck/Content")));
-        ChangePasswordBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_ChangePasswordButton/Content")));
         StatisticsTitle().Text(::AgentRedactor::LocString(L"HomePage_Statistics_Title/Text").c_str());
         ClearStatisticsBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Statistics_ClearButton/Content")));
         SessionRedactionsTitle().Text(::AgentRedactor::LocString(L"HomePage_SessionRedactions_Title/Text").c_str());
@@ -145,16 +146,25 @@ namespace winrt::AgentRedactor::implementation
         OpenLogBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Logs_OpenLogButton/Content")));
         OpenFolderBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Logs_OpenFolderButton/Content")));
         ClearLogsBtn().Content(winrt::box_value(::AgentRedactor::LocString(L"HomePage_Logs_ClearButton/Content")));
+        // PII category labels and the session-redactions list are also built
+        // from localized strings, but only at load time; re-localize them on
+        // a language change. The PII checkboxes are updated in place (labels
+        // only) so unsaved toggle state is preserved. No-op until the profile
+        // data has been loaded once (constructor path).
+        if (!currentProfileId_.empty()) {
+            for (uint32_t i = 0; i < piiCheckBoxes_.size() && i < ::AgentRedactor::DEFAULT_PII_TYPES.size(); ++i) {
+                piiCheckBoxes_[i].Content(box_value(::AgentRedactor::LocString(L"PII_Type_" + ::AgentRedactor::DEFAULT_PII_TYPES[i])));
+            }
+            LoadMatchesList(true);
+        }
     }
 
     void HomePage::OnLoaded(IInspectable const&, RoutedEventArgs const&)
     {
-        auto app = ::AgentRedactor::AppState::Instance();
-        if (app && app->Settings()->IsMasterPasswordEnabled() && !app->Settings()->IsUnlocked()) {
-            ShowStartupPasswordDialogAsync();
-        } else {
-            FinishInitialization();
-        }
+        // The Windows Hello session lock is owned by MainWindow (overlay +
+        // prompt on window show / tray re-open / inactivity timeout); this
+        // page just initializes underneath it.
+        FinishInitialization();
     }
 
     bool HomePage::IsDarkMode() const
@@ -325,7 +335,25 @@ namespace winrt::AgentRedactor::implementation
         auto app = ::AgentRedactor::AppState::Instance();
         if (app) {
             app->SetOnStatsUpdated([this]() {
-                DispatcherQueue().TryEnqueue([this]() { UpdateStats(); LoadMatchesList(); });
+                DispatcherQueue().TryEnqueue([this]() {
+                    // CLI-side profile mutations (aliases, api keys) bump a
+                    // revision in the engine; reload everything when it moved
+                    // so the GUI reflects them without a restart. Plain
+                    // statistics ticks only refresh the stats + matches list.
+                    auto app = ::AgentRedactor::AppState::Instance();
+                    json snap;
+                    unsigned long long revision = 0;
+                    if (app && app->GetSettingsSnapshot(snap)) {
+                        revision = snap.value("profilesRevision", 0ULL);
+                    }
+                    if (revision != profilesRevisionShown_) {
+                        profilesRevisionShown_ = revision;
+                        RefreshProfilesFromEngine();
+                        return;
+                    }
+                    UpdateStats();
+                    LoadMatchesList();
+                });
             });
             // Sync logging controls with persisted / runtime state.
             bool loggingEnabled = app->Settings()->IsLoggingEnabled();
@@ -335,72 +363,41 @@ namespace winrt::AgentRedactor::implementation
         }
     }
 
-    winrt::fire_and_forget HomePage::ShowStartupPasswordDialogAsync()
+    void HomePage::RefreshFromEngine()
     {
-        auto lifetime = get_strong();
-        bool dark = lifetime->IsDarkMode();
-
         auto app = ::AgentRedactor::AppState::Instance();
-        if (!app || !app->Settings()->IsMasterPasswordEnabled()) {
-            lifetime->FinishInitialization();
-            co_return;
-        }
-
-        int attempts = 0;
-        const int maxAttempts = 3;
-
-        while (attempts < maxAttempts) {
-            ContentDialog dialog;
-            dialog.XamlRoot(lifetime->XamlRoot());
-            ThemeContentDialog(dialog, dark);
-            dialog.Title(box_value(::AgentRedactor::LocString(L"Dialog_MasterPasswordRequired_Title")));
-            dialog.PrimaryButtonText(::AgentRedactor::LocString(L"Dialog_UnlockButton"));
-            dialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_ExitButton"));
-            dialog.DefaultButton(ContentDialogButton::Primary);
-
-            StackPanel panel;
-            panel.Spacing(8);
-            PasswordBox passwordBox;
-            passwordBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_EnterPasswordPlaceholder"));
-            ThemePasswordBox(passwordBox, dark);
-            panel.Children().Append(passwordBox);
-            dialog.Content(panel);
-
-            lifetime->activeDialog_ = dialog;
-            auto result = co_await dialog.ShowAsync();
-            lifetime->activeDialog_ = nullptr;
-
-            if (result == ContentDialogResult::Primary) {
-                auto password = passwordBox.Password();
-                if (app->Settings()->UnlockWithPassword(password.c_str())) {
-                    lifetime->FinishInitialization();
-                    co_return;
-                } else {
-                    attempts++;
-                    if (attempts < maxAttempts) {
-                        ContentDialog errorDialog;
-                        errorDialog.XamlRoot(lifetime->XamlRoot());
-                        ThemeContentDialog(errorDialog, dark);
-                        errorDialog.Title(box_value(::AgentRedactor::LocString(L"Dialog_IncorrectPassword_Title")));
-                        errorDialog.Content(box_value(::AgentRedactor::LocString(L"Dialog_IncorrectPassword_Message")));
-                        errorDialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                        co_await errorDialog.ShowAsync();
-                    }
-                }
-            } else {
-                Application::Current().Exit();
-                co_return;
+        if (!app) return;
+        // Diff-aware refresh: rebuild the profile UI only when the engine's
+        // profiles actually changed on the fields the list/form display. A
+        // profilesRevision bump caused by the GUI's OWN Add/Save then becomes
+        // a no-op, so in-progress (unsaved) form edits are never stomped by
+        // the 1-second poll; genuinely external changes (e.g. a CLI `set
+        // alias` / `set port`) still reload. Stats churn never reloads.
+        auto fresh = app->Settings()->GetProfiles();
+        if (fresh.empty() && profiles_.empty()) {
+            // First run: bootstrap the default profile.
+            LoadData();
+        } else if (!ProfilesMatch(fresh)) {
+            std::wstring prevId = currentProfileId_;
+            profiles_ = std::move(fresh);
+            bool keep = false;
+            for (const auto& p : profiles_) {
+                if (p.id == prevId) { keep = true; break; }
             }
+            currentProfileId_ = keep ? prevId : (profiles_.empty() ? L"" : profiles_[0].id);
+            ApplyTheme();
+            LoadProfileList();
+            LoadProfileForm();
+            LoadPIIGrid();
+            LoadRegexList();
+            LoadKeywordList();
+            UpdateStats();
         }
-
-        ContentDialog errorDialog;
-        errorDialog.XamlRoot(lifetime->XamlRoot());
-        ThemeContentDialog(errorDialog, dark);
-        errorDialog.Title(box_value(::AgentRedactor::LocString(L"Dialog_TooManyAttempts_Title")));
-        errorDialog.Content(box_value(::AgentRedactor::LocString(L"Dialog_TooManyAttempts_Message")));
-        errorDialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-        co_await errorDialog.ShowAsync();
-        Application::Current().Exit();
+        bool loggingEnabled = app->Settings()->IsLoggingEnabled();
+        EnableLoggingCheck().IsChecked(loggingEnabled);
+        ShowSensitiveCheck().IsEnabled(loggingEnabled);
+        ShowSensitiveCheck().IsChecked(loggingEnabled && app->Logs()->IsShowSensitive());
+        RequirePasswordCheck().IsChecked(app->Settings()->IsMasterPasswordEnabled());
     }
 
     void HomePage::OnNavigatedFrom(Navigation::NavigationEventArgs const&)
@@ -416,6 +413,7 @@ namespace winrt::AgentRedactor::implementation
     {
         auto app = ::AgentRedactor::AppState::Instance();
         if (!app) return;
+        std::wstring prevId = currentProfileId_;
         profiles_ = app->Settings()->GetProfiles();
         if (profiles_.empty()) {
             ::AgentRedactor::ApiKeyProfile defaultProfile(::AgentRedactor::LocString(L"Profile_DefaultName"));
@@ -426,7 +424,14 @@ namespace winrt::AgentRedactor::implementation
             profiles_ = app->Settings()->GetProfiles();
             currentProfileId_ = defaultProfile.id;
         } else {
-            currentProfileId_ = profiles_[0].id;
+            // Keep the current selection (by id) across engine-driven
+            // reloads; fall back to the first profile only when the selected
+            // one no longer exists.
+            bool keep = false;
+            for (const auto& p : profiles_) {
+                if (p.id == prevId) { keep = true; break; }
+            }
+            currentProfileId_ = keep ? prevId : profiles_[0].id;
         }
         ApplyTheme();
         LoadProfileList();
@@ -439,7 +444,6 @@ namespace winrt::AgentRedactor::implementation
 
         auto settings = app->Settings();
         RequirePasswordCheck().IsChecked(settings->IsMasterPasswordEnabled());
-        ChangePasswordBtn().IsEnabled(settings->IsMasterPasswordEnabled());
     }
 
     void HomePage::LoadProfileList()
@@ -555,6 +559,65 @@ namespace winrt::AgentRedactor::implementation
         }
     }
 
+    bool HomePage::ProfilesMatch(const std::vector<::AgentRedactor::ApiKeyProfile>& fresh) const
+    {
+        // Compare only the fields the list/form display; request/redaction
+        // stats change on every request and must never force a reload.
+        bool same = fresh.size() == profiles_.size();
+        if (same) {
+            for (size_t i = 0; i < fresh.size() && same; ++i) {
+                const auto& f = fresh[i];
+                const auto& o = profiles_[i];
+                same = f.id == o.id && f.alias == o.alias && f.port == o.port
+                    && f.upstreamUrl == o.upstreamUrl && f.apiKey == o.apiKey
+                    && f.useOpenAIModel == o.useOpenAIModel
+                    && f.enabledPIITypes == o.enabledPIITypes
+                    && f.piiConfidenceThreshold == o.piiConfidenceThreshold
+                    && f.regexPatterns.size() == o.regexPatterns.size()
+                    && f.keywords.size() == o.keywords.size();
+                if (!same) break;
+                for (size_t k = 0; k < f.regexPatterns.size(); ++k) {
+                    if (f.regexPatterns[k].pattern != o.regexPatterns[k].pattern
+                        || f.regexPatterns[k].enabled != o.regexPatterns[k].enabled) {
+                        same = false;
+                        break;
+                    }
+                }
+                if (same) {
+                    for (size_t k = 0; k < f.keywords.size(); ++k) {
+                        if (f.keywords[k].text != o.keywords[k].text
+                            || f.keywords[k].caseSensitive != o.keywords[k].caseSensitive
+                            || f.keywords[k].enabled != o.keywords[k].enabled) {
+                            same = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return same;
+    }
+
+    void HomePage::RefreshProfilesFromEngine()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        auto fresh = app->Settings()->GetProfiles();
+        if (ProfilesMatch(fresh)) return;
+
+        std::wstring prevId = currentProfileId_;
+        profiles_ = std::move(fresh);
+        bool keep = false;
+        for (const auto& p : profiles_) {
+            if (p.id == prevId) { keep = true; break; }
+        }
+        currentProfileId_ = keep ? prevId : (profiles_.empty() ? L"" : profiles_[0].id);
+        LoadProfileList();
+        LoadProfileForm();
+        UpdateStats();
+        LoadMatchesList();
+    }
+
     void HomePage::LoadProfileForm()
     {
         auto app = ::AgentRedactor::AppState::Instance();
@@ -565,10 +628,21 @@ namespace winrt::AgentRedactor::implementation
         ProfileNameBox().Text(p.alias);
         PortBox().Text(std::to_wstring(p.port));
         UrlBox().Text(p.upstreamUrl);
-        ApiKeyBox().Password(p.apiKey);
-        ApiKeyBox().PasswordRevealMode(PasswordRevealMode::Hidden);
+        // The engine's profile list only ever serves the masked key; fetch
+        // the real one so the box always shows the actual key (including
+        // keys set through the CLI) instead of a stale "abc...****" mask.
+        std::wstring apiKey = app->Settings()->GetProfileApiKey(currentProfileId_);
+        if (apiKey.empty()) apiKey = p.apiKey;
+        ApiKeyBox().Password(apiKey);
+        // Keep the reveal state across engine-driven reloads: a poll refresh
+        // landing while the user has the key shown must not hide it again.
+        // Switching profiles still resets it (privacy).
+        bool switching = formProfileId_ != currentProfileId_;
+        formProfileId_ = currentProfileId_;
+        bool wasShown = switching ? false : ShowKeyCheck().IsChecked().GetBoolean();
+        ApiKeyBox().PasswordRevealMode(wasShown ? PasswordRevealMode::Visible : PasswordRevealMode::Hidden);
+        ShowKeyCheck().IsChecked(wasShown);
         UseOpenAISwitch().IsOn(p.useOpenAIModel);
-        ShowKeyCheck().IsChecked(false);
         ConfidenceThresholdBox().Text(::AgentRedactor::Utils::FormatLocalizedFloat(p.piiConfidenceThreshold, 2));
         UpdateProxyStatus();
     }
@@ -869,19 +943,38 @@ namespace winrt::AgentRedactor::implementation
         UpdateProxyStatus();
     }
 
-    void HomePage::LoadMatchesList()
+    void HomePage::LoadMatchesList(bool force)
     {
         auto app = ::AgentRedactor::AppState::Instance();
         if (!app) return;
         auto list = MatchesList();
-        list.Items().Clear();
         auto matches = app->Proxy()->GetSessionMatches(currentProfileId_);
+        // The 1-second stats poll calls this constantly; only rebuild when
+        // the content actually changed, or the empty placeholder below would
+        // clear + re-append every second (visibly flashing "No Redactions").
+        // `force` (language change) bypasses the guard so the localized
+        // labels are re-rendered once in the new language.
+        std::wstring fingerprint;
+        for (const auto& m : matches) {
+            fingerprint += m.timestamp + L"|" + m.type + L"|" + m.detail + L"|" + m.matchedText + L"\n";
+        }
+        if (!force && matchesLoaded_ && fingerprint == matchesFingerprint_) return;
+        matchesFingerprint_ = std::move(fingerprint);
+        matchesLoaded_ = true;
+
+        list.Items().Clear();
         if (matches.empty()) {
             list.Items().Append(box_value(::AgentRedactor::LocString(L"HomePage_SessionRedactions_Empty")));
             return;
         }
         for (auto it = matches.rbegin(); it != matches.rend(); ++it) {
-            std::wstring line = L"[" + it->timestamp + L"] " + it->type;
+            // The engine serves match types via an English-only shim (it cannot
+            // link MRT localization); map them back to the localized strings.
+            std::wstring type = it->type;
+            if (type == L"PII") type = ::AgentRedactor::LocString(L"MatchType_PII");
+            else if (type == L"Regex") type = ::AgentRedactor::LocString(L"MatchType_Regex");
+            else if (type == L"Keyword") type = ::AgentRedactor::LocString(L"MatchType_Keyword");
+            std::wstring line = L"[" + it->timestamp + L"] " + type;
             if (!it->detail.empty()) line += L" (" + it->detail + L")";
             line += L": " + it->matchedText;
             list.Items().Append(box_value(line));
@@ -1078,7 +1171,7 @@ namespace winrt::AgentRedactor::implementation
     }
 
     // -------------------------------------------------------------------------
-    // Password handlers (dialog-based)
+    // Windows Hello protection handlers (checkbox-based)
     // -------------------------------------------------------------------------
     void HomePage::RequirePassword_Click(IInspectable const&, RoutedEventArgs const&)
     {
@@ -1087,216 +1180,97 @@ namespace winrt::AgentRedactor::implementation
         // fire_and_forget coroutine, terminate the process.
         if (activeDialog_) return;
         bool checked = RequirePasswordCheck().IsChecked().GetBoolean();
-        // Revert immediately; dialog will set the correct state on success
-        RequirePasswordCheck().IsChecked(!checked);
 
         if (checked) {
-            ShowEnablePasswordDialogAsync();
+            // Enabling needs no consent and no confirmation: turn protection
+            // on directly (the engine persists a random AES key wrapped in
+            // DPAPI — there is no typed password to set).
+            auto app = ::AgentRedactor::AppState::Instance();
+            if (!app || !app->Settings()->EnableMasterPassword()) {
+                RequirePasswordCheck().IsChecked(false);
+                ShowEnablePasswordFailedAsync();
+            }
         } else {
-            ShowDisablePasswordDialogAsync();
+            // Disabling DOES require a fresh Windows Hello verification
+            // before protection is turned off; revert the checkbox until
+            // that verification has succeeded.
+            RequirePasswordCheck().IsChecked(true);
+            DisableWithHelloAsync();
         }
     }
 
-    void HomePage::ChangePassword_Click(IInspectable const&, RoutedEventArgs const&)
-    {
-        if (activeDialog_) return;  // see RequirePassword_Click
-        ShowChangePasswordDialogAsync();
-    }
-
-    winrt::fire_and_forget HomePage::ShowEnablePasswordDialogAsync()
+    winrt::fire_and_forget HomePage::ShowEnablePasswordFailedAsync()
     {
         auto lifetime = get_strong();
-        bool dark = lifetime->IsDarkMode();
-
-        ContentDialog dialog;
-        dialog.XamlRoot(lifetime->XamlRoot());
-        ThemeContentDialog(dialog, dark);
-        dialog.Title(box_value(::AgentRedactor::LocString(L"Dialog_SetMasterPassword_Title")));
-        dialog.PrimaryButtonText(::AgentRedactor::LocString(L"Dialog_SetPasswordButton"));
-        dialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_CancelButton"));
-        dialog.DefaultButton(ContentDialogButton::Primary);
-
-        StackPanel panel;
-        panel.Spacing(8);
-        PasswordBox passBox;
-        passBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_PasswordPlaceholder"));
-        ThemePasswordBox(passBox, dark);
-        PasswordBox confirmBox;
-        confirmBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_ConfirmPasswordPlaceholder"));
-        ThemePasswordBox(confirmBox, dark);
-        panel.Children().Append(passBox);
-        panel.Children().Append(confirmBox);
-        dialog.Content(panel);
-
-        lifetime->activeDialog_ = dialog;
-        auto result = co_await dialog.ShowAsync();
+        ContentDialog err;
+        err.XamlRoot(lifetime->XamlRoot());
+        ThemeContentDialog(err, lifetime->IsDarkMode());
+        err.Title(box_value(::AgentRedactor::LocString(L"Dialog_EnableMasterPasswordFailed_Title")));
+        err.Content(box_value(::AgentRedactor::LocString(L"Dialog_EnableMasterPasswordFailed_Message")));
+        err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
+        lifetime->activeDialog_ = err;
+        co_await err.ShowAsync();
         lifetime->activeDialog_ = nullptr;
-
-        if (result == ContentDialogResult::Primary) {
-            auto pass = passBox.Password();
-            auto confirm = confirmBox.Password();
-
-            if (pass.empty()) {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_PasswordEmpty_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_PasswordEmpty_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-                co_return;
-            }
-
-            if (pass != confirm) {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_PasswordMismatch_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_PasswordMismatch_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-                co_return;
-            }
-
-            auto app = ::AgentRedactor::AppState::Instance();
-            if (app && app->Settings()->EnableMasterPassword(pass.c_str())) {
-                lifetime->RequirePasswordCheck().IsChecked(true);
-                lifetime->ChangePasswordBtn().IsEnabled(true);
-            } else {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_EnableMasterPasswordFailed_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_EnableMasterPasswordFailed_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-            }
-        }
     }
 
-    winrt::fire_and_forget HomePage::ShowDisablePasswordDialogAsync()
+    winrt::fire_and_forget HomePage::DisableWithHelloAsync()
     {
         auto lifetime = get_strong();
-        bool dark = lifetime->IsDarkMode();
-
-        ContentDialog dialog;
-        dialog.XamlRoot(lifetime->XamlRoot());
-        ThemeContentDialog(dialog, dark);
-        dialog.Title(box_value(::AgentRedactor::LocString(L"Dialog_DisableMasterPassword_Title")));
-        dialog.PrimaryButtonText(::AgentRedactor::LocString(L"Dialog_DisableButton"));
-        dialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_CancelButton"));
-        dialog.DefaultButton(ContentDialogButton::Primary);
-
-        StackPanel panel;
-        panel.Spacing(8);
-        PasswordBox passBox;
-        passBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_CurrentPasswordPlaceholder"));
-        ThemePasswordBox(passBox, dark);
-        panel.Children().Append(passBox);
-        dialog.Content(panel);
-
-        lifetime->activeDialog_ = dialog;
-        auto result = co_await dialog.ShowAsync();
-        lifetime->activeDialog_ = nullptr;
-
-        if (result == ContentDialogResult::Primary) {
-            auto pass = passBox.Password();
-            auto app = ::AgentRedactor::AppState::Instance();
-            if (app && app->Settings()->UnlockWithPassword(pass.c_str())) {
-                app->Settings()->DisableMasterPassword();
-                lifetime->RequirePasswordCheck().IsChecked(false);
-                lifetime->ChangePasswordBtn().IsEnabled(false);
-            } else {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_IncorrectCurrentPassword_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_IncorrectCurrentPassword_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-            }
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) {
+            lifetime->RequirePasswordCheck().IsChecked(true);
+            co_return;
         }
-    }
-
-    winrt::fire_and_forget HomePage::ShowChangePasswordDialogAsync()
-    {
-        auto lifetime = get_strong();
-        bool dark = lifetime->IsDarkMode();
-
-        ContentDialog dialog;
-        dialog.XamlRoot(lifetime->XamlRoot());
-        ThemeContentDialog(dialog, dark);
-        dialog.Title(box_value(::AgentRedactor::LocString(L"Dialog_ChangeMasterPassword_Title")));
-        dialog.PrimaryButtonText(::AgentRedactor::LocString(L"Dialog_ChangePasswordButton"));
-        dialog.CloseButtonText(::AgentRedactor::LocString(L"Dialog_CancelButton"));
-        dialog.DefaultButton(ContentDialogButton::Primary);
-
-        StackPanel panel;
-        panel.Spacing(8);
-        PasswordBox oldBox;
-        oldBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_CurrentPasswordPlaceholder"));
-        ThemePasswordBox(oldBox, dark);
-        PasswordBox newBox;
-        newBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_NewPasswordPlaceholder"));
-        ThemePasswordBox(newBox, dark);
-        PasswordBox confirmBox;
-        confirmBox.PlaceholderText(::AgentRedactor::LocString(L"Dialog_ConfirmNewPasswordPlaceholder"));
-        ThemePasswordBox(confirmBox, dark);
-        panel.Children().Append(oldBox);
-        panel.Children().Append(newBox);
-        panel.Children().Append(confirmBox);
-        dialog.Content(panel);
-
-        lifetime->activeDialog_ = dialog;
-        auto result = co_await dialog.ShowAsync();
-        lifetime->activeDialog_ = nullptr;
-
-        if (result == ContentDialogResult::Primary) {
-            auto oldPass = oldBox.Password();
-            auto newPass = newBox.Password();
-            auto confirm = confirmBox.Password();
-
-            if (newPass.empty()) {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_NewPasswordEmpty_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_NewPasswordEmpty_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-                co_return;
-            }
-
-            if (newPass != confirm) {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_NewPasswordMismatch_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_NewPasswordMismatch_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-                co_return;
-            }
-
-            auto app = ::AgentRedactor::AppState::Instance();
-            if (app && app->Settings()->ChangeMasterPassword(oldPass.c_str(), newPass.c_str())) {
-                ContentDialog success;
-                success.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(success, dark);
-                success.Title(box_value(::AgentRedactor::LocString(L"Dialog_ChangePasswordSuccess_Title")));
-                success.Content(box_value(::AgentRedactor::LocString(L"Dialog_ChangePasswordSuccess_Message")));
-                success.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await success.ShowAsync();
-            } else {
-                ContentDialog err;
-                err.XamlRoot(lifetime->XamlRoot());
-                ThemeContentDialog(err, dark);
-                err.Title(box_value(::AgentRedactor::LocString(L"Dialog_ChangePasswordFailed_Title")));
-                err.Content(box_value(::AgentRedactor::LocString(L"Dialog_ChangePasswordFailed_Message")));
-                err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
-                co_await err.ShowAsync();
-            }
+        // Disabling strips ALL protection, so it demands a fresh Windows Hello
+        // consent BEFORE the engine call. The prompt runs IN-PROCESS attached
+        // to this (active) window, so the Windows Security dialog comes to the
+        // foreground — an engine-owned prompt would belong to a background
+        // process and land behind the app. After a Verified result the engine
+        // session is unlocked via the trusted /unlock path, and only then is
+        // the disable accepted (the engine's disable endpoint requires an
+        // unlocked session, like the api-key endpoint). The padlock overlay
+        // covers the window for the whole flow so the regex/keywords/PII
+        // content is never visible behind the dialog.
+        app->SetSessionLockOverlay(true);
+        LOG(L"[HomePage] Disable flow: padlock overlay shown, prompt starting");
+        auto message = ::AgentRedactor::LocString(L"Dialog_DisableHello_Message");
+        bool verified = false;
+        try {
+            verified = co_await ::AgentRedactor::RequestHelloUnlockAsync(app->MainWindow(), message);
+        } catch (...) {
+            verified = false;
         }
+        if (!verified) {
+            ContentDialog err;
+            err.XamlRoot(lifetime->XamlRoot());
+            ThemeContentDialog(err, lifetime->IsDarkMode());
+            err.Title(box_value(::AgentRedactor::LocString(L"Dialog_HelloFailed_Title")));
+            err.Content(box_value(::AgentRedactor::LocString(L"Dialog_DisableHelloFailed_Message")));
+            err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
+            lifetime->activeDialog_ = err;
+            co_await err.ShowAsync();
+            lifetime->activeDialog_ = nullptr;
+            app->SetSessionLockOverlay(false);
+            co_return;
+        }
+        app->Settings()->UnlockEngine();
+        auto outcome = app->Settings()->DisableMasterPassword();
+        app->SetSessionLockOverlay(false);
+        if (outcome.ok) {
+            lifetime->RequirePasswordCheck().IsChecked(false);
+            co_return;
+        }
+        ContentDialog err;
+        err.XamlRoot(lifetime->XamlRoot());
+        ThemeContentDialog(err, lifetime->IsDarkMode());
+        err.Title(box_value(::AgentRedactor::LocString(L"Dialog_HelloFailed_Title")));
+        err.Content(box_value(::AgentRedactor::LocString(L"Dialog_DisableHelloFailed_Message")));
+        err.CloseButtonText(::AgentRedactor::LocString(L"Dialog_OKButton"));
+        lifetime->activeDialog_ = err;
+        co_await err.ShowAsync();
+        lifetime->activeDialog_ = nullptr;
+        // Protection is still on: re-assert the checked state.
+        lifetime->RequirePasswordCheck().IsChecked(true);
     }
 
     void HomePage::ClearStatisticsBtn_Click(IInspectable const&, RoutedEventArgs const&)
@@ -1460,7 +1434,10 @@ namespace winrt::AgentRedactor::implementation
     std::wstring HomePage::ValidateRegex(const std::wstring& pattern)
     {
         try {
-            std::wregex re(pattern, std::regex_constants::ECMAScript);
+            // The "{,N}" shorthand is normalized so it validates and matches
+            // (see Utils::NormalizeRegexBraces); the runtime engine normalizes
+            // identically.
+            std::wregex re(::AgentRedactor::Utils::NormalizeRegexBraces(pattern), std::regex_constants::ECMAScript);
         } catch (const std::regex_error& e) {
             return ::AgentRedactor::LocFormat(L"Validation_InvalidRegex", { ::AgentRedactor::Utils::Utf8ToWide(e.what()) });
         } catch (...) {

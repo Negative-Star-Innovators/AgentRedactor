@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Açar sözlər: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Girişi aktivləşdirin</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Həssas məlumatları göstərin</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Qeydlər bu kompüterdə saxlanılır. Redaktə edilmiş jurnallar hələ də aşkarlamanın buraxılmış həssas datasını ehtiva edə bilər.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Qeydiyyatı aktivləşdirin</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Həssas məlumatları göstərin</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Xəbərdarlıq</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Həssas məlumatların qeydiyyatı aktivləşdirildi. Qeydlər orijinal sorğu orqanları və API açarınız daxil olmaqla, redaktə edilməmiş datadan ibarət olacaq. Proqramı bağladığınız zaman bu sıfırlanır.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Proqramın kilidini açmaq üçün Windows Hello istifadə olunacaq. Sizdən Windows Hello ilə doğrulamağınız xahiş olunacaq.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello yoxlaması tamamlanmadı, ona görə də qoruma aktivləşdirilmədi. Yenidən cəhd edin.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello tələb olunur</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello doğrulaması uğursuz oldu. Yenidən cəhd edin və ya tətbiqdən çıxın.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Yenidən cəhd edin</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Qoruma deaktiv edilməzdən əvvəl sizdən Windows Hello ilə doğrulamağınız xahiş olunacaq.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello yoxlaması tamamlanmayıb, ona görə də qoruma hələ də aktivdir.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Həssas Məlumat göstərilsin?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Bu, redaktə edilməmiş həssas dəyərləri (adlar, e-poçtlar, telefon nömrələri və s.) və API açarınızı diskdəki log faylınıza yazacaq. Başqalarının bu kompüterə girişi varsa, bunu aktiv etməyin. Proqramı bağladığınız zaman parametr sıfırlanır.</value>
+  </data>
 </root>

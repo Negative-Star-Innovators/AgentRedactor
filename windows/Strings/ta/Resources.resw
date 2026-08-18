@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>முக்கியசொற்கள்: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>பதிவு செய்வதை இயக்கு</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>முக்கியமான தகவலைக் காட்டு</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>இந்த கணினியில் பதிவுகள் சேமிக்கப்படுகின்றன. திருத்தப்பட்ட பதிவுகளில், கண்டறிதல் தவறவிட்ட முக்கியமான தரவு இன்னும் இருக்கலாம்.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>பதிவு செய்வதை இயக்கு</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>முக்கியமான தகவலைக் காட்டு</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>எச்சரிக்கை</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>முக்கியமான தகவல் பதிவு இயக்கப்பட்டது. அசல் கோரிக்கை அமைப்புகள் மற்றும் உங்கள் API விசை உள்ளிட்ட திருத்தப்படாத தரவு பதிவுகளில் இருக்கும். நீங்கள் பயன்பாட்டை மூடும்போது இது மீட்டமைக்கப்படும்.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>பயன்பாட்டைத் திறக்க Windows Hello பயன்படுத்தப்படும். Windows Hello மூலம் சரிபார்க்கும்படி கேட்கப்படுவீர்கள்.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>விண்டோஸ் ஹலோ சரிபார்ப்பு முடிக்கப்படவில்லை, எனவே பாதுகாப்பு இயக்கப்படவில்லை. மீண்டும் முயற்சிக்கவும்.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>விண்டோஸ் ஹலோ தேவை</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>விண்டோஸ் ஹலோ சரிபார்ப்பு வெற்றிபெறவில்லை. மீண்டும் முயற்சிக்கவும் அல்லது பயன்பாட்டிலிருந்து வெளியேறவும்.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>மீண்டும் முயற்சிக்கவும்</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>பாதுகாப்பு முடக்கப்படும் முன் Windows Hello மூலம் சரிபார்க்கும்படி கேட்கப்படுவீர்கள்.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>விண்டோஸ் ஹலோ சரிபார்ப்பு முடிக்கப்படவில்லை, எனவே பாதுகாப்பு இன்னும் இயக்கப்பட்டுள்ளது.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>முக்கிய தகவலைக் காட்டவா?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>இது திருத்தப்படாத முக்கிய மதிப்புகள் (பெயர்கள், மின்னஞ்சல்கள், தொலைபேசி எண்கள் போன்றவை) மற்றும் உங்கள் API விசையை வட்டில் உள்ள உங்கள் பதிவுக் கோப்பில் எழுதும். இந்த கணினியை மற்றவர்கள் அணுகினால் இதை இயக்க வேண்டாம். நீங்கள் பயன்பாட்டை மூடும்போது அமைப்பு மீட்டமைக்கப்படும்.</value>
+  </data>
 </root>

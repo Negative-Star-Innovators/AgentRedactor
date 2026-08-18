@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Kľúčové slová: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Povoliť protokolovanie</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Ukážte citlivé informácie</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Protokoly sú uložené na tomto počítači. Redigované denníky môžu stále obsahovať citlivé údaje, ktoré sa nepodarilo zistiť.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Povoliť protokolovanie</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Zobraziť citlivé informácie</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>POZOR</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Je povolené zaznamenávanie citlivých informácií. Protokoly budú obsahovať nezreagované údaje vrátane pôvodných tiel požiadaviek a vášho kľúča API. Toto sa resetuje po zatvorení aplikácie.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Na odomknutie aplikácie sa použije Windows Hello. Budete požiadaní o overenie pomocou Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Overenie Windows Hello nebolo dokončené, takže ochrana nebola povolená. Skúste to znova.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Vyžaduje sa Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Overenie Windows Hello nebolo úspešné. Skúste to znova alebo ukončite aplikáciu.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Skúste to znova</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Pred vypnutím ochrany sa zobrazí výzva na overenie pomocou Windows Hello.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Overenie Windows Hello nebolo dokončené, takže ochrana je stále povolená.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Zobraziť citlivé informácie?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Tým sa zapíšu nezreagované citlivé hodnoty (mená, e-maily, telefónne čísla atď.) a váš kľúč API do súboru denníka na disk. Toto nepovoľujte, ak k tomuto počítaču majú prístup iní. Po zatvorení aplikácie sa nastavenie resetuje.</value>
+  </data>
 </root>

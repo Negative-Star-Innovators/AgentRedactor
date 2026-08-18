@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Schlësselwierder: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Logbuch aktivéieren</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Weist sensibel Informatiounen</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Logbicher ginn op dësem PC gespäichert. Redaktéiert Logbicher kënnen nach ëmmer sensibel Donnéeën enthalen déi Detektioun verpasst huet.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktivéiert Logging</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Show sensibel Informatiounen</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Warnung</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Sensibel Informatiounslogging aktivéiert. Logbicher enthalen onredaktéiert Donnéeën abegraff original Ufro Kierper an Ären API Schlëssel. Dëst gëtt zréckgesat wann Dir d&apos;App zoumaacht.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello gëtt benotzt fir d&apos;App opzemaachen. Dir wäert gefrot ginn mat Windows Hello z&apos;iwwerpréiwen.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello Verifizéierung war net ofgeschloss, sou datt de Schutz net aktivéiert gouf. Probéiert nach eng Kéier.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello erfuerderlech</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello Verifizéierung ass net gelongen. Probéiert nach eng Kéier, oder gitt d&apos;App aus.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Probéiert nach eng Kéier</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Dir wäert gefrot ginn mat Windows Hello z&apos;iwwerpréiwen ier de Schutz deaktivéiert ass.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello Verifizéierung gouf net ofgeschloss, sou datt de Schutz nach ëmmer aktivéiert ass.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Sensibel Informatioun weisen?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Dëst schreift onredaktéiert sensibel Wäerter (Nimm, E-Mailen, Telefonsnummeren, asw.) an Ären API Schlëssel op Är Logdatei op der Disk. Aktivéiert dëst net wann anerer Zougang zu dësem Computer hunn. D&apos;Astellung gëtt zréckgesat wann Dir d&apos;App zoumaacht.</value>
+  </data>
 </root>

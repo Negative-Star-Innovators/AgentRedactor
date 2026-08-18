@@ -232,7 +232,10 @@ jobs:
         shell: pwsh
         run: |
           $pkg = Get-AppxPackage -Name '*AgentRedactor*'
-          $appId = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Id
+          # Two Application entries exist (GUI + hidden engine alias entry);
+          # .Id alone would return an array and break the AUMID.
+          $appId = ((Get-AppxPackageManifest $pkg).Package.Applications.Application |
+            Where-Object { $_.Id -eq 'AgentRedactor' }).Id
           $aumid = "$($pkg.PackageFamilyName)!$appId"
           Write-Host "Activating $aumid"
 
@@ -265,7 +268,7 @@ jobs:
           $proc = $null
           while ((Get-Date) -lt $deadline -and -not $proc) {
             Start-Sleep -Seconds 3
-            $proc = Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue
+            $proc = Get-Process -Name 'AgentRedactorUI' -ErrorAction SilentlyContinue
           }
           if (-not $proc) { throw "Packaged app did not start within 180s (activation PID was $launchedPid)" }
           Write-Host "Packaged app is running (PID $($proc[0].Id)); stopping it."
@@ -302,7 +305,7 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Get-Process -Name 'AgentRedactorUI', 'agentredactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           $pkg = Get-AppxPackage -Name '*AgentRedactor*'
           if ($pkg) {
             $pkg | Remove-AppxPackage -ErrorAction Stop

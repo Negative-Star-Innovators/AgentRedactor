@@ -1,4 +1,4 @@
-"""Start and stop AgentRedactor.exe for GUI-driven tests.
+"""Start and stop AgentRedactorUI.exe (and its agentredactor.exe engine) for GUI-driven tests.
 
 This runs the normal Release build without --tray-only, so the app uses the
 real %APPDATA%/%LOCALAPPDATA% locations. The caller is responsible for backing
@@ -22,7 +22,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 # The vcxproj outputs to build/<Platform>/Release where <Platform> is the
 # MSBuild platform name (x64 / ARM64). Match the host architecture.
 _BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
-DEFAULT_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" / "AgentRedactor.exe"
+DEFAULT_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" / "AgentRedactorUI.exe"
+
+# Process image names to clean up between tests: the GUI and the engine it
+# spawns (the engine owns the proxy ports and the control API, so a stale one
+# would leak settings state and ports into the next test).
+_PROCESS_NAMES = ("agentredactorui.exe", "agentredactor.exe")
 
 
 def _find_free_port() -> int:
@@ -35,12 +40,12 @@ def _kill_existing_agent_redactor(
     timeout: float = 10.0,
     grace_period: float = 2.0,
 ) -> list[int]:
-    """Terminate any running AgentRedactor.exe processes and return killed PIDs."""
+    """Terminate any running GUI/engine processes and return killed PIDs."""
     killed: list[int] = []
     targets = []
     for proc in psutil.process_iter(["name"]):
         try:
-            if proc.info["name"] and proc.info["name"].lower() == "agentredactor.exe":
+            if proc.info["name"] and proc.info["name"].lower() in _PROCESS_NAMES:
                 targets.append(proc)
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
@@ -94,7 +99,7 @@ def _wait_for_port(port: int, timeout: float = 90.0) -> bool:
 
 
 class GuiAppProcess:
-    """Manages an AgentRedactor.exe process for GUI tests."""
+    """Manages an AgentRedactorUI.exe process for GUI tests."""
 
     def __init__(
         self,
@@ -109,7 +114,7 @@ class GuiAppProcess:
 
     def start(self) -> None:
         if not self.exe_path.exists():
-            raise FileNotFoundError(f"AgentRedactor.exe not found at {self.exe_path}")
+            raise FileNotFoundError(f"AgentRedactorUI.exe not found at {self.exe_path}")
 
         _kill_existing_agent_redactor()
 
@@ -148,7 +153,7 @@ class GuiAppProcess:
                     except Exception:
                         pass
             self.stop()
-            msg = f"AgentRedactor did not start listening on port {self.proxy_port}"
+            msg = f"AgentRedactor did not start listening on port {self.proxy_port} (GUI or engine failed to start)"
             if details:
                 msg += "\n" + "\n".join(details)
             raise RuntimeError(msg)
@@ -179,7 +184,7 @@ class GuiAppProcess:
                 except Exception:
                     pass
                 self._stderr_file = None
-            # Ensure no other AgentRedactor.exe processes linger; this avoids
+            # Ensure no GUI/engine processes linger; this avoids
             # file-handle locks on the log/session files during fixture teardown.
             _kill_existing_agent_redactor()
 

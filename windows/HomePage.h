@@ -24,6 +24,9 @@ namespace winrt::AgentRedactor::implementation
         winrt::fire_and_forget ShowErrorAsync(std::wstring message);
         static std::wstring ValidateRegex(const std::wstring& pattern);
         void LocalizeStaticUI();
+        // Re-read engine-owned settings/profiles (e.g. after a CLI `set`),
+        // refreshing all settings-driven controls on the page.
+        void RefreshFromEngine();
 
     private:
         void ApplyTheme();
@@ -38,18 +41,24 @@ namespace winrt::AgentRedactor::implementation
         void LoadData();
         void LoadProfileList();
         void LoadProfileForm();
+        // Re-reads the engine's profile snapshot; reloads the list + form
+        // only when the visible fields actually changed (e.g. CLI-driven
+        // alias/api-key edits). Stats churn alone never triggers a reload,
+        // so in-progress UI edits are never stomped by the 1s poll.
+        void RefreshProfilesFromEngine();
+        // True when `fresh` (an engine profile snapshot) matches the cached
+        // profiles_ on exactly the fields the list/form display.
+        bool ProfilesMatch(const std::vector<::AgentRedactor::ApiKeyProfile>& fresh) const;
         void LoadPIIGrid();
         void LoadRegexList();
         void LoadKeywordList();
-        void LoadMatchesList();
+        void LoadMatchesList(bool force = false);
         void UpdateStats();
         void UpdateProxyStatus();
 
-        winrt::fire_and_forget ShowStartupPasswordDialogAsync();
         void FinishInitialization();
-        winrt::fire_and_forget ShowEnablePasswordDialogAsync();
-        winrt::fire_and_forget ShowDisablePasswordDialogAsync();
-        winrt::fire_and_forget ShowChangePasswordDialogAsync();
+        winrt::fire_and_forget DisableWithHelloAsync();
+        winrt::fire_and_forget ShowEnablePasswordFailedAsync();
         winrt::fire_and_forget ShowRemoveProfileConfirmationAsync();
         winrt::fire_and_forget ShowPortErrorAsync(std::wstring message);
         winrt::fire_and_forget ShowHttpWarningAsync();
@@ -62,7 +71,6 @@ namespace winrt::AgentRedactor::implementation
         void AddRegex_Click(IInspectable const&, Microsoft::UI::Xaml::RoutedEventArgs const&);
         void AddKeyword_Click(IInspectable const&, Microsoft::UI::Xaml::RoutedEventArgs const&);
         void RequirePassword_Click(IInspectable const&, Microsoft::UI::Xaml::RoutedEventArgs const&);
-        void ChangePassword_Click(IInspectable const&, Microsoft::UI::Xaml::RoutedEventArgs const&);
 
         Microsoft::UI::Xaml::Controls::ContentDialog activeDialog_{ nullptr };
 
@@ -74,6 +82,20 @@ namespace winrt::AgentRedactor::implementation
         std::vector<Microsoft::UI::Xaml::Controls::TextBox> regexTextBoxes_;
         std::vector<Microsoft::UI::Xaml::Controls::Button> keywordCaseButtons_;
         std::vector<Microsoft::UI::Xaml::Controls::TextBox> keywordTextBoxes_;
+
+        // Profile id the form was last loaded for; a fresh selection resets
+        // the Show Key reveal (privacy), engine-driven reloads of the same
+        // profile keep the user's reveal state.
+        std::wstring formProfileId_;
+
+        // Change-diff guard for the 1-second stats poll: the session-matches
+        // list is rebuilt only when its content actually changed (otherwise
+        // the "No Redactions" placeholder visibly flashes every second).
+        std::wstring matchesFingerprint_;
+        bool matchesLoaded_ = false;
+        // Last engine-side profile revision shown in the form; a newer
+        // revision (e.g. a CLI `set alias` / `set api-key`) reloads the page.
+        unsigned long long profilesRevisionShown_ = 0;
 
 
     };

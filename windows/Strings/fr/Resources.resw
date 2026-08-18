@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Mots-clés : {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Activer la journalisation</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Afficher les informations sensibles</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Les journaux sont stockés sur ce PC. Les journaux expurgés peuvent toujours contenir des données sensibles qui n’ont pas été détectées.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Activer la journalisation</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Afficher les informations sensibles</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Avertissement</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Journalisation des informations sensibles activée. Les journaux contiendront des données non expurgées, notamment les corps de demande d&apos;origine et votre clé API. Cela se réinitialise lorsque vous fermez l&apos;application.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello sera utilisé pour déverrouiller l&apos;application. Il vous sera demandé de vérifier avec Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>La vérification de Windows Hello n&apos;a pas été terminée, la protection n&apos;a donc pas été activée. Essayer à nouveau.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello requis</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>La vérification de Windows Hello n&apos;a pas réussi. Réessayez ou quittez l&apos;application.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Essayer à nouveau</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Il vous sera demandé de vérifier auprès de Windows Hello avant que la protection ne soit désactivée.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>La vérification de Windows Hello n&apos;a pas été terminée, la protection est donc toujours activée.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Afficher les informations sensibles ?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Cela écrira les valeurs sensibles non expurgées (noms, e-mails, numéros de téléphone, etc.) et votre clé API dans votre fichier journal sur le disque. Ne l&apos;activez pas si d&apos;autres personnes ont accès à cet ordinateur. Le paramètre est réinitialisé lorsque vous fermez l&apos;application.</value>
+  </data>
 </root>

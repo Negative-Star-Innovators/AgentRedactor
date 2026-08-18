@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Mahimman kalmomi: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Kunna shiga</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Nuna bayanai masu mahimmanci</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Ana adana rajistan ayyukan akan wannan PC. Rubutun da aka sake gyara na iya ƙunsar mahimman bayanai waɗanda aka rasa.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Kunna shiga</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Nuna Bayani Mai Hankali</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Gargadi</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>An kunna shigar da bayanai masu mahimmanci. Logs za su ƙunshi bayanan da ba a gyara su ba gami da gawarwakin buƙatun asali da maɓallin API ɗin ku. Wannan yana sake saitawa lokacin da kuka rufe ƙa&apos;idar.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Za a yi amfani da Windows Hello don buɗe app. Za a umarce ku da ku tabbatar da Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Ba a gama tabbatar da Windows Hello ba, don haka ba a kunna kariya ba. Gwada kuma.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello ake bukata</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Tabbatar da Windows Hello bai yi nasara ba. A sake gwadawa, ko fita daga app.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Gwada kuma</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Za a umarce ku da ku tabbatar da Windows Hello kafin a kashe kariya.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Ba a gama tabbatar da Windows Hello ba, don haka har yanzu ana kunna kariya.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Nuna Bayani Mai Hankali?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Wannan zai rubuta ƙima mai mahimmanci (sunaye, imel, lambobin waya, da sauransu) da maɓallin API ɗin ku zuwa fayil ɗin log ɗin ku akan faifai. Kar a kunna wannan idan wasu suna da damar shiga wannan kwamfutar. Saitin yana sake saitawa lokacin da ka rufe ƙa&apos;idar.</value>
+  </data>
 </root>

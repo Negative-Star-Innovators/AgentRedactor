@@ -56,15 +56,19 @@ try {
     # terminal back.
     Write-Host 'Running installer...'
     $proc = Start-Process -FilePath $setupPath -PassThru
-    $appExe = Join-Path $env:LOCALAPPDATA 'AgentRedactor\current\AgentRedactor.exe'
+    # GUI exe was AgentRedactor.exe up to v1.x and AgentRedactorUI.exe after
+    # the engine/CLI split — accept either so this works for both releases.
+    $appExeNew = Join-Path $env:LOCALAPPDATA 'AgentRedactor\current\AgentRedactorUI.exe'
+    $appExeOld = Join-Path $env:LOCALAPPDATA 'AgentRedactor\current\AgentRedactor.exe'
     $deadline = (Get-Date).AddMinutes(5)
     while (-not $proc.HasExited -and (Get-Date) -lt $deadline) {
-        if ((Test-Path $appExe) -and (Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue)) { break }
+        $installed = (Test-Path $appExeNew) -or (Test-Path $appExeOld)
+        if ($installed -and (Get-Process -Name 'AgentRedactorUI', 'AgentRedactor' -ErrorAction SilentlyContinue)) { break }
         Start-Sleep -Seconds 2
     }
     if ($proc.HasExited -and $proc.ExitCode -ne 0) {
         Write-Warning "The installer exited with code $($proc.ExitCode). Agent Redactor may not be installed."
-    } elseif (Test-Path $appExe) {
+    } elseif ((Test-Path $appExeNew) -or (Test-Path $appExeOld)) {
         Write-Host 'AgentRedactor installed successfully. The app is starting — you can launch it anytime from the Start menu.'
     } else {
         Write-Warning 'Timed out waiting for the installer. Check the Start menu for Agent Redactor.'

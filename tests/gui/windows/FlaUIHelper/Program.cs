@@ -18,7 +18,7 @@ namespace FlaUIHelper
 {
     internal static class Program
     {
-        private const string ProcessName = "AgentRedactor";
+        private const string ProcessName = "AgentRedactorUI";
         private static readonly TimeSpan ProcessFindTimeout = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan ControlFindTimeout = TimeSpan.FromSeconds(10);
         private static readonly TimeSpan DialogFindTimeout = TimeSpan.FromSeconds(5);
@@ -169,6 +169,8 @@ namespace FlaUIHelper
                             return GetIsEnabled(automation, args);
                         case "add-profile":
                             return AddProfile(automation, args);
+                        case "set-profile-alias":
+                            return SetProfileAlias(automation, args);
                         case "select-profile":
                             return SelectProfile(automation, args);
                         case "get-profiles":
@@ -199,14 +201,10 @@ namespace FlaUIHelper
                             return GetApiKeyVisibility(automation);
                         case "toggle-show-api-key":
                             return ToggleShowApiKey(automation);
-                        case "set-master-password":
-                            return SetMasterPassword(automation, args);
-                        case "change-master-password":
-                            return ChangeMasterPassword(automation, args);
-                        case "unlock-master-password":
-                            return UnlockMasterPassword(automation, args);
-                        case "get-change-password-button-state":
-                            return GetChangePasswordButtonState(automation);
+                        case "get-require-password-state":
+                            return GetRequirePasswordState(automation);
+                        case "toggle-require-password":
+                            return ToggleRequirePassword(automation);
                         case "get-content-dialog-text":
                             return GetContentDialogText(automation);
                         case "dismiss-content-dialog":
@@ -263,10 +261,8 @@ namespace FlaUIHelper
             Console.WriteLine("  FlaUIHelper.exe get-profile-details");
             Console.WriteLine("  FlaUIHelper.exe get-api-key-visibility");
             Console.WriteLine("  FlaUIHelper.exe toggle-show-api-key");
-            Console.WriteLine("  FlaUIHelper.exe set-master-password --enabled true|false --password <pwd> [--confirm <pwd>]");
-            Console.WriteLine("  FlaUIHelper.exe change-master-password --old <pwd> --new <pwd> [--confirm <pwd>]");
-            Console.WriteLine("  FlaUIHelper.exe unlock-master-password --password <pwd>");
-            Console.WriteLine("  FlaUIHelper.exe get-change-password-button-state");
+            Console.WriteLine("  FlaUIHelper.exe get-require-password-state");
+            Console.WriteLine("  FlaUIHelper.exe toggle-require-password");
             Console.WriteLine("  FlaUIHelper.exe get-content-dialog-text");
             Console.WriteLine("  FlaUIHelper.exe dismiss-content-dialog");
             Console.WriteLine("  FlaUIHelper.exe quit");
@@ -389,7 +385,7 @@ namespace FlaUIHelper
 
             if (result == null)
             {
-                throw new InvalidOperationException("AgentRedactor.exe process not found.");
+                throw new InvalidOperationException("AgentRedactorUI.exe process not found.");
             }
             return result;
         }
@@ -1560,6 +1556,24 @@ namespace FlaUIHelper
             return 0;
         }
 
+        private static int SetProfileAlias(UIA3Automation automation, string[] args)
+        {
+            string alias = GetArg(args, "--alias");
+            if (string.IsNullOrEmpty(alias))
+            {
+                Console.Error.WriteLine("ERROR: --alias is required.");
+                return 1;
+            }
+
+            var window = PrepareWindow(automation);
+            var nameBox = FindByAutomationId(window, "ProfileNameBox").AsTextBox();
+            SetTextBoxValue(nameBox, alias);
+            Thread.Sleep(SettleDelayMs);
+
+            Console.WriteLine("OK");
+            return 0;
+        }
+
         private static int SelectProfile(UIA3Automation automation, string[] args)
         {
             string alias = GetArg(args, "--alias");
@@ -2049,127 +2063,24 @@ namespace FlaUIHelper
             return 0;
         }
 
-        private static int GetChangePasswordButtonState(UIA3Automation automation)
+        private static int GetRequirePasswordState(UIA3Automation automation)
         {
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
-            var btn = FindByAutomationId(window, "ChangePasswordBtn").AsButton();
-            Console.WriteLine($"ENABLED:{btn.IsEnabled}");
+            var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
+            Console.WriteLine($"CHECKED:{check.IsChecked == true}");
             return 0;
         }
 
-        private static int SetMasterPassword(UIA3Automation automation, string[] args)
+        private static int ToggleRequirePassword(UIA3Automation automation)
         {
-            bool enabled = false;
-            if (!bool.TryParse(GetArg(args, "--enabled"), out enabled))
-            {
-                Console.Error.WriteLine("ERROR: --enabled is required (true|false).");
-                return 1;
-            }
-            string password = GetArg(args, "--password") ?? "";
-            string confirm = GetArg(args, "--confirm") ?? password;
-
             var window = PrepareWindow(automation);
             ScrollToBottomWithKeyboard(window);
-            LogAgentRedactorLiveness("set-master-password start");
-
-            bool tookAction = false;
-            for (int attempt = 0; attempt < 3; attempt++)
-            {
-                LogAgentRedactorLiveness($"attempt start {attempt + 1}");
-                // Clear any shell nag that took the foreground since the last
-                // attempt, and any validation error dialog a previous attempt
-                // left behind; typing below needs the app to own the foreground.
-                DismissShellNags(automation);
-                if (DismissAppErrorDialog(window))
-                {
-                    Console.WriteLine($"DIAG attempt {attempt + 1}: dismissed a leftover validation error dialog.");
-                }
-                // The app process dying mid-flow is unrecoverable; stop instead
-                // of clicking anything else.
-                if (AgentRedactorProcessCount() == 0)
-                {
-                    Console.Error.WriteLine("ERROR: AgentRedactor process exited during set-master-password.");
-                    return 1;
-                }
-
-                // The app reverts RequirePasswordCheck while the dialog is open
-                // (HomePage.cpp RequirePassword_Click), so the checkbox state is
-                // not a reliable progress signal; check the Change password
-                // button, which is enabled exactly when a master password is set.
-                if (WaitForChangePasswordButtonState(window, enabled, attempt == 0 ? 1000 : 500))
-                {
-                    if (!tookAction)
-                        Console.WriteLine($"Master password already {(enabled ? "enabled" : "disabled")}.");
-                    Console.WriteLine("OK");
-                    return 0;
-                }
-
-                // Reuse a dialog left open by a previous attempt; otherwise
-                // open a fresh one. Re-invoking is safe: RequirePassword_Click
-                // in HomePage.cpp returns early while a dialog is in flight,
-                // so a duplicate invoke is a no-op rather than a crash, and if
-                // a validation error closed the previous dialog this reopens
-                // it so the attempt can recover.
-                string editName = enabled ? "Password" : "Current password";
-                string buttonName = enabled ? "Set Password" : "Disable";
-                var passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(1));
-                if (passEdit == null)
-                {
-                    var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
-                    InvokeElement(check);
-                }
-                if (passEdit == null)
-                {
-                    // Keep polling for the dialog's password boxes; on slow
-                    // runners the ContentDialog can take many seconds to appear
-                    // and may render as a popup outside the main window.
-                    passEdit = FindDialogEditByName(automation, window, editName, TimeSpan.FromSeconds(30));
-                }
-                tookAction = true;
-
-                if (enabled)
-                {
-                    var confirmEdit = FindDialogEditByName(automation, window, "Confirm password", TimeSpan.FromSeconds(10));
-                    if (passEdit == null || confirmEdit == null)
-                    {
-                        DumpUiTree(automation, window);
-                        throw new InvalidOperationException("Set master password password boxes not found.");
-                    }
-                    // Typing is focus-dependent; make sure the app (not a
-                    // leftover shell nag) owns the foreground before typing.
-                    bool fgOk = BringToForeground(window);
-                    Console.WriteLine($"DIAG foreground before typing: acquired={fgOk} ({DescribeForegroundWindow()})");
-                    SetEditValue(passEdit, password);
-                    SetEditValue(confirmEdit, confirm);
-                }
-                else
-                {
-                    if (passEdit == null)
-                    {
-                        DumpUiTree(automation, window);
-                        throw new InvalidOperationException("Disable master password password box not found.");
-                    }
-                    BringToForeground(window);
-                    SetEditValue(passEdit, password);
-                }
-                var btn = FindDialogButtonByName(automation, window, buttonName, TimeSpan.FromSeconds(10));
-                if (btn == null)
-                    throw new InvalidOperationException($"Master password dialog button '{buttonName}' not found.");
-                InvokeElement(btn);
-
-                Thread.Sleep(SettleDelayMs);
-
-                if (WaitForChangePasswordButtonState(window, enabled, 5000))
-                {
-                    Console.WriteLine("OK");
-                    return 0;
-                }
-                Console.WriteLine($"Master password state did not settle after attempt {attempt + 1}; retrying...");
-            }
-
-            Console.Error.WriteLine($"ERROR: Change password button did not become {(enabled ? "enabled" : "disabled")} after 3 attempts.");
-            return 1;
+            var check = FindByAutomationId(window, "RequirePasswordCheck").AsCheckBox();
+            InvokeElement(check);
+            Thread.Sleep(SettleDelayMs);
+            Console.WriteLine("OK");
+            return 0;
         }
 
         private static AutomationElement FindDialogEditByName(UIA3Automation automation, Window window, string name, TimeSpan timeout)
@@ -2234,7 +2145,7 @@ namespace FlaUIHelper
         {
             try
             {
-                int count = Process.GetProcessesByName("AgentRedactor").Length;
+                int count = Process.GetProcessesByName("AgentRedactorUI").Length;
                 Console.WriteLine($"DIAG liveness: AgentRedactor processes={count} ({context})");
             }
             catch { }
@@ -2242,7 +2153,7 @@ namespace FlaUIHelper
 
         private static int AgentRedactorProcessCount()
         {
-            try { return Process.GetProcessesByName("AgentRedactor").Length; }
+            try { return Process.GetProcessesByName("AgentRedactorUI").Length; }
             catch { return -1; }
         }
 
@@ -2260,8 +2171,7 @@ namespace FlaUIHelper
             try
             {
                 var check = FindByAutomationId(window, "RequirePasswordCheck")?.AsCheckBox();
-                var btn = FindByAutomationId(window, "ChangePasswordBtn")?.AsButton();
-                Console.WriteLine($"DIAG RequirePasswordCheck.IsChecked={check?.IsChecked} ChangePasswordBtn.IsEnabled={btn?.IsEnabled}");
+                Console.WriteLine($"DIAG RequirePasswordCheck.IsChecked={check?.IsChecked}");
             }
             catch (Exception ex)
             {
@@ -2325,7 +2235,7 @@ namespace FlaUIHelper
             // (a) Process state.
             try
             {
-                var processes = Process.GetProcessesByName("AgentRedactor");
+                var processes = Process.GetProcessesByName("AgentRedactorUI");
                 if (processes.Length == 0)
                     Console.WriteLine("DIAG AgentRedactor processes: 0 (app exited or crashed)");
                 else
@@ -2510,94 +2420,6 @@ namespace FlaUIHelper
                 catch { continue; }
                 DumpDescendants(child, depth + 1, maxDepth, ref lines, maxLines);
             }
-        }
-
-        private static bool WaitForChangePasswordButtonState(Window window, bool expectedEnabled, int timeoutMs)
-        {
-            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
-            do
-            {
-                try
-                {
-                    var btn = FindByAutomationId(window, "ChangePasswordBtn");
-                    if (btn != null && btn.AsButton().IsEnabled == expectedEnabled)
-                        return true;
-                }
-                catch { }
-                Thread.Sleep(250);
-            } while (DateTime.UtcNow < deadline);
-            return false;
-        }
-
-        private static int ChangeMasterPassword(UIA3Automation automation, string[] args)
-        {
-            string oldPass = GetArg(args, "--old") ?? "";
-            string newPass = GetArg(args, "--new") ?? "";
-            string confirm = GetArg(args, "--confirm") ?? newPass;
-
-            var window = PrepareWindow(automation);
-            ScrollToBottomWithKeyboard(window);
-            var btn = FindByAutomationId(window, "ChangePasswordBtn").AsButton();
-            if (!btn.IsEnabled)
-                throw new InvalidOperationException("Change password button is disabled; master password may not be enabled.");
-            InvokeElement(btn);
-            Thread.Sleep(SettleDelayMs);
-
-            var oldEdit = FindWindowEditByName(window, "Current password", TimeSpan.FromSeconds(10));
-            var newEdit = FindWindowEditByName(window, "New password", TimeSpan.FromSeconds(10));
-            var confirmEdit = FindWindowEditByName(window, "Confirm new password", TimeSpan.FromSeconds(10));
-            if (oldEdit == null || newEdit == null || confirmEdit == null)
-                throw new InvalidOperationException("Change master password password boxes not found.");
-            SetEditValue(oldEdit, oldPass);
-            SetEditValue(newEdit, newPass);
-            SetEditValue(confirmEdit, confirm);
-            var changeBtn = FindWindowButtonByName(window, "Change", TimeSpan.FromSeconds(5));
-            InvokeElement(changeBtn);
-
-            Thread.Sleep(SettleDelayMs);
-            Console.WriteLine("OK");
-            return 0;
-        }
-
-        private static int UnlockMasterPassword(UIA3Automation automation, string[] args)
-        {
-            string password = GetArg(args, "--password") ?? "";
-
-            // Wait for the startup dialog to appear.
-            FindAgentRedactorProcess();
-            Thread.Sleep(500);
-
-            // WinUI 3 ContentDialogs may render in a popup that is not a direct
-            // descendant of the main window. Search the desktop for the Unlock
-            // button so we can handle the startup password dialog regardless.
-            var desktop = automation.GetDesktop();
-            AutomationElement unlockBtn = Retry.WhileNull(() =>
-                desktop.FindFirstDescendant(x => x.ByName("Unlock")),
-                TimeSpan.FromSeconds(15), TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
-            if (unlockBtn == null)
-                throw new InvalidOperationException("Master password unlock button not found on desktop.");
-
-            // Walk up to the dialog root to scope the edit search.
-            AutomationElement scope = unlockBtn;
-            while (scope != null && scope.ControlType != ControlType.Window && scope.ControlType != ControlType.Pane)
-            {
-                try { scope = scope.Parent; }
-                catch { break; }
-            }
-            if (scope == null) scope = desktop;
-
-            var passEdit = Retry.WhileNull(() =>
-                scope.FindFirstDescendant(x => x.ByControlType(ControlType.Edit)),
-                TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
-            if (passEdit == null)
-                throw new InvalidOperationException("Master password unlock password box not found.");
-
-            SetEditValue(passEdit, password);
-            InvokeElement(unlockBtn);
-
-            Thread.Sleep(SettleDelayMs);
-            Console.WriteLine("OK");
-            return 0;
         }
 
         private static int GetContentDialogText(UIA3Automation automation)

@@ -1,11 +1,32 @@
-"""GUI tests for the master password feature."""
+"""GUI tests for the Windows-Hello-only protection model.
+
+There is no typed password anywhere in the product: the "Lock with Windows
+Hello" checkbox toggles protection. Enabling is direct (no dialog, no
+consent - the engine generates a random key wrapped in DPAPI); disabling is
+enforced by the ENGINE, which runs the Windows Hello consent inside the
+disable call and only disables on a Verified result. That prompt is system
+UI and cannot be automated, so these tests drive the UI up to the consent
+point and use the engine CLI against the running app's engine to ENABLE
+protection for the restart scenarios — and to verify that `password disable`
+is rejected without a real verification. Tests end with protection on; the
+user_data_backup fixture restores the original (unprotected) data dir
+afterwards.
+
+When the session is locked the window shows ONLY the padlock overlay (lock
+icon + app name + Unlock button). There is no retry/exit dialog, no message
+on failure, and nothing of the app content is in the UI tree while locked
+(the content frame is collapsed), so the tests assert those properties
+instead of driving a dialog.
+"""
 
 from __future__ import annotations
 
+import os
+import platform
+import subprocess
 import time
 from pathlib import Path
 
-import aiohttp
 import pytest
 
 from mock_llm import MockLLM
@@ -13,23 +34,76 @@ from mock_llm import MockLLM
 from config_factory import create_settings
 from gui_process import GuiAppProcess, _find_free_port
 from windows.gui_driver import (
-    change_master_password,
-    dismiss_content_dialog,
-    get_change_password_button_state,
     get_content_dialog_text,
-    set_master_password,
-    unlock_master_password,
+    get_require_password_state,
+    toggle_require_password,
+    wait_until,
+)
+
+# The GUI's lock overlay auto-runs the Windows Hello prompt when the window
+# appears. AGENTREDACTOR_HELLO_SUPPRESS_PROMPT (cancel-equivalent test hook)
+# makes that prompt behave exactly like a user pressing cancel: no system
+# "Windows Security" dialog ever appears, so the harness is never blocked by
+# it on Hello-enabled machines, and the lock flow is deterministic anywhere.
+# The hook can never verify or unlock (asserted by
+# test_hello_suppress_prompt_flag_never_grants_access in tests/cli); the real
+# unlock path requires the actual Windows Hello authentication. Inherited by
+# every GUI/engine process these tests spawn.
+os.environ["AGENTREDACTOR_HELLO_SUPPRESS_PROMPT"] = "1"
+# Belt-and-braces: the GUI prompt has no watchdog by default (it waits for
+# the user), so the timeout override makes any non-suppressed consent path
+# fail fast instead of hanging the harness.
+os.environ["AGENTREDACTOR_HELLO_TIMEOUT_MS"] = "1500"
+
+# The vcxproj outputs to build/<Platform>/Release where <Platform> is the
+# MSBuild platform name (x64 / ARM64). Match the host architecture, like
+# gui_process.py and tests/cli/conftest.py do — the ARM64 CI leg only has
+# windows/build/ARM64/Release/, so a hardcoded x64 path would not exist there.
+_BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
+ENGINE_EXE = (
+    Path(__file__).resolve().parent.parent.parent
+    / "windows"
+    / "build"
+    / _BUILD_PLATFORM
+    / "Release"
+    / "agentredactor.exe"
 )
 
 
-OPENAI_PATH = "/v1/chat/completions"
+def _run_cli(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [str(ENGINE_EXE), *args],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
 
 
-def _chat_request(content: str) -> dict:
-    return {
-        "model": "mock-model",
-        "messages": [{"role": "user", "content": content}],
-    }
+def _page_text() -> str:
+    """All text in the app window; the helper failure (window not ready) is
+    surfaced as an empty string so callers can keep polling."""
+    try:
+        return "\n".join(get_content_dialog_text())
+    except RuntimeError:
+        return ""
+
+
+def _overlay_visible() -> bool:
+    """True while the padlock overlay is up. Its app-name title is an exact
+    "Agent Redactor" line; the unlocked page only contains the longer
+    "How to use Agent Redactor" text, so an exact line match is unambiguous."""
+    return any(line.strip() == "Agent Redactor" for line in _page_text().splitlines())
+
+
+def _wait_for_locked_overlay() -> str:
+    """Wait (bounded) for the padlock overlay to be on screen."""
+    deadline = time.monotonic() + 20.0
+    while time.monotonic() < deadline:
+        text = _page_text()
+        if any(line.strip() == "Agent Redactor" for line in text.splitlines()):
+            return text
+        time.sleep(0.5)
+    raise AssertionError("lock overlay did not appear in time")
 
 
 def _start_app(
@@ -51,92 +125,102 @@ def _start_app(
 
 
 @pytest.mark.asyncio
-async def test_gui_enable_master_password_enables_change_button(
+async def test_gui_hello_enable_direct(
     gui_app: GuiAppProcess,
     mock_llm: MockLLM,
 ) -> None:
-    assert not get_change_password_button_state()
+    """Checking the Lock checkbox enables protection directly: no confirm
+    dialog and no consent prompt, and no lock overlay appears (there is
+    nothing to consent to - the engine just wraps a random key in DPAPI)."""
+    assert not get_require_password_state()
 
-    set_master_password(enabled=True, password="EnablePass123")
+    toggle_require_password()
+    assert get_require_password_state()
+    # No lock overlay: the page content is visible (not covered/collapsed).
+    text = _page_text()
+    assert "test-profile" in text, text
+    assert "Unlock" not in text, text
 
-    assert get_change_password_button_state()
+    # `password disable` is now gated by a Windows Hello verification that
+    # cannot be automated: the engine runs the consent inside the disable call
+    # and only disables on Verified. Under the suppress hook the consent
+    # cancels, so the CLI disable fails and protection stays on. (The GUI-side
+    # disable consent is equally non-automatable; the fixture restores the
+    # original unprotected data dir after the test.)
+    r = _run_cli("password", "disable")
+    assert r.returncode == 1, r.stdout
+    assert "windows hello consent canceled" in r.stdout, r.stdout
+    assert get_require_password_state()
 
 
 @pytest.mark.asyncio
-async def test_gui_disable_master_password_disables_change_button(
-    gui_app: GuiAppProcess,
-    mock_llm: MockLLM,
-) -> None:
-    set_master_password(enabled=True, password="DisablePass123")
-    assert get_change_password_button_state()
-
-    set_master_password(enabled=False, password="DisablePass123")
-    assert not get_change_password_button_state()
-
-
-@pytest.mark.asyncio
-async def test_gui_master_password_unlocks_after_restart(
+async def test_gui_hello_startup_lock_dialog(
     user_data_backup: Path,
     mock_llm: MockLLM,
 ) -> None:
+    """With protection enabled, a fresh app open starts locked: the window
+    shows ONLY the padlock overlay (lock icon + app name + Unlock button),
+    the app content is NOT in the UI tree at all (the frame is collapsed, so
+    profiles/regex/keywords cannot leak behind the Windows Security dialog),
+    the Hello prompt runs immediately, and a failed/cancelled verification
+    simply stays on the padlock. There is no retry/exit dialog and the app
+    keeps running until the user unlocks."""
     port = _find_free_port()
     app = _start_app(user_data_backup, port, mock_llm)
     try:
-        set_master_password(enabled=True, password="RestartPass123")
-        assert get_change_password_button_state()
-    finally:
-        app.stop()
-
-    # Restart the app; it should prompt for the master password.
-    app = _start_app(user_data_backup, port, mock_llm, create=False)
-    try:
-        unlock_master_password("RestartPass123")
-        # The UI should now be accessible and the change-password button enabled.
-        assert get_change_password_button_state()
-    finally:
-        app.stop()
-
-
-@pytest.mark.asyncio
-async def test_gui_master_password_wrong_password_blocks(
-    user_data_backup: Path,
-    mock_llm: MockLLM,
-) -> None:
-    port = _find_free_port()
-    app = _start_app(user_data_backup, port, mock_llm)
-    try:
-        set_master_password(enabled=True, password="RightPass456")
+        # Enabling via the engine CLI while the GUI runs is inherently racy
+        # (the app may or may not lock itself before we stop it); the restart
+        # below is the deterministic part that verifies the lock flow.
+        r = _run_cli("password", "enable")
+        assert r.returncode == 0, r.stdout
     finally:
         app.stop()
 
     app = _start_app(user_data_backup, port, mock_llm, create=False)
     try:
-        unlock_master_password("WrongPass000")
-        # An incorrect-password dialog should be showing after a wrong unlock.
-        dialog_text = get_content_dialog_text()
-        assert any("incorrect" in line.lower() for line in dialog_text), dialog_text
-        dismiss_content_dialog()
+        print("DIAG restart status:", _run_cli("status").stdout)
+        text = _wait_for_locked_overlay()
+        # Padlock overlay elements are on screen (app name)...
+        assert "Agent Redactor" in text, text
+        # ...and the app content is NOT (frame collapsed while locked).
+        assert "test-profile" not in text, text
+        # The app is still running: there is no exit path on the padlock.
+        assert app.process.poll() is None
     finally:
         app.stop()
 
 
 @pytest.mark.asyncio
-async def test_gui_change_master_password_works(
+async def test_gui_hello_disable_rejected_while_locked(
     user_data_backup: Path,
     mock_llm: MockLLM,
 ) -> None:
+    """`password disable` cannot be automated on a locked session: the engine
+    runs the Windows Hello consent inside the disable call and only disables
+    on a Verified result. Without a real verification (suppressed in tests)
+    the command fails, the padlock overlay stays up, protection stays enabled,
+    and the app keeps running."""
     port = _find_free_port()
     app = _start_app(user_data_backup, port, mock_llm)
     try:
-        set_master_password(enabled=True, password="OriginalPass789")
-        change_master_password(old="OriginalPass789", new="NewPass000")
+        r = _run_cli("password", "enable")
+        assert r.returncode == 0, r.stdout
     finally:
         app.stop()
 
-    # Restart and unlock with the new password.
     app = _start_app(user_data_backup, port, mock_llm, create=False)
     try:
-        unlock_master_password("NewPass000")
-        assert get_change_password_button_state()
+        _wait_for_locked_overlay()
+        assert app.process.poll() is None
+        r = _run_cli("password", "disable")
+        assert r.returncode == 1, r.stdout
+        assert "windows hello consent canceled" in r.stdout, r.stdout
+        # The padlock overlay stays up, protection is still enabled, and the
+        # app keeps running.
+        assert _overlay_visible()
+        assert app.process.poll() is None
+        r = _run_cli("status")
+        assert r.returncode == 0
+        assert "password enabled: true" in r.stdout
     finally:
         app.stop()

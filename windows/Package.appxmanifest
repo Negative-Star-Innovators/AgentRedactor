@@ -2,9 +2,10 @@
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
          xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
          xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-         IgnorableNamespaces="mp uap desktop rescap">
+         IgnorableNamespaces="mp uap uap5 desktop rescap">
   <Identity Name="NegativeStarInnovators.AgentRedactor" Publisher="CN=2DA9202A-A825-4863-AF70-4CB9F31DAFFD" Version="1.0.4.0" ProcessorArchitecture="x64"/>
   <mp:PhoneIdentity PhoneProductId="00000000-0000-0000-0000-000000000000" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
@@ -19,14 +20,26 @@
     <Resource Language="x-generate"/>
   </Resources>
   <Applications>
-    <Application Id="AgentRedactor" Executable="AgentRedactor.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="AgentRedactor" Executable="AgentRedactorUI.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements DisplayName="ms-resource:AppDisplayName" Description="ms-resource:AppDescription" BackgroundColor="transparent" Square150x150Logo="resources/assets/Square150x150Logo.png" Square44x44Logo="resources/assets/Square44x44Logo.png">
         <uap:DefaultTile Wide310x150Logo="resources/assets/Wide310x150Logo.png"/>
       </uap:VisualElements>
       <Extensions>
-        <desktop:Extension Category="windows.startupTask" Executable="AgentRedactor.exe" EntryPoint="Windows.FullTrustApplication">
+        <desktop:Extension Category="windows.startupTask" Executable="AgentRedactorUI.exe" EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="AgentRedactorStartup" Enabled="true" DisplayName="ms-resource:AppStartupTaskName"/>
         </desktop:Extension>
+      </Extensions>
+    </Application>
+    <!-- Hidden second entry point: exposes the engine/CLI exe to terminals as
+         `agentredactor` via an AppExecutionAlias (no PATH edits, no admin). -->
+    <Application Id="AgentRedactorEngine" Executable="agentredactor.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements AppListEntry="none" DisplayName="ms-resource:AppDisplayName" Description="ms-resource:AppDescription" BackgroundColor="transparent" Square150x150Logo="resources/assets/Square150x150Logo.png" Square44x44Logo="resources/assets/Square44x44Logo.png"/>
+      <Extensions>
+        <uap5:Extension Category="windows.appExecutionAlias" Executable="agentredactor.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias>
+            <uap5:ExecutionAlias Alias="agentredactor.exe"/>
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
       </Extensions>
     </Application>
   </Applications>

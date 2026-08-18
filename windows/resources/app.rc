@@ -39,7 +39,7 @@ BEGIN
             VALUE "FileVersion",      AR_VERSIONINFO_TEXT
             VALUE "InternalName",     "AgentRedactor"
             VALUE "LegalCopyright",   "Agent Redactor"
-            VALUE "OriginalFilename", "AgentRedactor.exe"
+            VALUE "OriginalFilename", "AgentRedactorUI.exe"
             VALUE "ProductName",      "Agent Redactor"
             VALUE "ProductVersion",   AR_VERSIONINFO_TEXT
         END

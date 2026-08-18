@@ -30,14 +30,14 @@ exit code, the `SETTINGS_MIGRATION_OK` stdout marker, and the resulting file:
   `settings_version`, and defaults applied for missing keys.
 
 The exe is resolved from `AGENTREDACTOR_EXE`, falling back to
-`windows/build/x64/Release/AgentRedactor.exe`. The module skips with a
+`windows/build/x64/Release/AgentRedactorUI.exe`. The module skips with a
 clear message when no exe is found. Run it with:
 
 ```powershell
 cd tests
 pytest -v migration/test_settings_migration.py
 # or against a specific build:
-$env:AGENTREDACTOR_EXE = "C:\path\to\AgentRedactor.exe"
+$env:AGENTREDACTOR_EXE = "C:\path\to\AgentRedactorUI.exe"
 pytest -v migration/test_settings_migration.py
 ```
 
@@ -96,7 +96,7 @@ The full self-release upgrade E2E:
    `build/velopack-arm64`).
 4. Launches the installed app with `AGENTREDACTOR_UPDATE_FEED=http://127.0.0.1:<port>`
    and `AGENTREDACTOR_UPDATE_AUTOAPPLY=1` (apply + restart without prompting).
-5. Polls (up to 5 min) until `current\AgentRedactor.exe`'s file version
+5. Polls (up to 5 min) until `current\AgentRedactorUI.exe`'s file version
    equals the expected vNext version.
 6. Runs `--selftest-migrate-settings` on the upgraded install and asserts the
    seeded settings survived (`settings_version == 2`, values preserved, no

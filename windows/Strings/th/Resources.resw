@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>คำสำคัญ: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>เปิดใช้งานการบันทึก</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>แสดงข้อมูลที่ละเอียดอ่อน</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>บันทึกจะถูกจัดเก็บไว้ในพีซีเครื่องนี้ บันทึกที่แก้ไขอาจยังคงมีข้อมูลที่ละเอียดอ่อนซึ่งพลาดการตรวจจับ</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>เปิดใช้งานการบันทึก</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>แสดงข้อมูลที่ละเอียดอ่อน</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>คำเตือน</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>เปิดใช้งานการบันทึกข้อมูลที่ละเอียดอ่อนแล้ว บันทึกจะมีข้อมูลที่ยังไม่ได้แก้ไข รวมถึงเนื้อหาคำขอดั้งเดิมและคีย์ API ของคุณ สิ่งนี้จะรีเซ็ตเมื่อคุณปิดแอป</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello จะถูกใช้เพื่อปลดล็อคแอป คุณจะถูกขอให้ตรวจสอบกับ Windows Hello</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>การตรวจสอบ Windows Hello ไม่เสร็จสมบูรณ์ ดังนั้นจึงไม่ได้เปิดใช้งานการป้องกัน ลองอีกครั้ง</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>ต้องใช้ Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>การตรวจสอบ Windows Hello ไม่สำเร็จ ลองอีกครั้งหรือออกจากแอป</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>ลองอีกครั้ง</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>คุณจะถูกขอให้ตรวจสอบกับ Windows Hello ก่อนที่จะปิดใช้งานการป้องกัน</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>การตรวจสอบ Windows Hello ยังไม่เสร็จสมบูรณ์ ดังนั้นการป้องกันจึงยังคงเปิดใช้งานอยู่</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>แสดงข้อมูลที่ละเอียดอ่อน?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>การดำเนินการนี้จะเขียนค่าที่ละเอียดอ่อนที่ยังไม่ได้แก้ไข (ชื่อ อีเมล หมายเลขโทรศัพท์ ฯลฯ) และคีย์ API ของคุณไปยังไฟล์บันทึกบนดิสก์ อย่าเปิดใช้งานสิ่งนี้หากผู้อื่นสามารถเข้าถึงคอมพิวเตอร์เครื่องนี้ได้ การตั้งค่าจะรีเซ็ตเมื่อคุณปิดแอป</value>
+  </data>
 </root>

@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Nøkkelord: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Aktiver logging</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Vis sensitiv informasjon</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Logger lagres på denne PC-en. Redakterte logger kan fortsatt inneholde sensitive data som gjenkjenning savnet.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktiver logging</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Vis sensitiv informasjon</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Advarsel</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Logging av sensitiv informasjon er aktivert. Logger vil inneholde uredigerte data, inkludert originale forespørselstekster og API-nøkkelen din. Dette tilbakestilles når du lukker appen.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello vil bli brukt til å låse opp appen. Du vil bli bedt om å verifisere med Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifisering ble ikke fullført, så beskyttelsen ble ikke aktivert. Prøv igjen.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello kreves</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifiseringen lyktes ikke. Prøv igjen, eller avslutt appen.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Prøv igjen</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Du vil bli bedt om å verifisere med Windows Hello før beskyttelsen deaktiveres.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-verifisering ble ikke fullført, så beskyttelse er fortsatt aktivert.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Vise sensitiv informasjon?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Dette vil skrive uredigerte sensitive verdier (navn, e-post, telefonnumre osv.) og API-nøkkelen til loggfilen på disken. Ikke aktiver dette hvis andre har tilgang til denne datamaskinen. Innstillingen tilbakestilles når du lukker appen.</value>
+  </data>
 </root>

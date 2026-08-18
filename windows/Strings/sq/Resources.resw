@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Fjalët kyçe: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Aktivizo regjistrimin</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Trego informacione të ndjeshme</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Regjistrat ruhen në këtë kompjuter. Regjistrimet e redaktuara mund të përmbajnë ende të dhëna të ndjeshme që zbulimi ka humbur.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktivizo Regjistrimin</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Shfaq informacione të ndjeshme</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Paralajmërim</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Regjistrimi i informacionit të ndjeshëm është aktivizuar. Regjistrat do të përmbajnë të dhëna të pa redaktuara, duke përfshirë trupat e kërkesës origjinale dhe çelësin tuaj API. Kjo rivendoset kur mbyllni aplikacionin.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello do të përdoret për të zhbllokuar aplikacionin. Do t&apos;ju kërkohet të verifikoni me Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Verifikimi i Windows Hello nuk u krye, kështu që mbrojtja nuk u aktivizua. Provo sërish.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Kërkohet Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Verifikimi i Windows Hello nuk pati sukses. Provo sërish ose dil nga aplikacioni.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Provo sërish</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Do t&apos;ju kërkohet të verifikoni me Windows Hello përpara se mbrojtja të çaktivizohet.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Verifikimi i Windows Hello nuk ka përfunduar, kështu që mbrojtja është ende e aktivizuar.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Shfaq informacione të ndjeshme?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Kjo do të shkruajë vlera të ndjeshme të pa redaktuara (emra, email, numra telefoni, etj.) dhe çelësin tuaj API në skedarin tuaj të regjistrit në disk. Mos e aktivizoni këtë nëse të tjerët kanë qasje në këtë kompjuter. Cilësimi rivendoset kur mbyllni aplikacionin.</value>
+  </data>
 </root>

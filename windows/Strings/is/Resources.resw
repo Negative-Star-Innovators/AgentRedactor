@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Lykilorð: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Virkja skráningu</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Sýndu viðkvæmar upplýsingar</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Dagskrár eru geymdar á þessari tölvu. Ritfærðar annálar gætu enn innihaldið viðkvæm gögn sem ekki var hægt að finna.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Virkja skráningu</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Sýna viðkvæmar upplýsingar</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Viðvörun</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Skráning viðkvæmra upplýsinga virkjuð. Skrár munu innihalda óútfærð gögn, þar á meðal upprunalega beiðnir og API lykilinn þinn. Þetta endurstillist þegar þú lokar appinu.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello verður notað til að opna appið. Þú verður beðinn um að staðfesta með Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Staðfestingu Windows Hello var ekki lokið, þannig að vernd var ekki virkjuð. Reyndu aftur.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello krafist</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Staðfesting Windows Hello tókst ekki. Reyndu aftur eða lokaðu forritinu.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Reyndu aftur</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Þú verður beðinn um að staðfesta með Windows Hello áður en vörnin er óvirk.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Staðfestingu Windows Hello var ekki lokið, þannig að vörnin er enn virkjuð.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Sýna viðkvæmar upplýsingar?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Þetta mun skrifa óbreytt viðkvæm gildi (nöfn, tölvupóstur, símanúmer o.s.frv.) og API lykilinn þinn í notendaskrána þína á disknum. Ekki virkja þetta ef aðrir hafa aðgang að þessari tölvu. Stillingin endurstillast þegar þú lokar appinu.</value>
+  </data>
 </root>

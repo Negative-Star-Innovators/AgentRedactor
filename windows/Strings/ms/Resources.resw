@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Kata kunci: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Dayakan pengelogan</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Tunjukkan maklumat sensitif</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Log disimpan pada PC ini. Log yang disunting mungkin masih mengandungi data sensitif yang terlepas pengesanan.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Dayakan Pembalakan</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Tunjukkan Maklumat Sensitif</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Amaran</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Pengelogan maklumat sensitif didayakan. Log akan mengandungi data yang tidak disunting termasuk badan permintaan asal dan kunci API anda. Ini ditetapkan semula apabila anda menutup apl.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello akan digunakan untuk membuka kunci apl. Anda akan diminta untuk mengesahkan dengan Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Pengesahan Windows Hello tidak selesai, jadi perlindungan tidak didayakan. Cuba lagi.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello diperlukan</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Pengesahan Windows Hello tidak berjaya. Cuba lagi atau keluar dari apl.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Cuba lagi</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Anda akan diminta untuk mengesahkan dengan Windows Hello sebelum perlindungan dilumpuhkan.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Pengesahan Windows Hello belum selesai, jadi perlindungan masih didayakan.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Tunjukkan Maklumat Sensitif?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Ini akan menulis nilai sensitif yang tidak disunting (nama, e-mel, nombor telefon, dll.) dan kunci API anda pada fail log anda pada cakera. Jangan dayakan ini jika orang lain mempunyai akses kepada komputer ini. Tetapan ditetapkan semula apabila anda menutup apl.</value>
+  </data>
 </root>

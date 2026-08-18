@@ -229,7 +229,7 @@ jobs:
         if: env.RUN_BUILD == 'true'
         shell: pwsh
         env:
-          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactor.exe
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/repo/windows/build/${{ matrix.arch == 'x64' && 'x64' || 'ARM64' }}/Release/AgentRedactorUI.exe
         run: python -m pytest repo/tests/migration/test_settings_migration.py -v
 
       # Fresh-install E2E: silent-install THIS build's Setup.exe, verify the
@@ -476,8 +476,13 @@ jobs:
         if: steps.live.outputs.live == 'true'
         shell: pwsh
         run: |
-          $exe = "$env:LOCALAPPDATA\AgentRedactor\current\AgentRedactor.exe"
-          if (-not (Test-Path $exe)) { throw "one-line installer finished but $exe does not exist" }
+          # The live release may predate the AgentRedactor.exe ->
+          # AgentRedactorUI.exe rename; accept either (same as install.ps1.js).
+          $exe = @("AgentRedactorUI.exe", "AgentRedactor.exe") |
+            ForEach-Object { "$env:LOCALAPPDATA\AgentRedactor\current\$_" } |
+            Where-Object { Test-Path $_ } |
+            Select-Object -First 1
+          if (-not $exe) { throw "one-line installer finished but no app exe exists under $env:LOCALAPPDATA\AgentRedactor\current" }
 
           # PE machine type: the installed build decides which channel's feed
           # to compare against (ARM64 runners legitimately get the x64 fallback
@@ -509,7 +514,7 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          Get-Process -Name 'AgentRedactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Get-Process -Name 'AgentRedactorUI', 'agentredactor' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           $updateExe = "$env:LOCALAPPDATA\AgentRedactor\Update.exe"
           if (Test-Path $updateExe) {
             # Best-effort: the uninstaller can hang without an interactive

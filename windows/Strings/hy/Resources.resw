@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Բանալի բառեր՝ {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Միացնել գրանցումը</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Ցույց տալ զգայուն տեղեկատվությունը</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Տեղեկամատյանները պահվում են այս համակարգչի վրա: Ռեակտիվացված մատյանները դեռ կարող են պարունակել զգայուն տվյալներ, որոնք հայտնաբերումը բաց է թողել:</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Միացնել գրանցումը</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Ցույց տալ զգայուն տեղեկատվությունը</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Զգուշացում</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Զգայուն տեղեկատվության գրանցումը միացված է: Գրանցամատյանները կպարունակեն չգրանցված տվյալներ, ներառյալ սկզբնական հարցումների մարմինները և ձեր API բանալին: Սա վերականգնվում է, երբ փակում եք հավելվածը:</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello-ն կօգտագործվի հավելվածն ապակողպելու համար: Ձեզանից կպահանջվի ստուգել Windows Hello-ով:</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-ի ստուգումը չի ավարտվել, ուստի պաշտպանությունը միացված չէ: Կրկին փորձեք:</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello-ն պարտադիր է</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-ի ստուգումը չհաջողվեց: Կրկին փորձեք կամ դուրս եկեք հավելվածից:</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Նորից փորձեք</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Ձեզանից կպահանջվի ստուգել Windows Hello-ով, նախքան պաշտպանությունն անջատելը:</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello-ի ստուգումը չի ավարտվել, ուստի պաշտպանությունը դեռ միացված է:</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Ցույց տալ զգայուն տեղեկատվությունը:</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Սա սկավառակի վրա ձեր գրանցամատյանի ֆայլում կգրի չգրանցված զգայուն արժեքներ (անուններ, էլ. նամակներ, հեռախոսահամարներ և այլն) և ձեր API բանալին: Մի միացրեք սա, եթե ուրիշներն ունեն մուտք դեպի այս համակարգիչ: Կարգավորումը վերականգնվում է, երբ փակում եք հավելվածը:</value>
+  </data>
 </root>

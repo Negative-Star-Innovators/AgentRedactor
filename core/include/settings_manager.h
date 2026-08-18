@@ -41,10 +41,11 @@ public:
 
     bool IsMasterPasswordEnabled() const;
     bool IsUnlocked() const;
-    bool UnlockWithPassword(const std::wstring& password);
-    bool EnableMasterPassword(const std::wstring& password);
-    bool ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword);
+    bool IsHelloEnabled() const;
+    bool EnableMasterPassword();
     void DisableMasterPassword();
+    bool UnlockWithHello();
+    void Lock();
 
     bool IsLoggingEnabled() const;
     void SetLoggingEnabled(bool enabled);

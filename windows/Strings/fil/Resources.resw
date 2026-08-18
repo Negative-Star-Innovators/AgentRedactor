@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Keywords: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Paganahin ang pag-log</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Ipakita ang sensitibong impormasyon</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Ang mga log ay nakaimbak sa PC na ito. Ang mga na-redact na log ay maaari pa ring maglaman ng sensitibong data na hindi natukoy.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Paganahin ang Pag-log</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Ipakita ang Sensitibong Impormasyon</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Babala</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Pinagana ang pag-log ng sensitibong impormasyon. Maglalaman ang mga log ng hindi na-redact na data kabilang ang mga orihinal na katawan ng kahilingan at ang iyong API key. Nagre-reset ito kapag isinara mo ang app.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Gagamitin ang Windows Hello para i-unlock ang app. Hihilingin sa iyo na mag-verify gamit ang Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Hindi nakumpleto ang pag-verify ng Windows Hello, kaya hindi pinagana ang proteksyon. Subukan muli.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Kinakailangan ang Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Hindi nagtagumpay ang pag-verify ng Windows Hello. Subukang muli, o lumabas sa app.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Subukan muli</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Hihilingin sa iyong mag-verify gamit ang Windows Hello bago i-disable ang proteksyon.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Hindi nakumpleto ang pag-verify ng Windows Hello, kaya pinagana pa rin ang proteksyon.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Ipakita ang Sensitibong Impormasyon?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Isusulat nito ang mga hindi na-redact na sensitibong halaga (mga pangalan, email, numero ng telepono, atbp.) at ang iyong API key sa iyong log file sa disk. Huwag paganahin ito kung ang iba ay may access sa computer na ito. Nire-reset ang setting kapag isinara mo ang app.</value>
+  </data>
 </root>

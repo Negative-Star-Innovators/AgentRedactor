@@ -50,11 +50,19 @@ public:
     HttpServer(const HttpServer&) = delete;
     HttpServer& operator=(const HttpServer&) = delete;
 
-    bool Start(int port, std::function<HttpResponse(const HttpRequest&)> handler);
+    // When loopbackOnly is true the server binds to 127.0.0.1 only (used by
+    // the localhost control API); otherwise it binds dual-stack to any
+    // interface (proxy data plane behavior). Port 0 picks an ephemeral port;
+    // GetPort() returns the actual bound port after a successful Start.
+    bool Start(int port, std::function<HttpResponse(const HttpRequest&)> handler, bool loopbackOnly = false);
     void Stop();
     bool IsRunning() const { return running_.load(); }
     int GetPort() const { return port_; }
     void SetLogManager(LogManager* lm) { logManager_ = lm; }
+    // When quiet, per-request traffic logging is suppressed (used by the
+    // localhost control API — the GUI polls /status every second, which would
+    // otherwise flood the log file with noise).
+    void SetQuiet(bool q) { quiet_ = q; }
 
     // Helpers for HTTP/1.1 chunked transfer encoding. These send the formatted
     // chunk over the socket and are used by streaming responses.
@@ -77,6 +85,7 @@ private:
     std::mutex stopMutex_;
     std::condition_variable stopCv_;
     LogManager* logManager_ = nullptr;
+    bool quiet_ = false;
 };
 
 bool IsPortAvailable(int port);

@@ -165,27 +165,14 @@ bool SettingsManager::IsUnlocked() const {
     return secureStorage_.IsInitialized();
 }
 
-bool SettingsManager::UnlockWithPassword(const std::wstring& password) {
-    std::unique_lock<std::shared_mutex> lock(mutex_);
-    if (!secureStorage_.IsMasterPasswordEnabled()) return true;
-    bool ok = secureStorage_.Unlock(password);
-    if (ok) {
-        DecryptSensitiveFields();
-    }
-    return ok;
+bool SettingsManager::IsHelloEnabled() const {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return secureStorage_.IsHelloEnabled();
 }
 
-bool SettingsManager::EnableMasterPassword(const std::wstring& password) {
+bool SettingsManager::EnableMasterPassword() {
     std::unique_lock<std::shared_mutex> lock(mutex_);
-    if (!secureStorage_.EnableMasterPassword(password)) return false;
-    settings_["master_password"] = secureStorage_.GetConfig();
-    SaveSettings();
-    return true;
-}
-
-bool SettingsManager::ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword) {
-    std::unique_lock<std::shared_mutex> lock(mutex_);
-    if (!secureStorage_.ChangeMasterPassword(oldPassword, newPassword)) return false;
+    if (!secureStorage_.EnableMasterPassword()) return false;
     settings_["master_password"] = secureStorage_.GetConfig();
     SaveSettings();
     return true;
@@ -196,6 +183,20 @@ void SettingsManager::DisableMasterPassword() {
     secureStorage_.DisableMasterPassword();
     settings_["master_password"] = secureStorage_.GetConfig();
     SaveSettings();
+}
+
+bool SettingsManager::UnlockWithHello() {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.IsMasterPasswordEnabled()) return true;
+    if (!secureStorage_.UnlockWithHello()) return false;
+    DecryptSensitiveFields();
+    return true;
+}
+
+void SettingsManager::Lock() {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.IsMasterPasswordEnabled()) return;
+    secureStorage_.Lock();
 }
 
 // ============================================================================
@@ -280,7 +281,7 @@ void SettingsManager::LoadSettings() {
     try {
         if (!Utils::FileExists(settingsFile_)) {
             settings_ = json::object();
-            secureStorage_.Initialize(json::object(), L"");
+            secureStorage_.Initialize(json::object());
             return;
         }
         std::ifstream file(settingsFile_);
@@ -293,18 +294,19 @@ void SettingsManager::LoadSettings() {
         if (settings_.contains("master_password")) {
             mpConfig = settings_["master_password"];
         }
-        secureStorage_.Initialize(mpConfig, L"");
+        secureStorage_.Initialize(mpConfig);
 
-        // If no master password is set, decrypt immediately with DPAPI
+        // If protection is not enabled, decrypt immediately with DPAPI
         if (!secureStorage_.IsMasterPasswordEnabled()) {
             DecryptSensitiveFields();
         }
-        // If master password is enabled, decryption is deferred until UnlockWithPassword is called
+        // If protection is enabled, decryption is deferred until
+        // UnlockWithHello is called (Windows Hello only).
     } catch (const std::exception& e) {
         LOGF_LIFECYCLE(L"[SettingsManager] Load error: %s", Utils::Utf8ToWide(e.what()).c_str());
         BackupCorruptSettingsFile();
         settings_ = json::object();
-        secureStorage_.Initialize(json::object(), L"");
+        secureStorage_.Initialize(json::object());
     }
 }
 

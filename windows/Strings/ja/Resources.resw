@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>キーワード: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>ロギングを有効にする</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>機密情報を表示する</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>ログはこの PC に保存されます。編集されたログには、検出できなかった機密データが含まれている可能性があります。</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>ロギングを有効にする</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>機密情報を表示する</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>機密情報のログ記録が有効になっています。ログには、元のリクエスト本文や API キーなどの編集されていないデータが含まれます。アプリを閉じるとリセットされます。</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>アプリのロックを解除するには Windows Hello が使用されます。 Windows Hello で確認するよう求められます。</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello の検証が完了していないため、保護が有効になっていませんでした。もう一度やり直してください。</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Helloが必要です</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello の検証が成功しませんでした。もう一度試すか、アプリを終了してください。</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>もう一度やり直してください</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>保護を無効にする前に、Windows Hello で確認するよう求められます。</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello の検証が完了していないため、保護はまだ有効になっています。</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>機密情報を表示しますか?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>これにより、編集されていない機密値 (名前、電子メール、電話番号など) と API キーがディスク上のログ ファイルに書き込まれます。他の人がこのコンピュータにアクセスできる場合は、これを有効にしないでください。アプリを閉じると設定がリセットされます。</value>
+  </data>
 </root>

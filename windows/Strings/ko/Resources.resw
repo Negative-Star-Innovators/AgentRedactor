@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>키워드: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>로깅 활성화</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>민감한 정보 표시</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>로그는 이 PC에 저장됩니다. 수정된 로그에는 탐지에서 놓친 민감한 데이터가 여전히 포함될 수 있습니다.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>로깅 활성화</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>민감한 정보 표시</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>경고</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>민감한 정보 로깅이 활성화되었습니다. 로그에는 원본 요청 본문 및 API 키를 포함하여 수정되지 않은 데이터가 포함됩니다. 앱을 닫으면 재설정됩니다.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>앱 잠금을 해제하는 데 Windows Hello가 사용됩니다. Windows Hello로 확인하라는 메시지가 표시됩니다.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello 확인이 완료되지 않아 보호가 활성화되지 않았습니다. 다시 시도해 보세요.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>윈도우 헬로 필수</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello 확인에 실패했습니다. 다시 시도하거나 앱을 종료하세요.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>다시 시도하세요</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>보호가 비활성화되기 전에 Windows Hello를 확인하라는 메시지가 표시됩니다.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello 확인이 완료되지 않았으므로 보호가 계속 활성화되어 있습니다.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>민감한 정보를 표시하시겠습니까?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>이렇게 하면 수정되지 않은 민감한 값(이름, 이메일, 전화번호 등)과 API 키가 디스크의 로그 파일에 기록됩니다. 다른 사람이 이 컴퓨터에 액세스할 수 있는 경우에는 이 기능을 활성화하지 마십시오. 앱을 닫으면 설정이 재설정됩니다.</value>
+  </data>
 </root>

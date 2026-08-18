@@ -17,20 +17,20 @@ $buildDir = "$root\build"
 $outDir = "$buildDir\$Platform\Release"
 $archLower = $Platform.ToLower()
 
-# Self-release builds are versioned from version.txt unless -Version is given
-if ($SelfRelease -and -not $PSBoundParameters.ContainsKey('Version')) {
+# Both channels are versioned from version.txt unless -Version is given.
+if (-not $PSBoundParameters.ContainsKey('Version')) {
     $versionFile = "$root\version.txt"
     if (Test-Path $versionFile) {
         $Version = (Get-Content $versionFile -Raw).Trim()
-        Write-Host "Self-release version from version.txt: $Version" -ForegroundColor Cyan
+        Write-Host "Version from version.txt: $Version" -ForegroundColor Cyan
     }
 }
 
-# Stop any running instance
-$proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
+# Stop any running instance (GUI and engine/CLI)
+$proc = Get-Process -Name "AgentRedactorUI", "agentredactor" -ErrorAction SilentlyContinue
 if ($proc) {
-    Write-Host "Stopping running AgentRedactor.exe..." -ForegroundColor Yellow
-    Stop-Process -Name "AgentRedactor" -Force -ErrorAction SilentlyContinue
+    Write-Host "Stopping running AgentRedactorUI.exe / agentredactor.exe..." -ForegroundColor Yellow
+    Stop-Process -Name "AgentRedactorUI", "agentredactor" -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
 }
 
@@ -151,23 +151,73 @@ $msbuildArgs = @(
     "$root\AgentRedactor.vcxproj",
     "-p:Configuration=Release",
     "-p:Platform=$Platform",
-    "-p:RestorePackages=false"
+    "-p:RestorePackages=false",
+    # Version identity for BOTH channels (AR_VERSION_STRING / VERSIONINFO):
+    # `agentredactor status` then reports the real version, and the exe's
+    # file version identifies which build is installed.
+    "-p:AppVersion=$Version"
 )
+# 4-part comma form for the VERSIONINFO resource (AR_VERSION_QUAD); the rc
+# preprocessor cannot split strings, so the quad is computed here. Embedded
+# quotes: without them PowerShell's native-argument passing splits the
+# comma-separated value into separate msbuild arguments (MSB1006).
+$versionCore = ($Version -split '[-+]')[0]
+$appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
+$msbuildArgs += "-p:AppVersionQuad=`"$appVersionQuad`""
+if ($Platform -eq "ARM64") {
+    # The default HostX86\arm64 cross-compiler is a 32-bit process and runs
+    # out of address space on the WinUI-sized PCH (C3859/C1076); force the
+    # 64-bit host tools (engine build further down gets the same flag).
+    $msbuildArgs += "-p:PreferredToolArchitecture=x64"
+}
 if ($SelfRelease) {
-    # Stamps AGENTREDACTOR_SELFRELEASE + AR_VERSION_STRING (see vcxproj)
+    # Stamps AGENTREDACTOR_SELFRELEASE (update manager + Velo lifecycle)
     $msbuildArgs += "-p:SelfRelease=true"
-    $msbuildArgs += "-p:AppVersion=$Version"
-    # 4-part comma form for the VERSIONINFO resource (AR_VERSION_QUAD); the rc
-    # preprocessor cannot split strings, so the quad is computed here.
-    $versionCore = ($Version -split '[-+]')[0]
-    $appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
-    # Embedded quotes: without them PowerShell's native-argument passing
-    # splits the comma-separated value into separate msbuild arguments
-    # (MSB1006 "Property is not valid").
-    $msbuildArgs += "-p:AppVersionQuad=`"$appVersionQuad`""
 }
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+
+# --- Build the engine (headless proxy process, no NuGet) ---------------------
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Building AgentRedactorEngine (Release|$Platform)..." -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+$engineBuildArgs = @(
+    "$root\AgentRedactorEngine.vcxproj",
+    "-p:Configuration=Release",
+    "-p:Platform=$Platform",
+    "-p:AppVersion=$Version"
+)
+if ($Platform -eq "ARM64") {
+    # See the GUI build above: force 64-bit host tools for ARM64.
+    $engineBuildArgs += "-p:PreferredToolArchitecture=x64"
+}
+if ($SelfRelease) {
+    $engineBuildArgs += "-p:SelfRelease=true"
+}
+& $msbuild @engineBuildArgs
+if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
+
+# ============================================================================
+# VERIFY FRESH OUTPUTS
+# ============================================================================
+# Guard against a stale incremental build: MSBuild skips TUs whose source
+# timestamps are older than the outputs (e.g. after a git checkout that
+# restores old mtimes), which would silently package yesterday's code. The
+# produced exes must be newer than every source file.
+$newestSource = Get-ChildItem -Path "$root", "$root\..\core" -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -notmatch '\\(build|packages|\.git|\.vs)\\' -and $_.Extension -in @('.cpp', '.h', '.hpp', '.idl', '.xaml', '.vcxproj', '.resw', '.rc', '.txt', '.manifest') } |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+foreach ($c in @(
+        @{ Path = "$outDir\AgentRedactorUI.exe"; Label = "GUI" },
+        @{ Path = "$outDir\agentredactor.exe"; Label = "engine" })) {
+    if (-not (Test-Path $c.Path)) { throw "Build did not produce $($c.Label): $($c.Path)" }
+    $exeTime = (Get-Item $c.Path).LastWriteTime
+    if ($newestSource -and $exeTime -lt $newestSource.LastWriteTime) {
+        throw "STALE $($c.Label) build: $($c.Path) ($exeTime) is older than source $($newestSource.FullName) ($($newestSource.LastWriteTime)). Rerun with -Clean."
+    }
+    Write-Host "$($c.Label) built fresh: $($c.Path) @ $exeTime" -ForegroundColor Green
+}
 
 # Copy models and resources
 if (Test-Path "$root\models") {
@@ -271,7 +321,7 @@ if ($SelfRelease) {
     $velopackOut = if ($Platform -eq "ARM64") { "$buildDir\velopack-arm64" } else { "$buildDir\velopack" }
     # -s: language-neutral splash shown by Setup.exe during install (fox logo
     # on dark background, no text — Velopack's own Setup UI text is English).
-    & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactor.exe `
+    & $vpk pack -u AgentRedactor -v $Version -p $outDir -e AgentRedactorUI.exe `
         -r $rid -c $channel `
         --packTitle "Agent Redactor" -i "$root\resources\app.ico" `
         -s "$root\resources\splash.png" -o $velopackOut
@@ -280,7 +330,7 @@ if ($SelfRelease) {
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Green
     Write-Host "Self-release build complete!" -ForegroundColor Green
-    Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+    Write-Host "EXE output: $outDir\AgentRedactorUI.exe" -ForegroundColor Green
     Write-Host "Velopack output: $velopackOut" -ForegroundColor Green
     Write-Host "========================================" -ForegroundColor Green
     return
@@ -325,6 +375,16 @@ if (Test-Path $versionFile) {
     } else {
         Write-Warning "version.txt contains '$msixVersion' (expected x.y.z); keeping the manifest's Identity Version."
     }
+    # Sideload installs of the SAME version are rejected by Add-AppxPackage,
+    # so the running app would silently stay on the previous build. Warn so a
+    # "same version" build cannot masquerade as a fresh install.
+    $installed = Get-AppxPackage -Name "NegativeStarInnovators.AgentRedactor" -ErrorAction SilentlyContinue
+    if ($installed -and $installed.Version -eq $msixVersion) {
+        # NOTE: keep this string ASCII-only. The file is UTF-8 without BOM,
+        # which PowerShell 5.1 reads as ANSI; a non-ASCII char here (e.g. an
+        # em-dash) decodes to a curly quote byte and terminates the string.
+        Write-Warning "Version $msixVersion is already installed - sideloading this MSIX will be REJECTED and the old build stays active. Bump version.txt before installing."
+    }
 }
 $resourcesNode = $manifestXml.Package.Resources
 $resourcesNode.RemoveAll()
@@ -356,6 +416,6 @@ Write-Host "MSIX created: $msixPath" -ForegroundColor Green
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "Build complete!" -ForegroundColor Green
-Write-Host "EXE output: $outDir\AgentRedactor.exe" -ForegroundColor Green
+Write-Host "EXE output: $outDir\AgentRedactorUI.exe" -ForegroundColor Green
 Write-Host "MSIX output: $msixPath" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green

@@ -19,6 +19,7 @@ from windows.gui_driver import (
     save_profile,
     set_regex_text,
     toggle_regex,
+    wait_until,
 )
 
 
@@ -229,12 +230,17 @@ async def test_gui_regex_stats_and_session(
     _assert_redacted_regex(upstream_body, secret)
     _assert_reconstructed(response_json, request_text)
 
-    stats = get_statistics()
-    assert "Requests: 1" in stats
-    assert "Regex: 1" in stats
+    stats = wait_until(
+        "statistics after traffic",
+        get_statistics,
+        lambda s: "Requests: 1" in s and "Regex: 1" in s,
+    )
 
-    redactions = get_session_redactions()
-    assert any(secret in entry or "REDACTED_REGEX" in entry for entry in redactions)
+    redactions = wait_until(
+        "session redactions after traffic",
+        get_session_redactions,
+        lambda entries: any(secret in entry or "REDACTED_REGEX" in entry for entry in entries),
+    )
 
 
 @pytest.mark.asyncio

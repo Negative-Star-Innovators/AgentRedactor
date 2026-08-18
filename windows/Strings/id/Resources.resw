@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Kata Kunci: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Aktifkan pencatatan</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Tampilkan informasi sensitif</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Log disimpan di PC ini. Log yang disunting mungkin masih berisi data sensitif yang tidak dapat dideteksi.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Aktifkan Pencatatan</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Tampilkan Informasi Sensitif</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Peringatan</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Pencatatan informasi sensitif diaktifkan. Log akan berisi data yang belum disunting termasuk badan permintaan asli dan kunci API Anda. Ini diatur ulang ketika Anda menutup aplikasi.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello akan digunakan untuk membuka kunci aplikasi. Anda akan diminta untuk memverifikasi dengan Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Verifikasi Windows Hello belum selesai, sehingga perlindungan tidak diaktifkan. Coba lagi.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Halo diperlukan</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Verifikasi Windows Hello tidak berhasil. Coba lagi, atau keluar dari aplikasi.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Coba lagi</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Anda akan diminta untuk memverifikasi dengan Windows Hello sebelum perlindungan dinonaktifkan.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Verifikasi Windows Hello belum selesai, jadi perlindungan masih diaktifkan.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Tampilkan Informasi Sensitif?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Ini akan menulis nilai sensitif yang tidak disunting (nama, email, nomor telepon, dll.) dan kunci API Anda ke file log Anda di disk. Jangan aktifkan ini jika orang lain memiliki akses ke komputer ini. Pengaturan ini diatur ulang ketika Anda menutup aplikasi.</value>
+  </data>
 </root>

@@ -4,14 +4,248 @@ This file is a quick reference for working on the Agent Redactor WinUI 3 C++ pro
 
 ## Project Layout
 
+Two executables are built from this folder (both land in `build\<Platform>\Release`):
+
+- `AgentRedactorUI.exe` — the WinUI 3 GUI (`AgentRedactor.vcxproj`). A thin frontend:
+  it owns the tray, windows, and an `EngineClient` that talks to the engine.
+  (Named `...UI` on purpose: the engine's `agentredactor.exe` differs only by
+  case from the old name, and Windows filesystems are case-insensitive — the
+  two outputs cannot share a directory otherwise.)
+- `agentredactor.exe` — the engine (`AgentRedactorEngine.vcxproj`, console subsystem,
+  dual-mode). Owns settings, PII detection, the proxy data plane, and a localhost
+  control API (127.0.0.1 only, bearer token in `<configDir>/control.json`).
+  Run the engine bare (`agentredactor.exe` with no args) or with `--console`
+  for a foreground debug run; there is NO `engine run` / `engine stop` CLI
+  command — engine lifecycle belongs to the GUI (spawn on startup, stop/lock
+  on quit; the engine also launches directly without a console when the GUI
+  CreateProcesses it).
+  The same binary is also the CLI: `agentredactor <subcommand>` (status,
+  get/set, profiles, regex, keywords, unlock, password) talks to
+  the running engine over the control API — see "CLI" below.
+
+Key sources:
+
+- `engine/` — engine host: `main.cpp` (entry, mutex, console handling, CLI
+  console/pipe plumbing), `EngineApp.*` (owns SettingsManager/PIIDetector/
+  ProxyEngine/proxy HttpServers + the whole data plane moved out of the old
+  AppState, plus the control-API router), `control_api_client.*` (WinHTTP
+  client for the CLI subcommands; the engine-side mirror of the GUI's
+  EngineClient — not shared because the GUI build requires pch.h as the
+  unconditional first include), `engine_loc.cpp` (English-only LocString
+  shim; the engine can't link MRT localization).
+- `../core/src/cli.cpp` (+ `../core/include/cli.h`) — OS-agnostic CLI command
+  logic: parsing, password gating, output formatting. The OS layer supplies a
+  `CliTransport` (control-API calls) and `CliConsole` (print + no-echo
+  password prompt); Linux will reuse this file with its own transport.
+- `../core/src/control_server.cpp` — localhost-only control API server (bind + token
+  auth + control.json). `../core/src/http_server.cpp` has a `loopbackOnly` bind mode.
+- `EngineClient.*` — GUI-side WinHTTP client + `SettingsFacade`/`LogsFacade`/
+  `ProxyFacade` mirroring the old in-process interfaces so pages barely changed.
+- `AppState.*` — now a thin GUI-side holder: EngineClient, tray, message window,
+  engine lifecycle (spawn hidden via CreateProcess when /status is unreachable,
+  POST /engine/stop on quit if this GUI spawned it), 1-second /status poll thread.
 - `AgentRedactor.vcxproj` — Main MSBuild project (WinUI 3 / C++/WinRT).
-- `../core/src/` / `../core/include/` — OS-agnostic C++ core (proxy, PII detector, settings, redaction engines, etc.), compiled directly by the vcxproj; `core/CMakeLists.txt` is scaffolding for future platform builds.
+- `../core/src/` / `../core/include/` — OS-agnostic C++ core (proxy, PII detector, settings, redaction engines, etc.), compiled directly by both vcxprojs; `core/CMakeLists.txt` is scaffolding for future platform builds.
 - `src/` / `include/` — Windows-only sources (system tray, secure storage/DPAPI, update manager).
 - `HomePage.xaml` / `MainWindow.xaml` — WinUI 3 UI.
-- `buildquick.ps1` — Fast local build (EXE + copy models/resources).
+- `buildquick.ps1` — Fast local build (builds BOTH vcxprojs + copies models/resources).
 - `build.ps1` — Full release build (MSIX packaging; much slower). With `-SelfRelease` it builds the Velopack channel instead (no MSIX).
 - `build-selfrelease.ps1` — Self-release wrapper: reads `version.txt`, calls `build.ps1 -SelfRelease`, then runs `vpk pack`.
-- `version.txt` — Single version source of truth for BOTH release channels. For the self-release channel it is stamped into the exe as `AR_VERSION_STRING` / `APP_VERSION` for C++ and as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the VERSIONINFO resource; for the Store channel, `build.ps1` stamps the MSIX `Identity Version` from it at pack time (3-part `x.y.z` → 4-part `x.y.z.0`; the hardcoded version in `Package.appxmanifest` is only a fallback when version.txt is absent).
+- `version.txt` — Single version source of truth for BOTH release channels.
+  `build.ps1` passes it to both vcxprojs as `-p:AppVersion=<version.txt>` for
+  EVERY channel, so it is stamped into the exes as `AR_VERSION_STRING` /
+  `APP_VERSION` for C++ (reported by `agentredactor status` as
+  `engineVersion`), as `AR_VERSION_TEXT` / `AR_VERSION_QUAD` for the
+  VERSIONINFO resource, and as the MSIX `Identity Version` at pack time
+  (3-part `x.y.z` → 4-part `x.y.z.0`; the hardcoded version in
+  `Package.appxmanifest` is only a fallback when version.txt is absent). A
+  bare msbuild invocation falls back to 1.0.0. build.ps1 also verifies the
+  produced exes are newer than every source file (stale-incremental-build
+  guard) and warns when the MSIX version equals the version already
+  installed (sideloading the same version is rejected by Add-AppxPackage, so
+  the running app would silently stay on the old build — bump version.txt).
+
+## CLI
+
+`agentredactor.exe` doubles as the CLI; every subcommand talks to the running
+engine over the control API (so CLI and GUI always agree). Output goes to the
+inherited console, or UTF-8 to stdout when piped (script/AI-agent friendly);
+exit codes are 0 success, 1 runtime error, 2 usage.
+
+```
+agentredactor status                          engine + profile overview (ungated)
+agentredactor languages                       list supported language codes (ungated)
+agentredactor get <key> [--profile P]         read a setting
+agentredactor set <key> <value> [--profile P] change a setting
+agentredactor profiles list                   table incl. request/redaction stats
+agentredactor profiles add <alias> [--port N] [--upstream-url U] [--api-key K]
+agentredactor profiles delete <id>
+agentredactor pii-types list|enable|disable <type> [--profile P]
+agentredactor regex list|add <p>|remove <n|p>
+agentredactor keywords list|add <t>|remove <n|t> [--ignore-case]
+agentredactor password enable | disable       Windows-Hello protection
+```
+
+`engine run` / `engine stop` are **not CLI commands at all**: both are
+rejected as unknown. Engine lifecycle belongs to the GUI (spawn on startup,
+stop/lock on quit), and the CLI test suite stops the engine by killing the
+process. (For a foreground debug engine run, launch the bare exe with
+`--console`.)
+
+Global keys: `start-on-boot`, `logging`, `show-sensitive`,
+`app-language`. Password state is NOT a get/set key: read it via `status`
+(`password enabled:`), change it via `password enable|disable`. PII types are
+NOT get/set keys either — they are owned by the `pii-types` command. Profile
+keys:
+`alias`, `upstream-url`, `api-key`, `port`, `confidence-threshold`,
+`use-ai-model`. `--profile P` selects by list number, id, or
+alias (optional when only one profile exists). `onnx-provider` and profile
+`enabled` remain engine/GUI-only for now (not exposed on the CLI); profile
+`enabled` no longer appears in `status` / `profiles list` output either.
+
+CLI input validation mirrors the GUI, so a bad value is rejected before it
+reaches the engine/proxy: `port` must be 1024..65535 and not already used by
+another profile; `upstream-url` must be non-empty, start with `http://` or
+`https://`, and have a real host; `confidence-threshold` must be 0..1;
+`app-language` must be an exact supported BCP-47 tag (from `SUPPORTED_LANGUAGES`
+in `core/include/constants.h`, listed by `agentredactor languages` — a partial
+tag like `zh` is rejected instead of silently selecting nothing) and `set
+show-sensitive true` is rejected while logging is disabled (the engine
+enforces it, mirroring the GUI checkbox); `regex add` validates the pattern
+(invalid regex is rejected) as well as rejecting an empty one. The CLI deals only in **single PII types** (e.g.
+`secret`, `private_email`) — there are no PII categories on the CLI, matching
+the GUI; a category name like `CONTACT` is rejected as an unknown type.
+
+`profiles add` prints the created profile's id on success
+("created profile <id> (<alias>)") or a failure message; without `--port` it
+picks the first free port from 8080 like the GUI. `profiles delete` accepts
+ONLY the profile id (never an alias or list number — those could point at a
+different profile later) and refuses to delete the last profile.
+
+Password model: with no master password everything is open. With Windows
+Hello enabled there is **no `unlock` command and no session-wide unlock
+step**: every gated command (get/set/profiles/regex/keywords/pii-types)
+demands a fresh Windows Hello consent on the spot. The consent runs
+**IN-PROCESS in the client** (the CLI via the transport's `consent` hook, the
+GUI via `RequestHelloUnlockAsync`): Windows attaches the dialog to the window
+of the ACTIVE application, so an engine-owned prompt would always land in the
+background. On Verified the client unlocks the engine via `POST /unlock` (the
+documented "caller has already verified in-process" path). `status` and bare
+`agentredactor` (help) stay open; `password disable` is gated the same way —
+consent, then `PUT /settings/disableMasterPassword`, which the engine only
+accepts on an unlocked session. The engine lock itself remains UX-level; the
+only server-side enforcement is `GET /profiles/<id>/apikey` AND
+`PUT /settings/disableMasterPassword` (both 403 while locked) — `GET
+/profiles` always masks keys as `abc...****`.
+
+Windows Hello unlock (Windows only; Linux/CLI core stays password-only):
+- Engine: `POST /unlock/hello` (always 200 with `ok`/`canceled`/
+  `retriesExhausted`/`unavailable`/`helloNotEnabled`/`error` fields) and
+  `POST /unlock` (SAME unlock but WITHOUT a consent prompt — the caller has
+  already verified in-process; the GUI and the CLI transport both use this
+  after their in-process prompts), `POST /hello/verify` (standalone consent, no
+  state change), `PUT /settings/lock`
+  (locks the session — the GUI sends it on quit when the engine survives),
+  `enableMasterPassword` accepts `hello: true` (with an empty `value` it
+  creates a **Hello-only** session: a random AES key wrapped in DPAPI, no
+  typed password at all — `SecureStorage::EnableMasterPasswordHelloOnly`);
+  `helloEnabled` in `status`/`settings`. The hello
+  secret is a DPAPI-wrapped AES key persisted under `master_password.hello`
+  in settings.json (`secure_storage.cpp` — `EnableHello`/`DisableHello`/
+  `UnlockWithHello`/`EnableMasterPasswordHelloOnly`/`Lock`/`DpapiProtect`).
+- CLI: `password enable` (no password anywhere) prints "windows hello
+  protection enabled" and no typed password exists. With protection on, every
+  gated command prompts for a fresh Hello consent IN-PROCESS (the transport's
+  `ConsentWithHello`, which is the ACTIVE application when run from a
+  terminal, so the dialog comes to the foreground) and then unlocks via
+  `POST /unlock`; `get api-key` therefore works like any other gated read.
+  `password disable` is gated the same way: consent → `POST /unlock` →
+  `PUT /settings/disableMasterPassword` (the endpoint 403s while the session
+  is locked).
+- GUI: ALL consent prompts are in-process (the GUI compiles
+  `engine/hello_unlock.cpp` too, so the Windows Security dialog belongs to
+  the GUI process, attaches to the active window, and stays in front).
+  Enabling protection is DIRECT (checkbox → engine, no
+  dialog, no consent); disabling keeps that in-process prompt, then unlocks
+  via `POST /unlock` and disables (the engine's disable endpoint requires an
+  unlocked session) — all under the padlock overlay. When
+  protection is on, the window shows a **lock overlay** (opaque
+  black scrim + lock icon + "Windows Hello required" + Try again button) and
+  the Windows Hello prompt runs immediately on every appearance: first start,
+  and close-to-tray → tray Open re-open. The engine is locked on window hide
+  and after **10 minutes without input** (any keyboard/mouse/touch activity
+  resets the timer), at which point the overlay + prompt re-appear. A failed
+  or cancelled prompt simply stays on the padlock overlay (no retry/exit
+  dialog); `AppState::Shutdown`
+  locks the engine (`PUT /settings/lock`) when it is left running so the next
+  open must authenticate again. The overlay lives in MainWindow (covers all
+  pages); `HomePage` no longer runs any startup lock flow. The overlay is
+  ALSO shown for the duration of the disable-protection consent
+  (`AppState::SetSessionLockOverlay`), so the
+  regex/keywords/profile content is never visible behind the Windows Security
+  dialog — the window always shows the padlock while Hello is on screen. As a
+  hard privacy guarantee, `ShowLockOverlay`/`HideLockOverlay` ALSO collapse
+  the content `frame_` itself (Visibility Collapsed/Visible): even if the
+  overlay ever failed to render, nothing of the app content is in the visual
+  tree while a Hello prompt is up.
+- `windows/engine/hello_unlock.cpp` drives `UserConsentVerifier`
+  (`IsWindowsHelloAvailable` + blocking `RequestHelloUnlock` for the engine's
+  control-API handlers + coroutine `RequestHelloUnlockAsync` for the GUI):
+  the consent prompt is real system UI and waits for the user. The BLOCKING
+  path keeps a watchdog (default 60 s, overridable via
+  `AGENTREDACTOR_HELLO_TIMEOUT_MS`) so a script can never hang on the prompt;
+  the GUI ASYNC path has **no watchdog by default** — the prompt is a lock
+  screen and waits for the user, and the only early cancels are the caller's
+  shared cancel flag (the window hiding or being destroyed, so no orphaned
+  system dialog survives) and the same env override for test harnesses.
+  **`AGENTREDACTOR_HELLO_SUPPRESS_PROMPT` (test-only, runtime env var, no
+  compile-time gate)** makes every consent prompt behave exactly as if the
+  user pressed cancel: no system UI is ever shown and the result can NEVER be
+  Verified. This is cancel-equivalent and therefore grants nothing — a user
+  canceling the prompt was always possible in production, so the flag cannot
+  be abused even though it exists in shipped binaries (env vars are settable
+  by any process; that is fine because the flag only ever yields
+  Canceled/false). SECURITY INVARIANT, enforced by the CLI test
+  `test_hello_suppress_prompt_flag_never_grants_access` (runs against the
+  release binary): the flag must never return Verified, never reach the
+  engine's real unlock, never serve the API key, and never pass the
+  disable-protection consent. Any change that lets it
+  grant access is a critical vulnerability. The real unlock path (successful
+  Windows Hello verification) is inherently interactive and is never
+  automated by the test suite.
+  The Windows Security dialog only comes to the FOREGROUND when the consent
+  is attached to a window of the ACTIVE application (`RequestVerificationForWindowAsync`,
+  `IUserConsentVerifierInterop`): the GUI attaches to its own main window on
+  the UI thread (`RequestHelloUnlockAsync`), and the CLI transport attaches
+  to a 1x1 window it owns in the CLI process (`ControlApiClient::ConsentWithHello`
+  → blocking `RequestHelloUnlock` → `TryWindowedPrompt`/`RunWindowedPrompt`
+  in `hello_unlock.cpp`, which creates the window on a dedicated message-pump
+  thread, shows it and tries to make it the active window). Both clients then
+  report the verified result to the engine via `POST /unlock`. An engine-owned
+  prompt — even window-attached to an engine window — belongs to a BACKGROUND
+  process and always lands behind other windows; the engine's blocking
+  `RequestHelloUnlock` still makes that best-effort attempt for raw API
+  callers (`/unlock/hello`, `/hello/verify`) and otherwise falls back to
+  unowned `RequestVerificationAsync`. The interop COM calls are wrapped in SEH
+  (raw COM only, `CreateWindowedVerification`) so a broken consent service
+  degrades to the unowned fallback instead of an access violation. The async
+  variant's prompt canceller is a detached `std::thread` holding shared_ptr
+  ownership — the earlier `fire_and_forget` + `winrt::resume_after` watchdog
+  coroutine raced its own frame teardown and crashed (SEH 0xC0000005 at the
+  `xchg` of `done->exchange` after `CloseThreadpoolTimer`, fault offset
+  0x930EE in the 1.1.3 build) — do NOT reintroduce a coroutine watchdog here.
+  The CLI transport special-cases `/unlock/hello`, `/hello/verify` and
+  `/settings/disableMasterPassword` with a
+  90 s WinHTTP receive timeout (the usual 3 s would abort mid-prompt):
+  `windows/engine/control_api_client.cpp`.
+- Reminder: availability is NOT enrollment — `CheckAvailabilityAsync` returns
+  Available on machines with no Hello configured; a headless run leaves an
+  unanswered "Windows Security" prompt on the desktop until the blocking
+  path's watchdog fires. The GUI stays on the padlock overlay after any
+  failed/cancelled attempt (no dialog, no exit); the CLI reports exit code 1 +
+  message ("windows hello consent canceled", "windows hello consent timed out
+  (no answer)", "...not available on this
+  device", ...).
 
 ## Quick Build (for testing)
 
@@ -22,11 +256,11 @@ Run from the `windows` folder:
 ```
 
 This will:
-1. Stop any running `AgentRedactor.exe`.
+1. Stop any running `AgentRedactorUI.exe` / `agentredactor.exe`.
 2. Find MSBuild (BuildTools / Enterprise / Professional).
-3. Build `Release|x64` (change with `-Configuration Debug` if needed).
+3. Build `Release|x64` for the GUI and the engine (change with `-Configuration Debug` if needed).
 4. Copy the `models\` folder and icon resources to `build\x64\Release\`.
-5. Produce `build\x64\Release\AgentRedactor.exe`.
+5. Produce `build\x64\Release\AgentRedactorUI.exe` and `agentredactor.exe`.
 
 The EXE can be run directly from that folder for rapid iteration.
 
@@ -152,7 +386,7 @@ is first backed up to `<name>.corrupt-<timestamp>.bak` and only then reset.
 
 ## End-to-End Tests
 
-Testing is done through the GUI E2E suite in `tests/gui/`. It drives the **real** `AgentRedactor.exe` Windows UI with a FlaUI/C# helper and verifies proxy behaviour against an `aiohttp` mock LLM.
+Testing is done through the GUI E2E suite in `tests/gui/`. It drives the **real** `AgentRedactorUI.exe` Windows UI with a FlaUI/C# helper and verifies proxy behaviour against an `aiohttp` mock LLM. The CLI suite in `tests/cli/` runs `agentredactor.exe` standalone against an isolated config dir (`AGENTREDACTOR_CONFIG_DIR`) and drives the CLI subcommands as subprocesses — fast, no GUI, no FlaUI helper needed (`pytest -v cli/`).
 
 ### Build for testing
 
@@ -179,7 +413,7 @@ A small FlaUI/C# helper drives the real Windows UI from Python. The goal is to e
 - `tests/gui/windows/FlaUIHelper/` — C# console app using **FlaUI.UIA3**.
 - `tests/gui/windows/build.ps1` — builds the helper with the same MSBuild toolchain used for AgentRedactor.
 - `tests/gui/windows/gui_driver.py` — Python wrapper that invokes `FlaUIHelper.exe`.
-- `tests/gui/gui_process.py` — starts/stops `AgentRedactor.exe` using the real `%APPDATA%` / `%LOCALAPPDATA%` directories.
+- `tests/gui/gui_process.py` — starts/stops `AgentRedactorUI.exe` (and the `agentredactor.exe` engine it spawns) using the real `%APPDATA%` / `%LOCALAPPDATA%` directories.
 - `tests/gui/conftest.py` — backs up the user's real `AgentRedactor` data, creates a clean test profile, and restores the original data after the test.
 - `tests/gui/test_gui_keyword_redaction.py` — focused keyword scenarios: case-insensitive/case-sensitive matching, deletion, toggling case sensitivity, modifying keyword text, statistics/session redactions, and log output.
 - `tests/gui/test_gui_regex_redaction.py` — focused regex scenarios: adding, deleting, modifying, enabling/disabling, statistics/session redactions, and log output.
@@ -188,6 +422,15 @@ A small FlaUI/C# helper drives the real Windows UI from Python. The goal is to e
 - `tests/gui/test_gui_protocol_modes.py` — **removed/deprecated**: protocol-mode translation is no longer available.
 - `tests/gui/test_gui_profiles.py` — adds a second profile through the UI.
 - `tests/gui/test_gui_verbose_logging.py` — toggles verbose logging through the UI.
+- `tests/gui/test_gui_master_password.py` — the Windows-Hello lock scenarios
+  (enable direct, startup lock padlock overlay, CLI disable rejected while
+  locked — the engine runs the consent inside the disable call, so without a
+  real verification the protection stays on). These tests set
+  `AGENTREDACTOR_HELLO_SUPPRESS_PROMPT=1` (plus
+  `AGENTREDACTOR_HELLO_TIMEOUT_MS=1500` as belt-and-braces) so the auto-run
+  Hello prompt behaves as cancelled: no system "Windows Security" dialog ever
+  appears, so the harness is never blocked by it on Hello-enabled machines
+  and the lock flow is deterministic anywhere.
 
 ### Build the helper
 
@@ -208,7 +451,7 @@ pytest -v gui/
 Each test:
 1. Backs up `%APPDATA%\AgentRedactor` and `%LOCALAPPDATA%\AgentRedactor`.
 2. Writes a clean test `settings.json` into `%APPDATA%\AgentRedactor`.
-3. Starts the normal `AgentRedactor.exe` window.
+3. Starts the normal `AgentRedactorUI.exe` window.
 4. Uses the FlaUI helper to drive the UI (add keywords/regex/PII toggles/profiles).
 5. Sends OpenAI and/or Anthropic requests through the proxy and asserts redaction and statistics.
 6. Stops the app and restores the original user data.
@@ -223,6 +466,14 @@ Each test:
 
 ## Notes
 
+- The "Fatal error occurred. See debug.log for details." dialog is
+  `MyExceptionFilter` in `App.cpp` (an SEH crash in the GUI). `debug.log`
+  (next to the exe) is **rotated, not deleted**, at every startup — the
+  previous run's crash frames land in `debug.prev.log`, so a crash report
+  must be read from BOTH files before the next launch overwrites the
+  rotation. A crash with 0xc0000409 in ucrtbase usually means an unhandled
+  C++ exception escaped a `fire_and_forget` coroutine; 0xc000027b is a
+  stowed WinUI XAML exception.
 - The WinUI 3 project defines `DisableXamlGeneratedMain=true` and uses a custom `wWinMain` in `App.cpp`.
 - The old Win32 UI in `src/app.cpp` is **not** compiled by `AgentRedactor.vcxproj`; it is left in the repo for reference.
 - When changing XAML, MSBuild will regenerate the `.xaml.g.hpp` files automatically.

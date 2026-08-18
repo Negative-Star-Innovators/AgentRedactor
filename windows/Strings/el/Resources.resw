@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Λέξεις-κλειδιά: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Ενεργοποίηση καταγραφής</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Εμφάνιση ευαίσθητων πληροφοριών</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Τα αρχεία καταγραφής αποθηκεύονται σε αυτόν τον υπολογιστή. Τα αρχεία καταγραφής που έχουν διορθωθεί ενδέχεται να εξακολουθούν να περιέχουν ευαίσθητα δεδομένα που δεν εντοπίστηκαν.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Ενεργοποίηση καταγραφής</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Εμφάνιση ευαίσθητων πληροφοριών</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Προειδοποίηση</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Ενεργοποιήθηκε η καταγραφή ευαίσθητων πληροφοριών. Τα αρχεία καταγραφής θα περιέχουν δεδομένα χωρίς επεξεργασία, συμπεριλαμβανομένων των αρχικών σωμάτων αιτημάτων και του κλειδιού API σας. Αυτό γίνεται επαναφορά όταν κλείνετε την εφαρμογή.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Το Windows Hello θα χρησιμοποιηθεί για το ξεκλείδωμα της εφαρμογής. Θα σας ζητηθεί να κάνετε επαλήθευση με το Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Η επαλήθευση του Windows Hello δεν ολοκληρώθηκε, επομένως η προστασία δεν ενεργοποιήθηκε. Προσπαθήστε ξανά.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Απαιτείται Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Η επαλήθευση του Windows Hello δεν ήταν επιτυχής. Δοκιμάστε ξανά ή βγείτε από την εφαρμογή.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Προσπαθήστε ξανά</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Θα σας ζητηθεί να κάνετε επαλήθευση με το Windows Hello πριν απενεργοποιηθεί η προστασία.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Η επαλήθευση του Windows Hello δεν ολοκληρώθηκε, επομένως η προστασία εξακολουθεί να είναι ενεργοποιημένη.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Εμφάνιση ευαίσθητων πληροφοριών;</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Αυτό θα γράψει μη διορθωμένα ευαίσθητες τιμές (ονόματα, email, αριθμούς τηλεφώνου, κ.λπ.) και το κλειδί API σας στο αρχείο καταγραφής σας στο δίσκο. Μην το ενεργοποιήσετε εάν άλλοι έχουν πρόσβαση σε αυτόν τον υπολογιστή. Η ρύθμιση επαναφέρει όταν κλείσετε την εφαρμογή.</value>
+  </data>
 </root>

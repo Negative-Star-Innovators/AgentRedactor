@@ -106,7 +106,7 @@ def _pe_machine(exe: Path) -> str:
 
 
 def _kill_install_processes(install_root: Path) -> None:
-    """Kill AgentRedactor.exe / Update.exe instances running from the install."""
+    """Kill AgentRedactorUI.exe / agentredactor.exe / Update.exe instances running from the install."""
     root = str(install_root).lower()
     for proc in psutil.process_iter(["exe"]):
         try:
@@ -214,7 +214,7 @@ def test_selfrelease_fresh_install(tmp_path):
         pytest.skip("AGENTREDACTOR_SETUP is not set or does not point at a Setup.exe")
 
     install_root = Path(os.environ["LOCALAPPDATA"]) / INSTALL_DIR_NAME
-    current_exe = install_root / "current" / "AgentRedactor.exe"
+    current_exe = install_root / "current" / "AgentRedactorUI.exe"
     update_exe = install_root / "Update.exe"
 
     try:
@@ -230,7 +230,7 @@ def test_selfrelease_fresh_install(tmp_path):
         #    expects at runtime.
         assert update_exe.is_file() and current_exe.is_file(), (
             "Unexpected Velopack install layout; expected Update.exe and "
-            f"current\\AgentRedactor.exe under {install_root}.\n"
+            f"current\\AgentRedactorUI.exe under {install_root}.\n"
             + _layout_listing(install_root)
         )
 

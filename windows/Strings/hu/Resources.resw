@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Kulcsszavak: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Naplózás engedélyezése</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Érzékeny információk megjelenítése</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>A naplók ezen a számítógépen tárolódnak. A módosított naplók továbbra is tartalmazhatnak olyan bizalmas adatokat, amelyek észlelése elmaradt.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Naplózás engedélyezése</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Érzékeny információk megjelenítése</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Figyelmeztetés</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Az érzékeny információk naplózása engedélyezve. A naplók módosítatlan adatokat tartalmaznak, beleértve az eredeti kérelmeket és az Ön API-kulcsát. Ez visszaáll az alkalmazás bezárásakor.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>A Windows Hello segítségével feloldhatja az alkalmazás zárolását. A rendszer felkéri, hogy ellenőrizze a Windows Hello segítségével.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>A Windows Hello ellenőrzése nem fejeződött be, így a védelem nem volt engedélyezve. Próbáld újra.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello szükséges</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>A Windows Hello ellenőrzése nem sikerült. Próbálja újra, vagy lépjen ki az alkalmazásból.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Próbáld újra</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>A védelem letiltása előtt ellenőrizni kell a Windows Hello segítségével.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>A Windows Hello ellenőrzése nem fejeződött be, így a védelem továbbra is engedélyezve van.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Érzékeny információkat mutat?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Ez a módosítatlan bizalmas értékeket (nevek, e-mailek, telefonszámok stb.) és az API-kulcsot a lemezen lévő naplófájlba írja. Ne engedélyezze ezt, ha mások is hozzáférhetnek ehhez a számítógéphez. A beállítás visszaáll az alkalmazás bezárásakor.</value>
+  </data>
 </root>

@@ -1,6 +1,6 @@
 # AgentRedactor GUI End-to-End Tests
 
-These tests drive the **real** `AgentRedactor.exe` Windows UI with a FlaUI/C# helper and verify proxy behaviour through an `aiohttp` mock LLM.
+These tests drive the **real** `AgentRedactorUI.exe` Windows UI with a FlaUI/C# helper and verify proxy behaviour through an `aiohttp` mock LLM.
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ pytest -v gui/
 
 - `gui/windows/FlaUIHelper/` — C# console app that automates the AgentRedactor window.
 - `gui/windows/gui_driver.py` — Python wrapper around `FlaUIHelper.exe`.
-- `gui/gui_process.py` — starts/stops `AgentRedactor.exe` using real `%APPDATA%` / `%LOCALAPPDATA%`.
+- `gui/gui_process.py` — starts/stops `AgentRedactorUI.exe` (plus the `agentredactor.exe` engine) using real `%APPDATA%` / `%LOCALAPPDATA%`.
 - `gui/conftest.py` — backs up the user's real data, creates a clean test profile, and restores it after the test.
 - `config_factory.py` generates a plaintext `settings.json`.
 - `mock_llm.py` is an `aiohttp` mock server that echoes redacted text back in OpenAI or Anthropic format.

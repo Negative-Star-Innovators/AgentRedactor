@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Cuvinte cheie: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Activați înregistrarea în jurnal</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Afișați informații sensibile</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Jurnalele sunt stocate pe acest computer. Jurnalele eliminate pot conține în continuare date sensibile pe care le-au ratat detectarea.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Activați înregistrarea</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Afișați informații sensibile</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Avertizare</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Înregistrarea informațiilor sensibile a fost activată. Jurnalele vor conține date neredactate, inclusiv corpurile originale ale cererii și cheia dvs. API. Aceasta se resetează când închideți aplicația.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello va fi folosit pentru a debloca aplicația. Vi se va cere să verificați cu Windows Hello.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Verificarea Windows Hello nu a fost finalizată, așa că protecția nu a fost activată. Încearcă din nou.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Este necesar Windows Hello</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Verificarea Windows Hello nu a reușit. Încercați din nou sau ieșiți din aplicație.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Încearcă din nou</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Vi se va cere să verificați cu Windows Hello înainte ca protecția să fie dezactivată.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Verificarea Windows Hello nu a fost finalizată, așa că protecția este încă activată.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Afișați informații sensibile?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Acest lucru va scrie valorile sensibile neredactate (nume, e-mailuri, numere de telefon etc.) și cheia API pe fișierul jurnal de pe disc. Nu activați acest lucru dacă alții au acces la acest computer. Setarea se resetează când închideți aplicația.</value>
+  </data>
 </root>

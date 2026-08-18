@@ -18,12 +18,30 @@ HttpServer::~HttpServer() {
     WSACleanup();
 }
 
-bool HttpServer::Start(int port, std::function<HttpResponse(const HttpRequest&)> handler) {
+bool HttpServer::Start(int port, std::function<HttpResponse(const HttpRequest&)> handler, bool loopbackOnly) {
     if (running_.load()) return false;
     requestHandler_ = handler;
     port_ = port;
 
-    listenSocket_ = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+    int addrLen = 0;
+    sockaddr_in6 addr6 = {};
+    sockaddr_in addr4 = {};
+    sockaddr* bindAddr = nullptr;
+    if (loopbackOnly) {
+        listenSocket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        addr4.sin_family = AF_INET;
+        addr4.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+        addr4.sin_port = htons(static_cast<u_short>(port));
+        bindAddr = (sockaddr*)&addr4;
+        addrLen = sizeof(addr4);
+    } else {
+        listenSocket_ = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+        addr6.sin6_family = AF_INET6;
+        addr6.sin6_addr = in6addr_any;
+        addr6.sin6_port = htons(static_cast<u_short>(port));
+        bindAddr = (sockaddr*)&addr6;
+        addrLen = sizeof(addr6);
+    }
     if (listenSocket_ == INVALID_SOCKET) {
         LOG(L"[HttpServer] Failed to create socket");
         return false;
@@ -32,20 +50,26 @@ bool HttpServer::Start(int port, std::function<HttpResponse(const HttpRequest&)>
     int reuse = 1;
     setsockopt(listenSocket_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
 
-    // Dual-stack: accept both IPv4 and IPv6 connections on one socket
-    int v6only = 0;
-    setsockopt(listenSocket_, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&v6only, sizeof(v6only));
+    if (!loopbackOnly) {
+        // Dual-stack: accept both IPv4 and IPv6 connections on one socket
+        int v6only = 0;
+        setsockopt(listenSocket_, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&v6only, sizeof(v6only));
+    }
 
-    sockaddr_in6 addr = {};
-    addr.sin6_family = AF_INET6;
-    addr.sin6_addr = in6addr_any;
-    addr.sin6_port = htons(static_cast<u_short>(port));
-
-    if (bind(listenSocket_, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
+    if (bind(listenSocket_, bindAddr, addrLen) == SOCKET_ERROR) {
         LOG(L"[HttpServer] Failed to bind to port " + std::to_wstring(port));
         closesocket(listenSocket_);
         listenSocket_ = INVALID_SOCKET;
         return false;
+    }
+
+    // Resolve the actual bound port (relevant when port 0 was requested).
+    {
+        sockaddr_in6 bound = {};
+        int boundLen = sizeof(bound);
+        if (getsockname(listenSocket_, (sockaddr*)&bound, &boundLen) == 0) {
+            port_ = ntohs(bound.sin6_port);
+        }
     }
 
     if (listen(listenSocket_, SOMAXCONN) == SOCKET_ERROR) {
@@ -108,10 +132,12 @@ void HttpServer::HandleClient(SOCKET clientSocket) {
     HttpRequest request;
     if (ParseRequest(clientSocket, request)) {
         bool showSensitive = logManager_ && logManager_->IsShowSensitive();
-        LOGF(L"[HTTP] Parsed request: %s %s %s, headers=%zu, body=%zu",
-            request.method.c_str(), request.path.c_str(), request.version.c_str(),
-            request.headers.size(), request.body.size());
-        if (showSensitive) {
+        if (!quiet_) {
+            LOGF(L"[HTTP] Parsed request: %s %s %s, headers=%zu, body=%zu",
+                request.method.c_str(), request.path.c_str(), request.version.c_str(),
+                request.headers.size(), request.body.size());
+        }
+        if (showSensitive && !quiet_) {
             std::wstring headerLog;
             for (const auto& [name, value] : request.headers) {
                 headerLog += name + L": " + value + L"\r\n";
@@ -119,7 +145,9 @@ void HttpServer::HandleClient(SOCKET clientSocket) {
             LOGF(L"[HTTP] Request headers from client:\n%s", headerLog.c_str());
             LOGF(L"[HTTP] Request body from client (%zu bytes):\n%s", request.body.size(), Utils::Utf8ToWide(request.body).c_str());
         }
-        if (showSensitive) {
+        if (quiet_) {
+            // Control API: no per-request traffic logging (see SetQuiet).
+        } else if (showSensitive) {
             std::wstring trafficHeaders;
             for (const auto& [name, value] : request.headers) {
                 std::wstring lowerName = Utils::ToLower(name);
@@ -235,7 +263,7 @@ bool HttpServer::ParseRequest(SOCKET clientSocket, HttpRequest& request) {
         size_t currentBodySize = buffer.size() - bodyStart;
         request.body = buffer.substr(bodyStart, currentBodySize);
 
-        LOGF(L"[HTTP] Body read: contentLength=%d, initialBodySize=%zu", contentLength, request.body.size());
+        if (!quiet_) LOGF(L"[HTTP] Body read: contentLength=%d, initialBodySize=%zu", contentLength, request.body.size());
 
         int recvCount = 0;
         while ((int)request.body.size() < contentLength && totalRead < 50 * 1024 * 1024) { // 50MB max body
@@ -243,14 +271,14 @@ bool HttpServer::ParseRequest(SOCKET clientSocket, HttpRequest& request) {
             recvCount++;
             if (received <= 0) {
                 int err = WSAGetLastError();
-                LOGF(L"[HTTP] Body recv returned %d (recvCount=%d, WSAError=%d)", received, recvCount, err);
+                if (!quiet_) LOGF(L"[HTTP] Body recv returned %d (recvCount=%d, WSAError=%d)", received, recvCount, err);
                 break;
             }
             request.body.append(temp, received);
             totalRead += received;
-            LOGF(L"[HTTP] Body recv chunk: received=%d, totalBody=%zu", received, request.body.size());
+            if (!quiet_) LOGF(L"[HTTP] Body recv chunk: received=%d, totalBody=%zu", received, request.body.size());
         }
-        LOGF(L"[HTTP] Body read complete: finalBodySize=%zu, expected=%d, recvCalls=%d", request.body.size(), contentLength, recvCount);
+        if (!quiet_) LOGF(L"[HTTP] Body read complete: finalBodySize=%zu, expected=%d, recvCalls=%d", request.body.size(), contentLength, recvCount);
     }
 
     return true;
@@ -326,7 +354,7 @@ bool HttpServer::SendResponse(SOCKET clientSocket, const HttpResponse& response)
     // Log the raw response (headers only, body preview) only when show-sensitive
     // mode is on to avoid writing sensitive values to the log file.
     bool showSensitive = logManager_ && logManager_->IsShowSensitive();
-    if (showSensitive) {
+    if (showSensitive && !quiet_) {
         std::string headerSection = data.substr(0, data.find("\r\n\r\n") + 4);
         std::wstring wHeaderSection = Utils::Utf8ToWide(headerSection);
         LOGF(L"[HTTP] Sending raw response headers:\n%s", wHeaderSection.c_str());
@@ -334,13 +362,15 @@ bool HttpServer::SendResponse(SOCKET clientSocket, const HttpResponse& response)
             response.body.size(),
             Utils::Utf8ToWide(response.body).c_str());
     }
-    if (showSensitive) {
-        LOG_TRAFFIC(L"CLIENT_OUT", Utils::Utf8ToWide(data));
-    } else {
-        // Non-sensitive mode: the final client response is post-unredaction,
-        // so only metadata is logged. The redacted body appears at UPSTREAM_IN.
-        LOG_TRAFFIC(L"CLIENT_OUT",
-            std::to_wstring(response.statusCode) + L" | " + std::to_wstring(data.size()) + L" bytes (body omitted)");
+    if (!quiet_) {
+        if (showSensitive) {
+            LOG_TRAFFIC(L"CLIENT_OUT", Utils::Utf8ToWide(data));
+        } else {
+            // Non-sensitive mode: the final client response is post-unredaction,
+            // so only metadata is logged. The redacted body appears at UPSTREAM_IN.
+            LOG_TRAFFIC(L"CLIENT_OUT",
+                std::to_wstring(response.statusCode) + L" | " + std::to_wstring(data.size()) + L" bytes (body omitted)");
+        }
     }
 
     int totalSent = 0;
@@ -349,7 +379,7 @@ bool HttpServer::SendResponse(SOCKET clientSocket, const HttpResponse& response)
         if (sent <= 0) return false;
         totalSent += sent;
     }
-    LOGF(L"[HTTP] Sent %d bytes total to client", totalSent);
+    if (!quiet_) LOGF(L"[HTTP] Sent %d bytes total to client", totalSent);
     return true;
 }
 

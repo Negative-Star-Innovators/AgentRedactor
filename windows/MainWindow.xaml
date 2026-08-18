@@ -7,5 +7,40 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="RootGrid"/>
+    <Grid x:Name="RootGrid">
+
+        <!--
+          Session-lock overlay: covers the whole window (all pages) whenever
+          Windows Hello protection is on but the session is locked. Fully
+          opaque (solid black) and the content frame itself is collapsed, so
+          regex/keywords/profile content behind it is NEVER visible. Shows
+          only the padlock, the app name, and an Unlock button. Strings are
+          set from code (LocalizeLockOverlay) so the overlay follows the
+          current language.
+        -->
+        <Grid x:Name="LockOverlay" Visibility="Collapsed" Background="#FF000000">
+            <StackPanel
+                x:Name="LockPanel"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="14">
+                <FontIcon
+                    Glyph="&#xE72E;"
+                    FontSize="64"
+                    HorizontalAlignment="Center"
+                    Foreground="White"/>
+                <TextBlock
+                    x:Name="LockTitleText"
+                    FontSize="26"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    HorizontalAlignment="Center"/>
+                <Button
+                    x:Name="UnlockBtn"
+                    HorizontalAlignment="Center"
+                    MinWidth="160"
+                    Padding="20,8"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>

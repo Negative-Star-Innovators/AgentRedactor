@@ -13,15 +13,18 @@ namespace AgentRedactor {
 class SecureStorage {
 public:
     // Initialize from the "master_password" config block in settings.json.
-    // If master password is enabled but no password is provided, the storage
-    // is not initialized (Encrypt/Decrypt will fail until Unlock is called).
-    bool Initialize(const json& config, const std::wstring& masterPassword = L"");
+    // Protection is Windows-Hello-only (no typed password). A legacy config
+    // that enabled protection with a typed password but has no Hello blob
+    // degrades to unprotected (the Hello blob cannot be created without the
+    // user's Windows Hello verification).
+    bool Initialize(const json& config);
 
     bool IsInitialized() const { return initialized_; }
     bool IsMasterPasswordEnabled() const { return masterPasswordEnabled_; }
+    bool IsHelloEnabled() const { return helloEnabled_; }
 
     // Encrypt a plaintext string. Returns a JSON object with the encrypted blob.
-    // Mode is determined by whether master password is enabled.
+    // Mode is determined by whether protection is enabled.
     json Encrypt(const std::wstring& plaintext) const;
 
     // Decrypt an encrypted field JSON object.
@@ -30,32 +33,34 @@ public:
     // Get the master_password config block to save to settings.json.
     json GetConfig() const;
 
-    // Enable master password protection. Generates a random AES key and
-    // encrypts it with a key derived from the provided password.
-    bool EnableMasterPassword(const std::wstring& password);
-
-    // Change the master password. Requires the old password to decrypt the AES key.
-    bool ChangeMasterPassword(const std::wstring& oldPassword, const std::wstring& newPassword);
+    // Enable Windows-Hello-only protection: a random AES key is generated and
+    // stored only as the DPAPI-wrapped Hello blob. Windows Hello is the only
+    // way to unlock.
+    bool EnableMasterPassword();
 
     // Disable master password. Subsequent Encrypt calls will use DPAPI.
     void DisableMasterPassword();
 
-    // Unlock the storage with the master password.
-    bool Unlock(const std::wstring& password);
+    // Unlock the storage with the Windows Hello blob (the UserConsentVerifier
+    // consent prompt is driven by the caller via hello_unlock.cpp).
+    bool UnlockWithHello();
+
+    // Lock the session again without discarding the in-memory AES key: the
+    // storage is marked uninitialized so reads/decrypts fail until
+    // UnlockWithHello succeeds (used after the GUI quits while the engine
+    // keeps running, so the next open must re-authenticate).
+    void Lock();
 
 private:
     bool initialized_ = false;
     bool masterPasswordEnabled_ = false;
-    std::vector<BYTE> aesKey_; // 32 bytes, only valid when initialized with master password
-
-    // Persistent config for saving
-    std::vector<BYTE> salt_;
-    int iterations_ = 100000;
-    std::vector<BYTE> encryptedAesKey_;
-    std::vector<BYTE> keyIv_;
-    std::vector<BYTE> keyTag_;
+    bool helloEnabled_ = false;
+    std::vector<BYTE> aesKey_; // 32 bytes, only valid when initialized
+    std::vector<BYTE> helloBlob_; // DPAPI-wrapped copy of aesKey_, used by UnlockWithHello
 
     // DPAPI
+    static std::optional<std::vector<BYTE>> DpapiProtect(const std::vector<BYTE>& data);
+    static std::optional<std::vector<BYTE>> DpapiUnprotect(const std::vector<BYTE>& data);
     static std::optional<std::vector<BYTE>> DpapiEncrypt(const std::wstring& plaintext);
     static std::optional<std::wstring> DpapiDecrypt(const std::vector<BYTE>& ciphertext);
 
@@ -64,10 +69,6 @@ private:
         std::vector<BYTE>& ciphertext, std::vector<BYTE>& iv, std::vector<BYTE>& tag);
     static std::optional<std::vector<BYTE>> AesGcmDecrypt(const std::vector<BYTE>& ciphertext,
         const std::vector<BYTE>& key, const std::vector<BYTE>& iv, const std::vector<BYTE>& tag);
-
-    // PBKDF2-HMAC-SHA256 via Windows CNG
-    static std::vector<BYTE> Pbkdf2DeriveKey(const std::wstring& password,
-        const std::vector<BYTE>& salt, int iterations, size_t keyLen = 32);
 
     // Random bytes via BCryptGenRandom
     static std::vector<BYTE> GenerateRandomBytes(size_t count);

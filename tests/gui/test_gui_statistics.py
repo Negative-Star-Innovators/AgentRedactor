@@ -11,7 +11,7 @@ import pytest
 from mock_llm import MockLLM
 
 from gui_process import GuiAppProcess
-from windows.gui_driver import add_keyword, get_session_redactions, get_statistics
+from windows.gui_driver import add_keyword, get_session_redactions, get_statistics, wait_until
 
 
 OPENAI_PATH = "/v1/chat/completions"
@@ -47,14 +47,19 @@ async def test_gui_statistics_and_session_redactions(
         assert resp.status == 200
         await resp.json()
 
-    stats = get_statistics()
+    stats = wait_until(
+        "statistics after traffic",
+        get_statistics,
+        lambda s: _extract_stat(s, "Requests") >= 1 and _extract_stat(s, "Keywords") >= 1,
+    )
     print(f"\n[GUI TEST] statistics: {stats}")
-    assert _extract_stat(stats, "Requests") >= 1
-    assert _extract_stat(stats, "Keywords") >= 1
 
-    session = get_session_redactions()
+    session = wait_until(
+        "session redactions after traffic",
+        get_session_redactions,
+        lambda entries: any(secret in entry or "REDACTED_KEYWORD" in entry for entry in entries),
+    )
     print(f"[GUI TEST] session redactions: {session}")
-    assert any(secret in entry or "REDACTED_KEYWORD" in entry for entry in session)
 
     elapsed = time.monotonic() - start
     print(f"\n[GUI TEST] test_gui_statistics_and_session_redactions took {elapsed:.2f}s")

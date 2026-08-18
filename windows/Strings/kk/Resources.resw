@@ -672,4 +672,53 @@
   <data name="ProxyLog_Keywords" xml:space="preserve">
     <value>Түйін сөздер: {0}</value>
   </data>
+
+  <data name="HomePage_Logs_EnableLoggingCheck.Content" xml:space="preserve">
+    <value>Тіркеуді қосу</value>
+  </data>
+  <data name="HomePage_Logs_SensitiveCheck.Content" xml:space="preserve">
+    <value>Құпия ақпаратты көрсету</value>
+  </data>
+  <data name="HomePage_Logs_Disclaimer.Text" xml:space="preserve">
+    <value>Журналдар осы компьютерде сақталады. Түзетілген журналдарда әлі де анықталмаған құпия деректер болуы мүмкін.</value>
+  </data>
+  <data name="SettingsPage_EnableLogging_Header.Header" xml:space="preserve">
+    <value>Журналды қосу</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfo_Header.Header" xml:space="preserve">
+    <value>Сезімтал ақпаратты көрсету</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Title" xml:space="preserve">
+    <value>Ескерту</value>
+  </data>
+  <data name="SettingsPage_SensitiveInfoWarning_Message" xml:space="preserve">
+    <value>Сезімтал ақпаратты тіркеу қосулы. Журналдарда өңделмеген деректер, соның ішінде бастапқы сұрау органдары және API кілті болады. Бұл қолданбаны жапқанда қалпына келтіріледі.</value>
+  </data>
+  <data name="Dialog_EnableHello_Message" xml:space="preserve">
+    <value>Windows Hello қолданбаның құлпын ашу үшін пайдаланылады. Сізден Windows Hello арқылы растау сұралады.</value>
+  </data>
+  <data name="Dialog_EnableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello тексеруі аяқталмады, сондықтан қорғау қосылмаған. Қайтадан байқап көріңіз.</value>
+  </data>
+  <data name="Dialog_HelloFailed_Title" xml:space="preserve">
+    <value>Windows Hello қажет</value>
+  </data>
+  <data name="Dialog_HelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello тексеруі сәтсіз аяқталды. Әрекетті қайталаңыз немесе қолданбадан шығыңыз.</value>
+  </data>
+  <data name="Dialog_TryAgainButton" xml:space="preserve">
+    <value>Қайтадан байқап көріңіз</value>
+  </data>
+  <data name="Dialog_DisableHello_Message" xml:space="preserve">
+    <value>Қорғау өшірілмес бұрын сізден Windows Hello арқылы тексеру сұралады.</value>
+  </data>
+  <data name="Dialog_DisableHelloFailed_Message" xml:space="preserve">
+    <value>Windows Hello тексеруі аяқталмады, сондықтан қорғау әлі де қосулы.</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Title" xml:space="preserve">
+    <value>Құпия ақпаратты көрсету керек пе?</value>
+  </data>
+  <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
+    <value>Бұл өңделмеген құпия мәндерді (аттар, электрондық пошталар, телефон нөмірлері, т.б.) және API кілтін дискідегі журнал файлына жазады. Басқалардың осы компьютерге кіру мүмкіндігі болса, оны қоспаңыз. Параметр қолданбаны жапқанда қалпына келтіріледі.</value>
+  </data>
 </root>

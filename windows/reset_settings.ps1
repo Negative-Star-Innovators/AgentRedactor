@@ -11,10 +11,10 @@ Write-Host "========================================" -ForegroundColor Cyan
 # -----------------------------------------------------------------------------
 # 1. Stop any running instance
 # -----------------------------------------------------------------------------
-$proc = Get-Process -Name "AgentRedactor" -ErrorAction SilentlyContinue
+$proc = Get-Process -Name "AgentRedactorUI", "agentredactor" -ErrorAction SilentlyContinue
 if ($proc) {
-    Write-Host "Stopping running AgentRedactor.exe..." -ForegroundColor Yellow
-    Stop-Process -Name "AgentRedactor" -Force -ErrorAction SilentlyContinue
+    Write-Host "Stopping running AgentRedactorUI.exe / agentredactor.exe..." -ForegroundColor Yellow
+    Stop-Process -Name "AgentRedactorUI", "agentredactor" -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
     Write-Host "Process stopped." -ForegroundColor Green
 } else {
