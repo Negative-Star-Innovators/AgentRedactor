@@ -23,6 +23,11 @@ public:
     bool Put(const std::wstring& path, const json& body, json* out) const;
     bool Delete(const std::wstring& path) const;
 
+    // HTTP status of the most recent request (0 = transport failure). The
+    // typed getters collapse non-200 to false; callers that need to
+    // distinguish e.g. 403-while-locked read this after a false return.
+    long LastStatus() const { return lastStatus_; }
+
     // Typed master password unlock (POST /unlock {"password": ...}). There is
     // no Windows Hello on Linux, so this is the only unlock path.
     bool UnlockWithPassword(const std::wstring& password) const;
@@ -33,6 +38,7 @@ private:
 
     int port_ = 0;
     std::wstring token_;
+    mutable long lastStatus_ = 0;
 };
 
 } // namespace AgentRedactor

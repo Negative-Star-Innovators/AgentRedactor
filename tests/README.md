@@ -70,5 +70,10 @@ Hello: the Hello-consent tests in `cli/test_cli.py` skip, and
 `cli/test_cli_linux_password.py` covers the equivalent password flow by
 piping the password to stdin.
 
+`linux/test_gui_smoke.py` additionally launches the real Qt GUI
+(`linux/build/gui/agentredactor-gui`, override with `AGENTREDACTOR_GUI_BIN`)
+offscreen (`QT_QPA_PLATFORM=offscreen`) and asserts engine spawn/stop
+ownership, lock-on-quit when protected, and XDG autostart reconciliation.
+
 Run each suite in its own pytest process (as above): the suites share the
 `conftest` module name and cannot be collected in a single invocation.

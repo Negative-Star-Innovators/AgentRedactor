@@ -90,6 +90,7 @@ bool ControlApiClient::Request(const std::wstring& method, const std::wstring& p
     const std::string* body, long& statusCode, std::string& responseBody) const {
     statusCode = 0;
     responseBody.clear();
+    lastStatus_ = 0;
     if (!IsConnected()) return false;
 
     CURL* curl = curl_easy_init();
@@ -120,6 +121,7 @@ bool ControlApiClient::Request(const std::wstring& method, const std::wstring& p
 
     const CURLcode res = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &statusCode);
+    lastStatus_ = statusCode;
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     return res == CURLE_OK;

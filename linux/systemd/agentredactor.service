@@ -1,0 +1,23 @@
+# Agent Redactor engine — systemd user unit (headless / boot-time startup).
+#
+# Install:
+#   mkdir -p ~/.config/systemd/user
+#   cp agentredactor.service ~/.config/systemd/user/
+#   # edit ExecStart to wherever the engine binary lives
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now agentredactor.service
+#
+# The engine is single-instance per config dir (flock on engine.lock), so a
+# desktop session that also autostarts the GUI will reuse this engine; the
+# GUI stops the engine on quit only when the GUI itself spawned it.
+[Unit]
+Description=Agent Redactor engine
+After=default.target
+
+[Service]
+ExecStart=%h/.local/bin/agentredactor --console
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
