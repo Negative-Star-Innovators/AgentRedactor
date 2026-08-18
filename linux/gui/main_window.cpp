@@ -139,7 +139,7 @@ void MainWindow::buildUi() {
     splitter->addWidget(sidebar);
 
     // Cards in a scroll area
-    auto* scroll = new QScrollArea(splitter);
+    auto* scroll = new QScrollArea;
     scroll->setWidgetResizable(true);
     auto* cards = new QWidget(scroll);
     auto* cardsLayout = new QVBoxLayout(cards);
@@ -313,8 +313,9 @@ void MainWindow::buildUi() {
 
     cardsLayout->addStretch();
     scroll->setWidget(cards);
-    splitter->addWidget(cards);
-    splitter->setStretchFactor(1, 1);
+    splitter->addWidget(scroll);
+    splitter->setStretchFactor(0, 0); // sidebar keeps its fixed width
+    splitter->setStretchFactor(1, 1); // cards take the remaining space
 
     contentLayout->addWidget(splitter);
     centralStack_->addWidget(content);

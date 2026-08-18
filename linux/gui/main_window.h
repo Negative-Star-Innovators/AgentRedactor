@@ -162,7 +162,9 @@ private:
     QPushButton* modelRetryBtn_ = nullptr;
 
     json profiles_ = json::array();
-    uint64_t prevProfilesRevision_ = 0;
+    // Sentinel forces the first settings snapshot to trigger a full profile
+    // load (a fresh engine's revision can legitimately be 0).
+    uint64_t prevProfilesRevision_ = UINT64_MAX;
     bool loading_ = false;  // suppress dirty-tracking while populating
     bool dirty_ = false;    // form edited since last load/save
     bool quitting_ = false; // real quit in progress (vs close-to-tray)
