@@ -1,6 +1,7 @@
 # Build outputs
 windows/build/
 windows/packages/
+linux/build/
 
 # Temporary scripts and artifacts
 temp/
