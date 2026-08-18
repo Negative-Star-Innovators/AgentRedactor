@@ -42,9 +42,16 @@ public:
     bool IsMasterPasswordEnabled() const;
     bool IsUnlocked() const;
     bool IsHelloEnabled() const;
+#ifdef _WIN32
     bool EnableMasterPassword();
     void DisableMasterPassword();
     bool UnlockWithHello();
+#else
+    // Linux: typed-master-password protection (no Windows Hello).
+    bool EnableMasterPassword(const std::wstring& password);
+    void DisableMasterPassword();
+    bool UnlockWithPassword(const std::wstring& password);
+#endif
     void Lock();
 
     bool IsLoggingEnabled() const;

@@ -1,8 +1,10 @@
 #include "model_downloader.h"
 #include "constants.h"
 #include "utils.h"
+#ifdef _WIN32
 #include <windows.h>
 #include <shlobj.h>
+#endif
 #include <system_error>
 
 namespace AgentRedactor {
@@ -15,7 +17,7 @@ namespace {
 constexpr const wchar_t* kWeightsUrls[] = {
     L"https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data",
 };
-constexpr const wchar_t* kWeightsRelativePath = L"onnx\\model_quantized.onnx_data";
+constexpr const wchar_t* kWeightsRelativePath = L"onnx/model_quantized.onnx_data";
 
 // Small companion files that ship with the app next to the exe and are copied
 // (not downloaded) into the fallback directory when missing.
@@ -23,7 +25,7 @@ constexpr const wchar_t* kCompanionFiles[] = {
     L"tokenizer.json",
     L"config.json",
     L"viterbi_calibration.json",
-    L"onnx\\model_quantized.onnx",
+    L"onnx/model_quantized.onnx",
 };
 
 std::filesystem::path WeightsPath(const std::filesystem::path& modelDir) {
@@ -44,11 +46,23 @@ std::filesystem::path WeightsFilePath(const std::filesystem::path& modelDir) {
 }
 
 std::filesystem::path GetFallbackModelDir() {
+#ifdef _WIN32
     wchar_t path[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_LOCAL_APPDATA, nullptr, 0, path))) {
         return std::filesystem::path(path) / L"AgentRedactor" / MODEL_DIR;
     }
     return std::filesystem::path(L"C:\\AgentRedactor") / MODEL_DIR;
+#else
+    // XDG: $XDG_DATA_HOME/agentredactor/models, defaulting to
+    // ~/.local/share/agentredactor/models.
+    if (const char* xdg = std::getenv("XDG_DATA_HOME"); xdg && *xdg) {
+        return std::filesystem::path(xdg) / "agentredactor" / "models";
+    }
+    if (const char* home = std::getenv("HOME"); home && *home) {
+        return std::filesystem::path(home) / ".local" / "share" / "agentredactor" / "models";
+    }
+    return std::filesystem::path("/tmp/agentredactor") / "models";
+#endif
 }
 
 bool HasModelWeights(const std::filesystem::path& modelDir) {
@@ -63,7 +77,7 @@ bool HasModelWeights(const std::filesystem::path& modelDir) {
     // instead of failing to initialize the detector forever.
     LOGF_LIFECYCLE(L"[ModelDownloader] Deleting corrupt weights (size %llu, expected %llu): %s",
         static_cast<unsigned long long>(size), static_cast<unsigned long long>(kWeightsExpectedBytes),
-        weights.c_str());
+        weights.wstring().c_str());
     std::filesystem::remove(weights, ec);
     return false;
 }
@@ -89,19 +103,19 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
         if (std::filesystem::exists(dest, ec)) continue;
         auto src = exeModels / relative;
         if (!std::filesystem::exists(src, ec)) {
-            LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe: %s", src.c_str());
+            LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe: %s", src.wstring().c_str());
             return false;
         }
         std::filesystem::create_directories(dest.parent_path(), ec);
         if (ec) {
             LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s: %s",
-                dest.parent_path().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
+                dest.parent_path().wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
             return false;
         }
         std::filesystem::copy_file(src, dest, ec);
         if (ec) {
             LOGF_LIFECYCLE(L"[ModelDownloader] Failed to copy %s: %s",
-                src.c_str(), Utils::Utf8ToWide(ec.message()).c_str());
+                src.wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
             return false;
         }
     }
@@ -117,7 +131,7 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     std::error_code ec;
     std::filesystem::create_directories(weightsDest.parent_path(), ec);
     if (ec) {
-        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s", weightsDest.parent_path().c_str());
+        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s", weightsDest.parent_path().wstring().c_str());
         return false;
     }
 
@@ -158,7 +172,7 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     if (ec) {
         // Keep the complete .partial; the next retry finalizes it without
         // downloading again.
-        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to finalize %s", weightsDest.c_str());
+        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to finalize %s", weightsDest.wstring().c_str());
         return false;
     }
 

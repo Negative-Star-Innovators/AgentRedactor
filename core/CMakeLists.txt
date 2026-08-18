@@ -48,6 +48,7 @@ else()
     find_package(OpenSSL REQUIRED)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSECRET REQUIRED IMPORTED_TARGET libsecret-1)
+    list(APPEND AR_CORE_SOURCES src/secure_storage_linux.cpp src/platform_compat.cpp)
 endif()
 
 add_library(agentredactor-core STATIC ${AR_CORE_SOURCES})

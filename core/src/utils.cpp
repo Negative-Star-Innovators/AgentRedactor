@@ -1,7 +1,15 @@
 #include "utils.h"
+#ifdef _WIN32
 #include <windows.h>
 #include <shlobj.h>
 #include <winhttp.h>
+#else
+#include <cctype>
+#include <codecvt>
+#include <locale>
+#include <random>
+#include <curl/curl.h>
+#endif
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
@@ -17,10 +25,10 @@
 namespace AgentRedactor {
 namespace Utils {
 
-static std::wstring g_logFilePath;
+static std::filesystem::path g_logFilePath;
 static std::mutex g_logMutex;
 
-static std::wstring g_debugTrafficLogFilePath;
+static std::filesystem::path g_debugTrafficLogFilePath;
 static std::mutex g_debugTrafficLogMutex;
 
 // Runtime gate for LOG/LOGF/LOG_TRAFFIC. LogManager is the single source of
@@ -43,8 +51,8 @@ void InitializeLogging(const std::filesystem::path& logDirOverride) {
     auto sessionsDir = logDir / L"sessions";
     g_logFilePath = logDir / L"agent_redactor.log";
 
-    CreateDirectoryW(logDir.c_str(), nullptr);
-    CreateDirectoryW(sessionsDir.c_str(), nullptr);
+    CreateDirectoryRecursive(logDir);
+    CreateDirectoryRecursive(sessionsDir);
 
     // Rotate previous session log if it exists and has content
     try {
@@ -88,7 +96,7 @@ void InitializeLogging(const std::filesystem::path& logDirOverride) {
 void InitializeDebugTrafficLogging(const std::filesystem::path& logDirOverride) {
     auto logDir = logDirOverride.empty() ? GetAppDataPath() : logDirOverride;
     g_debugTrafficLogFilePath = logDir / L"agent_redactor_debug.log";
-    CreateDirectoryW(logDir.c_str(), nullptr);
+    CreateDirectoryRecursive(logDir);
 }
 
 void LogTrafficMessage(const std::wstring& direction, const std::wstring& message) {
@@ -139,20 +147,47 @@ void LogLifecycleMessage(const std::wstring& message) {
 
 std::wstring Utf8ToWide(const std::string& utf8) {
     if (utf8.empty()) return L"";
+#ifdef _WIN32
     int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
     if (size_needed <= 0) return L"";
     std::wstring result(size_needed - 1, L'\0');
     MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, result.data(), size_needed);
     return result;
+#else
+    // wchar_t is 32-bit on Linux; wstrings stay opaque UTF-16-ish containers
+    // (supplementary characters become surrogate pairs), exactly matching the
+    // Windows representation the rest of the core assumes.
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    try {
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+        return conv.from_bytes(utf8);
+    } catch (...) {
+        return L"";
+    }
+    #pragma GCC diagnostic pop
+#endif
 }
 
 std::string WideToUtf8(const std::wstring& wide) {
     if (wide.empty()) return "";
+#ifdef _WIN32
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, nullptr, 0, nullptr, nullptr);
     if (size_needed <= 0) return "";
     std::string result(size_needed - 1, '\0');
     WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, result.data(), size_needed, nullptr, nullptr);
     return result;
+#else
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    try {
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+        return conv.to_bytes(wide);
+    } catch (...) {
+        return "";
+    }
+    #pragma GCC diagnostic pop
+#endif
 }
 
 std::wstring ToLower(const std::wstring& str) {
@@ -292,11 +327,22 @@ std::filesystem::path GetAppDataPath() {
         overrideDir && *overrideDir) {
         return std::filesystem::path(overrideDir);
     }
+#ifdef _WIN32
     wchar_t path[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path))) {
         return std::filesystem::path(path) / L"AgentRedactor";
     }
     return std::filesystem::path(L"C:\\AgentRedactor");
+#else
+    // XDG: $XDG_CONFIG_HOME/agentredactor, defaulting to ~/.config/agentredactor.
+    if (const char* xdg = std::getenv("XDG_CONFIG_HOME"); xdg && *xdg) {
+        return std::filesystem::path(xdg) / "agentredactor";
+    }
+    if (const char* home = std::getenv("HOME"); home && *home) {
+        return std::filesystem::path(home) / ".config" / "agentredactor";
+    }
+    return std::filesystem::path("/tmp/agentredactor");
+#endif
 }
 
 std::filesystem::path GetCurrentLogFilePath() {
@@ -307,9 +353,17 @@ std::filesystem::path GetCurrentLogFilePath() {
 }
 
 std::filesystem::path GetExecutablePath() {
+#ifdef _WIN32
     wchar_t path[MAX_PATH];
     GetModuleFileNameW(nullptr, path, MAX_PATH);
     return std::filesystem::path(path).parent_path();
+#else
+    char path[4096];
+    ssize_t len = ::readlink("/proc/self/exe", path, sizeof(path) - 1);
+    if (len <= 0) return std::filesystem::current_path();
+    path[len] = '\0';
+    return std::filesystem::path(path).parent_path();
+#endif
 }
 
 std::wstring GetCurrentMonth() {
@@ -326,6 +380,7 @@ int64_t GetCurrentTimestamp() {
 }
 
 std::wstring GenerateUUID() {
+#ifdef _WIN32
     UUID uuid = {};
     RPC_STATUS status = UuidCreate(&uuid);
     if (status != RPC_S_OK) {
@@ -336,6 +391,25 @@ std::wstring GenerateUUID() {
         << std::setw(8) << uuid.Data1 << L'-' << std::setw(4) << uuid.Data2 << L'-' << std::setw(4) << uuid.Data3 << L'-';
     for (int i = 0; i < 8; ++i) oss << std::setw(2) << static_cast<int>(uuid.Data4[i]);
     return oss.str();
+#else
+    // RFC 4122 v4 UUID from OS randomness.
+    try {
+        unsigned char b[16];
+        std::random_device rd;
+        for (auto& byte : b) byte = static_cast<unsigned char>(rd());
+        b[6] = (b[6] & 0x0F) | 0x40;
+        b[8] = (b[8] & 0x3F) | 0x80;
+        std::wostringstream oss;
+        oss << std::hex << std::setfill(L'0');
+        for (int i = 0; i < 16; ++i) {
+            if (i == 4 || i == 6 || i == 8 || i == 10) oss << L'-';
+            oss << std::setw(2) << static_cast<int>(b[i]);
+        }
+        return oss.str();
+    } catch (...) {
+        return L"uuid_" + std::to_wstring(std::chrono::steady_clock::now().time_since_epoch().count());
+    }
+#endif
 }
 
 std::wstring FormatSize(size_t size) {
@@ -373,6 +447,7 @@ double ParseLocalizedFloat(const std::wstring& text) {
     return _wtof(normalized.c_str());
 }
 
+#ifdef _WIN32
 static SYSTEMTIME TmToSystemTime(const struct tm& timeinfo) {
     SYSTEMTIME st = {};
     st.wYear = static_cast<WORD>(timeinfo.tm_year + 1900);
@@ -384,11 +459,13 @@ static SYSTEMTIME TmToSystemTime(const struct tm& timeinfo) {
     st.wMilliseconds = 0;
     return st;
 }
+#endif
 
 std::wstring FormatLocalizedTime(const std::time_t& time) {
     std::wstring buffer(64, L'\0');
     struct tm timeinfo;
     localtime_s(&timeinfo, &time);
+#ifdef _WIN32
     SYSTEMTIME st = TmToSystemTime(timeinfo);
     int len = GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, buffer.data(), static_cast<int>(buffer.size()));
     if (len > 0) {
@@ -397,6 +474,10 @@ std::wstring FormatLocalizedTime(const std::time_t& time) {
         wcsftime(buffer.data(), buffer.size(), L"%H:%M:%S", &timeinfo);
         buffer.resize(wcslen(buffer.c_str()));
     }
+#else
+    wcsftime(buffer.data(), buffer.size(), L"%H:%M", &timeinfo);
+    buffer.resize(wcslen(buffer.c_str()));
+#endif
     return buffer;
 }
 
@@ -404,6 +485,7 @@ std::wstring FormatLocalizedDateTime(const std::time_t& time) {
     std::wstring buffer(128, L'\0');
     struct tm timeinfo;
     localtime_s(&timeinfo, &time);
+#ifdef _WIN32
     SYSTEMTIME st = TmToSystemTime(timeinfo);
     int len = GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, buffer.data(), static_cast<int>(buffer.size()), nullptr);
     if (len > 0) {
@@ -412,10 +494,15 @@ std::wstring FormatLocalizedDateTime(const std::time_t& time) {
         wcsftime(buffer.data(), buffer.size(), L"%Y-%m-%d", &timeinfo);
         buffer.resize(wcslen(buffer.c_str()));
     }
+#else
+    wcsftime(buffer.data(), buffer.size(), L"%Y-%m-%d", &timeinfo);
+    buffer.resize(wcslen(buffer.c_str()));
+#endif
     std::wstring timeStr = FormatLocalizedTime(time);
     return buffer + L" " + timeStr;
 }
 
+#ifdef _WIN32
 namespace {
 
 struct WinHttpHandle {
@@ -716,6 +803,331 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     LOG_LIFECYCLE(L"[Utils] Segmented download complete");
     return true;
 }
+
+#else // POSIX: libcurl implementations of the same three helpers
+
+namespace {
+
+// Result of the headers callback: fail the request, continue receiving the
+// body, or stop here successfully (headers-only probe — mirrors the WinHTTP
+// code closing the request handle right after the consume callback returns).
+enum class HeadersAction { Fail, Proceed, HeadersOnly };
+
+struct CurlGetContext {
+    CURL* curl = nullptr;
+    std::function<HeadersAction(long status, uint64_t contentLength)> onHeaders;
+    std::function<bool(const char* data, size_t len)> onData;
+    std::string location;
+    HeadersAction action = HeadersAction::Proceed;
+};
+
+static bool AsciiStartsWithNoCase(const std::string& s, const char* prefix) {
+    for (size_t i = 0; prefix[i]; ++i) {
+        if (i >= s.size() || tolower((unsigned char)s[i]) != tolower((unsigned char)prefix[i])) return false;
+    }
+    return true;
+}
+
+size_t CurlHeaderCallback(char* buffer, size_t size, size_t nitems, void* userdata) {
+    const size_t len = size * nitems;
+    auto* ctx = static_cast<CurlGetContext*>(userdata);
+    const std::string line(buffer, len);
+    if (AsciiStartsWithNoCase(line, "Location:")) {
+        std::string value = line.substr(9);
+        value.erase(0, value.find_first_not_of(" \t\r\n"));
+        value.erase(value.find_last_not_of(" \t\r\n") + 1);
+        ctx->location = value;
+        return len;
+    }
+    if (line == "\r\n" || line == "\n") {
+        // End of the header block. Redirect responses are handled by the
+        // caller after perform; only invoke onHeaders for the final status.
+        long status = 0;
+        curl_off_t contentLength = -1;
+        curl_easy_getinfo(ctx->curl, CURLINFO_RESPONSE_CODE, &status);
+        if (status >= 300 && status < 400) return len;
+        curl_easy_getinfo(ctx->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &contentLength);
+        ctx->action = ctx->onHeaders(status, contentLength > 0 ? static_cast<uint64_t>(contentLength) : 0);
+        if (ctx->action != HeadersAction::Proceed) return 0; // abort transfer
+    }
+    return len;
+}
+
+size_t CurlWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    const size_t len = size * nmemb;
+    auto* ctx = static_cast<CurlGetContext*>(userdata);
+    return ctx->onData(ptr, len) ? len : 0;
+}
+
+// Performs a GET against `url`, following redirects manually (the default
+// auto policy is disabled so cross-host chains like worker -> github.com ->
+// release asset CDN are explicit). `extraHeaders` (e.g. a Range header) is
+// re-sent on every hop of the redirect chain. onHeaders decides whether the
+// body is consumed; onData feeds body bytes. Never throws.
+bool CurlGet(const std::wstring& url, const std::wstring& extraHeaders,
+    const std::function<HeadersAction(long status, uint64_t contentLength)>& onHeaders,
+    const std::function<bool(const char* data, size_t len)>& onData) {
+    std::string current = WideToUtf8(url);
+    for (int redirect = 0; redirect < 5; ++redirect) {
+        CURL* curl = curl_easy_init();
+        if (!curl) return false;
+        CurlGetContext ctx;
+        ctx.curl = curl;
+        ctx.onHeaders = onHeaders;
+        ctx.onData = onData;
+        curl_easy_setopt(curl, CURLOPT_URL, current.c_str());
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "AgentRedactor/1.0");
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+        // WinHTTP-equivalent timeouts: 30 s connect; abort when the transfer
+        // stalls below 1 byte/s for 300 s (receive timeout for large files).
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 30000L);
+        curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L);
+        curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 300L);
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, CurlHeaderCallback);
+        curl_easy_setopt(curl, CURLOPT_HEADERDATA, &ctx);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ctx);
+        struct curl_slist* headerList = nullptr;
+        if (!extraHeaders.empty()) {
+            for (const auto& h : Split(extraHeaders, L'\n')) {
+                const std::string narrow = WideToUtf8(Trim(h));
+                if (!narrow.empty()) headerList = curl_slist_append(headerList, narrow.c_str());
+            }
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerList);
+        }
+        CURLcode res = curl_easy_perform(curl);
+        long status = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+        curl_slist_free_all(headerList);
+        curl_easy_cleanup(curl);
+
+        if (ctx.action == HeadersAction::Fail) return false;
+        if (ctx.action == HeadersAction::HeadersOnly) return true;
+        if (status == 301 || status == 302 || status == 303 || status == 307 || status == 308) {
+            if (ctx.location.empty()) return false;
+            current = ctx.location;
+            continue;
+        }
+        if (status != 200 && status != 206) return false;
+        return res == CURLE_OK;
+    }
+    return false;
+}
+
+} // anonymous namespace
+
+bool HttpGetString(const std::wstring& url, std::string& outBody) {
+    outBody.clear();
+    return CurlGet(url, L"",
+        [](long status, uint64_t) {
+            return (status == 200 || status == 206) ? HeadersAction::Proceed : HeadersAction::Fail;
+        },
+        [&outBody](const char* data, size_t len) {
+            outBody.append(data, len);
+            return true;
+        });
+}
+
+bool HttpDownloadFile(const std::wstring& url, const std::filesystem::path& destPath,
+    const std::function<void(uint64_t downloaded, uint64_t total)>& progress) {
+    // Resume from an existing partial file when the server honors ranges.
+    uint64_t existing = 0;
+    {
+        std::error_code ec;
+        auto size = std::filesystem::file_size(destPath, ec);
+        if (!ec) existing = size;
+    }
+    std::wstring rangeHeader;
+    if (existing > 0) rangeHeader = L"Range: bytes=" + std::to_wstring(existing) + L"-\r\n";
+
+    struct State {
+        std::ofstream file;
+        uint64_t total = 0;
+        uint64_t downloaded = 0;
+        bool resuming = false;
+    } st;
+    const bool transportOk = CurlGet(url, rangeHeader,
+        [&](long status, uint64_t contentLength) {
+            if (status != 200 && status != 206) return HeadersAction::Fail;
+            // 206: the server honored the Range request, append. 200: it
+            // answered the whole file instead — discard the partial and
+            // restart from zero.
+            st.resuming = (existing > 0 && status == 206);
+            st.file.open(destPath, std::ios::binary | (st.resuming ? std::ios::app : std::ios::trunc));
+            if (!st.file) return HeadersAction::Fail;
+            st.total = st.resuming ? existing + contentLength : contentLength;
+            st.downloaded = st.resuming ? existing : 0;
+            return HeadersAction::Proceed;
+        },
+        [&](const char* data, size_t len) {
+            st.file.write(data, static_cast<std::streamsize>(len));
+            st.downloaded += len;
+            if (progress) progress(st.downloaded, st.total);
+            return st.file.good();
+        });
+    if (st.file.is_open()) st.file.flush();
+    // A cleanly closed connection ends the transfer early; a short file is a
+    // failed download, not a success.
+    return transportOk && st.file.good() && (st.total == 0 || st.downloaded == st.total);
+}
+
+bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::path& destPath,
+    const std::function<void(uint64_t downloaded, uint64_t total)>& progress,
+    size_t maxSegments) {
+    constexpr uint64_t kMinSegmentedBytes = 64ull * 1024 * 1024;
+
+    // Probe the total size and range support before committing to segments.
+    uint64_t totalSize = 0;
+    CurlGet(url, L"",
+        [&](long status, uint64_t contentLength) {
+            if (status != 200 && status != 206) return HeadersAction::Fail;
+            totalSize = contentLength;
+            return HeadersAction::HeadersOnly;
+        },
+        [](const char*, size_t) { return true; });
+    bool rangesSupported = false;
+    if (totalSize > 0) {
+        CurlGet(url, L"Range: bytes=0-0\r\n",
+            [&](long status, uint64_t) {
+                rangesSupported = (status == 206);
+                return HeadersAction::HeadersOnly;
+            },
+            [](const char*, size_t) { return true; });
+    }
+
+    size_t segmentCount = static_cast<size_t>(std::min<uint64_t>(maxSegments, totalSize / kMinSegmentedBytes));
+    if (!rangesSupported || segmentCount < 2) {
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %s (ranges %s, size %llu)",
+            url.c_str(), rangesSupported ? L"supported" : L"unsupported",
+            static_cast<unsigned long long>(totalSize));
+        return HttpDownloadFile(url, destPath, progress);
+    }
+
+    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %s",
+        static_cast<unsigned long long>(totalSize), segmentCount, url.c_str());
+
+    const uint64_t segmentSize = totalSize / segmentCount;
+    std::vector<std::filesystem::path> partPaths(segmentCount);
+    for (size_t i = 0; i < segmentCount; ++i) {
+        partPaths[i] = destPath;
+        partPaths[i] += L".part" + std::to_wstring(i);
+    }
+
+    std::atomic<uint64_t> totalDownloaded{ 0 };
+    std::mutex progressMutex;
+    auto reportProgress = [&](uint64_t downloaded) {
+        if (progress) {
+            std::lock_guard lock(progressMutex);
+            progress(downloaded, totalSize);
+        }
+    };
+
+    // One thread per segment, each on its own curl connection with an
+    // explicit Range header (redirects are followed per segment, like
+    // CurlGet does for single-stream downloads).
+    std::vector<char> results(segmentCount, 0);
+    std::vector<std::thread> threads;
+    threads.reserve(segmentCount);
+    try {
+        for (size_t i = 0; i < segmentCount; ++i) {
+            threads.emplace_back([&, i] {
+                try {
+                    const uint64_t begin = i * segmentSize;
+                    const uint64_t end = (i + 1 == segmentCount) ? totalSize - 1 : begin + segmentSize - 1;
+                    const uint64_t expected = end - begin + 1;
+                    const auto& partPath = partPaths[i];
+
+                    // Resume a partially downloaded segment. A complete part
+                    // needs no request; an oversized one is corrupt.
+                    uint64_t existing = 0;
+                    {
+                        std::error_code ec;
+                        auto size = std::filesystem::file_size(partPath, ec);
+                        if (!ec) existing = size;
+                    }
+                    if (existing == expected) {
+                        reportProgress(totalDownloaded.fetch_add(expected) + expected);
+                        results[i] = 1;
+                        return;
+                    }
+                    if (existing > expected) {
+                        std::error_code ec;
+                        std::filesystem::remove(partPath, ec);
+                        existing = 0;
+                    }
+
+                    totalDownloaded.fetch_add(existing);
+                    const std::wstring rangeHeader = L"Range: bytes=" + std::to_wstring(begin + existing) +
+                        L"-" + std::to_wstring(end) + L"\r\n";
+                    uint64_t have = existing;
+                    std::ofstream file;
+                    results[i] = CurlGet(url, rangeHeader,
+                        [&](long status, uint64_t) {
+                            if (status != 206) return HeadersAction::Fail; // server ignored the Range header
+                            file.open(partPath, std::ios::binary | (existing > 0 ? std::ios::app : std::ios::trunc));
+                            return file ? HeadersAction::Proceed : HeadersAction::Fail;
+                        },
+                        [&](const char* data, size_t len) {
+                            if (have >= expected) return false;
+                            const size_t chunk = static_cast<size_t>(std::min<uint64_t>(len, expected - have));
+                            file.write(data, static_cast<std::streamsize>(chunk));
+                            have += chunk;
+                            reportProgress(totalDownloaded.fetch_add(chunk) + chunk);
+                            return file.good() && have <= expected;
+                        }) ? 1 : 0;
+                    file.flush();
+                    if (results[i] && (!file.good() || have != expected)) results[i] = 0;
+                } catch (...) {
+                    results[i] = 0;
+                }
+            });
+        }
+    } catch (...) {
+        for (auto& t : threads) if (t.joinable()) t.join();
+        return false;
+    }
+    for (auto& t : threads) t.join();
+    for (size_t i = 0; i < segmentCount; ++i) {
+        if (!results[i]) {
+            // Part files are kept so the next retry resumes each segment.
+            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %s", i, url.c_str());
+            return false;
+        }
+    }
+
+    // Concatenate the segments in order and verify the final size. On any
+    // failure the part files survive for the next retry.
+    {
+        std::ofstream out(destPath, std::ios::binary | std::ios::trunc);
+        if (!out) return false;
+        std::vector<char> buffer(1024 * 1024);
+        for (size_t i = 0; i < segmentCount; ++i) {
+            std::ifstream in(partPaths[i], std::ios::binary);
+            if (!in) return false;
+            while (in) {
+                in.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+                auto got = in.gcount();
+                if (got > 0) out.write(buffer.data(), got);
+            }
+        }
+        out.flush();
+        if (!out.good()) return false;
+    }
+    std::error_code ec;
+    auto finalSize = std::filesystem::file_size(destPath, ec);
+    if (ec || finalSize != totalSize) {
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %s", url.c_str());
+        std::filesystem::remove(destPath, ec);
+        return false;
+    }
+    for (const auto& partPath : partPaths) std::filesystem::remove(partPath, ec);
+    reportProgress(totalSize);
+    LOG_LIFECYCLE(L"[Utils] Segmented download complete");
+    return true;
+}
+
+#endif // _WIN32
 
 } // namespace Utils
 } // namespace AgentRedactor

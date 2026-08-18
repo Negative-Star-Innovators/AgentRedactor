@@ -5,7 +5,9 @@
 #include "logging.h"
 #include <onnxruntime_cxx_api.h>
 #include <algorithm>
+#ifdef _WIN32
 #include <windows.h>
+#endif
 #include <nlohmann/json.hpp>
 #include <cwctype>
 #include <future>
@@ -78,6 +80,9 @@ bool PIIDetector::LoadModel() {
         currentProvider_ = L"CPU";
 
         if (preferredProvider_ != L"cpu") {
+#ifdef _WIN32
+            // GPU providers (DirectML, CUDA) are only wired up on Windows;
+            // the Linux build is CPU-only.
             std::vector<std::string> availableProviders = Ort::GetAvailableProviders();
             bool gpuEnabled = false;
             if (preferredProvider_ == L"auto" || preferredProvider_ == L"gpu") {
@@ -114,9 +119,18 @@ bool PIIDetector::LoadModel() {
             if (!gpuEnabled) {
                 LOG(L"[PIIDetector] No GPU provider available, using CPU");
             }
+#else
+            LOG(L"[PIIDetector] GPU providers are not supported in this build, using CPU");
+#endif
         }
 
+#ifdef _WIN32
         session_ = std::make_unique<Ort::Session>(*g_onnx_env, modelFile.c_str(), sessionOptions);
+#else
+        // ORTCHAR_T is narrow on Linux: the session path must be UTF-8.
+        const std::string modelFileUtf8 = Utils::WideToUtf8(modelFile.wstring());
+        session_ = std::make_unique<Ort::Session>(*g_onnx_env, modelFileUtf8.c_str(), sessionOptions);
+#endif
         LOGF_LIFECYCLE(L"[PIIDetector] Model loaded with provider: %s", currentProvider_.c_str());
         return true;
     } catch (const std::exception& e) {
