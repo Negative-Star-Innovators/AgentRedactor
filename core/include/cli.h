@@ -59,10 +59,19 @@ struct CliTransport {
     // unlocks the engine session (POST /unlock). Falls back to
     // HelloConsentOutcome::Unavailable on platforms without Windows Hello.
     std::function<HelloConsentOutcome()> consent;
+    // Typed-master-password mode (Linux, where Windows Hello does not exist):
+    // when set, gated commands prompt for the master password (via
+    // CliConsole::readSecret) instead of the Hello consent, and this hook
+    // verifies it via POST /unlock {"password": ...}. Null on Windows, where
+    // the Hello consent flow above is used.
+    std::function<bool(const std::wstring& password)> unlockWithPassword;
 };
 
 struct CliConsole {
     std::function<void(const std::wstring& line)> print;
+    // No-echo secret prompt, used only in typed-master-password mode (Linux).
+    // Returns the entered text; an empty string means no input.
+    std::function<std::wstring(const std::wstring& prompt)> readSecret;
 };
 
 // Executes one CLI invocation (args excluding argv[0], e.g. {"get","api-key",

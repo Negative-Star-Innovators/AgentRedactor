@@ -1,10 +1,12 @@
-#include "EngineApp.h"
+#include "engine_app.h"
 #include "utils.h"
 #include "api_key_profile.h"
 #include "logging.h"
 #include "model_downloader.h"
+#ifdef _WIN32
 #include "hello_unlock.h"
 #include <winnls.h>
+#endif
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <chrono>
@@ -247,7 +249,9 @@ namespace {
                 if (!hasClose) return true;
                 ++pos;
             }
-            if (!fullText.ends_with(">>") && EndsWithLabelPrefix(fullText)) {
+            // (std::string::ends_with is C++20; this project is C++17)
+            if (!(fullText.size() >= 2 && fullText.compare(fullText.size() - 2, 2, ">>") == 0) &&
+                EndsWithLabelPrefix(fullText)) {
                 return true;
             }
             return false;
@@ -289,12 +293,6 @@ EngineApp::~EngineApp() {
 }
 
 bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
-    stopEvent_ = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-    if (!stopEvent_) {
-        LOG_LIFECYCLE(L"[EngineApp] Failed to create stop event");
-        return false;
-    }
-
     settings_ = std::make_unique<SettingsManager>(dataDir);
     logManager_ = std::make_unique<LogManager>();
 
@@ -350,19 +348,20 @@ void EngineApp::Shutdown() {
     LOG(L"=== Agent Redactor Engine Shutdown ===");
     StopProxyServers();
     controlServer_.Stop();
-    if (stopEvent_) {
-        CloseHandle(stopEvent_);
-        stopEvent_ = nullptr;
-    }
 }
 
 void EngineApp::Run() {
     LOG_LIFECYCLE(L"[EngineApp] Engine running");
-    WaitForSingleObject(stopEvent_, INFINITE);
+    std::unique_lock lock(stopMutex_);
+    stopCv_.wait(lock, [this]() { return stopRequested_; });
 }
 
 void EngineApp::RequestStop() {
-    if (stopEvent_) SetEvent(stopEvent_);
+    {
+        std::lock_guard lock(stopMutex_);
+        stopRequested_ = true;
+    }
+    stopCv_.notify_all();
 }
 
 // ---------------------------------------------------------------------------
@@ -851,7 +850,7 @@ HttpResponse EngineApp::HandleControlRequest(const HttpRequest& request) {
         if (path == L"/profiles" && method == "POST") return ApiPostProfile(request.body);
         if (path == L"/hello/verify" && method == "POST") return ApiHelloVerify(query);
         if (path == L"/unlock/hello" && method == "POST") return ApiUnlockHello(query);
-        if (path == L"/unlock" && method == "POST") return ApiUnlock();
+        if (path == L"/unlock" && method == "POST") return ApiUnlock(request.body);
         if (path == L"/logs" && method == "GET") {
             std::wstring profileParam;
             const std::wstring prefix = L"profile=";
@@ -870,7 +869,7 @@ HttpResponse EngineApp::HandleControlRequest(const HttpRequest& request) {
             // Respond first, then stop: Shutdown() joins the listener threads,
             // which would deadlock if Stop ran inside this request handler.
             std::thread([this]() {
-                Sleep(200);
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 RequestStop();
             }).detach();
             return JsonResponse(200, "{\"ok\": true}");
@@ -948,9 +947,20 @@ HttpResponse EngineApp::ApiGetSettings() {
     // never print a blank line on a fresh install.
     std::wstring appLanguage = settings_->GetAppLanguage();
     if (appLanguage.empty()) {
+#ifdef _WIN32
         wchar_t langBuf[LOCALE_NAME_MAX_LENGTH] = {};
         LCIDToLocaleName(GetUserDefaultUILanguage(), langBuf, LOCALE_NAME_MAX_LENGTH, 0);
         appLanguage = langBuf;
+#else
+        // Derive a BCP-47-ish tag from LANG (e.g. "de_DE.UTF-8" → "de-DE").
+        if (const char* lang = std::getenv("LANG"); lang && *lang) {
+            appLanguage = Utils::Utf8ToWide(lang);
+            const size_t dot = appLanguage.find(L'.');
+            if (dot != std::wstring::npos) appLanguage.resize(dot);
+            std::replace(appLanguage.begin(), appLanguage.end(), L'_', L'-');
+        }
+        if (appLanguage.empty() || appLanguage == L"C" || appLanguage == L"POSIX") appLanguage = L"en";
+#endif
     }
     j["appLanguage"] = Utils::WideToUtf8(appLanguage);
     j["masterPasswordEnabled"] = settings_->IsMasterPasswordEnabled();
@@ -962,7 +972,9 @@ HttpResponse EngineApp::ApiGetSettings() {
 
 // Defined below (next to the hello endpoints that use it): parses ?hwnd= so
 // engine-owned consent prompts attach to the caller's window where possible.
+#ifdef _WIN32
 static HWND ParseHwndQuery(const std::wstring& query);
+#endif
 
 HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body) {
     json j = json::parse(body);
@@ -988,12 +1000,24 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstrin
     } else if (key == L"appLanguage") {
         settings_->SetAppLanguage(Utils::Utf8ToWide(j.at("value").get<std::string>()));
     } else if (key == L"enableMasterPassword") {
+#ifdef _WIN32
         // Windows-Hello-only protection: no typed password exists; the AES
         // key lives only in the DPAPI-wrapped Hello blob. The GUI prompts
         // for consent (POST /hello/verify) before sending this.
         if (!settings_->EnableMasterPassword()) {
             return JsonResponse(500, "{\"error\": \"failed to enable windows hello\"}");
         }
+#else
+        // Linux: typed-master-password protection (no Windows Hello). The
+        // client supplies the new password in the request body.
+        const std::wstring password = Utils::Utf8ToWide(j.value("password", std::string("")));
+        if (password.empty()) {
+            return JsonResponse(400, "{\"error\": \"password required\"}");
+        }
+        if (!settings_->EnableMasterPassword(password)) {
+            return JsonResponse(500, "{\"error\": \"failed to enable master password\"}");
+        }
+#endif
     } else if (key == L"lock") {
         settings_->Lock();
     } else if (key == L"disableMasterPassword") {
@@ -1020,7 +1044,8 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstrin
     return JsonResponse(200, "{\"ok\": true}");
 }
 
-HttpResponse EngineApp::ApiUnlock() {
+HttpResponse EngineApp::ApiUnlock(const std::string& body) {
+#ifdef _WIN32
     // Same unlock as /unlock/hello but WITHOUT the consent prompt — the
     // caller (the GUI) has already verified the user with its own
     // in-process Windows Hello prompt, so this only decrypts and unlocks.
@@ -1034,6 +1059,23 @@ HttpResponse EngineApp::ApiUnlock() {
         return JsonResponse(200, "{\"ok\": true}");
     }
     return JsonResponse(200, "{\"ok\": false, \"error\": \"unlock failed\"}");
+#else
+    // Linux: unlock with the typed master password supplied in the body.
+    if (!settings_->IsMasterPasswordEnabled()) {
+        return JsonResponse(200, "{\"ok\": false, \"error\": \"master password not enabled\"}");
+    }
+    std::wstring password;
+    try {
+        password = Utils::Utf8ToWide(json::parse(body.empty() ? std::string("{}") : body)
+            .value("password", std::string("")));
+    } catch (...) {
+        return JsonResponse(200, "{\"ok\": false, \"error\": \"bad request\"}");
+    }
+    if (!password.empty() && settings_->UnlockWithPassword(password)) {
+        return JsonResponse(200, "{\"ok\": true}");
+    }
+    return JsonResponse(200, "{\"ok\": false, \"error\": \"wrong password\"}");
+#endif
 }
 
 HttpResponse EngineApp::ApiGetProfiles() {
@@ -1129,6 +1171,7 @@ HttpResponse EngineApp::ApiDeleteMatches(const std::wstring& id) {
     return JsonResponse(200, "{\"ok\": true}");
 }
 
+#ifdef _WIN32
 // The CLI's transport tags the hello consent requests with the console HWND
 // (?hwnd=<decimal>) so the prompt is owned by the CLI's window and comes to
 // the foreground. HWND values are valid across processes for real top-level
@@ -1193,6 +1236,17 @@ HttpResponse EngineApp::ApiUnlockHello(const std::wstring& query) {
         return JsonResponse(200, "{\"ok\": false, \"error\": \"windows hello failed\"}");
     }
 }
+#else
+// Linux: no Windows Hello — both endpoints report unavailability (the typed
+// master password flow goes through POST /unlock with {"password": ...}).
+HttpResponse EngineApp::ApiHelloVerify(const std::wstring&) {
+    return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+}
+
+HttpResponse EngineApp::ApiUnlockHello(const std::wstring&) {
+    return JsonResponse(200, "{\"ok\": false, \"unavailable\": true}");
+}
+#endif
 
 HttpResponse EngineApp::ApiGetLogs(const std::wstring& profileParam) {
     std::vector<LogEntry> entries;

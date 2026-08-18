@@ -6,11 +6,9 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <mutex>
+#include <condition_variable>
 #include <filesystem>
-// winsock2 must come before windows.h (no pch.h in the engine project).
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
+#include "platform_compat.h"
 #include "settings_manager.h"
 #include "pii_detector.h"
 #include "log_manager.h"
@@ -65,7 +63,7 @@ private:
     HttpResponse ApiGetMatches(const std::wstring& id);
     HttpResponse ApiDeleteMatches(const std::wstring& id);
     HttpResponse ApiUnlockHello(const std::wstring& query);
-    HttpResponse ApiUnlock();
+    HttpResponse ApiUnlock(const std::string& body);
     HttpResponse ApiHelloVerify(const std::wstring& query);
     HttpResponse ApiGetLogs(const std::wstring& profileParam);
 
@@ -79,7 +77,11 @@ private:
     std::unordered_set<int> runningPorts_;
     ControlServer controlServer_;
 
-    HANDLE stopEvent_ = nullptr;
+    // Stop signal for Run() (a Win32 event handle was used before the core
+    // move; a condition variable is portable and behaves identically).
+    std::mutex stopMutex_;
+    std::condition_variable stopCv_;
+    bool stopRequested_ = false;
 
     // First-run model download state (guarded by stateMutex_)
     mutable std::mutex stateMutex_;

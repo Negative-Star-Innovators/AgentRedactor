@@ -22,6 +22,7 @@ endif()
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../windows/version.txt AR_VERSION LIMIT_COUNT 1)
 string(STRIP "${AR_VERSION}" AR_VERSION)
 message(STATUS "Agent Redactor version: ${AR_VERSION}")
+add_compile_definitions(AR_VERSION_STRING="${AR_VERSION}")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core ${CMAKE_BINARY_DIR}/core)
 

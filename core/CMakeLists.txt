@@ -27,6 +27,7 @@ set(AR_CORE_SOURCES
     src/bpe_tokenizer.cpp
     src/cli.cpp
     src/control_server.cpp
+    src/engine_app.cpp
     src/http_server.cpp
     src/keyword_engine.cpp
     src/log_manager.cpp

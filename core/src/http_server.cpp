@@ -96,12 +96,19 @@ void HttpServer::Stop() {
     running_ = false;
 
     if (listenSocket_ != INVALID_SOCKET) {
-        closesocket(listenSocket_);
-        listenSocket_ = INVALID_SOCKET;
+        // Wake the listener's select() so it can exit; the socket is only
+        // closed AFTER the thread is joined. Closing it first races with
+        // FD_SET on POSIX (glibc aborts on the invalidated descriptor).
+        shutdown(listenSocket_, SD_BOTH);
     }
 
     if (listenerThread_.joinable()) {
         listenerThread_.join();
+    }
+
+    if (listenSocket_ != INVALID_SOCKET) {
+        closesocket(listenSocket_);
+        listenSocket_ = INVALID_SOCKET;
     }
 
     // Wait for all client connections to finish

@@ -152,7 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="engine\main.cpp" />
-    <ClCompile Include="engine\EngineApp.cpp" />
+    <ClCompile Include="..\core\src\engine_app.cpp" />
     <ClCompile Include="engine\engine_loc.cpp" />
     <ClCompile Include="engine\hello_unlock.cpp" />
     <ClCompile Include="engine\control_api_client.cpp" />

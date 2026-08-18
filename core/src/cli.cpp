@@ -146,10 +146,27 @@ struct Ctx {
     // command anymore). The consent runs IN-PROCESS via the transport (the
     // client is the active application, so the Windows dialog comes to the
     // foreground) and on success unlocks the engine session (POST /unlock),
-    // exactly like the GUI after its in-process prompt. `status`/`help` stay
-    // open so the CLI remains introspectable.
+    // exactly like the GUI after its in-process prompt. On Linux the same
+    // gate is a typed master password prompt (no echo) verified through
+    // POST /unlock. `status`/`help` stay open so the CLI remains
+    // introspectable.
     bool EnsureConsent(const json& status) const {
         if (!status.value("masterPasswordEnabled", false)) return true;
+        if (t.unlockWithPassword) {
+            // Typed-master-password mode (Linux).
+            if (!c.readSecret) {
+                Error(L"master password required (no interactive prompt available)");
+                return false;
+            }
+            const std::wstring password = c.readSecret(L"master password: ");
+            if (password.empty()) {
+                Error(L"master password required");
+                return false;
+            }
+            if (t.unlockWithPassword(password)) return true;
+            Error(L"wrong master password");
+            return false;
+        }
         if (!status.value("helloEnabled", false)) {
             Error(L"windows hello is not configured on this device");
             return false;
@@ -239,7 +256,7 @@ int CmdStatus(const Ctx& ctx) {
     if (!ctx.EngineStatus(status)) return 1;
 
     ctx.Print(L"engine:          " + Utils::Utf8ToWide(status.value("engineVersion", std::string("?"))));
-    ctx.Print(L"password enabled: " + BoolStr(status.value("helloEnabled", false)));
+    ctx.Print(L"password enabled: " + BoolStr(status.value("masterPasswordEnabled", false) || status.value("helloEnabled", false)));
     if (status.value("modelDownloadInProgress", false)) {
         ctx.Print(L"model download:  in progress (" + std::to_wstring(status.value("modelDownloadPercent", 0)) + L"%)");
     } else if (status.value("modelDownloadFailed", false)) {
@@ -306,8 +323,33 @@ int CmdPassword(const Ctx& ctx) {
 
     if (action == L"enable") {
         if (status.value("masterPasswordEnabled", false)) {
-            ctx.Error(L"windows hello protection is already enabled");
+            ctx.Error(ctx.t.unlockWithPassword
+                ? L"master password protection is already enabled"
+                : L"windows hello protection is already enabled");
             return 1;
+        }
+        if (ctx.t.unlockWithPassword) {
+            // Linux: typed master password (no Windows Hello). Prompt twice.
+            if (!ctx.c.readSecret) {
+                ctx.Error(L"no interactive prompt available");
+                return 1;
+            }
+            const std::wstring pw1 = ctx.c.readSecret(L"new master password: ");
+            if (pw1.empty()) {
+                ctx.Error(L"password must not be empty");
+                return 1;
+            }
+            const std::wstring pw2 = ctx.c.readSecret(L"confirm master password: ");
+            if (pw1 != pw2) {
+                ctx.Error(L"passwords do not match");
+                return 1;
+            }
+            if (!ctx.t.put(L"/settings/enableMasterPassword", json{{"password", Utils::WideToUtf8(pw1)}}, nullptr)) {
+                ctx.Error(L"failed to enable master password protection");
+                return 1;
+            }
+            ctx.Print(L"master password protection enabled");
+            return 0;
         }
         // Windows-Hello-only protection: no typed password exists. The GUI
         // asks for the consent prompt before enabling; the CLI (a headless
@@ -322,8 +364,11 @@ int CmdPassword(const Ctx& ctx) {
     }
 
     if (action == L"disable") {
+        const bool passwordMode = ctx.t.unlockWithPassword != nullptr;
         if (!status.value("masterPasswordEnabled", false)) {
-            ctx.Print(L"windows hello protection is not enabled");
+            ctx.Print(passwordMode
+                ? L"master password protection is not enabled"
+                : L"windows hello protection is not enabled");
             return 0;
         }
         // Disabling strips ALL protection, so it demands the same fresh
@@ -334,10 +379,14 @@ int CmdPassword(const Ctx& ctx) {
         if (!ctx.EnsureConsent(status)) return 1;
         json out;
         if (!ctx.t.put(L"/settings/disableMasterPassword", json{{"value", true}}, &out) || !out.value("ok", false)) {
-            ctx.Error(L"failed to disable windows hello protection");
+            ctx.Error(passwordMode
+                ? L"failed to disable master password protection"
+                : L"failed to disable windows hello protection");
             return 1;
         }
-        ctx.Print(L"windows hello protection disabled");
+        ctx.Print(passwordMode
+            ? L"master password protection disabled"
+            : L"windows hello protection disabled");
         return 0;
     }
 
@@ -1033,11 +1082,19 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"              private_address, private_date, private_email, private_person,");
     ctx.Print(L"              private_phone, private_url, secret");
     ctx.Print(L"");
-    ctx.Print(L"security (Windows Hello only, no typed password):");
-    ctx.Print(L"  password enable         enable Windows Hello protection");
-    ctx.Print(L"  password disable        disable Windows Hello protection");
-    ctx.Print(L"  With protection enabled every read/write command demands a");
-    ctx.Print(L"  fresh Windows Hello consent prompt (status/help stay open).");
+    if (ctx.t.unlockWithPassword) {
+        ctx.Print(L"security (typed master password):");
+        ctx.Print(L"  password enable         enable master password protection");
+        ctx.Print(L"  password disable        disable master password protection");
+        ctx.Print(L"  With protection enabled every read/write command prompts for");
+        ctx.Print(L"  the master password (status/help stay open).");
+    } else {
+        ctx.Print(L"security (Windows Hello only, no typed password):");
+        ctx.Print(L"  password enable         enable Windows Hello protection");
+        ctx.Print(L"  password disable        disable Windows Hello protection");
+        ctx.Print(L"  With protection enabled every read/write command demands a");
+        ctx.Print(L"  fresh Windows Hello consent prompt (status/help stay open).");
+    }
     ctx.Print(L"");
     ctx.Print(L"options:");
     ctx.Print(L"  --profile P     profile selector: list number, id, or alias");

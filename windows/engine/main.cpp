@@ -12,7 +12,7 @@
 // this file only supplies the Windows console plumbing and the WinHTTP
 // transport (control_api_client, the engine-side mirror of the GUI's
 // EngineClient).
-#include "EngineApp.h"
+#include "engine_app.h"
 #include "control_api_client.h"
 #include "cli.h"
 #include "utils.h"
