@@ -3,10 +3,12 @@
 // window / tray. All backend logic lives in the engine process.
 
 #include <csignal>
+#include <filesystem>
 
 #include <QApplication>
 #include <QMessageBox>
 #include <QSocketNotifier>
+#include <QStandardPaths>
 
 #include <sys/socket.h>
 #include <unistd.h>
@@ -16,6 +18,10 @@
 #include "tray_icon.h"
 #include "translator_loader.h"
 #include "utils.h"
+
+#ifdef AR_SELFRELEASE
+#include <Velopack.hpp>
+#endif
 
 namespace {
 
@@ -31,9 +37,38 @@ void onSignal(int sig) {
     }
 }
 
+// Terminal discoverability: expose the bundled engine/CLI binary as
+// ~/.local/bin/agentredactor. Best-effort and idempotent; only done in the
+// installed layout (engine next to the GUI binary), never in the dev tree.
+void EnsureCliSymlink() {
+    namespace fs = std::filesystem;
+    const fs::path engine =
+        fs::path(QCoreApplication::applicationDirPath().toStdString()) / "agentredactor";
+    if (!fs::exists(engine)) return;
+    const fs::path binDir =
+        fs::path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation).toStdString())
+        / ".local" / "bin";
+    const fs::path link = binDir / "agentredactor";
+    std::error_code ec;
+    if (fs::exists(link, ec) || fs::is_symlink(link, ec)) {
+        if (fs::read_symlink(link, ec) == engine) return; // already correct
+        fs::remove(link, ec);
+    }
+    fs::create_directories(binDir, ec);
+    fs::create_symlink(engine, link, ec);
+    if (ec) qWarning("[main] could not create CLI symlink %s: %s",
+        link.c_str(), ec.message().c_str());
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) {
+#ifdef AR_SELFRELEASE
+    // Velopack startup logic: handles post-update restart/apply hooks and may
+    // exit or restart the process. Must run before anything else.
+    Velopack::VelopackApp::Build().Run();
+#endif
+
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, g_signalFds) == 0) {
         struct sigaction sa{};
         sa.sa_handler = onSignal;
@@ -59,6 +94,8 @@ int main(int argc, char* argv[]) {
     }
 
     const bool trayOnly = QApplication::arguments().contains(QLatin1String("--tray-only"));
+
+    EnsureCliSymlink();
 
     TranslatorLoader translator(app);
 

@@ -1,7 +1,10 @@
 # Build outputs
 windows/build/
 windows/packages/
-linux/build/
+linux/build*/
+
+# Vendored prebuilt Velopack C/C++ library (fetched via linux/fetch-velopack.sh)
+linux/third_party/
 
 # Temporary scripts and artifacts
 temp/

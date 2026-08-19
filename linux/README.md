@@ -58,3 +58,40 @@ when none is running, and stops it on quit only when it spawned it.
 - Password protection on Linux is a typed master password chosen inside the
   app (not your OS login password). The GUI shows a lock overlay with a
   password field when the session is locked.
+
+## Release packaging and self-update (Velopack)
+
+Self-release builds package the app as a Velopack AppImage with an in-app
+updater, mirroring the Windows self-release flow (channel `linux`, same R2
+bucket, same feed worker). Prereqs: the .NET SDK and the pinned Velopack CLI
+(`dotnet tool install -g vpk --version 1.2.0` — keep it in sync with
+`linux/fetch-velopack.sh`).
+
+```bash
+linux/build-release.sh    # Release build (-DAR_SELFRELEASE=ON) + AppDir + vpk pack
+```
+
+Artifacts land in `linux/build-release/velopack/`: `AgentRedactor.AppImage`
+(fixed-name installer/portable binary), `*-linux-full.nupkg` and
+`releases.linux.json` (the update feed). Upload mirrors the Windows workflow:
+
+```bash
+vpk upload s3 --bucket agentredactor-releases \
+  --endpoint https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com \
+  --keyId "$R2_ACCESS_KEY_ID" --secret "$R2_SECRET_ACCESS_KEY" \
+  --prefix linux -c linux --outputDir linux/build-release/velopack
+```
+
+Updater behavior: check at startup plus a "Check for updates" button in
+Settings (self-release builds only); when an update is downloaded the app
+offers "Restart now / later", applies via Velopack, and restarts. The engine
+binary ships inside the AppImage next to the GUI; on version mismatch the GUI
+stops and respawns it. Qt is bundled dynamically linked inside the AppImage
+with `LGPL-Qt-notice.txt`. First run symlinks the CLI to
+`~/.local/bin/agentredactor`.
+
+Test hooks (self-release builds only, same contract as Windows):
+`AGENTREDACTOR_UPDATE_FEED` overrides the feed URL (loopback http only) and
+`AGENTREDACTOR_UPDATE_AUTOAPPLY=1` skips the restart prompt.
+`tests/linux/test_update_feed.py` runs the full pack-vNext → update → swap
+cycle against a local feed; it skips when the pack output or vpk is missing.

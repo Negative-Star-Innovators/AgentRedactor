@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QProcess>
+#include <QtDebug>
 
 #include "autostart.h"
 #include "utils.h"
@@ -32,7 +33,22 @@ AppState::~AppState() {
 }
 
 bool AppState::EnsureEngineRunning() {
-    if (client_.Connect(configDir_) && client_.Ping()) return true;
+    if (client_.Connect(configDir_) && client_.Ping()) {
+        // After a GUI self-update the still-running engine is the old build
+        // (the engine binary lives next to the GUI inside the AppImage, so
+        // the updated GUI must respawn it). Restart on version mismatch.
+        json status;
+        if (client_.GetStatus(status) &&
+            status.value("engineVersion", std::string()) == std::string(AR_VERSION_STRING)) {
+            return true;
+        }
+        qInfo("[AppState] engine version mismatch; restarting engine");
+        client_.StopEngine();
+        for (int i = 0; i < 50; ++i) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (!client_.Connect(configDir_) || !client_.Ping()) break;
+        }
+    }
 
     const auto engine = FindEngineBinary();
     engineSpawned_ = QProcess::startDetached(

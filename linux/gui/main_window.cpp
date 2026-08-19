@@ -38,6 +38,7 @@
 #include "password_dialog.h"
 #include "tray_icon.h"
 #include "translator_loader.h"
+#include "update_manager.h"
 #include "utils.h"
 
 using namespace AgentRedactor;
@@ -97,6 +98,44 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
     connect(qApp, &QApplication::aboutToQuit, this, [this] {
         appState_->Shutdown(isProtected());
     });
+
+    // Self-update (Velopack self-release builds only): startup check plus the
+    // Settings-card button. Restart prompt mirrors Windows: "later" default.
+    if (AppUpdateManager::IsSelfRelease()) {
+        updateMgr_ = new AppUpdateManager(this);
+        connect(updateMgr_, &AppUpdateManager::updateDownloaded, this,
+            [this](QString version, bool) {
+                auto* box = new QMessageBox(QMessageBox::Information,
+                    tr("Update available"),
+                    tr("Version %1 has been downloaded and is ready to install.").arg(version),
+                    QMessageBox::NoButton, this);
+                QPushButton* now = box->addButton(tr("Restart now"), QMessageBox::AcceptRole);
+                box->addButton(tr("Restart later"), QMessageBox::RejectRole);
+                box->setDefaultButton(qobject_cast<QPushButton*>(box->buttons().last()));
+                box->exec();
+                if (box->clickedButton() == now) updateMgr_->ApplyAndRestart();
+                box->deleteLater();
+            });
+        connect(updateMgr_, &AppUpdateManager::noUpdateFound, this,
+            [this](bool userInitiated) {
+                if (userInitiated)
+                    QMessageBox::information(this, tr("Check for updates"),
+                        tr("Agent Redactor is up to date."));
+            });
+        connect(updateMgr_, &AppUpdateManager::checkFailed, this,
+            [this](QString message, bool userInitiated) {
+                if (userInitiated)
+                    QMessageBox::warning(this, tr("Check for updates"),
+                        tr("Could not check for updates: %1").arg(message));
+            });
+        // The Velopack updater is already waiting for this process to exit;
+        // skip the quit confirmation and shut down immediately.
+        connect(updateMgr_, &AppUpdateManager::restartRequested, this, [this] {
+            quitting_ = true;
+            QApplication::quit();
+        });
+        QTimer::singleShot(0, this, [this] { updateMgr_->CheckForUpdates(false); });
+    }
 
     if (!trayOnly || !tray_->available()) {
         // Control-panel fallback: without a tray a hidden window would leave
@@ -309,6 +348,13 @@ void MainWindow::buildUi() {
     startOnBootCheck_ = new QCheckBox(settingsCard);
     connect(startOnBootCheck_, &QCheckBox::toggled, this, &MainWindow::onStartOnBootToggled);
     settingsLayout->addWidget(startOnBootCheck_);
+    if (AppUpdateManager::IsSelfRelease()) {
+        checkUpdatesBtn_ = new QPushButton(settingsCard);
+        connect(checkUpdatesBtn_, &QPushButton::clicked, this, [this] {
+            updateMgr_->CheckForUpdates(true);
+        });
+        settingsLayout->addWidget(checkUpdatesBtn_, 0, Qt::AlignLeft);
+    }
     cardsLayout->addWidget(settingsCard);
 
     cardsLayout->addStretch();
@@ -389,6 +435,7 @@ void MainWindow::retranslateUi() {
     findChild<QPushButton*>(QStringLiteral("openFolderBtn"))->setText(tr("Open folder"));
     findChild<QPushButton*>(QStringLiteral("clearLogsBtn"))->setText(tr("Clear logs"));
     startOnBootCheck_->setText(tr("Start on boot"));
+    if (checkUpdatesBtn_) checkUpdatesBtn_->setText(tr("Check for updates"));
     unlockBox_->setPlaceholderText(tr("Master password"));
     findChild<QPushButton*>(QStringLiteral("unlockBtn"))->setText(tr("Unlock"));
     if (auto* t = findChild<QLabel*>(QStringLiteral("lockTitle")))

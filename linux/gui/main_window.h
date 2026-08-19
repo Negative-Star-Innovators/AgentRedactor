@@ -12,6 +12,7 @@
 #include "engine_client.h"
 
 class AppState;
+class AppUpdateManager;
 class TrayIcon;
 class TranslatorLoader;
 
@@ -149,6 +150,10 @@ private:
 
     // Settings card
     QCheckBox* startOnBootCheck_ = nullptr;
+    QPushButton* checkUpdatesBtn_ = nullptr;
+
+    // Self-update (Velopack); nullptr in non-self-release builds.
+    AppUpdateManager* updateMgr_ = nullptr;
 
     // Lock overlay widgets
     QWidget* lockOverlay_ = nullptr;

@@ -24,6 +24,11 @@ string(STRIP "${AR_VERSION}" AR_VERSION)
 message(STATUS "Agent Redactor version: ${AR_VERSION}")
 add_compile_definitions(AR_VERSION_STRING="${AR_VERSION}")
 
+# Self-release builds (Velopack-packaged AppImage) get the updater; plain dev
+# builds carry no update code (mirror of AGENTREDACTOR_SELFRELEASE on Windows).
+# Requires linux/fetch-velopack.sh to have been run.
+option(AR_SELFRELEASE "Enable Velopack self-update in the GUI" OFF)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../core ${CMAKE_BINARY_DIR}/core)
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/engine/CMakeLists.txt)
