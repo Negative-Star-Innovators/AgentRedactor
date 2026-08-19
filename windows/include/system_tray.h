@@ -5,6 +5,10 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+// Block winsock v1 (same _WINSOCKAPI_ idiom as pch.h): core headers pull in
+// platform_compat.h, which includes winsock2.h — if v1 gets compiled first
+// here, the two socket APIs clash in this TU.
+#define _WINSOCKAPI_
 #include <windows.h>
 #include <shellapi.h>
 
