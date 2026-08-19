@@ -4,6 +4,10 @@
 #include <vector>
 #include <mutex>
 #include <deque>
+// On Windows this must come before the class: windows.h (via winevent.h)
+// defines IsLoggingEnabled -> IsLoggingEnabledW under UNICODE, and the
+// declaration, definition and every call site must all see the macro.
+#include "platform_compat.h"
 
 namespace AgentRedactor {
 
