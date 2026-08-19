@@ -16,12 +16,15 @@ class AppUpdateManager;
 class TrayIcon;
 class TranslatorLoader;
 
+class QAction;
 class QCheckBox;
 class QCloseEvent;
+class QComboBox;
 class QDialog;
 class QLabel;
 class QLineEdit;
 class QListWidget;
+class QMenu;
 class QProgressBar;
 class QPushButton;
 class QStackedLayout;
@@ -75,6 +78,8 @@ private slots:
     void onOpenLogFolder();
     void onClearLogs();
 
+    void onLanguageSelected(int index);
+
 private:
     // Loading/saving
     void reloadProfiles(bool keepSelection);
@@ -99,12 +104,17 @@ private:
     void retranslateUi();
     void setCardsEnabled(bool enabled);
 
-    // PII type display label (English; PII_Type_<type> keys in Windows resw).
+    // PII type display label (translated; English source matches the
+    // PII_Type_<type> values in the Windows resw catalogs).
     static QString piiTypeLabel(const std::wstring& type);
 
     AppState* appState_ = nullptr;
     TrayIcon* tray_ = nullptr;
     TranslatorLoader* translator_ = nullptr;
+
+    // Menu bar (kept for retranslateUi; built once in buildUi)
+    QMenu* fileMenu_ = nullptr;
+    QAction* quitMenuAction_ = nullptr;
 
     // Central stack: page 0 = content, page 1 = lock overlay.
     QStackedLayout* centralStack_ = nullptr;
@@ -115,6 +125,10 @@ private:
     QPushButton* removeProfileBtn_ = nullptr;
 
     // Profile card
+    QLabel* aliasLabel_ = nullptr;
+    QLabel* portLabel_ = nullptr;
+    QLabel* urlLabel_ = nullptr;
+    QLabel* apiKeyLabel_ = nullptr;
     QLineEdit* aliasBox_ = nullptr;
     QLineEdit* portBox_ = nullptr;
     QLineEdit* urlBox_ = nullptr;
@@ -124,6 +138,8 @@ private:
     QPushButton* saveBtn_ = nullptr;
 
     // Detection card
+    QLabel* useAiLabel_ = nullptr;
+    QLabel* confidenceLabel_ = nullptr;
     QCheckBox* useAiCheck_ = nullptr;
     QLineEdit* confidenceBox_ = nullptr;
     std::vector<std::pair<std::wstring, QCheckBox*>> piiChecks_;
@@ -150,6 +166,8 @@ private:
 
     // Settings card
     QCheckBox* startOnBootCheck_ = nullptr;
+    QLabel* languageLabel_ = nullptr;
+    QComboBox* languageCombo_ = nullptr;
     QPushButton* checkUpdatesBtn_ = nullptr;
 
     // Self-update (Velopack); nullptr in non-self-release builds.

@@ -4,6 +4,7 @@
 #include <QCheckBox>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QComboBox>
 #include <QDesktopServices>
 #include <QDialog>
 #include <QFile>
@@ -66,14 +67,15 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
 
     buildUi();
 
-    auto* fileMenu = menuBar()->addMenu(tr("&File"));
-    auto* quitAction = fileMenu->addAction(tr("&Quit"));
-    connect(quitAction, &QAction::triggered, this, &MainWindow::onQuitRequested);
-
     connect(appState_, &AppState::statusUpdated, this, &MainWindow::onStatusUpdated);
     connect(appState_, &AppState::settingsChanged, this, &MainWindow::onSettingsChanged);
     connect(appState_, &AppState::modelDownloadChanged, this, &MainWindow::onModelDownloadChanged);
     connect(appState_, &AppState::connectionLost, this, &MainWindow::onConnectionLost);
+    connect(tray_, &TrayIcon::languageChangeRequested, this, [this](const QString& tag) {
+        // The settings poll picks up the change and retranslates everything
+        // live (no restart, unlike Windows).
+        appState_->client().PutSetting(L"appLanguage", tag.toStdString());
+    });
 
     // 10-minute inactivity re-lock, reset by any key/mouse activity (mirrors
     // the Windows message-filter timer).
@@ -106,11 +108,11 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
         connect(updateMgr_, &AppUpdateManager::updateDownloaded, this,
             [this](QString version, bool) {
                 auto* box = new QMessageBox(QMessageBox::Information,
-                    tr("Update available"),
-                    tr("Version %1 has been downloaded and is ready to install.").arg(version),
+                    tr("Update ready to install"),
+                    tr("Agent Redactor %1 has been downloaded. Restart now to apply the update.").arg(version),
                     QMessageBox::NoButton, this);
                 QPushButton* now = box->addButton(tr("Restart now"), QMessageBox::AcceptRole);
-                box->addButton(tr("Restart later"), QMessageBox::RejectRole);
+                box->addButton(tr("Later"), QMessageBox::RejectRole);
                 box->setDefaultButton(qobject_cast<QPushButton*>(box->buttons().last()));
                 box->exec();
                 if (box->clickedButton() == now) updateMgr_->ApplyAndRestart();
@@ -120,13 +122,13 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
             [this](bool userInitiated) {
                 if (userInitiated)
                     QMessageBox::information(this, tr("Check for updates"),
-                        tr("Agent Redactor is up to date."));
+                        tr("You're up to date."));
             });
         connect(updateMgr_, &AppUpdateManager::checkFailed, this,
-            [this](QString message, bool userInitiated) {
+            [this](QString, bool userInitiated) {
                 if (userInitiated)
                     QMessageBox::warning(this, tr("Check for updates"),
-                        tr("Could not check for updates: %1").arg(message));
+                        tr("Couldn't check for updates. Try again later."));
             });
         // The Velopack updater is already waiting for this process to exit;
         // skip the quit confirmation and shut down immediately.
@@ -190,15 +192,19 @@ void MainWindow::buildUi() {
     auto* profileCard = makeCard(QString(), profileLayout, cards); // title set in retranslateUi
     profileCard->setObjectName(QStringLiteral("profileCard"));
     auto* profileForm = new QFormLayout;
+    aliasLabel_ = new QLabel(profileCard);
+    portLabel_ = new QLabel(profileCard);
+    urlLabel_ = new QLabel(profileCard);
+    apiKeyLabel_ = new QLabel(profileCard);
     aliasBox_ = new QLineEdit(profileCard);
     portBox_ = new QLineEdit(profileCard);
     urlBox_ = new QLineEdit(profileCard);
     apiKeyBox_ = new QLineEdit(profileCard);
     apiKeyBox_->setEchoMode(QLineEdit::Password);
-    profileForm->addRow(QStringLiteral("Name:"), aliasBox_);
-    profileForm->addRow(QStringLiteral("Port:"), portBox_);
-    profileForm->addRow(QStringLiteral("Upstream URL:"), urlBox_);
-    profileForm->addRow(QStringLiteral("API key:"), apiKeyBox_);
+    profileForm->addRow(aliasLabel_, aliasBox_);
+    profileForm->addRow(portLabel_, portBox_);
+    profileForm->addRow(urlLabel_, urlBox_);
+    profileForm->addRow(apiKeyLabel_, apiKeyBox_);
     profileLayout->addLayout(profileForm);
     connect(aliasBox_, &QLineEdit::textEdited, this, markDirty);
     connect(portBox_, &QLineEdit::textEdited, this, markDirty);
@@ -224,10 +230,12 @@ void MainWindow::buildUi() {
     auto* detectionCard = makeCard(QString(), detectionLayout, cards);
     detectionCard->setObjectName(QStringLiteral("detectionCard"));
     auto* detectionForm = new QFormLayout;
+    useAiLabel_ = new QLabel(detectionCard);
+    confidenceLabel_ = new QLabel(detectionCard);
     useAiCheck_ = new QCheckBox(detectionCard);
     confidenceBox_ = new QLineEdit(detectionCard);
-    detectionForm->addRow(QStringLiteral("Use AI model:"), useAiCheck_);
-    detectionForm->addRow(QStringLiteral("Confidence threshold:"), confidenceBox_);
+    detectionForm->addRow(useAiLabel_, useAiCheck_);
+    detectionForm->addRow(confidenceLabel_, confidenceBox_);
     detectionLayout->addLayout(detectionForm);
     connect(useAiCheck_, &QCheckBox::toggled, this, markDirty);
     connect(confidenceBox_, &QLineEdit::textEdited, this, markDirty);
@@ -348,6 +356,22 @@ void MainWindow::buildUi() {
     startOnBootCheck_ = new QCheckBox(settingsCard);
     connect(startOnBootCheck_, &QCheckBox::toggled, this, &MainWindow::onStartOnBootToggled);
     settingsLayout->addWidget(startOnBootCheck_);
+
+    // Language selector (Windows: Settings page combo + tray submenu). Qt
+    // retranslates live, so no restart is needed here — the settings poll
+    // re-applies the tag and retranslateUi rebuilds every string.
+    auto* langRow = new QHBoxLayout;
+    languageLabel_ = new QLabel(settingsCard);
+    languageCombo_ = new QComboBox(settingsCard);
+    languageCombo_->addItem(QString(), QString()); // "System default" (retranslateUi)
+    for (const auto& lang : SUPPORTED_LANGUAGES) {
+        languageCombo_->addItem(QString::fromStdWString(lang.nativeName),
+            QString::fromStdWString(lang.tag));
+    }
+    connect(languageCombo_, &QComboBox::activated, this, &MainWindow::onLanguageSelected);
+    langRow->addWidget(languageLabel_);
+    langRow->addWidget(languageCombo_, 1);
+    settingsLayout->addLayout(langRow);
     if (AppUpdateManager::IsSelfRelease()) {
         checkUpdatesBtn_ = new QPushButton(settingsCard);
         connect(checkUpdatesBtn_, &QPushButton::clicked, this, [this] {
@@ -402,20 +426,34 @@ void MainWindow::buildUi() {
     setCentralWidget(central);
     centralStack_->setCurrentIndex(0);
 
+    // Menu bar (titles set in retranslateUi).
+    fileMenu_ = menuBar()->addMenu(QString());
+    quitMenuAction_ = fileMenu_->addAction(QString());
+    connect(quitMenuAction_, &QAction::triggered, this, &MainWindow::onQuitRequested);
+
     retranslateUi();
 }
 
 void MainWindow::retranslateUi() {
     setWindowTitle(tr("Agent Redactor"));
+    fileMenu_->setTitle(tr("&File"));
+    quitMenuAction_->setText(tr("&Quit"));
     findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("Profile"));
     findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("Detection"));
-    findChild<QGroupBox*>(QStringLiteral("regexCard"))->setTitle(tr("Regex patterns"));
+    findChild<QGroupBox*>(QStringLiteral("regexCard"))->setTitle(tr("Regex Patterns"));
     findChild<QGroupBox*>(QStringLiteral("keywordsCard"))->setTitle(tr("Keywords"));
     findChild<QGroupBox*>(QStringLiteral("passwordCard"))->setTitle(tr("Password"));
     findChild<QGroupBox*>(QStringLiteral("statsCard"))->setTitle(tr("Statistics"));
-    findChild<QGroupBox*>(QStringLiteral("matchesCard"))->setTitle(tr("Session redactions"));
+    findChild<QGroupBox*>(QStringLiteral("matchesCard"))->setTitle(tr("Session Redactions"));
     findChild<QGroupBox*>(QStringLiteral("logsCard"))->setTitle(tr("Logs"));
     findChild<QGroupBox*>(QStringLiteral("settingsCard"))->setTitle(tr("Settings"));
+
+    aliasLabel_->setText(tr("Name:"));
+    portLabel_->setText(tr("Port:"));
+    urlLabel_->setText(tr("Forward To"));
+    apiKeyLabel_->setText(tr("API Key"));
+    useAiLabel_->setText(tr("Use AI model:"));
+    confidenceLabel_->setText(tr("Confidence threshold:"));
 
     addProfileBtn_->setText(tr("Add"));
     removeProfileBtn_->setText(tr("Remove"));
@@ -431,20 +469,34 @@ void MainWindow::retranslateUi() {
     findChild<QPushButton*>(QStringLiteral("clearMatchesBtn"))->setText(tr("Clear"));
     loggingCheck_->setText(tr("Enable logging"));
     showSensitiveCheck_->setText(tr("Show sensitive information in logs"));
-    findChild<QPushButton*>(QStringLiteral("openLogBtn"))->setText(tr("Open log"));
+    findChild<QPushButton*>(QStringLiteral("openLogBtn"))->setText(tr("Open log file"));
     findChild<QPushButton*>(QStringLiteral("openFolderBtn"))->setText(tr("Open folder"));
-    findChild<QPushButton*>(QStringLiteral("clearLogsBtn"))->setText(tr("Clear logs"));
-    startOnBootCheck_->setText(tr("Start on boot"));
+    findChild<QPushButton*>(QStringLiteral("clearLogsBtn"))->setText(tr("Delete all logs"));
+    startOnBootCheck_->setText(tr("Start on Boot"));
+    languageLabel_->setText(tr("Language"));
+    languageCombo_->setItemText(0, tr("System default"));
     if (checkUpdatesBtn_) checkUpdatesBtn_->setText(tr("Check for updates"));
-    unlockBox_->setPlaceholderText(tr("Master password"));
+    unlockBox_->setPlaceholderText(tr("Master Password"));
     findChild<QPushButton*>(QStringLiteral("unlockBtn"))->setText(tr("Unlock"));
     if (auto* t = findChild<QLabel*>(QStringLiteral("lockTitle")))
         t->setText(tr("Agent Redactor is locked"));
+
+    // PII grid labels are translated too (Windows PII_Type_* strings).
+    for (auto& [type, check] : piiChecks_) check->setText(piiTypeLabel(type));
 }
 
 QString MainWindow::piiTypeLabel(const std::wstring& type) {
-    // English display labels for the PII grid (Windows: PII_Type_<type> resw
-    // keys). Underscores become spaces, first letter capitalized.
+    // English sources match the Windows PII_Type_<type> resw values, so the
+    // existing per-language catalogs translate these for free.
+    if (type == L"account_number")  return tr("Account number");
+    if (type == L"private_address") return tr("Address");
+    if (type == L"private_date")    return tr("Date");
+    if (type == L"private_email")   return tr("Email");
+    if (type == L"private_person")  return tr("Person");
+    if (type == L"private_phone")   return tr("Phone");
+    if (type == L"private_url")     return tr("URL");
+    if (type == L"secret")          return tr("Secret");
+    // Unknown future type: raw type name, humanized (English fallback).
     QString s = QString::fromStdWString(type);
     s.replace(QLatin1Char('_'), QLatin1Char(' '));
     if (!s.isEmpty()) s[0] = s[0].toUpper();
@@ -515,6 +567,17 @@ void MainWindow::onSettingsChanged() {
 
     translator_->applyLanguage(
         QString::fromStdString(settings.value("appLanguage", std::string())));
+
+    // Language controls: the engine reports the effective tag (empty/system
+    // is already resolved to the OS locale), so an unrecognized tag means
+    // "System default" — nothing is checked/selected beyond index 0.
+    const QString langTag = QString::fromStdString(settings.value("appLanguage", std::string()));
+    {
+        QSignalBlocker b(languageCombo_);
+        const int idx = languageCombo_->findData(langTag);
+        languageCombo_->setCurrentIndex(idx < 0 ? 0 : idx);
+    }
+    tray_->setCurrentLanguage(langTag);
 
     {
         QSignalBlocker b(requirePasswordCheck_);
@@ -641,8 +704,8 @@ void MainWindow::loadProfileIntoForm(int index) {
             try {
                 std::regex re(Utils::WideToUtf8(normalized), std::regex_constants::ECMAScript);
             } catch (const std::regex_error&) {
-                QMessageBox::warning(this, tr("Invalid regex"),
-                    tr("The pattern is not a valid regular expression."));
+                QMessageBox::warning(this, tr("Validation Error"),
+                    tr("Invalid regex syntax."));
                 reloadProfiles(true);
                 return;
             }
@@ -772,7 +835,9 @@ bool MainWindow::validateForm(QString& error, bool& httpWarning) {
     for (size_t i = 0; i < profiles_.size(); ++i) {
         if (static_cast<int>(i) == profileList_->currentRow()) continue;
         if (profiles_[i].value("port", 0) == port) {
-            error = tr("Another profile already uses this port.");
+            error = tr("Port %1 is already used by profile '%2'.")
+                .arg(port)
+                .arg(QString::fromStdString(profiles_[i].value("alias", std::string())));
             return false;
         }
     }
@@ -782,7 +847,7 @@ bool MainWindow::validateForm(QString& error, bool& httpWarning) {
     if (url.isEmpty() ||
         !(url.startsWith(QLatin1String("http://")) || url.startsWith(QLatin1String("https://"))) ||
         parsed.host().isEmpty()) {
-        error = tr("Upstream URL must start with http:// or https:// and have a host.");
+        error = tr("Forward To URL must start with http:// or https://.");
         return false;
     }
     if (url.startsWith(QLatin1String("http://")) &&
@@ -793,7 +858,7 @@ bool MainWindow::validateForm(QString& error, bool& httpWarning) {
 
     const double confidence = confidenceBox_->text().toDouble(&ok);
     if (!ok || confidence < 0.0 || confidence > 1.0) {
-        error = tr("Confidence threshold must be between 0 and 1.");
+        error = tr("Confidence threshold must be between 0.0 and 1.0.");
         return false;
     }
     return true;
@@ -806,14 +871,14 @@ void MainWindow::onSaveProfile() {
     QString error;
     bool httpWarning = false;
     if (!validateForm(error, httpWarning)) {
-        QMessageBox::warning(this, tr("Invalid profile"), error);
+        QMessageBox::warning(this, tr("Validation Error"), error);
         reloadProfiles(true);
         return;
     }
     if (httpWarning) {
-        const auto answer = QMessageBox::warning(this, tr("Plain HTTP upstream"),
-            tr("The upstream URL uses plain HTTP to a non-local host. Redacted requests "
-               "will be readable on the network. Save anyway?"),
+        const auto answer = QMessageBox::warning(this, tr("Security Warning"),
+            tr("You are using an HTTP (unencrypted) upstream URL. Your API key will be "
+               "sent in plaintext over the network."),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (answer != QMessageBox::Yes) {
             reloadProfiles(true);
@@ -823,7 +888,7 @@ void MainWindow::onSaveProfile() {
 
     const json updated = gatherProfileFromForm();
     if (!appState_->client().PutProfile(w(selectedProfileId()), updated)) {
-        QMessageBox::warning(this, tr("Save failed"),
+        QMessageBox::warning(this, tr("Error"),
             tr("The engine rejected the profile. Check the engine log for details."));
         return;
     }
@@ -858,7 +923,7 @@ void MainWindow::onAddProfile() {
 
     std::wstring id;
     if (!appState_->client().PostProfile(profile, id)) {
-        QMessageBox::warning(this, tr("Add profile failed"),
+        QMessageBox::warning(this, tr("Error"),
             tr("The engine rejected the new profile."));
         return;
     }
@@ -876,10 +941,8 @@ void MainWindow::onAddProfile() {
 
 void MainWindow::onRemoveProfile() {
     if (profiles_.size() <= 1) return; // the last profile cannot be deleted
-    const QString alias = profileList_->currentItem()
-        ? profileList_->currentItem()->text() : QString();
-    const auto answer = QMessageBox::question(this, tr("Remove profile"),
-        tr("Remove profile \"%1\"?").arg(alias));
+    const auto answer = QMessageBox::question(this, tr("Remove Profile"),
+        tr("Are you sure? This operation is permanent."));
     if (answer != QMessageBox::Yes) return;
 
     if (appState_->client().DeleteProfile(w(selectedProfileId()))) {
@@ -912,8 +975,8 @@ void MainWindow::onAddRegex() {
     try {
         std::regex re(Utils::WideToUtf8(normalized), std::regex_constants::ECMAScript);
     } catch (const std::regex_error&) {
-        QMessageBox::warning(this, tr("Invalid regex"),
-            tr("The pattern is not a valid regular expression."));
+        QMessageBox::warning(this, tr("Validation Error"),
+            tr("Invalid regex syntax."));
         return;
     }
 
@@ -1082,8 +1145,9 @@ void MainWindow::onOpenLogFolder() {
 }
 
 void MainWindow::onClearLogs() {
-    const auto answer = QMessageBox::question(this, tr("Clear logs"),
-        tr("Delete the log files? This cannot be undone."));
+    const auto answer = QMessageBox::question(this, tr("Delete all logs?"),
+        tr("This will permanently delete the current log file and all archived session "
+           "logs. This cannot be undone."));
     if (answer != QMessageBox::Yes) return;
 
     // Same files the Windows GUI deletes directly on disk.
@@ -1110,6 +1174,14 @@ void MainWindow::onStartOnBootToggled(bool checked) {
         QSignalBlocker b(startOnBootCheck_);
         startOnBootCheck_->setChecked(!checked);
     }
+}
+
+void MainWindow::onLanguageSelected(int index) {
+    if (loading_) return;
+    // Empty data = "System default"; the engine resolves it from the OS
+    // locale. The poll then re-applies the language live to every widget.
+    const QString tag = languageCombo_->itemData(index).toString();
+    appState_->client().PutSetting(L"appLanguage", tag.toStdString());
 }
 
 // ---------------------------------------------------------------------------
@@ -1145,7 +1217,7 @@ void MainWindow::updateModelDownloadDialog() {
         layout->addWidget(modelProgress_);
         layout->addWidget(modelRetryBtn_, 0, Qt::AlignLeft);
     }
-    modelDialog_->setWindowTitle(tr("Downloading language model"));
+    modelDialog_->setWindowTitle(tr("Downloading AI model"));
     modelRetryBtn_->setText(tr("Retry"));
 
     const int percent = status.value("modelDownloadPercent", 0);
@@ -1153,7 +1225,8 @@ void MainWindow::updateModelDownloadDialog() {
     modelStatusLabel_->setText(tr("The PII detection model is downloading (%1%).").arg(percent));
     modelRetryBtn_->setEnabled(failed);
     if (failed) {
-        modelStatusLabel_->setText(tr("The model download failed. Check your connection and retry."));
+        modelStatusLabel_->setText(tr("The model download failed. Check your internet "
+            "connection, then retry. PII detection is unavailable until the download completes."));
     } else if (!inProgress) {
         // Not started yet — kick it off.
         appState_->client().DownloadModel();
@@ -1199,9 +1272,9 @@ void MainWindow::openWindow() {
 }
 
 void MainWindow::onQuitRequested() {
-    const auto answer = QMessageBox::question(this, tr("Quit Agent Redactor"),
+    const auto answer = QMessageBox::question(this, tr("Are you sure you want to quit?"),
         tray_->available() || appState_->engineSpawned()
-            ? tr("Quit Agent Redactor? The proxy will stop.")
+            ? tr("If you quit, Agent Redactor will no longer monitor and redact API traffic.")
             : tr("Quit Agent Redactor? The engine keeps running in the background."));
     if (answer != QMessageBox::Yes) return;
 
@@ -1212,6 +1285,12 @@ void MainWindow::onQuitRequested() {
 }
 
 void MainWindow::changeEvent(QEvent* event) {
-    if (event->type() == QEvent::LanguageChange) retranslateUi();
+    if (event->type() == QEvent::LanguageChange) {
+        retranslateUi();
+        // Persistent/transient strings outside retranslateUi: the tray menu
+        // (built once) and the regex/keyword rows (rebuilt on profile load).
+        tray_->retranslate();
+        if (!dirty_ && !profiles_.empty()) reloadProfiles(true);
+    }
     QMainWindow::changeEvent(event);
 }

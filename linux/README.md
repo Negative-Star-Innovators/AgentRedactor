@@ -6,7 +6,7 @@ on Linux:
 ```bash
 sudo apt install -y build-essential cmake ninja-build pkg-config \
   libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
-  qt6-base-dev libgl1-mesa-dev \
+  qt6-base-dev qt6-l10n-tools libgl1-mesa-dev \
   python3-pytest python3-pytest-asyncio python3-aiohttp python3-psutil
 
 # onnxruntime is not packaged in apt; use the official linux-x64 tarball
@@ -39,10 +39,11 @@ python -m pytest linux -q
 
 ## GUI, tray and autostart
 
-`build/gui/agentredactor-gui` is the desktop app (Qt6 Widgets, English-only
-UI structured for later `.ts` translations). It spawns the engine
-(`agentredactor`, found next to it or in the sibling `engine/` build dir)
-when none is running, and stops it on quit only when it spawned it.
+`build/gui/agentredactor-gui` is the desktop app (Qt6 Widgets, translated
+into every language Windows supports — see "Translations" below). It spawns
+the engine (`agentredactor`, found next to it or in the sibling `engine/`
+build dir) when none is running, and stops it on quit only when it spawned
+it.
 
 - Tray: `QSystemTrayIcon` (StatusNotifierItem). On desktops without a tray
   (plain Wayland GNOME without the AppIndicator extension) the app runs as a
@@ -52,12 +53,32 @@ when none is running, and stops it on quit only when it spawned it.
 - Autostart: the "Start on boot" toggle writes/removes
   `$XDG_CONFIG_HOME/autostart/agentredactor.desktop` (the GUI reconciles the
   file with the persisted setting on startup, so CLI changes apply too).
+- Language: switchable from the tray Language submenu, the Settings card
+  combo, or the CLI (`agentredactor set app-language <tag>`); applies live
+  with no restart (Qt retranslation, RTL included).
 - Headless/boot-time startup without a desktop session: install the systemd
   user unit from `linux/systemd/agentredactor.service` (instructions in the
   file's header comment).
 - Password protection on Linux is a typed master password chosen inside the
   app (not your OS login password). The GUI shows a lock overlay with a
   password field when the session is locked.
+
+## Translations
+
+The GUI supports the same languages as Windows (`SUPPORTED_LANGUAGES` in
+`core/include/constants.h` is the shared source of truth). Catalogs live in
+`linux/gui/i18n/agentredactor_<locale>.ts` and are compiled into `:/i18n`
+with `lrelease` (package `qt6-l10n-tools`; without it the build is
+English-only with a CMake warning). Two scripts maintain them:
+
+- `i18n/sync_ts.py` — scans the GUI sources for `tr()` strings and fills
+  each catalog from the matching `windows/Strings/<tag>/Resources.resw`
+  translations (normalizing `&` accelerators and `{0}` ↔ `%1` placeholders).
+  Idempotent; re-run it after changing any GUI string.
+- `i18n/bootstrap_translations.py` — machine-translates the Linux-only
+  strings (typed-password flow etc.) with Google Translate, like the Windows
+  bootstrap (`windows/generate_new_languages.py`); review by native speakers
+  is still needed.
 
 ## Release packaging and self-update (Velopack)
 

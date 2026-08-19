@@ -29,3 +29,6 @@ windows/store-listing/
 
 # Internal planning docs (not for public release)
 docs/linux-port-plan.md
+
+# Translation/CI tooling venv (lrelease, deep-translator)
+.transvenv/

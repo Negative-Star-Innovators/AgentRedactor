@@ -36,6 +36,16 @@ GUI_BIN = Path(
     or PROJECT_ROOT / "linux" / "build" / "gui" / "agentredactor-gui"
 )
 ENGINE_BIN = PROJECT_ROOT / "linux" / "build" / "engine" / "agentredactor"
+I18N_DIR = PROJECT_ROOT / "linux" / "gui" / "i18n"
+
+
+def _cli(config_dir: Path, *args: str) -> subprocess.CompletedProcess:
+    env = dict(os.environ)
+    env["AGENTREDACTOR_CONFIG_DIR"] = str(config_dir)
+    return subprocess.run(
+        [str(ENGINE_BIN), *args], env=env,
+        stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30,
+    )
 
 
 def _engine_processes() -> list[psutil.Process]:
@@ -243,3 +253,47 @@ def test_autostart_file_reconciled_with_setting(gui_env) -> None:
         time.sleep(0.2)
     gui.stop()
     assert not desktop_file.exists()
+
+
+def test_all_supported_languages_have_catalogs(gui_env) -> None:
+    """Every language the CLI/engine supports must have a Qt catalog, so the
+    GUI can never offer a language it cannot display."""
+    config_dir, _, proxy_port = gui_env
+    _start_engine(config_dir, proxy_port)
+
+    r = _cli(config_dir, "languages")
+    assert r.returncode == 0, r.stdout + r.stderr
+    tags = [line.strip() for line in r.stdout.splitlines() if line.strip()]
+    assert len(tags) > 50
+
+    missing = [
+        tag for tag in tags
+        if tag != "en"  # English is the source language; no catalog needed
+        and not (I18N_DIR / f"agentredactor_{tag.replace('-', '_')}.ts").is_file()
+    ]
+    assert not missing, f"languages without a translation catalog: {missing}"
+
+
+def test_gui_applies_language_setting_live(gui_env) -> None:
+    """Switching app-language via the CLI while the GUI runs is picked up by
+    the settings poll and retranslates without a restart (and without a
+    crash — offscreen we cannot assert pixels, but the whole load/retranslate
+    path executes, including the RTL layout flip)."""
+    config_dir, xdg_home, proxy_port = gui_env
+    _start_engine(config_dir, proxy_port)
+
+    gui = GuiProcess(config_dir, xdg_home)
+    gui.start()
+    try:
+        time.sleep(3)
+        assert gui.process.poll() is None
+
+        for tag in ("de", "ar", "zh-CN", "en"):
+            r = _cli(config_dir, "set", "app-language", tag)
+            assert r.returncode == 0, r.stdout + r.stderr
+            time.sleep(2.5)  # at least one settings poll + LanguageChange
+            assert gui.process.poll() is None, f"GUI died switching to {tag}"
+            settings = _control_api(config_dir, "/settings")
+            assert settings.get("appLanguage") == tag
+    finally:
+        gui.stop()

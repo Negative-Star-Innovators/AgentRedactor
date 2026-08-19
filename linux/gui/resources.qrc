@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file alias="app.png">assets/app.png</file>
     </qresource>
-    <!-- Translation catalogs load from :/i18n/agentredactor_<tag>.qm when a
-         future phase converts windows/Strings/<tag>/Resources.resw. -->
+    <!-- Translation catalogs (:/i18n/agentredactor_<locale>.qm) are compiled
+         from i18n/*.ts by CMake into a generated i18n.qrc — see
+         linux/gui/CMakeLists.txt. -->
 </RCC>

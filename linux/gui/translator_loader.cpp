@@ -29,8 +29,11 @@ void TranslatorLoader::applyLanguage(const QString& tag) {
     }
 
     if (effective != QLatin1String("en")) {
-        // Translation catalogs (when they exist) are embedded under :/i18n.
-        if (translator_.load(QStringLiteral(":/i18n/agentredactor_") + effective)) {
+        // Translation catalogs are embedded under :/i18n, named with Qt
+        // locale suffixes (zh_CN, sr_Latn) rather than BCP-47 dashes.
+        QString fileTag = effective;
+        fileTag.replace(QLatin1Char('-'), QLatin1Char('_'));
+        if (translator_.load(QStringLiteral(":/i18n/agentredactor_") + fileTag)) {
             app_.installTranslator(&translator_);
         }
     }
