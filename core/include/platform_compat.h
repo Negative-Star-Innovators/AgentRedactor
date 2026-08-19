@@ -10,10 +10,13 @@
 
 // winsock2.h must precede windows.h (otherwise the legacy winsock.h wins and
 // SOCKET stays undeclared in core headers like http_server.h, which no longer
-// rely on the includer's pch.h ordering).
+// rely on the includer's pch.h ordering). winhttp.h is pulled in too: the
+// core's WinHTTP upstream client (proxy_engine) used to get it from
+// proxy_engine.h directly.
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+#include <winhttp.h>
 
 // POSIX name for the address-length type Winsock exposes as int.
 typedef int ar_socklen_t;
