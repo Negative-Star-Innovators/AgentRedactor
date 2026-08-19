@@ -10,7 +10,9 @@ URL="https://github.com/velopack/velopack/releases/download/${VP_VERSION}/velopa
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 DEST="${ROOT}/third_party/velopack"
 
-if [ -f "${DEST}/include/Velopack.hpp" ] && [ -f "${DEST}/lib/velopack_libc_linux_x64_gnu.so" ]; then
+if [ -f "${DEST}/include/Velopack.hpp" ] \
+    && [ -f "${DEST}/lib/velopack_libc_linux_x64_gnu.so" ] \
+    && [ -f "${DEST}/lib/velopack_libc_linux_arm64_gnu.so" ]; then
     echo "velopack_libc ${VP_VERSION} already present in ${DEST}"
     exit 0
 fi
@@ -25,11 +27,12 @@ echo "${VP_SHA256}  ${TMP}/velopack_libc.zip" | sha256sum -c -
 
 rm -rf "${DEST}"
 mkdir -p "${DEST}"
-# Only the Linux x64 pieces this project links/ships; other platforms are
-# fetched from the same zip if ever needed.
+# Only the Linux pieces this project links/ships (x64 + arm64); other
+# platforms are fetched from the same zip if ever needed.
 unzip -q "${TMP}/velopack_libc.zip" \
     'include/*' \
     'lib/velopack_libc_linux_x64_gnu.so' \
+    'lib/velopack_libc_linux_arm64_gnu.so' \
     -d "${DEST}"
 
 echo "velopack_libc ${VP_VERSION} extracted to ${DEST}"

@@ -13,11 +13,18 @@
 #include <thread>
 
 // The Cloudflare worker serves every file under this prefix from the R2
-// releases bucket. The host is shared with Windows; the channel segment for
-// Linux x64 builds is "linux" (matches vpk pack -c in build-release.sh).
+// releases bucket. The host is shared with Windows; the channel segment is
+// arch-aware (matches vpk pack -c in build-release.sh): x64 builds use the
+// original "linux" channel, ARM64 builds use "linux-arm64" — the same split
+// as the Windows "win" / "win-arm64" channels.
 namespace {
+#if defined(__aarch64__)
+constexpr const char* kUpdateFeedUrl =
+    "https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64";
+#else
 constexpr const char* kUpdateFeedUrl =
     "https://api.agentredactor.negativestarinnovators.com/updates/linux";
+#endif
 
 // Test hook (self-release builds only): AGENTREDACTOR_UPDATE_FEED overrides
 // the update feed URL so the E2E tests can point at a local feed. Loopback

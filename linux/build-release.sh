@@ -4,13 +4,15 @@
 # Usage:
 #   linux/build-release.sh            # build + pack into linux/build-release/velopack/
 #
-# Produces the Velopack linux channel artifacts (AppImage, zsync, nupkg,
-# releases.linux.json). Upload to R2 with (same secrets as the Windows flow):
+# Produces the Velopack channel artifacts (AppImage, nupkg, feed JSON) for the
+# host architecture: channel 'linux' on x64, 'linux-arm64' on aarch64 (mirrors
+# the win / win-arm64 split). Upload to R2 with (same secrets as the Windows
+# flow):
 #
 #   vpk upload s3 --bucket agentredactor-releases \
 #     --endpoint https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com \
 #     --keyId "$R2_ACCESS_KEY_ID" --secret "$R2_SECRET_ACCESS_KEY" \
-#     --prefix linux -c linux --outputDir linux/build-release/velopack
+#     --prefix <channel> -c <channel> --outputDir linux/build-release/velopack
 #
 # Prereqs: build deps from linux/README.md, dotnet SDK + `vpk` 1.2.0
 # (dotnet tool install -g vpk --version 1.2.0), onnxruntime tarball.
@@ -24,7 +26,22 @@ VERSION="$(tr -d '[:space:]' < "${ROOT}/../windows/version.txt")"
 ONNX_INCLUDE="${ONNXRUNTIME_INCLUDE_DIR:-$HOME/onnxruntime/include}"
 ONNX_LIB="${ONNXRUNTIME_LIB:-$HOME/onnxruntime/lib/libonnxruntime.so}"
 
-VP_QT_PLUGIN_DIR="${QT6_PLUGIN_DIR:-/usr/lib/x86_64-linux-gnu/qt6/plugins}"
+# Arch-aware: mirrors the Windows win / win-arm64 channel split. The x64
+# channel keeps the original 'linux' name; ARM64 uses 'linux-arm64'.
+ARCH="$(uname -m)"
+if [ "${ARCH}" = "aarch64" ]; then
+    VP_ARCH="arm64"
+    VPK_RID="linux-arm64"
+    CHANNEL="linux-arm64"
+    LIB_DIR="/usr/lib/aarch64-linux-gnu"
+else
+    VP_ARCH="x64"
+    VPK_RID="linux-x64"
+    CHANNEL="linux"
+    LIB_DIR="/usr/lib/x86_64-linux-gnu"
+fi
+
+VP_QT_PLUGIN_DIR="${QT6_PLUGIN_DIR:-${LIB_DIR}/qt6/plugins}"
 
 echo "==> Fetching Velopack lib"
 bash "${ROOT}/fetch-velopack.sh"
@@ -44,8 +61,8 @@ mkdir -p "${STAGE}/plugins"
 cp "${BUILD}/gui/agentredactor-gui" "${STAGE}/"
 cp "${BUILD}/engine/agentredactor" "${STAGE}/"
 # DT_NEEDED records the lib-prefixed name (see gui/CMakeLists.txt).
-cp "${ROOT}/third_party/velopack/lib/velopack_libc_linux_x64_gnu.so" \
-    "${STAGE}/libvelopack_libc_linux_x64_gnu.so"
+cp "${ROOT}/third_party/velopack/lib/velopack_libc_linux_${VP_ARCH}_gnu.so" \
+    "${STAGE}/libvelopack_libc_linux_${VP_ARCH}_gnu.so"
 cp "${ONNX_LIB}" "${STAGE}/"
 
 # Bundle the shared libraries the two binaries resolve to, minus the
@@ -92,8 +109,8 @@ vpk pack \
     --packVersion "${VERSION}" \
     --packDir "${STAGE}" \
     --mainExe agentredactor-gui \
-    --runtime linux-x64 \
-    --channel linux \
+    --runtime "${VPK_RID}" \
+    --channel "${CHANNEL}" \
     --packTitle "Agent Redactor" \
     --packAuthors "Negative Star Innovators" \
     --icon "${ROOT}/gui/assets/app.png" \

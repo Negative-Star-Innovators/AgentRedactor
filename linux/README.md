@@ -62,10 +62,15 @@ when none is running, and stops it on quit only when it spawned it.
 ## Release packaging and self-update (Velopack)
 
 Self-release builds package the app as a Velopack AppImage with an in-app
-updater, mirroring the Windows self-release flow (channel `linux`, same R2
-bucket, same feed worker). Prereqs: the .NET SDK and the pinned Velopack CLI
+updater, mirroring the Windows self-release flow (same R2 bucket, same feed
+worker). Channels are arch-aware, mirroring `win` / `win-arm64`: x64 builds
+use `linux`, ARM64 builds use `linux-arm64`. `build-release.sh` derives the
+architecture from the host (`uname -m`); on aarch64 it packs
+`-r linux-arm64 -c linux-arm64` and uses the aarch64 Qt plugin dir. Prereqs:
+the .NET SDK and the pinned Velopack CLI
 (`dotnet tool install -g vpk --version 1.2.0` — keep it in sync with
-`linux/fetch-velopack.sh`).
+`linux/fetch-velopack.sh`). On aarch64, point `ONNXRUNTIME_INCLUDE_DIR` /
+`ONNXRUNTIME_LIB` at the linux-aarch64 onnxruntime tarball instead.
 
 ```bash
 linux/build-release.sh    # Release build (-DAR_SELFRELEASE=ON) + AppDir + vpk pack

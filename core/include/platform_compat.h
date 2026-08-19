@@ -8,6 +8,11 @@
 
 #ifdef _WIN32
 
+// winsock2.h must precede windows.h (otherwise the legacy winsock.h wins and
+// SOCKET stays undeclared in core headers like http_server.h, which no longer
+// rely on the includer's pch.h ordering).
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 
 // POSIX name for the address-length type Winsock exposes as int.
