@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>התחל באתחול</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>המנוע לא פועל - מנסה שוב...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>ברירת מחדל</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>התחל באתחול</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

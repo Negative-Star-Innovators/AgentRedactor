@@ -11,6 +11,7 @@
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -20,6 +21,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QScreen>
 #include <QScrollArea>
 #include <QSplitter>
 #include <QStackedLayout>
@@ -63,7 +65,14 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
     : QMainWindow(parent), appState_(appState), tray_(tray), translator_(translator) {
     setWindowTitle(tr("Agent Redactor"));
     setWindowIcon(QIcon(QStringLiteral(":/app.png")));
-    resize(1000, 900);
+    // Never open larger than the available work area: on Wayland an app
+    // cannot reposition its own window, so one that opens taller than the
+    // screen (900px on a 1280x800 display) loses its title bar off the top
+    // edge with no way to drag it back down.
+    const QRect avail = QGuiApplication::primaryScreen()
+        ? QGuiApplication::primaryScreen()->availableGeometry()
+        : QRect(0, 0, 1000, 900);
+    resize(std::min(1000, avail.width()), std::min(900, avail.height()));
 
     buildUi();
 
@@ -611,6 +620,36 @@ void MainWindow::onConnectionLost() {
 void MainWindow::reloadProfiles(bool keepSelection) {
     json profiles;
     if (!appState_->client().GetProfiles(profiles) || !profiles.is_array()) return;
+
+    if (profiles.empty()) {
+        // Mirror the Windows GUI (HomePage::LoadProfileList): seed a default
+        // profile on first run so the user never lands on an empty form.
+        const int port = FindAvailablePort(8080, {});
+        json profile = {
+            {"alias", tr("Default").toStdString()},
+            {"upstream_url", ""},
+            {"api_key", ""},
+            {"port", port > 0 ? port : 8080},
+            {"use_openai_model", true},
+            {"protocol_mode", "none"},
+            {"enabled_pii_types", json::array()},
+            {"pii_confidence_threshold", 0.9},
+            {"regex_patterns", json::array()},
+            {"keywords", json::array()},
+            {"stats", {{"total_requests", 0}, {"total_pii_detected", 0},
+                       {"total_regex_matches", 0}, {"total_keyword_matches", 0},
+                       {"pii_type_breakdown", json::object()}}},
+            {"enabled", true},
+        };
+        for (const auto& t : DEFAULT_PII_TYPES)
+            profile["enabled_pii_types"].push_back(Utils::WideToUtf8(t));
+        std::wstring id;
+        if (appState_->client().PostProfile(profile, id)) {
+            appState_->client().RestartListeners();
+            reloadProfiles(keepSelection);
+        }
+        return;
+    }
 
     const QString previousId = keepSelection ? selectedProfileId() : QString();
     profiles_ = profiles;

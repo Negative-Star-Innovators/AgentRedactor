@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>開機啟動</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>引擎未運作 — 正在重試...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>預設</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>開機啟動</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

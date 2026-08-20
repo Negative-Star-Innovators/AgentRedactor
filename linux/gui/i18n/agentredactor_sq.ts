@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Filloni në Boot</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>Motori nuk funksionon - po riprovohet…</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>Parazgjedhur</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Filloni në Boot</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

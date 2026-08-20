@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Mulai saat Boot</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>Mesin tidak hidup — mencoba lagi…</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>Default</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Mulai saat Boot</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

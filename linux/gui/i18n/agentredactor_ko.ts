@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>부팅 시 시작</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>엔진이 실행되고 있지 않습니다. 다시 시도하는 중입니다…</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>기본값</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>부팅 시 시작</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

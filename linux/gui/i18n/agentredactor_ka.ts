@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>დაწყება ჩატვირთვით</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>ძრავა არ მუშაობს — ხელახლა ცდა…</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>ნაგულისხმევი</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>დაწყება ჩატვირთვით</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

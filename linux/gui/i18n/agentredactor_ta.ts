@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>துவக்கத்தில் தொடங்கவும்</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>எஞ்சின் இயங்கவில்லை - மீண்டும் முயற்சிக்கிறது...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>இயல்புநிலை</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>துவக்கத்தில் தொடங்கவும்</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

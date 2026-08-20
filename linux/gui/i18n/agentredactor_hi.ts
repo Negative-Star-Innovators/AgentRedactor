@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>बूट पर प्रारंभ करें</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>इंजन नहीं चल रहा है - पुनः प्रयास किया जा रहा है...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>डिफ़ॉल्ट</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>बूट पर प्रारंभ करें</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

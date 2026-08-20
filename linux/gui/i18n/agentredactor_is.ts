@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Byrjaðu á Boot</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>Vél er ekki í gangi — reynir aftur...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>Sjálfgefið</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Byrjaðu á Boot</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

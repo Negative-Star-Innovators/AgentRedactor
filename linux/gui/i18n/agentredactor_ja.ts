@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>ブート時に開始</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>エンジンが動作していません - 再試行しています…</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>既定</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>ブート時に開始</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

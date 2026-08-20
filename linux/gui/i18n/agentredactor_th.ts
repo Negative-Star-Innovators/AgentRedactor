@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>เริ่มที่บูท</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>เครื่องยนต์ไม่ทำงาน — กำลังลองอีกครั้ง...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>ค่าเริ่มต้น</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>เริ่มที่บูท</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>

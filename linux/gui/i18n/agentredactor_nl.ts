@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Begin bij het opstarten</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
@@ -225,6 +225,10 @@
     <message>
       <source>Engine is not running — retrying…</source>
       <translation>De motor draait niet. Opnieuw proberen...</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>Standaard</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -363,7 +367,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation>Begin bij het opstarten</translation>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Language</source>
