@@ -2,9 +2,15 @@
 // engine is running (spawning it detached when not), and shows the main
 // window / tray. All backend logic lives in the engine process.
 
+#include <cerrno>
 #include <csignal>
+#include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
+#include <fstream>
+#include <string>
+#include <vector>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -38,26 +44,89 @@ void onSignal(int sig) {
     }
 }
 
-// Terminal discoverability: expose the bundled engine/CLI binary as
-// ~/.local/bin/agentredactor. Best-effort and idempotent; only done in the
-// installed layout (engine next to the GUI binary), never in the dev tree.
-// Skipped under an AppImage: applicationDirPath is then an ephemeral
-// /tmp/.mount_* and the symlink would dangle as soon as the app exits.
-void EnsureCliSymlink() {
+// CLI pass-through: "<gui> --cli <args...>" re-execs the sibling dual-mode
+// engine/CLI binary with the remaining args. This is how the
+// ~/.local/bin/agentredactor wrapper reaches the CLI inside an AppImage: the
+// wrapper re-launches the AppImage file with --cli, the AppImage runtime
+// mounts and starts this binary, and we hand off to the real CLI. Runs before
+// Velopack/Qt startup so CLI calls stay fast and never parse GUI flags.
+int ForwardToCli(int argc, char* argv[]) {
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    const fs::path self = fs::read_symlink("/proc/self/exe", ec);
+    const fs::path cliBin = ec ? fs::path() : self.parent_path() / "agentredactor";
+
+    std::vector<std::string> args;
+    args.push_back(cliBin.string());
+    for (int i = 2; i < argc; ++i) args.emplace_back(argv[i]);
+    std::vector<char*> cargv;
+    for (auto& a : args) cargv.push_back(a.data());
+    cargv.push_back(nullptr);
+
+    execv(cliBin.c_str(), cargv.data());
+    std::fprintf(stderr, "agentredactor: could not launch the bundled CLI (%s)\n",
+        std::strerror(errno));
+    return 1;
+}
+
+// Shell-quote a path for embedding in a double-quoted wrapper script.
+std::string ShellQuoteDouble(const std::string& s) {
+    std::string out;
+    for (char c : s) {
+        if (c == '"' || c == '\\' || c == '$' || c == '`') out += '\\';
+        out += c;
+    }
+    return out;
+}
+
+// Terminal discoverability: expose the CLI as ~/.local/bin/agentredactor.
+// Best-effort and idempotent.
+//  - Installed/dev layout (engine binary next to the GUI): plain symlink to
+//    the dual-mode binary.
+//  - AppImage: the CLI binary lives inside the ephemeral /tmp/.mount_* so a
+//    symlink cannot reach it; instead drop a two-line wrapper that re-runs
+//    the AppImage file ($APPIMAGE is the stable path) with --cli. Rewritten
+//    on every launch so moving the AppImage self-heals on the next run.
+void EnsureCliShim() {
     namespace fs = std::filesystem;
     const fs::path binDir =
         fs::path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation).toStdString())
         / ".local" / "bin";
     const fs::path link = binDir / "agentredactor";
 
-    const bool appImageRun = std::getenv("APPIMAGE") != nullptr ||
+    const char* appImageEnv = std::getenv("APPIMAGE");
+    const bool appImageRun = (appImageEnv && *appImageEnv) ||
         QCoreApplication::applicationDirPath().startsWith(QLatin1String("/tmp/.mount_"));
     if (appImageRun) {
-        // Clean up a dangling link left by an earlier AppImage run.
+        // Clean up a dangling symlink left by an earlier AppImage run.
         std::error_code ec;
         if (fs::is_symlink(link, ec) &&
             fs::read_symlink(link, ec).string().rfind("/tmp/.mount_", 0) == 0) {
             fs::remove(link, ec);
+        }
+        if (!appImageEnv || !*appImageEnv) return; // extract-and-run: no stable path
+
+        std::error_code ec2;
+        fs::create_directories(binDir, ec2);
+        const std::string script = "#!/bin/sh\nexec \"" +
+            ShellQuoteDouble(appImageEnv) + "\" --cli \"$@\"\n";
+        bool upToDate = false;
+        {
+            std::ifstream in(link, std::ios::binary);
+            if (in) upToDate = std::string(std::istreambuf_iterator<char>(in),
+                std::istreambuf_iterator<char>()) == script;
+        }
+        if (!upToDate) {
+            // Not atomic, but a torn half-written wrapper just fails its next
+            // exec and is rewritten on the following app launch.
+            std::ofstream out(link, std::ios::binary | std::ios::trunc);
+            out << script;
+            out.close();
+            fs::permissions(link, fs::perms::owner_all | fs::perms::group_read |
+                fs::perms::group_exec | fs::perms::others_read | fs::perms::others_exec,
+                fs::perm_options::replace, ec2);
+            if (ec2) qWarning("[main] could not write CLI wrapper %s: %s",
+                link.c_str(), ec2.message().c_str());
         }
         return;
     }
@@ -79,6 +148,9 @@ void EnsureCliSymlink() {
 } // namespace
 
 int main(int argc, char* argv[]) {
+    if (argc > 1 && std::strcmp(argv[1], "--cli") == 0) {
+        return ForwardToCli(argc, argv);
+    }
 #ifdef AR_SELFRELEASE
     // Velopack startup logic: handles post-update restart/apply hooks and may
     // exit or restart the process. Must run before anything else.
@@ -111,7 +183,7 @@ int main(int argc, char* argv[]) {
 
     const bool trayOnly = QApplication::arguments().contains(QLatin1String("--tray-only"));
 
-    EnsureCliSymlink();
+    EnsureCliShim();
 
     TranslatorLoader translator(app);
 

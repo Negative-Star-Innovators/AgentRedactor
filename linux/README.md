@@ -113,8 +113,12 @@ Settings (self-release builds only); when an update is downloaded the app
 offers "Restart now / later", applies via Velopack, and restarts. The engine
 binary ships inside the AppImage next to the GUI; on version mismatch the GUI
 stops and respawns it. Qt is bundled dynamically linked inside the AppImage
-with `LGPL-Qt-notice.txt`. First run symlinks the CLI to
-`~/.local/bin/agentredactor`.
+with `LGPL-Qt-notice.txt`. First run exposes the CLI as
+`~/.local/bin/agentredactor`: a plain symlink in installed layouts, and under
+an AppImage a two-line wrapper that re-runs the AppImage file with `--cli`
+(the GUI binary then execs the bundled dual-mode engine/CLI binary; a symlink
+cannot reach inside the ephemeral mount). The wrapper is rewritten on every
+launch, so moving the AppImage self-heals on the next run.
 
 Model files follow the Windows self-release split: the small companions
 (`config.json`, `tokenizer.json`, `viterbi_calibration.json`,

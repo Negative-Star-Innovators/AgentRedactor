@@ -207,3 +207,24 @@ def test_appimage_self_updates_against_local_feed(update_env) -> None:
                 pass
 
     assert _sha256(app) != before
+
+    # 7. First-run CLI shim: launching the AppImage drops a wrapper at
+    #    ~/.local/bin/agentredactor that re-invokes the AppImage with --cli.
+    #    Drive the full chain end-to-end: wrapper -> AppImage runtime -> GUI
+    #    binary -> exec of the bundled dual-mode CLI binary.
+    shim = home_dir / ".local" / "bin" / "agentredactor"
+    assert shim.is_file(), f"CLI shim missing at {shim}"
+    assert os.access(shim, os.X_OK)
+    assert str(app) in shim.read_text(encoding="utf-8")
+    cli_env = dict(os.environ)
+    cli_env.update({
+        "AGENTREDACTOR_CONFIG_DIR": str(config_dir),
+        "HOME": str(home_dir),
+        "XDG_CONFIG_HOME": str(home_dir / ".config"),
+        "XDG_DATA_HOME": str(home_dir / ".local" / "share"),
+    })
+    cli = subprocess.run(
+        [str(shim), "help"], env=cli_env,
+        capture_output=True, text=True, timeout=60)
+    assert cli.returncode == 0, f"CLI via shim failed: {cli.stdout} {cli.stderr}"
+    assert "profiles" in cli.stdout and "keywords" in cli.stdout
