@@ -123,14 +123,32 @@ static void WriteLogLine(const std::wstring& message) {
     if (g_logFilePath.empty()) InitializeLogging();
     std::lock_guard<std::mutex> lock(g_logMutex);
     try {
+        auto now = std::chrono::system_clock::now();
+        auto time = std::chrono::system_clock::to_time_t(now);
+        std::wstring timeStr = FormatLocalizedDateTime(time);
+#ifdef _WIN32
+        // The engine and the UI both append to this file. A CRT append stream
+        // seeks to EOF and then writes, so two processes racing that pattern
+        // overwrite each other's lines (seen in CI as a mangled
+        // "[UpdateManager] Up to date" line). A handle opened with
+        // FILE_APPEND_DATA only (no FILE_WRITE_DATA) ignores the file pointer
+        // and appends every WriteFile atomically at EOF.
+        HANDLE h = CreateFileW(g_logFilePath.c_str(), FILE_APPEND_DATA,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (h != INVALID_HANDLE_VALUE) {
+            const std::string utf8 = WideToUtf8(L"[" + timeStr + L"] " + message + L"\r\n");
+            DWORD written = 0;
+            WriteFile(h, utf8.data(), static_cast<DWORD>(utf8.size()), &written, nullptr);
+            CloseHandle(h);
+        }
+#else
         std::wofstream logFile(g_logFilePath, std::ios::app);
         if (logFile) {
-            auto now = std::chrono::system_clock::now();
-            auto time = std::chrono::system_clock::to_time_t(now);
-            std::wstring timeStr = FormatLocalizedDateTime(time);
             logFile << L"[" << timeStr << L"] " << message << std::endl;
             logFile.flush();
         }
+#endif
     } catch (...) {}
     OutputDebugStringW((message + L"\n").c_str());
 }
