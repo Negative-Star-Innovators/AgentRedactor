@@ -116,6 +116,13 @@ stops and respawns it. Qt is bundled dynamically linked inside the AppImage
 with `LGPL-Qt-notice.txt`. First run symlinks the CLI to
 `~/.local/bin/agentredactor`.
 
+Model files follow the Windows self-release split: the small companions
+(`config.json`, `tokenizer.json`, `viterbi_calibration.json`,
+`onnx/model_quantized.onnx` from `windows/models/`) ship inside the package
+next to the binaries, while the ~1.6 GB `onnx/model_quantized.onnx_data`
+weights download on first run from the R2 endpoint into
+`~/.local/share/agentredactor/models/` (see `core/src/model_downloader.cpp`).
+
 Test hooks (self-release builds only, same contract as Windows):
 `AGENTREDACTOR_UPDATE_FEED` overrides the feed URL (loopback http only) and
 `AGENTREDACTOR_UPDATE_AUTOAPPLY=1` skips the restart prompt.

@@ -65,6 +65,17 @@ cp "${ROOT}/third_party/velopack/lib/velopack_libc_linux_${VP_ARCH}_gnu.so" \
     "${STAGE}/libvelopack_libc_linux_${VP_ARCH}_gnu.so"
 cp "${ONNX_LIB}" "${STAGE}/"
 
+# Model companions ship in the package next to the exe (same split as the
+# Windows self-release channel, build.ps1 /XF *.onnx_data): the 1.6 GB weights
+# download on first run from the R2 endpoint, but the tokenizer / config /
+# calibration / model graph must be present or EnsureModelFiles cannot start
+# (core/src/model_downloader.cpp kCompanionFiles).
+MODELS_SRC="${ROOT}/../windows/models"
+mkdir -p "${STAGE}/models/onnx"
+cp "${MODELS_SRC}/config.json" "${MODELS_SRC}/tokenizer.json" \
+    "${MODELS_SRC}/viterbi_calibration.json" "${STAGE}/models/"
+cp "${MODELS_SRC}/onnx/model_quantized.onnx" "${STAGE}/models/onnx/"
+
 # Bundle the shared libraries the two binaries resolve to, minus the
 # AppImage-standard system set that must come from the host.
 EXCLUDE='^(linux-vdso|ld-linux|libc|libm|libdl|librt|libpthread|libresolv|libnsl|libutil|libz|libGL|libEGL|libX11|libxcb|libXau|libXdmcp|libdrm|libgbm|libwayland-|libxkbcommon|libfontconfig|libfreetype|libexpat|libdbus-1|libsystemd|libglib-2.0|libgobject-2.0|libgio-2.0)\.so'

@@ -72,8 +72,10 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
     connect(appState_, &AppState::modelDownloadChanged, this, &MainWindow::onModelDownloadChanged);
     connect(appState_, &AppState::connectionLost, this, &MainWindow::onConnectionLost);
     connect(tray_, &TrayIcon::languageChangeRequested, this, [this](const QString& tag) {
-        // The settings poll picks up the change and retranslates everything
-        // live (no restart, unlike Windows).
+        // Apply immediately so the UI switches without waiting for the
+        // settings-poll round-trip; the poll later reconciles the persisted
+        // tag (no restart, unlike Windows).
+        translator_->applyLanguage(tag);
         appState_->client().PutSetting(L"appLanguage", tag.toStdString());
     });
 
@@ -1179,8 +1181,10 @@ void MainWindow::onStartOnBootToggled(bool checked) {
 void MainWindow::onLanguageSelected(int index) {
     if (loading_) return;
     // Empty data = "System default"; the engine resolves it from the OS
-    // locale. The poll then re-applies the language live to every widget.
+    // locale. Apply immediately so the UI switches without waiting for the
+    // settings-poll round-trip; the poll later re-applies the persisted tag.
     const QString tag = languageCombo_->itemData(index).toString();
+    translator_->applyLanguage(tag);
     appState_->client().PutSetting(L"appLanguage", tag.toStdString());
 }
 
