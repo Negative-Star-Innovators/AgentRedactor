@@ -8,6 +8,12 @@ the updater downloads the vNext package and swaps the AppImage in place.
 Skipped unless the release pack has been built (linux/build-release/velopack)
 and vpk is available to pack the vNext feed. Unlike the regular smoke tests
 this exercises the AR_SELFRELEASE build, not the dev-tree binary.
+
+Note: Velopack keeps downloaded packages in a fixed machine-wide state dir
+(/var/tmp/velopack/<packId>) that does NOT follow the test's isolated
+HOME/XDG. The fixture purges it before and after — a leftover vNext package
+there would otherwise be applied to ANY AgentRedactor AppImage started later
+(including a freshly packed one), silently reverting it to the test build.
 """
 
 from __future__ import annotations
@@ -40,6 +46,9 @@ RELEASE_DIR = PROJECT_ROOT / "linux" / "build-release"
 VELOPACK_OUT = RELEASE_DIR / "velopack"
 APPDIR = RELEASE_DIR / "appdir"
 APPIMAGE = VELOPACK_OUT / "AgentRedactor.AppImage"
+
+# Velopack's machine-wide package cache/staging for this packId.
+VELOPACK_STATE = Path("/var/tmp/velopack/AgentRedactor")
 
 POLL_TIMEOUT_S = 180.0
 POLL_INTERVAL_S = 2.0
@@ -91,6 +100,8 @@ def update_env(tmp_path: Path):
     if not vpk:
         pytest.skip("vpk (Velopack CLI) not installed")
     _kill_existing_agent_redactor()
+    # No leftover staged packages from a previous run (theirs or ours).
+    shutil.rmtree(VELOPACK_STATE, ignore_errors=True)
     yield tmp_path, vpk
     _kill_existing_agent_redactor()
     for p in _gui_processes_for(tmp_path):
@@ -98,6 +109,9 @@ def update_env(tmp_path: Path):
             p.kill()
         except psutil.NoSuchProcess:
             pass
+    # Never leave the test's vNext package in the machine-wide Velopack
+    # state dir: the next real AppImage launch would apply it in place.
+    shutil.rmtree(VELOPACK_STATE, ignore_errors=True)
 
 
 def test_appimage_self_updates_against_local_feed(update_env) -> None:

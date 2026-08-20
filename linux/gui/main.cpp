@@ -3,6 +3,7 @@
 // window / tray. All backend logic lives in the engine process.
 
 #include <csignal>
+#include <cstdlib>
 #include <filesystem>
 
 #include <QApplication>
@@ -40,15 +41,30 @@ void onSignal(int sig) {
 // Terminal discoverability: expose the bundled engine/CLI binary as
 // ~/.local/bin/agentredactor. Best-effort and idempotent; only done in the
 // installed layout (engine next to the GUI binary), never in the dev tree.
+// Skipped under an AppImage: applicationDirPath is then an ephemeral
+// /tmp/.mount_* and the symlink would dangle as soon as the app exits.
 void EnsureCliSymlink() {
     namespace fs = std::filesystem;
-    const fs::path engine =
-        fs::path(QCoreApplication::applicationDirPath().toStdString()) / "agentredactor";
-    if (!fs::exists(engine)) return;
     const fs::path binDir =
         fs::path(QStandardPaths::writableLocation(QStandardPaths::HomeLocation).toStdString())
         / ".local" / "bin";
     const fs::path link = binDir / "agentredactor";
+
+    const bool appImageRun = std::getenv("APPIMAGE") != nullptr ||
+        QCoreApplication::applicationDirPath().startsWith(QLatin1String("/tmp/.mount_"));
+    if (appImageRun) {
+        // Clean up a dangling link left by an earlier AppImage run.
+        std::error_code ec;
+        if (fs::is_symlink(link, ec) &&
+            fs::read_symlink(link, ec).string().rfind("/tmp/.mount_", 0) == 0) {
+            fs::remove(link, ec);
+        }
+        return;
+    }
+
+    const fs::path engine =
+        fs::path(QCoreApplication::applicationDirPath().toStdString()) / "agentredactor";
+    if (!fs::exists(engine)) return;
     std::error_code ec;
     if (fs::exists(link, ec) || fs::is_symlink(link, ec)) {
         if (fs::read_symlink(link, ec) == engine) return; // already correct
