@@ -87,7 +87,10 @@ for bin in "${STAGE}/agentredactor-gui" "${STAGE}/agentredactor"; do
 done
 
 # Qt plugins the GUI actually uses; qt.conf points Qt at the bundled copy.
-for group in platforms platformthemes wayland-shell-integration xcbglintegrations imageformats iconengines tls; do
+# wayland-decoration-client provides the client-side title bar (min/max/
+# close buttons) on compositors without server-side decorations (GNOME) —
+# without it Qt runs with "no decorations" and the window has no title bar.
+for group in platforms platformthemes wayland-shell-integration wayland-decoration-client xcbglintegrations imageformats iconengines tls; do
     if [ -d "${VP_QT_PLUGIN_DIR}/${group}" ]; then
         cp -r "${VP_QT_PLUGIN_DIR}/${group}" "${STAGE}/plugins/"
     fi
