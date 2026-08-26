@@ -138,11 +138,13 @@ void AppState::onPolled(QString statusDump, QString settingsDump, bool statusOk)
             return;
         }
         // Keep the XDG autostart entry in agreement with the persisted
-        // setting (e.g. changed via the CLI while the GUI was closed).
+        // setting (e.g. changed via the CLI while the GUI was closed), and
+        // rewrite entries whose Exec no longer matches (e.g. written with an
+        // ephemeral /tmp/.mount_* AppImage path, which breaks on reboot).
         const bool startOnBoot = lastSettings_.value("startOnBoot", false);
-        if (Autostart::IsEnabled() != startOnBoot) {
-            Autostart::SetEnabled(startOnBoot,
-                QCoreApplication::applicationFilePath().toStdString());
+        if (startOnBoot != Autostart::IsEnabled() ||
+            (startOnBoot && !Autostart::IsUpToDate())) {
+            Autostart::SetEnabled(startOnBoot);
         }
         emit settingsChanged();
     }

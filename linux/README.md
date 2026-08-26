@@ -37,6 +37,23 @@ python -m pytest migration/test_settings_migration.py -q
 python -m pytest linux -q
 ```
 
+The AT-SPI UI tests in `linux/test_gui_atspi.py` (marker `atspi`) drive the
+real GUI through the accessibility bus, so they need a display (a real X
+session, or Xvfb) plus the distro `gi`/AT-SPI bindings
+(`python3-gi gir1.2-atspi-2.0 at-spi2-core`; Qt only registers on the bus
+under `QT_QPA_PLATFORM=xcb`, never offscreen). They skip cleanly without
+those. Headless run:
+
+```bash
+sudo apt install xvfb python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11
+cd tests
+PYTHONPATH=/usr/lib/python3/dist-packages \
+  dbus-run-session -- xvfb-run -a -s "-screen 0 1280x800x24" \
+  python -m pytest linux/test_gui_atspi.py -q
+# or exclude them from the full Linux run:
+python -m pytest linux -q -m "not atspi"
+```
+
 ## GUI, tray and autostart
 
 `build/gui/agentredactor-gui` is the desktop app (Qt6 Widgets, translated

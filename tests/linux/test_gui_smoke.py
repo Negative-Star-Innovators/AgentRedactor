@@ -255,6 +255,48 @@ def test_autostart_file_reconciled_with_setting(gui_env) -> None:
     assert not desktop_file.exists()
 
 
+def test_autostart_exec_uses_stable_appimage_path(gui_env) -> None:
+    """Regression: an autostart entry pointing into the transient
+    /tmp/.mount_* AppImage FUSE mount never survives a reboot. Under an
+    AppImage the entry must exec $APPIMAGE (the AppImage file), and a stale
+    mount-path entry must be rewritten when the GUI next runs."""
+    config_dir, xdg_home, proxy_port = gui_env
+    desktop_file = xdg_home / "autostart" / "agentredactor.desktop"
+    _start_engine(config_dir, proxy_port)
+
+    env = dict(os.environ)
+    env["AGENTREDACTOR_CONFIG_DIR"] = str(config_dir)
+    r = subprocess.run(
+        [str(ENGINE_BIN), "set", "start-on-boot", "true"],
+        env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30,
+    )
+    assert r.returncode == 0, r.stdout + r.stderr
+
+    # Stale entry as written by the old code (ephemeral mount path).
+    desktop_file.parent.mkdir(parents=True, exist_ok=True)
+    desktop_file.write_text(
+        "[Desktop Entry]\nType=Application\nName=Agent Redactor\n"
+        "Exec=/tmp/.mount_AgentRLghAAm/usr/bin/agentredactor-gui --tray-only\n"
+        "X-GNOME-Autostart-enabled=true\n",
+        encoding="utf-8",
+    )
+
+    gui = GuiProcess(config_dir, xdg_home)
+    gui.env["APPIMAGE"] = "/fake/stable/AgentRedactor.AppImage"
+    gui.start()
+    try:
+        deadline = time.monotonic() + 15
+        content = desktop_file.read_text(encoding="utf-8")
+        while "/tmp/.mount_" in content and time.monotonic() < deadline:
+            time.sleep(0.2)
+            content = desktop_file.read_text(encoding="utf-8")
+    finally:
+        gui.stop()
+
+    assert "/tmp/.mount_" not in content, f"stale mount path kept: {content}"
+    assert 'Exec="/fake/stable/AgentRedactor.AppImage" --tray-only' in content
+
+
 def test_all_supported_languages_have_catalogs(gui_env) -> None:
     """Every language the CLI/engine supports must have a Qt catalog, so the
     GUI can never offer a language it cannot display."""

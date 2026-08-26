@@ -382,8 +382,13 @@ class MockLLM:
     @property
     def base_url(self) -> str:
         """Return the base URL of the running mock server."""
-        # site.name is like 'http://127.0.0.1:54321'
-        return self.site.name
+        # site.name keeps the configured port, which is 0 when the OS assigned
+        # one (aiohttp >= 3.9); fall back to the actual bound socket address.
+        name = self.site.name
+        if name.rsplit(":", 1)[-1] != "0":
+            return name
+        host, port = self.runner.addresses[0]
+        return f"http://{host}:{port}"
 
 
 async def mock_llm_context() -> AsyncIterator[MockLLM]:

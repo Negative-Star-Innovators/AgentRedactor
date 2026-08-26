@@ -187,6 +187,46 @@
       <translation>Agent Redactor ถูกล็อค</translation>
     </message>
     <message>
+      <source>Profiles</source>
+      <translation>โปรไฟล์</translation>
+    </message>
+    <message>
+      <source>Profile name</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Proxy port</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Forward To URL</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>API key</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Confidence threshold</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>New regex pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>New keyword</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Session redactions</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Master password</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Account number</source>
       <translation>หมายเลขบัญชี</translation>
     </message>
@@ -231,6 +271,14 @@
       <translation>ค่าเริ่มต้น</translation>
     </message>
     <message>
+      <source>Enable pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Regex pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Delete</source>
       <translation>ลบ</translation>
     </message>
@@ -243,12 +291,20 @@
       <translation>รูปแบบ Regex ไม่ถูกต้อง</translation>
     </message>
     <message>
+      <source>Enable keyword</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Case: Yes</source>
       <translation>กรณี: ใช่</translation>
     </message>
     <message>
       <source>Case: No</source>
       <translation>กรณี: ไม่ใช่</translation>
+    </message>
+    <message>
+      <source>Keyword text</source>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>

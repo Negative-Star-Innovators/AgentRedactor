@@ -187,6 +187,46 @@
       <translation>Agent Redactor je zaklenjen</translation>
     </message>
     <message>
+      <source>Profiles</source>
+      <translation>Profili</translation>
+    </message>
+    <message>
+      <source>Profile name</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Proxy port</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Forward To URL</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>API key</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Confidence threshold</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>New regex pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>New keyword</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Session redactions</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Master password</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Številka računa</translation>
     </message>
@@ -231,6 +271,14 @@
       <translation>Privzeto</translation>
     </message>
     <message>
+      <source>Enable pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Regex pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Delete</source>
       <translation>Izbriši</translation>
     </message>
@@ -243,12 +291,20 @@
       <translation>Neveljavna regex sintaksa.</translation>
     </message>
     <message>
+      <source>Enable keyword</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Case: Yes</source>
       <translation>Primer: Da</translation>
     </message>
     <message>
       <source>Case: No</source>
       <translation>Zadeva: št</translation>
+    </message>
+    <message>
+      <source>Keyword text</source>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>

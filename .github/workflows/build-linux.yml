@@ -48,7 +48,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake ninja-build pkg-config \
             libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
-            qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse
+            qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse \
+            xvfb python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11
 
       # onnxruntime has no apt package; official tarball per arch, same as
       # linux/README.md documents for local builds.
@@ -109,7 +110,18 @@ jobs:
         run: python -m pytest tests/migration -q
 
       - name: Run Linux tests (offscreen GUI smoke)
-        run: python -m pytest tests/linux -q
+        run: python -m pytest tests/linux -q -m "not atspi"
+
+      # The AT-SPI suite (tests/linux/test_gui_atspi.py) drives the real GUI
+      # through the accessibility bus: Qt only registers there under
+      # QT_QPA_PLATFORM=xcb, so it needs a display (Xvfb) and a D-Bus session
+      # for the a11y bus. The gi/Atspi bindings come from the distro packages
+      # above; PYTHONPATH exposes them to the setup-python interpreter.
+      - name: Run Linux GUI tests (AT-SPI, Xvfb)
+        run: |
+          PYTHONPATH=/usr/lib/python3/dist-packages \
+            dbus-run-session -- xvfb-run -a -s "-screen 0 1280x800x24" \
+            python -m pytest tests/linux/test_gui_atspi.py -q
 
       - name: Set up .NET (for vpk)
         uses: actions/setup-dotnet@v4

@@ -187,6 +187,46 @@
       <translation>에이전트 편집자가 잠겨 있습니다.</translation>
     </message>
     <message>
+      <source>Profiles</source>
+      <translation>프로필</translation>
+    </message>
+    <message>
+      <source>Profile name</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Proxy port</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Forward To URL</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>API key</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Confidence threshold</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>New regex pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>New keyword</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Session redactions</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Master password</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Account number</source>
       <translation>계좌 번호</translation>
     </message>
@@ -231,6 +271,14 @@
       <translation>기본값</translation>
     </message>
     <message>
+      <source>Enable pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
+      <source>Regex pattern</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Delete</source>
       <translation>삭제</translation>
     </message>
@@ -243,12 +291,20 @@
       <translation>정규식 구문이 잘못되었습니다.</translation>
     </message>
     <message>
+      <source>Enable keyword</source>
+      <translation type="unfinished" />
+    </message>
+    <message>
       <source>Case: Yes</source>
       <translation>케이스: 예</translation>
     </message>
     <message>
       <source>Case: No</source>
       <translation>케이스: 아니오</translation>
+    </message>
+    <message>
+      <source>Keyword text</source>
+      <translation type="unfinished" />
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>

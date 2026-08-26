@@ -492,6 +492,20 @@ void MainWindow::retranslateUi() {
     if (auto* t = findChild<QLabel*>(QStringLiteral("lockTitle")))
         t->setText(tr("Agent Redactor is locked"));
 
+    // Accessible names for widgets whose accessible label would otherwise be
+    // empty or fall back to the enclosing card title (the four Profile form
+    // boxes all reported "Profile" without these).
+    profileList_->setAccessibleName(tr("Profiles"));
+    aliasBox_->setAccessibleName(tr("Profile name"));
+    portBox_->setAccessibleName(tr("Proxy port"));
+    urlBox_->setAccessibleName(tr("Forward To URL"));
+    apiKeyBox_->setAccessibleName(tr("API key"));
+    confidenceBox_->setAccessibleName(tr("Confidence threshold"));
+    newRegexBox_->setAccessibleName(tr("New regex pattern"));
+    newKeywordBox_->setAccessibleName(tr("New keyword"));
+    matchesList_->setAccessibleName(tr("Session redactions"));
+    unlockBox_->setAccessibleName(tr("Master password"));
+
     // PII grid labels are translated too (Windows PII_Type_* strings).
     for (auto& [type, check] : piiChecks_) check->setText(piiTypeLabel(type));
 }
@@ -536,6 +550,19 @@ void MainWindow::onStatusUpdated() {
     // Stats + session matches refresh every tick (Windows: UpdateStats +
     // LoadMatchesList on the same cadence).
     if (json* p = selectedProfile(); p && !dirty_) {
+        // Stats change on every proxied request without bumping
+        // profilesRevision, so the cached profile json goes stale between
+        // reloads; refresh just the stats from the engine.
+        json live;
+        if (appState_->client().GetProfiles(live) && live.is_array()) {
+            const std::string id = (*p).value("id", std::string());
+            for (const auto& lp : live) {
+                if (lp.value("id", std::string()) == id) {
+                    (*p)["stats"] = lp.value("stats", json::object());
+                    break;
+                }
+            }
+        }
         const json& stats = (*p)["stats"];
         statsLabel_->setText(tr("Requests: %1   PII: %2   Regex: %3   Keywords: %4")
             .arg(stats.value("total_requests", 0))
@@ -720,7 +747,9 @@ void MainWindow::loadProfileIntoForm(int index) {
         rowLayout->setContentsMargins(0, 0, 0, 0);
         auto* enabled = new QCheckBox;
         enabled->setChecked(r.value("enabled", true));
+        enabled->setAccessibleName(tr("Enable pattern"));
         auto* pattern = new QLineEdit(QString::fromStdString(r.value("pattern", std::string())));
+        pattern->setAccessibleName(tr("Regex pattern"));
         auto* del = new QPushButton(tr("Delete"));
         rowLayout->addWidget(enabled);
         rowLayout->addWidget(pattern, 1);
@@ -779,10 +808,12 @@ void MainWindow::loadProfileIntoForm(int index) {
         rowLayout->setContentsMargins(0, 0, 0, 0);
         auto* enabled = new QCheckBox;
         enabled->setChecked(k.value("enabled", true));
+        enabled->setAccessibleName(tr("Enable keyword"));
         auto* caseBtn = new QPushButton(k.value("case_sensitive", true)
             ? tr("Case: Yes") : tr("Case: No"));
         caseBtn->setFixedWidth(90);
         auto* text = new QLineEdit(QString::fromStdString(k.value("text", std::string())));
+        text->setAccessibleName(tr("Keyword text"));
         auto* del = new QPushButton(tr("Delete"));
         rowLayout->addWidget(enabled);
         rowLayout->addWidget(caseBtn);
@@ -861,6 +892,37 @@ json MainWindow::gatherProfileFromForm() {
         if (check->isChecked()) types.push_back(Utils::WideToUtf8(type));
     }
     p["enabled_pii_types"] = types;
+
+    // Row edits only mark the form dirty; the cached profile json still holds
+    // the pre-edit keywords/regexes. Rebuild both arrays from the row widgets
+    // so a save after editing a row text actually persists the new value.
+    json regexes = json::array();
+    for (int i = 0; i < regexRows_->count(); ++i) {
+        auto* rowWidget = regexRows_->itemAt(i)->widget();
+        if (!rowWidget) continue;
+        auto* enabled = rowWidget->findChild<QCheckBox*>();
+        auto* pattern = rowWidget->findChild<QLineEdit*>();
+        if (!enabled || !pattern) continue;
+        const std::wstring normalized =
+            Utils::NormalizeRegexBraces(pattern->text().toStdWString());
+        regexes.push_back({{"pattern", Utils::WideToUtf8(normalized)},
+            {"enabled", enabled->isChecked()}});
+    }
+    p["regex_patterns"] = regexes;
+
+    json keywords = json::array();
+    for (int i = 0; i < keywordRows_->count(); ++i) {
+        auto* rowWidget = keywordRows_->itemAt(i)->widget();
+        if (!rowWidget) continue;
+        auto* enabled = rowWidget->findChild<QCheckBox*>();
+        auto* caseBtn = rowWidget->findChild<QPushButton*>();
+        auto* text = rowWidget->findChild<QLineEdit*>();
+        if (!enabled || !caseBtn || !text) continue;
+        keywords.push_back({{"text", text->text().toStdString()},
+            {"case_sensitive", caseBtn->text() == tr("Case: Yes")},
+            {"enabled", enabled->isChecked()}});
+    }
+    p["keywords"] = keywords;
     return p;
 }
 
@@ -1209,7 +1271,7 @@ void MainWindow::onClearLogs() {
 void MainWindow::onStartOnBootToggled(bool checked) {
     if (loading_) return;
     if (appState_->client().PutSetting(L"startOnBoot", checked)) {
-        Autostart::SetEnabled(checked, QCoreApplication::applicationFilePath().toStdString());
+        Autostart::SetEnabled(checked);
         tray_->setStartOnBoot(checked);
     } else {
         QSignalBlocker b(startOnBootCheck_);
