@@ -160,6 +160,10 @@ class AtspiGui:
         # offscreen never registers on the a11y bus; xcb does.
         self.env["QT_QPA_PLATFORM"] = "xcb"
         self.env["QT_LINUX_ACCESSIBILITY_ALWAYS_ON"] = "1"
+        # Under the test session bus (dbus-run-session) a keyring daemon can
+        # own org.freedesktop.secrets without serving promptly; skip libsecret
+        # so engine startup stays deterministic (~4 s, machine-id fallback).
+        self.env["AGENTREDACTOR_DISABLE_KEYRING"] = "1"
         self._log_file: Any | None = None
 
     # -- process lifecycle --------------------------------------------------

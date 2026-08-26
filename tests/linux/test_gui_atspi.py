@@ -103,6 +103,8 @@ class GuiContext:
         """Run the engine CLI against this test's engine/config dir."""
         env = dict(os.environ)
         env["AGENTREDACTOR_CONFIG_DIR"] = str(self.config_dir)
+        # Same rationale as AtspiGui: no keyring on the test session bus.
+        env["AGENTREDACTOR_DISABLE_KEYRING"] = "1"
         return subprocess.run(
             [str(ENGINE_BIN), *args], env=env, input=input,
             capture_output=True, text=True, timeout=60,

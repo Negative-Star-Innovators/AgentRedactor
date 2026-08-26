@@ -21,6 +21,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <libsecret/secret.h>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 
@@ -44,6 +45,38 @@ const SecretSchema* MachineKeySchema() {
         }
     };
     return &schema;
+}
+
+// True when a Secret Service daemon owns org.freedesktop.secrets on the
+// session bus. secret_password_*_sync below block for the full default D-Bus
+// timeout (~25 s each) when the name is activatable but never actually
+// answers — e.g. a dbus-run-session/systemd --user session where keyring
+// activation starts a daemon that cannot serve (locked keyring, prompter
+// with no display, or a stale GNOME_KEYRING_CONTROL pointing at another
+// session's daemon). Two such calls stalled headless engine startup ~52 s
+// and tripped the GUI's engine-spawn watchdog. A service that owns the name
+// answers promptly; anything else takes the machine-id fallback, which the
+// headless path below already implements.
+bool SecretServiceOwned() {
+    GError* error = nullptr;
+    GDBusConnection* bus = g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, &error);
+    if (error) g_error_free(error);
+    if (!bus) return false;
+    GVariant* reply = g_dbus_connection_call_sync(
+        bus, "org.freedesktop.DBus", "/org/freedesktop/DBus",
+        "org.freedesktop.DBus", "NameHasOwner",
+        g_variant_new("(s)", "org.freedesktop.secrets"),
+        G_VARIANT_TYPE("(b)"), G_DBUS_CALL_FLAGS_NONE,
+        2000, nullptr, &error);
+    g_object_unref(bus);
+    if (!reply) {
+        if (error) g_error_free(error);
+        return false;
+    }
+    gboolean owned = FALSE;
+    g_variant_get(reply, "(b)", &owned);
+    g_variant_unref(reply);
+    return owned == TRUE;
 }
 
 } // anonymous namespace
@@ -236,34 +269,48 @@ std::optional<std::vector<BYTE>> SecureStorage::MachineKey() {
     static bool warnedFallback = false;
     if (cached) return cached;
 
-    GError* error = nullptr;
-    gchar* stored = secret_password_lookup_sync(MachineKeySchema(), nullptr, &error,
-        "app", "agentredactor", nullptr);
-    if (stored) {
-        auto key = Base64Decode(stored);
-        secret_password_free(stored);
-        if (key.size() == kSessionKeyBytes) {
-            cached = key;
-            return cached;
+    // Only talk to libsecret when a Secret Service actually owns the name;
+    // otherwise each sync call can stall for the full D-Bus timeout before
+    // failing (see SecretServiceOwned). AGENTREDACTOR_DISABLE_KEYRING=1 skips
+    // the keyring entirely — for headless servers and CI, where an
+    // activatable-but-broken daemon can still own the name without serving.
+    static const bool keyringOwned = [] {
+        if (const char* dis = std::getenv("AGENTREDACTOR_DISABLE_KEYRING");
+            dis && *dis && std::string(dis) != "0") {
+            return false;
         }
-    }
-    if (error) {
-        g_error_free(error);
-        error = nullptr;
-    }
-
-    auto key = GenerateRandomBytes(kSessionKeyBytes);
-    if (key.size() == kSessionKeyBytes) {
-        const std::string encoded = Base64Encode(key);
-        if (secret_password_store_sync(MachineKeySchema(), SECRET_COLLECTION_DEFAULT,
-                "Agent Redactor machine key", encoded.c_str(), nullptr, &error,
-                "app", "agentredactor", nullptr)) {
-            cached = key;
-            return cached;
+        return SecretServiceOwned();
+    }();
+    if (keyringOwned) {
+        GError* error = nullptr;
+        gchar* stored = secret_password_lookup_sync(MachineKeySchema(), nullptr, &error,
+            "app", "agentredactor", nullptr);
+        if (stored) {
+            auto key = Base64Decode(stored);
+            secret_password_free(stored);
+            if (key.size() == kSessionKeyBytes) {
+                cached = key;
+                return cached;
+            }
         }
         if (error) {
             g_error_free(error);
             error = nullptr;
+        }
+
+        auto key = GenerateRandomBytes(kSessionKeyBytes);
+        if (key.size() == kSessionKeyBytes) {
+            const std::string encoded = Base64Encode(key);
+            if (secret_password_store_sync(MachineKeySchema(), SECRET_COLLECTION_DEFAULT,
+                    "Agent Redactor machine key", encoded.c_str(), nullptr, &error,
+                    "app", "agentredactor", nullptr)) {
+                cached = key;
+                return cached;
+            }
+            if (error) {
+                g_error_free(error);
+                error = nullptr;
+            }
         }
     }
 
