@@ -123,6 +123,18 @@ jobs:
             dbus-run-session -- xvfb-run -a -s "-screen 0 1280x800x24" \
             python -m pytest tests/linux/test_gui_atspi.py -q
 
+      # On AT-SPI failures upload the per-test GUI logs and the accessibility
+      # tree dumps the driver writes on lookup timeouts.
+      - name: Upload AT-SPI failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atspi-diagnostics-${{ matrix.arch }}
+          path: |
+            /tmp/pytest-of-runner/**/gui_atspi.log
+            /tmp/pytest-of-runner/**/atspi_tree_dump.txt
+          retention-days: 14
+
       - name: Set up .NET (for vpk)
         uses: actions/setup-dotnet@v4
         with:

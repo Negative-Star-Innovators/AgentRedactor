@@ -285,12 +285,55 @@ class AtspiGui:
         def _get() -> list[Any]:
             return self.find_all(role, name, text=text, within=within, showing=showing)
 
-        return wait_until(
-            f"node role={role!r} name={name!r} text={text!r}",
-            _get,
-            lambda nodes: len(nodes) > 0,
-            timeout=timeout,
-        )[0]
+        try:
+            return wait_until(
+                f"node role={role!r} name={name!r} text={text!r}",
+                _get,
+                lambda nodes: len(nodes) > 0,
+                timeout=timeout,
+            )[0]
+        except AssertionError as exc:
+            # Attach the live tree so CI failures (no display to inspect) show
+            # what the GUI actually exposed at the timeout.
+            dump = self.dump_tree()
+            raise AssertionError(f"{exc}\n--- accessible tree at timeout ---\n{dump}") from exc
+
+    def dump_tree(self, max_lines: int = 150) -> str:
+        """Compact dump of the app tree (role, name, showing) for diagnostics."""
+        root = self._app_once()
+        if root is None:
+            return "<no application node on the a11y bus>"
+        lines: list[str] = []
+
+        def rec(node: Any, depth: int) -> None:
+            if len(lines) >= max_lines:
+                return
+            try:
+                lines.append(
+                    "  " * depth
+                    + f"[{node.get_role_name()}] {node.get_name()!r} "
+                    + ("showing" if _is_showing(node) else "hidden")
+                )
+            except Exception as exc:
+                lines.append("  " * depth + f"<error: {exc}>")
+                return
+            for i in range(node.get_child_count()):
+                try:
+                    child = node.get_child_at_index(i)
+                except Exception:
+                    continue
+                if child is not None:
+                    rec(child, depth + 1)
+
+        rec(root, 0)
+        if len(lines) >= max_lines:
+            lines.append("... (truncated)")
+        out = "\n".join(lines)
+        try:  # best-effort artifact next to gui_atspi.log for CI upload
+            (self.config_dir.parent / "atspi_tree_dump.txt").write_text(out, encoding="utf-8")
+        except Exception:
+            pass
+        return out
 
     # -- primitive actions (with stale-node retry) ---------------------------
 
