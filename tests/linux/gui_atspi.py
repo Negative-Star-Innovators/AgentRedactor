@@ -418,28 +418,25 @@ class AtspiGui:
         finders that locate a row by its old text can never re-find a
         successful rename. Stale node -> loop and re-find (a rebuild that
         wiped the value also restored the old text, so the finder works
-        again). Password fields read back masked, so for those a same-length
-        echo string counts as a match.
-        """
-        def matches(node: Any) -> bool:
-            text = _text_of(node)
-            if text == value:
-                return True
-            try:
-                return (node.get_role_name() == "password text"
-                        and text is not None and len(text) == len(value) and len(text) > 0)
-            except Exception:
-                return False
+        again).
 
+        Password fields are exempt from verification: their AT-SPI text
+        reads back masked, and the masking differs between at-spi2-core
+        builds (bullet count locally, something else on the GH runners), so
+        there is no reliable read-back. They get a single set, as before.
+        """
         last: Exception | None = None
         for _ in range(6):
             try:
                 node = finder()
-                if matches(node):
+                if node.get_role_name() == "password text":
+                    node.get_editable_text_iface().set_text_contents(value)
+                    return
+                if _text_of(node) == value:
                     return
                 node.get_editable_text_iface().set_text_contents(value)
                 time.sleep(0.3)
-                if matches(node):
+                if _text_of(node) == value:
                     return
             except (GLib.GError, AssertionError) as exc:
                 last = exc
