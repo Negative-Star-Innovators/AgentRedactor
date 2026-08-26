@@ -410,18 +410,41 @@ class AtspiGui:
         raise AssertionError(f"press_until({description}) never took effect; last: {last!r}")
 
     def set_text_refound(self, finder: Callable[[], Any], value: str) -> None:
+        """Set an editable's text, verifying the write actually landed.
+
+        A settings-poll reload can rebuild the widget right after the set and
+        silently drop the value (the arm64 CI port-field flake), so verify
+        after writing. The read-back happens on the SAME node reference:
+        finders that locate a row by its old text can never re-find a
+        successful rename. Stale node -> loop and re-find (a rebuild that
+        wiped the value also restored the old text, so the finder works
+        again). Password fields read back masked, so for those a same-length
+        echo string counts as a match.
+        """
+        def matches(node: Any) -> bool:
+            text = _text_of(node)
+            if text == value:
+                return True
+            try:
+                return (node.get_role_name() == "password text"
+                        and text is not None and len(text) == len(value) and len(text) > 0)
+            except Exception:
+                return False
+
         last: Exception | None = None
         for _ in range(6):
             try:
                 node = finder()
-                if _text_of(node) == value:
+                if matches(node):
                     return
                 node.get_editable_text_iface().set_text_contents(value)
-                return
+                time.sleep(0.3)
+                if matches(node):
+                    return
             except (GLib.GError, AssertionError) as exc:
                 last = exc
-                time.sleep(0.5)
-        raise last  # type: ignore[misc]
+            time.sleep(0.5)
+        raise AssertionError(f"set_text_refound never stuck (value {value!r}); last: {last!r}")
 
     @staticmethod
     def checked(node: Any) -> bool:
