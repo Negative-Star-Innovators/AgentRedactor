@@ -148,6 +148,20 @@ def _sensitive(node: Any) -> bool:
         return False
 
 
+# AT-SPI role-name spelling varies across at-spi2-core versions: QPushButton
+# reports "button" on some and "push button" on others (local Ubuntu 24.04
+# vs the GitHub runner image differ). Treat the spellings as one role.
+_ROLE_ALIASES: dict[str, frozenset[str]] = {
+    "button": frozenset({"button", "push button", "toggle button"}),
+}
+
+
+def _role_matches(actual: str, wanted: str) -> bool:
+    if actual == wanted:
+        return True
+    return actual in _ROLE_ALIASES.get(wanted, frozenset())
+
+
 class AtspiGui:
     """Owns one agentredactor-gui process and exposes AT-SPI operations on it."""
 
@@ -260,7 +274,7 @@ class AtspiGui:
             try:
                 if showing and not _is_showing(node):
                     continue
-                if role is not None and node.get_role_name() != role:
+                if role is not None and not _role_matches(node.get_role_name(), role):
                     continue
                 if name is not None and node.get_name() != name:
                     continue
@@ -568,7 +582,7 @@ class AtspiGui:
                     continue
                 if role == "check box" and node.get_name() == "Enable keyword":
                     enabled_box = node
-                elif role == "button" and (node.get_name() or "").startswith("Case:"):
+                elif _role_matches(role, "button") and (node.get_name() or "").startswith("Case:"):
                     case_btn = node
             rows[value] = {
                 "enabled": _checked(enabled_box) if enabled_box is not None else None,
@@ -584,7 +598,7 @@ class AtspiGui:
         row_widget = box.get_parent()
         for node in _walk(row_widget):
             try:
-                if node.get_role_name() != role:
+                if not _role_matches(node.get_role_name(), role):
                     continue
                 if name is not None and node.get_name() != name:
                     continue
@@ -614,7 +628,7 @@ class AtspiGui:
         box = self.find("text", "Keyword text", text=text, within=card)
         for node in _walk(box.get_parent()):
             try:
-                if node.get_role_name() == "button" \
+                if _role_matches(node.get_role_name(), "button") \
                         and (node.get_name() or "").startswith("Case:"):
                     return node
             except Exception:
@@ -661,7 +675,7 @@ class AtspiGui:
         row_widget = box.get_parent()
         for node in _walk(row_widget):
             try:
-                if node.get_role_name() != role:
+                if not _role_matches(node.get_role_name(), role):
                     continue
                 if name is not None and node.get_name() != name:
                     continue
