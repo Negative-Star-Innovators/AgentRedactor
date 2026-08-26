@@ -534,8 +534,22 @@ class AtspiGui:
         return self.profile_list().get_parent()
 
     def add_profile(self) -> None:
-        """Click the sidebar Add button (the new profile gets a default alias)."""
+        """Click the sidebar Add button (the new profile gets a default alias).
+
+        Waits until the engine round-trip has settled — the Add handler
+        reloads the list and reselects asynchronously, and a fast caller that
+        starts filling the form immediately gets wiped by that reload.
+        """
+        before = self.profiles()
         self.press_named("Add", within=self._sidebar())
+        wait_until("profile added", self.profiles,
+                   lambda names: len(names) == len(before) + 1, timeout=30.0)
+        wait_until(
+            "form settled on the new profile",
+            lambda: self.field_text("Profile name", within=self.panel("Profile")),
+            lambda alias: bool(alias) and alias not in before,
+            timeout=30.0,
+        )
 
     def select_profile(self, alias: str) -> None:
         lst = self.profile_list()

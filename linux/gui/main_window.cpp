@@ -217,10 +217,15 @@ void MainWindow::buildUi() {
     profileForm->addRow(urlLabel_, urlBox_);
     profileForm->addRow(apiKeyLabel_, apiKeyBox_);
     profileLayout->addLayout(profileForm);
-    connect(aliasBox_, &QLineEdit::textEdited, this, markDirty);
-    connect(portBox_, &QLineEdit::textEdited, this, markDirty);
-    connect(urlBox_, &QLineEdit::textEdited, this, markDirty);
-    connect(apiKeyBox_, &QLineEdit::textEdited, this, markDirty);
+    // textChanged (not textEdited): programmatic edits — assistive tech like
+    // AT-SPI setTextContents, which never emits textEdited — must also mark
+    // the form dirty, or a settings-poll reload can wipe an in-progress edit
+    // before it is saved. loadProfileIntoForm's own setText calls are covered
+    // by the loading_ guard in markDirty.
+    connect(aliasBox_, &QLineEdit::textChanged, this, markDirty);
+    connect(portBox_, &QLineEdit::textChanged, this, markDirty);
+    connect(urlBox_, &QLineEdit::textChanged, this, markDirty);
+    connect(apiKeyBox_, &QLineEdit::textChanged, this, markDirty);
 
     auto* profileBtns = new QHBoxLayout;
     showKeyCheck_ = new QCheckBox(profileCard);
@@ -782,6 +787,10 @@ void MainWindow::loadProfileIntoForm(int index) {
             dirty_ = true;
             onSaveProfile();
         });
+        // Programmatic edits (AT-SPI) never fire editingFinished; without
+        // textChanged a poll-triggered reload can wipe an unsaved row edit.
+        connect(pattern, &QLineEdit::textChanged, this,
+                [this] { if (!loading_) dirty_ = true; });
         connect(del, &QPushButton::clicked, this, [this, pattern] {
             json* p = selectedProfile();
             if (!p) return;
@@ -842,6 +851,10 @@ void MainWindow::loadProfileIntoForm(int index) {
             dirty_ = true;
             onSaveProfile();
         });
+        // Programmatic edits (AT-SPI) never fire editingFinished; without
+        // textChanged a poll-triggered reload can wipe an unsaved row edit.
+        connect(text, &QLineEdit::textChanged, this,
+                [this] { if (!loading_) dirty_ = true; });
         connect(del, &QPushButton::clicked, this, [this, text] {
             json* p = selectedProfile();
             if (!p) return;
