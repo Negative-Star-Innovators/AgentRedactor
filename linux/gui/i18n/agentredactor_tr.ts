@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>Önyüklemede Başlat</translation>
     </message>
     <message>
       <source>Language</source>
@@ -192,39 +192,39 @@
     </message>
     <message>
       <source>Profile name</source>
-      <translation type="unfinished" />
+      <translation>Profil adı</translation>
     </message>
     <message>
       <source>Proxy port</source>
-      <translation type="unfinished" />
+      <translation>Proxy bağlantı noktası</translation>
     </message>
     <message>
       <source>Forward To URL</source>
-      <translation type="unfinished" />
+      <translation>URL'ye İlet</translation>
     </message>
     <message>
       <source>API key</source>
-      <translation type="unfinished" />
+      <translation>API anahtarı</translation>
     </message>
     <message>
       <source>Confidence threshold</source>
-      <translation type="unfinished" />
+      <translation>Güven eşiği</translation>
     </message>
     <message>
       <source>New regex pattern</source>
-      <translation type="unfinished" />
+      <translation>Yeni normal ifade modeli</translation>
     </message>
     <message>
       <source>New keyword</source>
-      <translation type="unfinished" />
+      <translation>Yeni anahtar kelime</translation>
     </message>
     <message>
       <source>Session redactions</source>
-      <translation type="unfinished" />
+      <translation>Oturum düzenlemeleri</translation>
     </message>
     <message>
       <source>Master password</source>
-      <translation type="unfinished" />
+      <translation>Ana şifre</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -272,11 +272,11 @@
     </message>
     <message>
       <source>Enable pattern</source>
-      <translation type="unfinished" />
+      <translation>Deseni etkinleştir</translation>
     </message>
     <message>
       <source>Regex pattern</source>
-      <translation type="unfinished" />
+      <translation>Normal ifade modeli</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Enable keyword</source>
-      <translation type="unfinished" />
+      <translation>Anahtar kelimeyi etkinleştir</translation>
     </message>
     <message>
       <source>Case: Yes</source>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Keyword text</source>
-      <translation type="unfinished" />
+      <translation>Anahtar kelime metni</translation>
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>Önyüklemede Başlat</translation>
     </message>
     <message>
       <source>Language</source>

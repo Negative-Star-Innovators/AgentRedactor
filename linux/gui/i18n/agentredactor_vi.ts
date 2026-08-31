@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>Bắt đầu khi khởi động</translation>
     </message>
     <message>
       <source>Language</source>
@@ -192,39 +192,39 @@
     </message>
     <message>
       <source>Profile name</source>
-      <translation type="unfinished" />
+      <translation>Tên hồ sơ</translation>
     </message>
     <message>
       <source>Proxy port</source>
-      <translation type="unfinished" />
+      <translation>Cổng ủy quyền</translation>
     </message>
     <message>
       <source>Forward To URL</source>
-      <translation type="unfinished" />
+      <translation>Chuyển tiếp tới URL</translation>
     </message>
     <message>
       <source>API key</source>
-      <translation type="unfinished" />
+      <translation>Khóa API</translation>
     </message>
     <message>
       <source>Confidence threshold</source>
-      <translation type="unfinished" />
+      <translation>Ngưỡng tin cậy</translation>
     </message>
     <message>
       <source>New regex pattern</source>
-      <translation type="unfinished" />
+      <translation>Mẫu biểu thức chính quy mới</translation>
     </message>
     <message>
       <source>New keyword</source>
-      <translation type="unfinished" />
+      <translation>Từ khóa mới</translation>
     </message>
     <message>
       <source>Session redactions</source>
-      <translation type="unfinished" />
+      <translation>Biên tập phiên</translation>
     </message>
     <message>
       <source>Master password</source>
-      <translation type="unfinished" />
+      <translation>Mật khẩu chính</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -272,11 +272,11 @@
     </message>
     <message>
       <source>Enable pattern</source>
-      <translation type="unfinished" />
+      <translation>Bật mẫu</translation>
     </message>
     <message>
       <source>Regex pattern</source>
-      <translation type="unfinished" />
+      <translation>Mẫu biểu thức chính quy</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Enable keyword</source>
-      <translation type="unfinished" />
+      <translation>Bật từ khóa</translation>
     </message>
     <message>
       <source>Case: Yes</source>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Keyword text</source>
-      <translation type="unfinished" />
+      <translation>Văn bản từ khóa</translation>
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>Bắt đầu khi khởi động</translation>
     </message>
     <message>
       <source>Language</source>

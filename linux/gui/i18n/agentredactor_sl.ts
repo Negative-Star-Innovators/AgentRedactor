@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>Začnite pri zagonu</translation>
     </message>
     <message>
       <source>Language</source>
@@ -192,39 +192,39 @@
     </message>
     <message>
       <source>Profile name</source>
-      <translation type="unfinished" />
+      <translation>Ime profila</translation>
     </message>
     <message>
       <source>Proxy port</source>
-      <translation type="unfinished" />
+      <translation>Proxy vrata</translation>
     </message>
     <message>
       <source>Forward To URL</source>
-      <translation type="unfinished" />
+      <translation>Posreduj na URL</translation>
     </message>
     <message>
       <source>API key</source>
-      <translation type="unfinished" />
+      <translation>API ključ</translation>
     </message>
     <message>
       <source>Confidence threshold</source>
-      <translation type="unfinished" />
+      <translation>Prag zaupanja</translation>
     </message>
     <message>
       <source>New regex pattern</source>
-      <translation type="unfinished" />
+      <translation>Nov vzorec regularnega izraza</translation>
     </message>
     <message>
       <source>New keyword</source>
-      <translation type="unfinished" />
+      <translation>Nova ključna beseda</translation>
     </message>
     <message>
       <source>Session redactions</source>
-      <translation type="unfinished" />
+      <translation>Redakcije sej</translation>
     </message>
     <message>
       <source>Master password</source>
-      <translation type="unfinished" />
+      <translation>Glavno geslo</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -272,11 +272,11 @@
     </message>
     <message>
       <source>Enable pattern</source>
-      <translation type="unfinished" />
+      <translation>Omogoči vzorec</translation>
     </message>
     <message>
       <source>Regex pattern</source>
-      <translation type="unfinished" />
+      <translation>Regex vzorec</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Enable keyword</source>
-      <translation type="unfinished" />
+      <translation>Omogoči ključno besedo</translation>
     </message>
     <message>
       <source>Case: Yes</source>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Keyword text</source>
-      <translation type="unfinished" />
+      <translation>Besedilo ključne besede</translation>
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>Začnite pri zagonu</translation>
     </message>
     <message>
       <source>Language</source>

@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>부팅 시 시작</translation>
     </message>
     <message>
       <source>Language</source>
@@ -192,39 +192,39 @@
     </message>
     <message>
       <source>Profile name</source>
-      <translation type="unfinished" />
+      <translation>프로필 이름</translation>
     </message>
     <message>
       <source>Proxy port</source>
-      <translation type="unfinished" />
+      <translation>프록시 포트</translation>
     </message>
     <message>
       <source>Forward To URL</source>
-      <translation type="unfinished" />
+      <translation>URL로 전달</translation>
     </message>
     <message>
       <source>API key</source>
-      <translation type="unfinished" />
+      <translation>API 키</translation>
     </message>
     <message>
       <source>Confidence threshold</source>
-      <translation type="unfinished" />
+      <translation>신뢰도 임계값</translation>
     </message>
     <message>
       <source>New regex pattern</source>
-      <translation type="unfinished" />
+      <translation>새로운 정규식 패턴</translation>
     </message>
     <message>
       <source>New keyword</source>
-      <translation type="unfinished" />
+      <translation>새 키워드</translation>
     </message>
     <message>
       <source>Session redactions</source>
-      <translation type="unfinished" />
+      <translation>세션 수정</translation>
     </message>
     <message>
       <source>Master password</source>
-      <translation type="unfinished" />
+      <translation>마스터 비밀번호</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -272,11 +272,11 @@
     </message>
     <message>
       <source>Enable pattern</source>
-      <translation type="unfinished" />
+      <translation>패턴 활성화</translation>
     </message>
     <message>
       <source>Regex pattern</source>
-      <translation type="unfinished" />
+      <translation>정규식 패턴</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Enable keyword</source>
-      <translation type="unfinished" />
+      <translation>키워드 활성화</translation>
     </message>
     <message>
       <source>Case: Yes</source>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Keyword text</source>
-      <translation type="unfinished" />
+      <translation>키워드 텍스트</translation>
     </message>
     <message>
       <source>Port must be between 1024 and 65535.</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>Start on Boot</source>
-      <translation type="unfinished" />
+      <translation>부팅 시 시작</translation>
     </message>
     <message>
       <source>Language</source>

@@ -185,9 +185,11 @@ def main():
                 if key is not None and key in resw:
                     translation = convert_placeholders(resw[key])
                     reused += 1
-                elif ((context, source) in existing
-                      and source not in EXCLUDE_REUSE):
-                    # Previously bootstrapped/reviewed translation survives.
+                elif (context, source) in existing:
+                    # Previously bootstrapped/reviewed translation survives —
+                    # including EXCLUDE_REUSE sources: the exclusion only bars
+                    # resw reuse (OS-specific wording), not preservation of the
+                    # fresh machine translation bootstrap_translations.py wrote.
                     translation, finished = existing[(context, source)]
                     kept += 1
                 else:

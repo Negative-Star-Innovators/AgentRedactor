@@ -128,13 +128,28 @@ def main() -> int:
                     retries -= 1
                     time.sleep(5)
             if results is None:
-                results = sources  # leave as English below (still flagged)
+                # Batch endpoint is rate-limiting us: fall back to one call
+                # per string (slower, but a single hiccup no longer sinks the
+                # whole batch).
+                results = []
+                for s in sources:
+                    translated = None
+                    for attempt in range(3):
+                        try:
+                            translated = translator.translate(s)
+                            break
+                        except Exception as e:
+                            print(f"  single retry {attempt + 1}/3: {s!r}: {e}",
+                                  flush=True)
+                            time.sleep(5)
+                    results.append(translated)  # None marks failure
+                    time.sleep(1.0)
 
             for (tr, source), translated in zip(batch, results):
+                if not translated:
+                    continue  # translation failed — leave unfinished
                 if tag == "sr-Latn":
                     translated = sr_latinize(translated)
-                if not translated or translated == source and retries == 0 and results is sources:
-                    continue  # untouched unfinished (translation failed)
                 if not placeholders_ok(source, translated):
                     print(f"  PLACEHOLDER LOST: {source!r} -> {translated!r} (left unfinished)")
                     failed += 1
