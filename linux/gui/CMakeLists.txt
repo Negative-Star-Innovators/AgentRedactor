@@ -58,6 +58,7 @@ add_executable(agentredactor-gui
     main.cpp
     app_state.cpp
     autostart.cpp
+    desktop_integration.cpp
     main_window.cpp
     password_dialog.cpp
     translator_loader.cpp

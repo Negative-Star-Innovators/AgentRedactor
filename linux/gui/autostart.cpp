@@ -54,6 +54,8 @@ std::string DesktopFileContents() {
        << "Type=Application\n"
        << "Name=Agent Redactor\n"
        << "Exec=" << QuoteExecArg(ResolveExecPath().string()) << " --tray-only\n"
+       // Resolved from the hicolor set installed by DesktopIntegration.
+       << "Icon=agentredactor\n"
        << "X-GNOME-Autostart-enabled=true\n";
     // Desktop entries are user config, not secrets; 644 is conventional.
     return ss.str();

@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include "app_state.h"
+#include "desktop_integration.h"
 #include "main_window.h"
 #include "tray_icon.h"
 #include "translator_loader.h"
@@ -170,6 +171,11 @@ int main(int argc, char* argv[]) {
     QApplication::setApplicationName(QStringLiteral("agentredactor"));
     QApplication::setOrganizationName(QStringLiteral("NegativeStarInnovators"));
     QApplication::setWindowIcon(QIcon(QStringLiteral(":/app.png")));
+    // Wayland ignores setWindowIcon: the dock icon comes from the desktop
+    // entry whose name matches the app-id, so this must equal the
+    // agentredactor.desktop installed by DesktopIntegration::EnsureInstalled.
+    QGuiApplication::setDesktopFileName(QStringLiteral("agentredactor"));
+    DesktopIntegration::EnsureInstalled();
     // Closing the last window must not quit the app when the tray keeps it
     // alive; MainWindow decides when a close is a real quit.
     QApplication::setQuitOnLastWindowClosed(false);
