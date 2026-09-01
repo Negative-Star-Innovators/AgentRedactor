@@ -769,7 +769,18 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
             }
             if (lowerName != L"content-length" && lowerName != L"transfer-encoding" && lowerName != L"content-encoding"
                 && lowerName != L"keep-alive" && lowerName != L"proxy-connection") {
-                clientResp.headers[name] = value;
+                if (lowerName == L"content-type") {
+                    // Replace the default seeded above — under HTTP/2 the
+                    // upstream header name arrives lowercase (curl preserves
+                    // wire case), which would otherwise collide with the
+                    // canonical "Content-Type" key and emit the header twice;
+                    // strict clients reject the joined "application/json,
+                    // application/json" value (openclaw verification).
+                    clientResp.headers.erase(L"Content-Type");
+                    clientResp.headers[L"Content-Type"] = value;
+                } else {
+                    clientResp.headers[name] = value;
+                }
                 headerLog += name + L": " + value + L"; ";
             }
         }
