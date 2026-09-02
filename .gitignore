@@ -32,3 +32,6 @@ docs/linux-port-plan.md
 
 # Translation/CI tooling venv (lrelease, deep-translator)
 .transvenv/
+
+# Sparse-attention re-export scratch (cloned source repo, intermediate models)
+_sparse_export/

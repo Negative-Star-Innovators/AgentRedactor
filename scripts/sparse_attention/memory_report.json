@@ -1,0 +1,80 @@
+{
+  "runs": [
+    {
+      "model": "dense",
+      "tokens": 1024,
+      "ok": true,
+      "peak_rss": 1881657344,
+      "seconds": 2.8
+    },
+    {
+      "model": "dense",
+      "tokens": 4096,
+      "ok": true,
+      "peak_rss": 5152681984,
+      "seconds": 8.4
+    },
+    {
+      "model": "dense",
+      "tokens": 8192,
+      "ok": true,
+      "peak_rss": 15528075264,
+      "seconds": 23.2
+    },
+    {
+      "model": "dense",
+      "tokens": 12288,
+      "ok": true,
+      "peak_rss": 30815813632,
+      "seconds": 48.4
+    },
+    {
+      "model": "dense",
+      "tokens": 16384,
+      "ok": true,
+      "peak_rss": 53834084352,
+      "seconds": 75.8
+    },
+    {
+      "model": "sparse",
+      "tokens": 1024,
+      "ok": true,
+      "peak_rss": 1723867136,
+      "seconds": 2.5
+    },
+    {
+      "model": "sparse",
+      "tokens": 4096,
+      "ok": true,
+      "peak_rss": 2268164096,
+      "seconds": 4.4
+    },
+    {
+      "model": "sparse",
+      "tokens": 16384,
+      "ok": true,
+      "peak_rss": 3814367232,
+      "seconds": 10.1
+    },
+    {
+      "model": "sparse",
+      "tokens": 65536,
+      "ok": true,
+      "peak_rss": 12085223424,
+      "seconds": 38.0
+    }
+  ],
+  "marginal_bytes_per_token": {
+    "dense": [
+      1064786.7,
+      2533055.0,
+      3732358.0,
+      5619695.0
+    ],
+    "sparse": [
+      177180.0,
+      125830.3,
+      168271.0
+    ]
+  }
+}
