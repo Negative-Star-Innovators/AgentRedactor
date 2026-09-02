@@ -9,6 +9,8 @@
 #     ~1.6 GB ONNX weights — the next run re-downloads them)
 #   - the ~/.local/bin/agentredactor CLI shim
 #   - the XDG autostart entry (~/.config/autostart/agentredactor.desktop)
+#   - the desktop entry (~/.local/share/applications/agentredactor.desktop)
+#     and the installed hicolor icon set
 #   - Velopack update staging (/var/tmp/velopack/AgentRedactor)
 #
 # It does NOT delete any .AppImage file you downloaded — remove that yourself.
@@ -54,6 +56,10 @@ remove "$XDG_CONFIG/agentredactor"                  # settings, logs, sessions, 
 remove "$XDG_DATA/agentredactor"                    # downloaded AI model files
 remove "$HOME/.local/bin/agentredactor"             # CLI shim (symlink or wrapper)
 remove "$XDG_CONFIG/autostart/agentredactor.desktop" # start-on-boot entry
+remove "$XDG_DATA/applications/agentredactor.desktop" # menu/desktop entry
+for d in "$XDG_DATA"/icons/hicolor/*/apps/agentredactor.png; do
+    [ -e "$d" ] && remove "$d"                      # installed icon set
+done
 remove "/var/tmp/velopack/AgentRedactor"            # Velopack update staging
 remove "/tmp/velopack_AgentRedactor.log"            # Velopack log
 
