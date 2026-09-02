@@ -6,6 +6,8 @@
 #include <shlobj.h>
 #endif
 #include <system_error>
+#include <fstream>
+#include <iterator>
 
 namespace AgentRedactor {
 namespace ModelDownloader {
@@ -37,6 +39,22 @@ void ReportProgress(const std::function<void(int, const std::wstring&)>& progres
     if (progress) {
         try { progress(percent, message); } catch (...) {}
     }
+}
+
+// Companion files are small enough (<= a few hundred KB) that a byte
+// compare is cheap and exact.
+bool CompanionMatches(const std::filesystem::path& src, const std::filesystem::path& dest) {
+    std::error_code ec;
+    if (!std::filesystem::exists(dest, ec)) return false;
+    const auto srcSize = std::filesystem::file_size(src, ec);
+    if (ec) return true;  // source unreadable: leave dest alone
+    const auto destSize = std::filesystem::file_size(dest, ec);
+    if (ec || srcSize != destSize) return false;
+    std::ifstream a(src, std::ios::binary);
+    std::ifstream b(dest, std::ios::binary);
+    if (!a || !b) return true;  // unreadable: leave dest alone
+    return std::equal(std::istreambuf_iterator<char>(a), std::istreambuf_iterator<char>(),
+                      std::istreambuf_iterator<char>(b));
 }
 
 } // anonymous namespace
@@ -90,35 +108,52 @@ std::filesystem::path ResolveModelDir() {
 
 bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     const std::function<void(int percent, const std::wstring& message)>& progress) {
-    if (HasModelWeights(fallbackModelDir)) return true;
+    const bool weightsPresent = HasModelWeights(fallbackModelDir);
 
     auto exeModels = Utils::GetExecutablePath() / MODEL_DIR;
 
-    // Copy the small companion files from the exe-dir models folder. They are
-    // required by PIIDetector (tokenizer / config / calibration / model graph)
-    // but are tiny and ship inside both package types.
+    // Refresh the small companion files from the exe-dir models folder. They
+    // are required by PIIDetector (tokenizer / config / calibration / model
+    // graph) and ship inside both package types. Copy when missing OR when
+    // the bundled file differs — an upgrade must replace an older graph left
+    // in the fallback dir by a previous version (e.g. the sparse-attention
+    // model graph), not keep using it. This runs even when the weights are
+    // already present, unlike the first-run-only flow before.
     for (const auto* relative : kCompanionFiles) {
         auto dest = fallbackModelDir / relative;
-        std::error_code ec;
-        if (std::filesystem::exists(dest, ec)) continue;
         auto src = exeModels / relative;
+        std::error_code ec;
         if (!std::filesystem::exists(src, ec)) {
-            LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe: %s", src.wstring().c_str());
-            return false;
+            if (!weightsPresent) {
+                LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe: %s", src.wstring().c_str());
+                return false;
+            }
+            continue;  // nothing bundled (dev layout); keep the existing dest
         }
+        if (CompanionMatches(src, dest)) continue;
         std::filesystem::create_directories(dest.parent_path(), ec);
         if (ec) {
             LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s: %s",
                 dest.parent_path().wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
-            return false;
+            if (!weightsPresent) return false;
+            continue;
         }
-        std::filesystem::copy_file(src, dest, ec);
+        // Copy via temp + rename so a crash mid-copy never leaves a
+        // truncated graph that the engine would try to load.
+        auto tmp = dest;
+        tmp += L".tmp";
+        std::filesystem::copy_file(src, tmp, std::filesystem::copy_options::overwrite_existing, ec);
+        if (!ec) std::filesystem::rename(tmp, dest, ec);
         if (ec) {
-            LOGF_LIFECYCLE(L"[ModelDownloader] Failed to copy %s: %s",
+            LOGF_LIFECYCLE(L"[ModelDownloader] Failed to refresh %s: %s",
                 src.wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
-            return false;
+            std::filesystem::remove(tmp, ec);
+            if (!weightsPresent) return false;
+            // Weights present: the older companion still works; keep it.
         }
     }
+
+    if (weightsPresent) return true;
 
     // Download the large weights to a .partial file and rename on success so a
     // killed download never leaves a truncated file looking complete. The

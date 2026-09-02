@@ -300,6 +300,15 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
     // to before); self-release installs download them on first run into
     // %LOCALAPPDATA%\AgentRedactor\models.
     auto modelDir = ModelDownloader::ResolveModelDir();
+    // Self-release/AppImage installs load the model from the user-writable
+    // fallback dir: refresh the companion files (model graph, tokenizer,
+    // config) from the ones bundled with this build so an upgrade replaces
+    // files left by a previous version (e.g. the sparse-attention graph)
+    // instead of silently keeping them. Cheap no-op when unchanged. MSIX
+    // loads the packaged files in place and skips this entirely.
+    if (modelDir == ModelDownloader::GetFallbackModelDir()) {
+        ModelDownloader::EnsureModelFiles(modelDir, nullptr);
+    }
     detector_ = std::make_unique<PIIDetector>(modelDir);
     // Set the provider BEFORE initializing so the model loads with the user's
     // chosen execution provider (CPU, GPU/Auto/DirectML/CUDA).
