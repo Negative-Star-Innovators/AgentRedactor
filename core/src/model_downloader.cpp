@@ -106,10 +106,12 @@ std::filesystem::path ResolveModelDir() {
     return GetFallbackModelDir();
 }
 
-bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
-    const std::function<void(int percent, const std::wstring& message)>& progress) {
-    const bool weightsPresent = HasModelWeights(fallbackModelDir);
+namespace {
 
+// Shared companion-refresh body. `weightsPresent` only controls error
+// tolerance: with weights already in place a failed copy keeps the older
+// (still working) companion; without weights a missing bundle is fatal.
+bool RefreshCompanions(const std::filesystem::path& fallbackModelDir, bool weightsPresent) {
     auto exeModels = Utils::GetExecutablePath() / MODEL_DIR;
 
     // Refresh the small companion files from the exe-dir models folder. They
@@ -152,6 +154,20 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
             // Weights present: the older companion still works; keep it.
         }
     }
+    return true;
+}
+
+} // anonymous namespace
+
+bool RefreshCompanionFiles(const std::filesystem::path& fallbackModelDir) {
+    return RefreshCompanions(fallbackModelDir, HasModelWeights(fallbackModelDir));
+}
+
+bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
+    const std::function<void(int percent, const std::wstring& message)>& progress) {
+    const bool weightsPresent = HasModelWeights(fallbackModelDir);
+
+    if (!RefreshCompanions(fallbackModelDir, weightsPresent)) return false;
 
     if (weightsPresent) return true;
 

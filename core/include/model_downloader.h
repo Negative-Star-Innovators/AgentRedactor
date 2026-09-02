@@ -34,6 +34,16 @@ bool HasModelWeights(const std::filesystem::path& modelDir);
 // otherwise the fallback dir. Pure path resolution; never downloads.
 std::filesystem::path ResolveModelDir();
 
+// Startup-safe companion refresh: copies the small companion files
+// (tokenizer.json, config.json, viterbi_calibration.json,
+// onnx\model_quantized.onnx) from the exe-dir models folder into
+// `fallbackModelDir` when absent or different (upgrade case), but NEVER
+// downloads the weights — a first-run download takes minutes and must not
+// block engine startup; it is driven by the GUI via the control API
+// (StartModelDownloadIfNeeded → EnsureModelFiles). Cheap no-op when the
+// companions already match.
+bool RefreshCompanionFiles(const std::filesystem::path& fallbackModelDir);
+
 // Synchronous — call from a worker thread. Ensures a complete model directory
 // at `fallbackModelDir`: copies the small companion files (tokenizer.json,
 // config.json, viterbi_calibration.json, onnx\model_quantized.onnx) from the

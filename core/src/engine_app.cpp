@@ -305,9 +305,13 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
     // config) from the ones bundled with this build so an upgrade replaces
     // files left by a previous version (e.g. the sparse-attention graph)
     // instead of silently keeping them. Cheap no-op when unchanged. MSIX
-    // loads the packaged files in place and skips this entirely.
+    // loads the packaged files in place and skips this entirely. This must
+    // NOT download the weights: a first-run download takes minutes and would
+    // block startup before the control API is up (the GUI would hit its
+    // engine-start timeout) — the first-run download is GUI-driven via
+    // StartModelDownloadIfNeeded below.
     if (modelDir == ModelDownloader::GetFallbackModelDir()) {
-        ModelDownloader::EnsureModelFiles(modelDir, nullptr);
+        ModelDownloader::RefreshCompanionFiles(modelDir);
     }
     detector_ = std::make_unique<PIIDetector>(modelDir);
     // Set the provider BEFORE initializing so the model loads with the user's
