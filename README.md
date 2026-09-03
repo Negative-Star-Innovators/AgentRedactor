@@ -50,11 +50,11 @@ AppImage for your architecture, make it executable, and run it:
 curl -fL -o AgentRedactor.AppImage \
   https://api.agentredactor.negativestarinnovators.com/updates/linux/AgentRedactor.AppImage
 # ARM64
-curl -fL -o AgentRedactor.AppImage \
-  https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/AgentRedactor.AppImage
+curl -fL -o AgentRedactor-linux-arm64.AppImage \
+  https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/AgentRedactor-linux-arm64.AppImage
 
-chmod +x AgentRedactor.AppImage
-./AgentRedactor.AppImage
+chmod +x AgentRedactor*.AppImage
+./AgentRedactor*.AppImage
 ```
 
 The app creates `~/.config/agentredactor/` for settings and downloads the
