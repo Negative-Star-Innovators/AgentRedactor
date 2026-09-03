@@ -101,11 +101,34 @@ std::vector<ApiKeyProfile> SettingsManager::GetProfiles() const {
 
 void SettingsManager::SetProfiles(const std::vector<ApiKeyProfile>& profiles) {
     std::unique_lock<std::shared_mutex> lock(mutex_);
+    json oldProfiles = settings_.value("profiles", json::array());
     json arr = json::array();
     for (const auto& p : profiles) {
         json pj;
         p.ToJson(pj);
-        arr.push_back(pj);
+        // If decryption failed for a sensitive field, keep the existing encrypted
+        // blob instead of replacing it with an encrypted empty string.
+        if (p.apiKeyUnavailable || p.keywordsUnavailable || p.regexPatternsUnavailable) {
+            const json* old = nullptr;
+            for (const auto& o : oldProfiles) {
+                if (o.value("id", std::string()) == Utils::WideToUtf8(p.id)) {
+                    old = &o;
+                    break;
+                }
+            }
+            if (old) {
+                if (p.apiKeyUnavailable && old->contains("api_key")) {
+                    pj["api_key"] = (*old)["api_key"];
+                }
+                if (p.keywordsUnavailable && old->contains("keywords")) {
+                    pj["keywords"] = (*old)["keywords"];
+                }
+                if (p.regexPatternsUnavailable && old->contains("regex_patterns")) {
+                    pj["regex_patterns"] = (*old)["regex_patterns"];
+                }
+            }
+        }
+        arr.push_back(std::move(pj));
     }
     settings_["profiles"] = arr;
     SaveSettings();

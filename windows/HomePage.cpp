@@ -1055,7 +1055,7 @@ namespace winrt::AgentRedactor::implementation
             }
         }
 
-        std::wstring url = UrlBox().Text().c_str();
+        std::wstring url = ::AgentRedactor::Utils::Trim(UrlBox().Text().c_str());
         std::wstring lowerUrl = ::AgentRedactor::Utils::ToLower(url);
         if (url.empty()) {
             ShowPortErrorAsync(::AgentRedactor::LocString(L"Validation_UrlEmpty"));
@@ -1118,7 +1118,7 @@ namespace winrt::AgentRedactor::implementation
             p.keywords[i].caseSensitive = unbox_value<hstring>(keywordCaseButtons_[i].Content()) == ::AgentRedactor::LocString(L"Common_Yes");
         }
 
-        p.apiKey = ApiKeyBox().Password().c_str();
+        p.apiKey = ::AgentRedactor::Utils::Trim(ApiKeyBox().Password().c_str());
 
         p.enabledPIITypes.clear();
         for (uint32_t i = 0; i < piiCheckBoxes_.size() && i < ::AgentRedactor::DEFAULT_PII_TYPES.size(); ++i) {

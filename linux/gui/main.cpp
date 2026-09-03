@@ -13,9 +13,14 @@
 #include <vector>
 
 #include <QApplication>
+#include <QDir>
+#include <QLockFile>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QMessageBox>
 #include <QSocketNotifier>
 #include <QStandardPaths>
+#include <QThread>
 
 #include <sys/socket.h>
 #include <unistd.h>
@@ -148,6 +153,32 @@ void EnsureCliShim() {
 
 } // namespace
 
+namespace {
+
+// Single-instance guard for the GUI. A second launch forwards to the running
+// instance instead of creating another system tray icon.
+constexpr int kSingleInstanceTimeoutMs = 500;
+constexpr int kSingleInstanceMaxRetries = 15;
+constexpr int kSingleInstanceRetryDelayMs = 150;
+constexpr char kSingleInstanceShowCmd[] = "show\n";
+
+QString GuiSocketName() {
+    return QStringLiteral("agentredactor-gui-%1").arg(getuid());
+}
+
+bool ForwardToRunningGui() {
+    QLocalSocket socket;
+    socket.connectToServer(GuiSocketName());
+    if (!socket.waitForConnected(kSingleInstanceTimeoutMs)) return false;
+    socket.write(kSingleInstanceShowCmd);
+    if (!socket.waitForBytesWritten(kSingleInstanceTimeoutMs)) return false;
+    // Give the running instance a moment to raise its window before we exit.
+    socket.waitForReadyRead(200);
+    return true;
+}
+
+} // namespace
+
 int main(int argc, char* argv[]) {
     if (argc > 1 && std::strcmp(argv[1], "--cli") == 0) {
         return ForwardToCli(argc, argv);
@@ -180,6 +211,23 @@ int main(int argc, char* argv[]) {
     // alive; MainWindow decides when a close is a real quit.
     QApplication::setQuitOnLastWindowClosed(false);
 
+    // Single-instance guard: a second icon click forwards to the running
+    // instance instead of spawning another tray icon.
+    if (ForwardToRunningGui()) return 0;
+
+    const QString lockDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    QDir().mkpath(lockDir);
+    const QString lockPath = lockDir + QStringLiteral("/gui.lock");
+    QLockFile lockFile(lockPath);
+    if (!lockFile.tryLock(100)) {
+        // Another launch is racing us; wait for its socket to come up.
+        for (int i = 0; i < kSingleInstanceMaxRetries; ++i) {
+            QThread::msleep(kSingleInstanceRetryDelayMs);
+            if (ForwardToRunningGui()) return 0;
+        }
+        return 0;
+    }
+
     QSocketNotifier notifier(g_signalFds[0], QSocketNotifier::Read);
     if (g_signalFds[0] >= 0) {
         notifier.setEnabled(true);
@@ -202,6 +250,21 @@ int main(int argc, char* argv[]) {
 
     TrayIcon tray;
     MainWindow window(&appState, &tray, &translator, trayOnly);
+
+    QLocalServer instanceServer(&app);
+    QObject::connect(&instanceServer, &QLocalServer::newConnection, &window,
+        [&instanceServer, &window] {
+            if (QLocalSocket* client = instanceServer.nextPendingConnection())
+                client->deleteLater();
+            window.openWindow();
+        });
+    if (!instanceServer.listen(GuiSocketName())) {
+        if (instanceServer.serverError() == QAbstractSocket::AddressInUseError) {
+            QLocalServer::removeServer(GuiSocketName());
+            instanceServer.listen(GuiSocketName());
+        }
+    }
+
     tray.showIcon();
     QObject::connect(&tray, &TrayIcon::openRequested, &window, &MainWindow::openWindow);
     QObject::connect(&tray, &TrayIcon::quitRequested, &window, &MainWindow::onQuitRequested);

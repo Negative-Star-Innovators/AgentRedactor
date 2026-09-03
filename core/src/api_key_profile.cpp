@@ -103,6 +103,7 @@ ApiKeyProfile ApiKeyProfile::FromJson(const json& j) {
             // Encrypted format - SettingsManager will decrypt before passing to us.
             // If we see this, the key hasn't been decrypted yet.
             profile.apiKey = L"";
+            profile.apiKeyUnavailable = true;
         }
     }
     if (j.contains("port")) j.at("port").get_to(profile.port);
@@ -127,6 +128,8 @@ ApiKeyProfile ApiKeyProfile::FromJson(const json& j) {
                 else entry.enabled = true;
                 profile.regexPatterns.push_back(entry);
             }
+        } else if (rp.is_object() && rp.contains("_enc")) {
+            profile.regexPatternsUnavailable = true;
         }
     }
     if (j.contains("keywords")) {
@@ -141,6 +144,8 @@ ApiKeyProfile ApiKeyProfile::FromJson(const json& j) {
                 else entry.enabled = true;
                 profile.keywords.push_back(entry);
             }
+        } else if (kw.is_object() && kw.contains("_enc")) {
+            profile.keywordsUnavailable = true;
         }
     }
     if (j.contains("stats")) {

@@ -94,9 +94,15 @@ private:
     std::vector<BYTE> wrappedKeyTag_;
 
     // The unprotected at-rest key (DPAPI counterpart): a random key from the
-    // libsecret keyring, or PBKDF2-derived from /etc/machine-id when no
-    // keyring is available (headless servers).
+    // libsecret keyring, wrapped by the machine-id-derived key in machine.key,
+    // or PBKDF2-derived from /etc/machine-id when no keyring/wrap file is
+    // available (headless servers).
     static std::optional<std::vector<BYTE>> MachineKey();
+    static std::optional<std::vector<BYTE>> MachineIdDerivedKey();
+    static std::optional<std::vector<BYTE>> ReadWrappedMachineKey(
+        const std::vector<BYTE>& machineIdKey);
+    static bool WriteWrappedMachineKey(const std::vector<BYTE>& machineKey,
+        const std::vector<BYTE>& machineIdKey);
 
     static std::vector<BYTE> Pbkdf2(const std::string& password, const std::vector<BYTE>& salt, uint32_t iterations);
 #endif

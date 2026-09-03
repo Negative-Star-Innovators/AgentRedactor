@@ -1016,6 +1016,15 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
         }
         return key;
     };
+    auto credentialValueEmpty = [](const std::wstring& lowerName, const std::wstring& value) {
+        if (lowerName == L"authorization") {
+            size_t sp = value.find(L' ');
+            if (sp == std::wstring::npos) return true;
+            size_t firstNonSpace = value.find_first_not_of(L" \t\r\n", sp + 1);
+            return firstNonSpace == std::wstring::npos;
+        }
+        return value.find_first_not_of(L" \t\r\n") == std::wstring::npos;
+    };
 
     std::wstring headerString;
     std::wstring logHeaderString; // log-safe headers (API key masked unless show-sensitive mode is on)
@@ -1025,15 +1034,26 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
         if (lowerName == L"host" || lowerName == L"proxy-authorization") continue;
         if (lowerName == L"connection" || lowerName == L"keep-alive" || lowerName == L"proxy-connection" || lowerName == L"content-length" || lowerName == L"accept-encoding") continue;
         if (isCredentialHeader(lowerName)) {
+            if (!apiKey.empty() && credentialValueEmpty(lowerName, value)) {
+                // Client sent an empty/whitespace credential (e.g. "Bearer " with no token).
+                // Treat it as if no credential was sent so we inject the stored key below.
+                continue;
+            }
             clientSentCredential = true;
-            headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
-            logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            if (apiKey.empty()) {
+                // No stored key: preserve whatever the client sent rather than overwriting with empty.
+                headerString += name + L": " + value + L"\r\n";
+                logHeaderString += name + L": " + (logManager_->IsShowSensitive() ? value : L"<REDACTED>") + L"\r\n";
+            } else {
+                headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
+                logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            }
             continue;
         }
         headerString += name + L": " + value + L"\r\n";
         logHeaderString += name + L": " + value + L"\r\n";
     }
-    if (!clientSentCredential) {
+    if (!clientSentCredential && !apiKey.empty()) {
         headerString += L"Authorization: Bearer " + apiKey + L"\r\n";
         logHeaderString += L"Authorization: Bearer <REDACTED>\r\n";
     }
@@ -1205,6 +1225,15 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
         }
         return key;
     };
+    auto credentialValueEmpty = [](const std::wstring& lowerName, const std::wstring& value) {
+        if (lowerName == L"authorization") {
+            size_t sp = value.find(L' ');
+            if (sp == std::wstring::npos) return true;
+            size_t firstNonSpace = value.find_first_not_of(L" \t\r\n", sp + 1);
+            return firstNonSpace == std::wstring::npos;
+        }
+        return value.find_first_not_of(L" \t\r\n") == std::wstring::npos;
+    };
 
     std::wstring headerString;
     std::wstring logHeaderString; // log-safe headers (API key masked unless show-sensitive mode is on)
@@ -1214,15 +1243,26 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
         if (lowerName == L"host" || lowerName == L"proxy-authorization") continue;
         if (lowerName == L"connection" || lowerName == L"keep-alive" || lowerName == L"proxy-connection" || lowerName == L"content-length" || lowerName == L"accept-encoding") continue;
         if (isCredentialHeader(lowerName)) {
+            if (!apiKey.empty() && credentialValueEmpty(lowerName, value)) {
+                // Client sent an empty/whitespace credential (e.g. "Bearer " with no token).
+                // Treat it as if no credential was sent so we inject the stored key below.
+                continue;
+            }
             clientSentCredential = true;
-            headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
-            logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            if (apiKey.empty()) {
+                // No stored key: preserve whatever the client sent rather than overwriting with empty.
+                headerString += name + L": " + value + L"\r\n";
+                logHeaderString += name + L": " + (logManager_->IsShowSensitive() ? value : L"<REDACTED>") + L"\r\n";
+            } else {
+                headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
+                logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            }
             continue;
         }
         headerString += name + L": " + value + L"\r\n";
         logHeaderString += name + L": " + value + L"\r\n";
     }
-    if (!clientSentCredential) {
+    if (!clientSentCredential && !apiKey.empty()) {
         headerString += L"Authorization: Bearer " + apiKey + L"\r\n";
         logHeaderString += L"Authorization: Bearer <REDACTED>\r\n";
     }

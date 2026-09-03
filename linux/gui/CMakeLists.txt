@@ -2,7 +2,7 @@
 # Mirrors the Windows WinUI 3 app (MainWindow + HomePage surface); a thin
 # client — all backend logic lives in core/ and the engine process.
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
 find_package(CURL REQUIRED)
 
 # Translation catalogs: i18n/agentredactor_<locale>.ts (synced from the
@@ -77,6 +77,7 @@ target_include_directories(agentredactor-gui PRIVATE
 target_link_libraries(agentredactor-gui PRIVATE
     agentredactor-core
     Qt6::Widgets
+    Qt6::Network
     CURL::libcurl
 )
 

@@ -895,8 +895,10 @@ json MainWindow::gatherProfileFromForm() {
     json p = base ? *base : json::object();
     p["alias"] = aliasBox_->text().toStdString();
     p["port"] = portBox_->text().toInt();
-    p["upstream_url"] = urlBox_->text().toStdString();
-    p["api_key"] = apiKeyBox_->text().toStdString();
+    // Strip accidental leading/trailing whitespace so a pasted URL or key
+    // with trailing spaces does not get used verbatim by the engine.
+    p["upstream_url"] = urlBox_->text().trimmed().toStdString();
+    p["api_key"] = apiKeyBox_->text().trimmed().toStdString();
     p["use_openai_model"] = useAiCheck_->isChecked();
     p["pii_confidence_threshold"] = confidenceBox_->text().toDouble();
 

@@ -23,6 +23,7 @@
 #include <libsecret/secret.h>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 
 namespace AgentRedactor {
@@ -190,6 +191,14 @@ std::optional<std::wstring> SecureStorage::Decrypt(const json& fieldJson) const 
     std::vector<BYTE> iv = Base64Decode(fieldJson.value("_iv", ""));
     std::vector<BYTE> tag = Base64Decode(fieldJson.value("_tag", ""));
     auto decrypted = AesGcmDecrypt(ciphertext, key, iv, tag);
+    if (!decrypted && mode == "machine") {
+        // Fallback for legacy data or a transition between keyring and
+        // machine-id-only installs: try the raw machine-id-derived key.
+        auto fallbackKey = MachineIdDerivedKey();
+        if (fallbackKey) {
+            decrypted = AesGcmDecrypt(ciphertext, *fallbackKey, iv, tag);
+        }
+    }
     if (!decrypted) return std::nullopt;
     std::string utf8Result(decrypted->begin(), decrypted->end());
     return Utils::Utf8ToWide(utf8Result);
@@ -262,12 +271,70 @@ void SecureStorage::Lock() {
 // Machine key (unprotected at-rest encryption)
 // ============================================================================
 
+// Stable key derived from /etc/machine-id. Used both as a fallback encryption
+// key and as the wrapping key for the random keyring key stored in machine.key.
+std::optional<std::vector<BYTE>> SecureStorage::MachineIdDerivedKey() {
+    std::ifstream machineId("/etc/machine-id", std::ios::binary);
+    if (!machineId) return std::nullopt;
+    std::string id((std::istreambuf_iterator<char>(machineId)), std::istreambuf_iterator<char>());
+    if (id.empty()) return std::nullopt;
+    static const std::vector<BYTE> kMachineSalt = {
+        'a','g','e','n','t','r','e','d','a','c','t','o','r','-','m','k'
+    };
+    auto derived = Pbkdf2(id, kMachineSalt, 10000);
+    if (derived.size() != kSessionKeyBytes) return std::nullopt;
+    return derived;
+}
+
+static std::filesystem::path WrappedMachineKeyPath() {
+    return Utils::GetAppDataPath() / "machine.key";
+}
+
+std::optional<std::vector<BYTE>> SecureStorage::ReadWrappedMachineKey(
+    const std::vector<BYTE>& machineIdKey) {
+    std::ifstream file(WrappedMachineKeyPath(), std::ios::binary);
+    if (!file) return std::nullopt;
+    try {
+        json j;
+        file >> j;
+        auto ciphertext = Base64Decode(j.value("_enc", ""));
+        auto iv = Base64Decode(j.value("_iv", ""));
+        auto tag = Base64Decode(j.value("_tag", ""));
+        if (ciphertext.empty()) return std::nullopt;
+        auto plaintext = AesGcmDecrypt(ciphertext, machineIdKey, iv, tag);
+        if (!plaintext || plaintext->size() != kSessionKeyBytes) return std::nullopt;
+        return *plaintext;
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
+bool SecureStorage::WriteWrappedMachineKey(const std::vector<BYTE>& machineKey,
+    const std::vector<BYTE>& machineIdKey) {
+    auto configDir = Utils::GetAppDataPath();
+    if (!Utils::CreateDirectoryRecursive(configDir)) return false;
+    std::vector<BYTE> ciphertext, iv, tag;
+    if (!AesGcmEncrypt(machineKey, machineIdKey, ciphertext, iv, tag)) return false;
+    json j = {
+        {"_enc", Base64Encode(ciphertext)},
+        {"_iv", Base64Encode(iv)},
+        {"_tag", Base64Encode(tag)}
+    };
+    std::ofstream file(WrappedMachineKeyPath(), std::ios::binary | std::ios::trunc);
+    if (!file) return false;
+    file << j.dump(2);
+    return file.good();
+}
+
 std::optional<std::vector<BYTE>> SecureStorage::MachineKey() {
     // Cached: keyring round-trips on every field encrypt/decrypt would be
     // needlessly slow.
     static std::optional<std::vector<BYTE>> cached;
     static bool warnedFallback = false;
     if (cached) return cached;
+
+    auto machineIdKey = MachineIdDerivedKey();
+    if (!machineIdKey) return std::nullopt;
 
     // Only talk to libsecret when a Secret Service actually owns the name;
     // otherwise each sync call can stall for the full D-Bus timeout before
@@ -288,7 +355,7 @@ std::optional<std::vector<BYTE>> SecureStorage::MachineKey() {
         if (stored) {
             auto key = Base64Decode(stored);
             secret_password_free(stored);
-            if (key.size() == kSessionKeyBytes) {
+            if (key.size() == kSessionKeyBytes && WriteWrappedMachineKey(key, *machineIdKey)) {
                 cached = key;
                 return cached;
             }
@@ -304,8 +371,10 @@ std::optional<std::vector<BYTE>> SecureStorage::MachineKey() {
             if (secret_password_store_sync(MachineKeySchema(), SECRET_COLLECTION_DEFAULT,
                     "Agent Redactor machine key", encoded.c_str(), nullptr, &error,
                     "app", "agentredactor", nullptr)) {
-                cached = key;
-                return cached;
+                if (WriteWrappedMachineKey(key, *machineIdKey)) {
+                    cached = key;
+                    return cached;
+                }
             }
             if (error) {
                 g_error_free(error);
@@ -314,25 +383,26 @@ std::optional<std::vector<BYTE>> SecureStorage::MachineKey() {
         }
     }
 
-    // No keyring (headless server): derive a stable key from the machine id.
-    // This only protects secrets from other local users; anyone reading both
-    // /etc/machine-id and settings.json can unwrap them.
+    // No keyring (or keyring unavailable this run): try to unwrap the random
+    // keyring key that was previously persisted in machine.key using the
+    // machine-id-derived key. This lets the same settings file work whether the
+    // app was launched from a desktop session (keyring present) or a terminal
+    // / headless session (keyring absent).
+    auto wrapped = ReadWrappedMachineKey(*machineIdKey);
+    if (wrapped) {
+        cached = *wrapped;
+        return cached;
+    }
+
+    // Final fallback: use the machine-id-derived key directly. This matches the
+    // legacy headless behavior and keeps old installs readable.
     if (!warnedFallback) {
         warnedFallback = true;
-        LOG_LIFECYCLE(L"[SecureStorage] No secret keyring available; deriving the at-rest key "
-            L"from the machine id. Secrets are only obfuscated, not protected. "
+        LOG_LIFECYCLE(L"[SecureStorage] No secret keyring available and no wrapped machine key; "
+            L"deriving the at-rest key from the machine id. Secrets are only obfuscated, not protected. "
             L"Install gnome-keyring (or another Secret Service provider) for stronger storage.");
     }
-    std::ifstream machineId("/etc/machine-id", std::ios::binary);
-    if (!machineId) return std::nullopt;
-    std::string id((std::istreambuf_iterator<char>(machineId)), std::istreambuf_iterator<char>());
-    if (id.empty()) return std::nullopt;
-    static const std::vector<BYTE> kMachineSalt = {
-        'a','g','e','n','t','r','e','d','a','c','t','o','r','-','m','k'
-    };
-    auto derived = Pbkdf2(id, kMachineSalt, 10000);
-    if (derived.size() != kSessionKeyBytes) return std::nullopt;
-    cached = derived;
+    cached = *machineIdKey;
     return cached;
 }
 
