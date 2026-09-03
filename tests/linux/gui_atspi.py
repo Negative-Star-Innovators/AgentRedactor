@@ -727,8 +727,11 @@ class AtspiGui:
         )
 
     def delete_regex(self, pattern: str) -> None:
-        self.press_refound(lambda: self._regex_row_child(pattern, "button", "Delete"))
-        wait_until("regex deleted", self.regexes, lambda rs: pattern not in rs)
+        self.press_until(
+            f"regex {pattern!r} deleted",
+            lambda: self._regex_row_child(pattern, "button", "Delete"),
+            lambda: pattern not in self.regexes(),
+        )
 
     # -- PII / detection ---------------------------------------------------------
 

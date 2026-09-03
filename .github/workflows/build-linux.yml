@@ -204,7 +204,7 @@ jobs:
             echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          latest=$(echo "$feed" | python3 -c "import sys,json; a=[x for x in json.load(sys.stdin).get('Assets',[]) if x.get('Version') and str(x.get('Type')) in ('1','Full')]; print(max(a,key=lambda x:tuple(map(int,x['Version'].lstrip('vV').split('-')[0].split('+')[0].split('.'))))['Version']) if a else '')")
+          latest=$(echo "$feed" | python3 -c "import sys,json; a=[x for x in json.load(sys.stdin).get('Assets',[]) if x.get('Version') and str(x.get('Type')) in ('1','Full')]; print(max(a,key=lambda x:tuple(map(int,x['Version'].lstrip('vV').split('-')[0].split('+')[0].split('.'))))['Version']) if a else '')
           if [ -z "$latest" ]; then
             echo "::warning::No full-package asset on channel '$channel'; skipping upgrade E2E"
             echo "found=false" >> "$GITHUB_OUTPUT"
