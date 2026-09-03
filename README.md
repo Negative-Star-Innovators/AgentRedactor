@@ -1,16 +1,17 @@
 # Agent Redactor
 
-A Windows desktop app that sits between AI coding agents and their LLM
-endpoints as a local proxy, redacting PII (names, emails, phone numbers,
-secrets, and more) from outbound requests before they leave your machine —
-and un-redacting the responses coming back.
+A desktop app for Windows and Linux that sits between AI coding agents and
+their LLM endpoints as a local proxy, redacting PII (names, emails, phone
+numbers, secrets, and more) from outbound requests before they leave your
+machine — and un-redacting the responses coming back.
 
-- WinUI 3 (C++/WinRT) desktop app, self-contained Windows App SDK
+- Windows: WinUI 3 (C++/WinRT) desktop app, self-contained Windows App SDK
+- Linux: Qt6 Widgets GUI shipped as a Velopack AppImage
 - Local HTTP proxy with on-device ONNX NER model — no cloud calls for detection
 - Custom keyword and regex redaction rules on top of model-based PII detection
 - Localized UI in 53 languages
-- Distributed two ways: the Microsoft Store (MSIX) and a self-release channel
-  (Velopack, with built-in auto-updates)
+- Distributed via the Microsoft Store (Windows MSIX) and a self-release channel
+  (Velopack, with built-in auto-updates) for Windows and Linux
 
 **Website:** <https://agentredactor.negativestarinnovators.com/>
 
@@ -40,6 +41,29 @@ The installer picks the native build for your architecture (falling back to the
 x64 build on ARM64 if no native package is published yet) and installs per-user
 under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
 Windows SmartScreen may warn on first run.
+
+**Linux / Ubuntu** (x64 and ARM64; updates itself via Velopack). Download the
+AppImage for your architecture, make it executable, and run it:
+
+```bash
+# x64
+curl -fL -o AgentRedactor.AppImage \
+  https://api.agentredactor.negativestarinnovators.com/updates/linux/AgentRedactor.AppImage
+# ARM64
+curl -fL -o AgentRedactor.AppImage \
+  https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/AgentRedactor.AppImage
+
+chmod +x AgentRedactor.AppImage
+./AgentRedactor.AppImage
+```
+
+The app creates `~/.config/agentredactor/` for settings and downloads the
+~1.6 GB ONNX model weights on first run into `~/.local/share/agentredactor/models/`.
+On first launch it also installs a CLI shim at `~/.local/bin/agentredactor` so
+`agentredactor` is available on your PATH once that directory is on your PATH.
+If your desktop environment does not show a system tray icon, the window stays
+open as the control panel; closing it exits the GUI but leaves the proxy engine
+running until you quit from the tray menu.
 
 ## Repository layout
 
