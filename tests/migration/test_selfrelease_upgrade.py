@@ -249,7 +249,13 @@ def test_selfrelease_upgrade(tmp_path):
             time.sleep(0.5)
         assert relaunched, "Update.exe did not restart the app after applying the upgrade"
         time.sleep(3)
-        still_alive = [p for p in relaunched if psutil.Process(p).is_running()]
+        still_alive = []
+        for p in relaunched:
+            try:
+                if psutil.Process(p).is_running():
+                    still_alive.append(p)
+            except psutil.NoSuchProcess:
+                pass
         assert still_alive, "Restarted app process died shortly after the upgrade"
 
         # 7. Settings survived the upgrade and still migrate cleanly on the
