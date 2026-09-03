@@ -42,29 +42,6 @@ x64 build on ARM64 if no native package is published yet) and installs per-user
 under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
 Windows SmartScreen may warn on first run.
 
-**Linux / Ubuntu** (x64 and ARM64; updates itself via Velopack). Download the
-AppImage for your architecture, make it executable, and run it:
-
-```bash
-# x64
-curl -fL -o AgentRedactor.AppImage \
-  https://api.agentredactor.negativestarinnovators.com/updates/linux/AgentRedactor.AppImage
-# ARM64
-curl -fL -o AgentRedactor-linux-arm64.AppImage \
-  https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/AgentRedactor-linux-arm64.AppImage
-
-chmod +x AgentRedactor*.AppImage
-./AgentRedactor*.AppImage
-```
-
-The app creates `~/.config/agentredactor/` for settings and downloads the
-~1.6 GB ONNX model weights on first run into `~/.local/share/agentredactor/models/`.
-On first launch it also installs a CLI shim at `~/.local/bin/agentredactor` so
-`agentredactor` is available on your PATH once that directory is on your PATH.
-If your desktop environment does not show a system tray icon, the window stays
-open as the control panel; closing it exits the GUI but leaves the proxy engine
-running until you quit from the tray menu.
-
 ## Repository layout
 
 | Path | Contents |
