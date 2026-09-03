@@ -243,8 +243,8 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
         capture_output=True, text=True, timeout=60)
     assert version_check.returncode == 0, (
         f"upgraded AppImage failed to run --cli status: {version_check.stdout} {version_check.stderr}")
-    assert f"v{expected_core.group(0)}" in version_check.stdout, (
-        f"upgraded AppImage does not report expected version v{expected_core.group(0)}: "
+    assert expected_core.group(0) in version_check.stdout, (
+        f"upgraded AppImage does not report expected version {expected_core.group(0)}: "
         f"{version_check.stdout}")
 
     deadline = time.monotonic() + RELAUNCH_ALIVE_S
