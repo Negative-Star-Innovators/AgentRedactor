@@ -183,9 +183,17 @@ Once a release has been published to R2:
 ```
 curl -I https://api.agentredactor.negativestarinnovators.com/updates/win/releases.win.json
 curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux/releases.linux.json
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/releases.linux-arm64.json
 ```
 
 Expect `HTTP 200` from the bucket with `Accept-Ranges: bytes` and `Cache-Control: no-store`. Missing objects return `HTTP 404` JSON (no redirect).
+
+Linux AppImage downloads:
+
+```
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux/AgentRedactor.AppImage
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/AgentRedactor-linux-arm64.AppImage
+```
 
 ```
 curl https://api.agentredactor.negativestarinnovators.com/health
