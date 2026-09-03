@@ -1,5 +1,6 @@
 #include "log_manager.h"
 #include "utils.h"
+#include <algorithm>
 #include <chrono>
 #include <iomanip>
 #include <sstream>

@@ -53,6 +53,13 @@ struct ApiKeyProfile {
     RedactionStats stats;
     bool enabled = true;
 
+    // Set when the corresponding sensitive field could not be decrypted (e.g.
+    // the Linux machine key source changed). This lets the settings layer
+    // preserve the encrypted blob instead of overwriting it with an empty value.
+    bool apiKeyUnavailable = false;
+    bool keywordsUnavailable = false;
+    bool regexPatternsUnavailable = false;
+
     ApiKeyProfile();
     explicit ApiKeyProfile(const std::wstring& aliasName);
 

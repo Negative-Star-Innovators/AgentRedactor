@@ -1,10 +1,10 @@
 # agentredactor-api (Cloudflare Worker)
 
-Worker that fronts update checks and the install bootstrapper for AgentRedactor (Velopack-based Windows app).
+Worker that fronts update checks and the install bootstrapper for AgentRedactor (Velopack-based Windows and Linux app).
 
 ## Routes
 
-- `GET /updates/:channel/:file` — serves Velopack update assets exclusively from the `RELEASES_BUCKET` R2 bucket at `<channel>/<file>` with HTTP Range support and conditional requests (ETag / 304). R2 is the only update source — there is no GitHub fallback; missing objects return 404. Channels: `win` (x64) and `win-arm64` (ARM64). Allowlisted files: `releases.<channel>.json`, `*.nupkg`, `*-Setup.exe`, `*-Portable.zip`. Versioned `*.nupkg` files are cached immutably; the fixed-name feed/installer files are `no-store`.
+- `GET /updates/:channel/:file` — serves Velopack update assets exclusively from the `RELEASES_BUCKET` R2 bucket at `<channel>/<file>` with HTTP Range support and conditional requests (ETag / 304). R2 is the only update source — there is no GitHub fallback; missing objects return 404. Channels: `win` (Windows x64), `win-arm64` (Windows ARM64), `linux` (Linux x64), and `linux-arm64` (Linux ARM64). Allowlisted files: `releases.<channel>.json`, `*.nupkg`, `*-Setup.exe`, `*-Portable.zip`, `*.AppImage`. Versioned `*.nupkg` files are cached immutably; the fixed-name feed/installer files are `no-store`.
 - `GET /install.ps1` — PowerShell one-line installer (`iex "& { $(irm https://api.agentredactor.negativestarinnovators.com/install.ps1) }"`). Detects CPU architecture (`AMD64` vs `ARM64`) and downloads the matching `*-Setup.exe`; on ARM64 it falls back to the x64 installer (runs under emulation) if no ARM64 build is published yet.
 - `GET /models/:file` — serves the app's AI model weights from the `MODELS_BUCKET` R2 bucket with HTTP Range support (segmented/resumable downloads) and conditional requests (ETag / 304). Allowlisted files: `model_quantized.onnx_data`. Cached immutably (`Cache-Control: public, max-age=31536000, immutable`) since the model is content-versioned.
 - `GET /health` — `{"ok":true,"service":"agentredactor-api"}`.
@@ -12,7 +12,16 @@ Worker that fronts update checks and the install bootstrapper for AgentRedactor 
 
 ## Update channels
 
-The self-release channel is split per architecture: x64 builds check `/updates/win/releases.win.json`, ARM64 builds check `/updates/win-arm64/releases.win-arm64.json`. CI publishes both channels to the `agentredactor-releases` R2 bucket (under `win/` and `win-arm64/` prefixes) via the `release-selfrelease.yml` publish job. R2 is the sole host — releases are not published to GitHub.
+The self-release channel is split per OS and architecture:
+- Windows x64 checks `/updates/win/releases.win.json`
+- Windows ARM64 checks `/updates/win-arm64/releases.win-arm64.json`
+- Linux x64 checks `/updates/linux/releases.linux.json`
+- Linux ARM64 checks `/updates/linux-arm64/releases.linux-arm64.json`
+
+CI publishes all four channels to the `agentredactor-releases` R2 bucket (under
+`win/`, `win-arm64/`, `linux/`, and `linux-arm64/` prefixes) via the
+`release-selfrelease.yml` and `build-linux.yml` publish jobs. R2 is the sole
+host — releases are not published to GitHub.
 
 ## Updates hosting (R2)
 
@@ -79,6 +88,29 @@ is just the courier. From then on the api worker serves them at
    ```
 
    Both should return `HTTP 200`.
+
+#### Seeding the first Linux release manually
+
+The Linux workflow artifacts are named `AgentRedactor-velopack-linux-x64` and
+`AgentRedactor-velopack-linux-arm64`. Download them from a successful
+**Build Linux** run, then upload with the same `vpk upload s3` command using
+prefixes `linux` and `linux-arm64`:
+
+```bash
+# x64 channel (prefix linux)
+vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> -c linux --prefix linux --outputDir seed/velopack-linux-x64
+# ARM64 channel (prefix linux-arm64)
+vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> -c linux-arm64 --prefix linux-arm64 --outputDir seed/velopack-linux-arm64
+```
+
+Verify:
+
+```
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux/releases.linux.json
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/releases.linux-arm64.json
+```
+
+Both should return `HTTP 200`.
 
 WARNING: this is a *live* publish — every installed self-release instance
 will auto-update to whatever you seed. Only do this pre-launch (or with a
@@ -150,6 +182,7 @@ Once a release has been published to R2:
 
 ```
 curl -I https://api.agentredactor.negativestarinnovators.com/updates/win/releases.win.json
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux/releases.linux.json
 ```
 
 Expect `HTTP 200` from the bucket with `Accept-Ranges: bytes` and `Cache-Control: no-store`. Missing objects return `HTTP 404` JSON (no redirect).

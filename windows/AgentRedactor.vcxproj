@@ -218,7 +218,7 @@
     <ClInclude Include="..\core\include\proxy_engine.h" />
     <ClInclude Include="..\core\include\regex_engine.h" />
     <ClInclude Include="..\core\include\keyword_engine.h" />
-    <ClInclude Include="include\secure_storage.h" />
+    <ClInclude Include="..\core\include\secure_storage.h" />
     <ClInclude Include="include\update_manager.h" />
     <ClInclude Include="..\core\include\model_downloader.h" />
     <ClInclude Include="..\core\include\migrations\settings_migrator.h" />

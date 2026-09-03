@@ -11,6 +11,7 @@
 
 using json = nlohmann::json;
 
+#ifdef _WIN32
 #ifndef WINHTTP_OPTION_DECOMPRESSION
 #define WINHTTP_OPTION_DECOMPRESSION 118
 #endif
@@ -22,6 +23,9 @@ using json = nlohmann::json;
 #endif
 #ifndef WINHTTP_DECOMPRESSION_FLAG_ALL
 #define WINHTTP_DECOMPRESSION_FLAG_ALL (WINHTTP_DECOMPRESSION_FLAG_GZIP | WINHTTP_DECOMPRESSION_FLAG_DEFLATE)
+#endif
+#else
+#include <curl/curl.h>
 #endif
 
 namespace AgentRedactor {
@@ -930,6 +934,7 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
     std::function<bool(const char* data, size_t len)> onBodyChunk,
     std::function<void(int statusCode, const std::vector<std::pair<std::wstring, std::wstring>>& headers)> onHeaders) {
 
+#ifdef _WIN32
     URL_COMPONENTS urlComp = { sizeof(URL_COMPONENTS) };
     urlComp.dwSchemeLength = (DWORD)-1;
     urlComp.dwHostNameLength = (DWORD)-1;
@@ -1011,6 +1016,15 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
         }
         return key;
     };
+    auto credentialValueEmpty = [](const std::wstring& lowerName, const std::wstring& value) {
+        if (lowerName == L"authorization") {
+            size_t sp = value.find(L' ');
+            if (sp == std::wstring::npos) return true;
+            size_t firstNonSpace = value.find_first_not_of(L" \t\r\n", sp + 1);
+            return firstNonSpace == std::wstring::npos;
+        }
+        return value.find_first_not_of(L" \t\r\n") == std::wstring::npos;
+    };
 
     std::wstring headerString;
     std::wstring logHeaderString; // log-safe headers (API key masked unless show-sensitive mode is on)
@@ -1020,15 +1034,26 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
         if (lowerName == L"host" || lowerName == L"proxy-authorization") continue;
         if (lowerName == L"connection" || lowerName == L"keep-alive" || lowerName == L"proxy-connection" || lowerName == L"content-length" || lowerName == L"accept-encoding") continue;
         if (isCredentialHeader(lowerName)) {
+            if (!apiKey.empty() && credentialValueEmpty(lowerName, value)) {
+                // Client sent an empty/whitespace credential (e.g. "Bearer " with no token).
+                // Treat it as if no credential was sent so we inject the stored key below.
+                continue;
+            }
             clientSentCredential = true;
-            headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
-            logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            if (apiKey.empty()) {
+                // No stored key: preserve whatever the client sent rather than overwriting with empty.
+                headerString += name + L": " + value + L"\r\n";
+                logHeaderString += name + L": " + (logManager_->IsShowSensitive() ? value : L"<REDACTED>") + L"\r\n";
+            } else {
+                headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
+                logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            }
             continue;
         }
         headerString += name + L": " + value + L"\r\n";
         logHeaderString += name + L": " + value + L"\r\n";
     }
-    if (!clientSentCredential) {
+    if (!clientSentCredential && !apiKey.empty()) {
         headerString += L"Authorization: Bearer " + apiKey + L"\r\n";
         logHeaderString += L"Authorization: Bearer <REDACTED>\r\n";
     }
@@ -1131,6 +1156,249 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
     WinHttpCloseHandle(hConnect);
     WinHttpCloseHandle(hSession);
     return true;
+
+#else // POSIX: libcurl upstream client
+    // NOTE: the path-concatenation, credential-substitution and logging logic
+    // below mirrors the WinHTTP branch above; keep the two in sync.
+
+    // Crack upstreamUrl into scheme/host[:port]/path (WinHttpCrackUrl
+    // counterpart; curl re-parses the port from the rebuilt URL).
+    const std::string upstreamNarrow = Utils::WideToUtf8(upstreamUrl);
+    std::string scheme = "http";
+    std::string hostPort;
+    std::wstring urlPath;
+    {
+        std::string rest = upstreamNarrow;
+        const size_t schemeEnd = rest.find("://");
+        if (schemeEnd != std::string::npos) {
+            scheme = rest.substr(0, schemeEnd);
+            rest = rest.substr(schemeEnd + 3);
+        }
+        const size_t slash = rest.find('/');
+        hostPort = (slash == std::string::npos) ? rest : rest.substr(0, slash);
+        urlPath = Utils::Utf8ToWide((slash == std::string::npos) ? "" : rest.substr(slash));
+    }
+
+    // Smart path concatenation: deduplicate overlapping segments
+    // e.g. upstream=/api/v1 + incoming=/v1/chat → /api/v1/chat
+    std::wstring fullPath = urlPath;
+    if (!fullPath.empty() && fullPath.back() == L'/') fullPath.pop_back();
+
+    if (!path.empty()) {
+        size_t maxCommon = std::min(fullPath.length(), path.length());
+        size_t common = 0;
+        for (size_t i = 1; i <= maxCommon; ++i) {
+            if (fullPath.substr(fullPath.length() - i) == path.substr(0, i)) {
+                common = i;
+            }
+        }
+        if (common > 0) {
+            fullPath = fullPath.substr(0, fullPath.length() - common);
+        }
+        if (!fullPath.empty() && !path.empty() && fullPath.back() == L'/' && path.front() == L'/') {
+            fullPath.pop_back();
+        }
+        fullPath += path;
+    }
+    std::wstring wMethod = Utils::Utf8ToWide(method);
+
+    // Build headers, stripping hop-by-hop and accept-encoding headers.
+    // Client credential headers (Authorization, x-api-key, api-key) are
+    // forwarded with the real upstream key substituted for whatever value the
+    // client sent — agents commonly send placeholders (e.g. Claude Code's
+    // dummy ANTHROPIC_AUTH_TOKEN) and expect the proxy to hold the real key.
+    // The client's auth style is preserved (Authorization keeps its scheme,
+    // x-api-key/api-key take the raw key), so both OpenAI-style Bearer and
+    // Anthropic-style x-api-key upstreams work without agent sniffing. If the
+    // client sent no credential header at all, default to Authorization:
+    // Bearer as before.
+    auto isCredentialHeader = [](const std::wstring& lowerName) {
+        return lowerName == L"authorization" || lowerName == L"x-api-key" || lowerName == L"api-key";
+    };
+    auto substituteKey = [](const std::wstring& lowerName, const std::wstring& value, const std::wstring& key) {
+        if (lowerName == L"authorization") {
+            size_t sp = value.find(L' ');
+            if (sp != std::wstring::npos) {
+                // Preserve the client's scheme (e.g. Bearer) when present.
+                return value.substr(0, sp) + L" " + key;
+            }
+        }
+        return key;
+    };
+    auto credentialValueEmpty = [](const std::wstring& lowerName, const std::wstring& value) {
+        if (lowerName == L"authorization") {
+            size_t sp = value.find(L' ');
+            if (sp == std::wstring::npos) return true;
+            size_t firstNonSpace = value.find_first_not_of(L" \t\r\n", sp + 1);
+            return firstNonSpace == std::wstring::npos;
+        }
+        return value.find_first_not_of(L" \t\r\n") == std::wstring::npos;
+    };
+
+    std::wstring headerString;
+    std::wstring logHeaderString; // log-safe headers (API key masked unless show-sensitive mode is on)
+    bool clientSentCredential = false;
+    for (const auto& [name, value] : headers) {
+        std::wstring lowerName = Utils::ToLower(name);
+        if (lowerName == L"host" || lowerName == L"proxy-authorization") continue;
+        if (lowerName == L"connection" || lowerName == L"keep-alive" || lowerName == L"proxy-connection" || lowerName == L"content-length" || lowerName == L"accept-encoding") continue;
+        if (isCredentialHeader(lowerName)) {
+            if (!apiKey.empty() && credentialValueEmpty(lowerName, value)) {
+                // Client sent an empty/whitespace credential (e.g. "Bearer " with no token).
+                // Treat it as if no credential was sent so we inject the stored key below.
+                continue;
+            }
+            clientSentCredential = true;
+            if (apiKey.empty()) {
+                // No stored key: preserve whatever the client sent rather than overwriting with empty.
+                headerString += name + L": " + value + L"\r\n";
+                logHeaderString += name + L": " + (logManager_->IsShowSensitive() ? value : L"<REDACTED>") + L"\r\n";
+            } else {
+                headerString += name + L": " + substituteKey(lowerName, value, apiKey) + L"\r\n";
+                logHeaderString += name + L": " + substituteKey(lowerName, value, L"<REDACTED>") + L"\r\n";
+            }
+            continue;
+        }
+        headerString += name + L": " + value + L"\r\n";
+        logHeaderString += name + L": " + value + L"\r\n";
+    }
+    if (!clientSentCredential && !apiKey.empty()) {
+        headerString += L"Authorization: Bearer " + apiKey + L"\r\n";
+        logHeaderString += L"Authorization: Bearer <REDACTED>\r\n";
+    }
+    const std::wstring& headersForLog = logManager_->IsShowSensitive() ? headerString : logHeaderString;
+
+    // Log what we're about to send upstream
+    std::wstring upstreamBodyPreview = Utils::Utf8ToWide(body);
+    if (upstreamBodyPreview.length() > 50000) upstreamBodyPreview = upstreamBodyPreview.substr(0, 50000) + L"...[truncated]";
+    LOG(L"[Upstream] Request: " + wMethod + L" " + fullPath);
+    LOG(L"[Upstream] Request headers:\n" + headersForLog);
+    LOG(L"[Upstream] Request body:\n" + upstreamBodyPreview);
+    LOG_TRAFFIC(L"UPSTREAM_OUT",
+        wMethod + L" " + fullPath + L"\r\n" +
+        headersForLog + L"\r\n" +
+        Utils::Utf8ToWide(body));
+    logManager_->AddLog(profileAlias, LogDirection::ProxyToLLM,
+        L"Upstream request: " + wMethod + L" " + fullPath,
+        L"=== HEADERS SENT TO UPSTREAM ===\n" + headersForLog +
+        L"\n=== BODY SENT TO UPSTREAM ===\n" + upstreamBodyPreview);
+
+    struct UpstreamCurlContext {
+        CURL* curl = nullptr;
+        int statusCode = 0;
+        std::vector<std::pair<std::wstring, std::wstring>>* responseHeaders = nullptr;
+        std::function<bool(const char*, size_t)>* onBodyChunk = nullptr;
+        std::function<void(int, const std::vector<std::pair<std::wstring, std::wstring>>& )>* onHeaders = nullptr;
+        bool abortedByConsumer = false;
+        size_t totalBytes = 0;
+    };
+
+    CURL* curl = curl_easy_init();
+    if (!curl) return false;
+
+    UpstreamCurlContext ctx;
+    ctx.curl = curl;
+    ctx.responseHeaders = &responseHeaders;
+    ctx.onBodyChunk = &onBodyChunk;
+    ctx.onHeaders = &onHeaders;
+
+    const std::string fullUrl = scheme + "://" + hostPort + Utils::WideToUtf8(fullPath.empty() ? L"/" : fullPath);
+    curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "AgentRedactor/1.0");
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.data());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, static_cast<long>(body.size()));
+    // Explicit upstream timeouts so a stalled upstream cannot hang the proxy
+    // indefinitely (30 s connect; abort when the transfer stalls below
+    // 1 byte/s for 300 s, matching the WinHTTP receive timeout).
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 30000L);
+    curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L);
+    curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 300L);
+    // Automatic gzip/deflate decompression (curl adds its own Accept-Encoding;
+    // any client-provided one is stripped above, like the WinHTTP branch).
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
+
+    struct curl_slist* headerList = nullptr;
+    for (const auto& h : Utils::Split(headerString, L'\n')) {
+        const std::string narrow = Utils::WideToUtf8(Utils::Trim(h));
+        if (!narrow.empty()) headerList = curl_slist_append(headerList, narrow.c_str());
+    }
+    // WinHTTP never sends Expect: 100-continue; suppress curl's automatic one
+    // so onHeaders fires exactly once with the final response.
+    headerList = curl_slist_append(headerList, "Expect:");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerList);
+
+    auto headerCb = +[](char* buffer, size_t size, size_t nitems, void* userdata) -> size_t {
+        const size_t len = size * nitems;
+        auto* c = static_cast<UpstreamCurlContext*>(userdata);
+        std::string line(buffer, len);
+        while (!line.empty() && (line.back() == '\r' || line.back() == '\n')) line.pop_back();
+        if (line.empty()) {
+            // End of a header block: invoke onHeaders with the final status
+            // (interim 1xx blocks are skipped).
+            long status = 0;
+            curl_easy_getinfo(c->curl, CURLINFO_RESPONSE_CODE, &status);
+            if (status >= 200) {
+                c->statusCode = static_cast<int>(status);
+                if (c->onHeaders && *c->onHeaders) {
+                    (*c->onHeaders)(c->statusCode, *c->responseHeaders);
+                }
+            }
+            return len;
+        }
+        const size_t colon = line.find(':');
+        if (colon != std::string::npos && colon > 0) {
+            std::string name = line.substr(0, colon);
+            std::string value = line.substr(colon + 1);
+            const size_t start = value.find_first_not_of(" \t");
+            if (start != std::string::npos) value = value.substr(start);
+            c->responseHeaders->push_back({Utils::Utf8ToWide(name), Utils::Utf8ToWide(value)});
+        }
+        return len;
+    };
+    auto writeCb = +[](char* ptr, size_t size, size_t nmemb, void* userdata) -> size_t {
+        const size_t len = size * nmemb;
+        auto* c = static_cast<UpstreamCurlContext*>(userdata);
+        if (len > 0 && c->onBodyChunk && *c->onBodyChunk) {
+            if (!(*c->onBodyChunk)(ptr, len)) {
+                c->abortedByConsumer = true;
+                return 0;
+            }
+            c->totalBytes += len;
+        }
+        return len;
+    };
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, headerCb);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &ctx);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCb);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ctx);
+
+    const CURLcode res = curl_easy_perform(curl);
+    statusCode = ctx.statusCode;
+    curl_slist_free_all(headerList);
+    curl_easy_cleanup(curl);
+
+    if (res != CURLE_OK && !ctx.abortedByConsumer) {
+        logManager_->AddLog(profileAlias, LogDirection::LLMToProxy,
+            L"Upstream response FAILED",
+            L"curl_easy_perform failed: " + Utils::Utf8ToWide(curl_easy_strerror(res)));
+        return false;
+    }
+    if (ctx.abortedByConsumer) {
+        LOG(L"[Upstream] Streaming aborted by consumer");
+    }
+
+    std::wstring headerSummary;
+    for (const auto& [name, value] : responseHeaders) {
+        headerSummary += name + L": " + value + L"; ";
+    }
+    LOG(L"[Upstream] Response headers: " + headerSummary);
+    LOG(L"[Upstream] Streamed response: " + std::to_wstring(statusCode) + L" | " + std::to_wstring(ctx.totalBytes) + L" bytes");
+    logManager_->AddLog(profileAlias, LogDirection::LLMToProxy,
+        L"Upstream streaming response: " + std::to_wstring(statusCode) + L" | " + std::to_wstring(ctx.totalBytes) + L" bytes",
+        L"=== HEADERS FROM UPSTREAM ===\n" + headerSummary);
+    return true;
+#endif
 }
 
 void ProxyEngine::UpdateStats(const ApiKeyProfile& profile, size_t piiCount, size_t regexCount, size_t keywordCount) {

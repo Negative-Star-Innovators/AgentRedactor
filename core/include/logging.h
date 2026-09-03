@@ -1,7 +1,7 @@
 #pragma once
 
-#include <windows.h>
 #include <string>
+#include "platform_compat.h"
 
 // Runtime-gated logging (controlled by the app's logging options, not
 // compile-time flags):
@@ -20,11 +20,23 @@ namespace AgentRedactor {
 namespace Utils {
     template<typename... Args>
     std::wstring FormatString(const wchar_t* fmt, Args... args) {
+#ifdef _WIN32
         int size = _snwprintf(nullptr, 0, fmt, args...);
         if (size <= 0) return L"";
         std::wstring result(size, L'\0');
         _snwprintf(result.data(), result.size() + 1, fmt, args...);
         return result;
+#else
+        // glibc swprintf reports no would-be size on truncation; grow instead.
+        for (size_t size = 256;; size *= 2) {
+            std::wstring result(size, L'\0');
+            int n = swprintf(result.data(), result.size(), fmt, args...);
+            if (n >= 0 && static_cast<size_t>(n) < result.size()) {
+                result.resize(static_cast<size_t>(n));
+                return result;
+            }
+        }
+#endif
     }
 }
 }

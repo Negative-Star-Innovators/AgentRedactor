@@ -101,11 +101,34 @@ std::vector<ApiKeyProfile> SettingsManager::GetProfiles() const {
 
 void SettingsManager::SetProfiles(const std::vector<ApiKeyProfile>& profiles) {
     std::unique_lock<std::shared_mutex> lock(mutex_);
+    json oldProfiles = settings_.value("profiles", json::array());
     json arr = json::array();
     for (const auto& p : profiles) {
         json pj;
         p.ToJson(pj);
-        arr.push_back(pj);
+        // If decryption failed for a sensitive field, keep the existing encrypted
+        // blob instead of replacing it with an encrypted empty string.
+        if (p.apiKeyUnavailable || p.keywordsUnavailable || p.regexPatternsUnavailable) {
+            const json* old = nullptr;
+            for (const auto& o : oldProfiles) {
+                if (o.value("id", std::string()) == Utils::WideToUtf8(p.id)) {
+                    old = &o;
+                    break;
+                }
+            }
+            if (old) {
+                if (p.apiKeyUnavailable && old->contains("api_key")) {
+                    pj["api_key"] = (*old)["api_key"];
+                }
+                if (p.keywordsUnavailable && old->contains("keywords")) {
+                    pj["keywords"] = (*old)["keywords"];
+                }
+                if (p.regexPatternsUnavailable && old->contains("regex_patterns")) {
+                    pj["regex_patterns"] = (*old)["regex_patterns"];
+                }
+            }
+        }
+        arr.push_back(std::move(pj));
     }
     settings_["profiles"] = arr;
     SaveSettings();
@@ -170,6 +193,7 @@ bool SettingsManager::IsHelloEnabled() const {
     return secureStorage_.IsHelloEnabled();
 }
 
+#ifdef _WIN32
 bool SettingsManager::EnableMasterPassword() {
     std::unique_lock<std::shared_mutex> lock(mutex_);
     if (!secureStorage_.EnableMasterPassword()) return false;
@@ -177,6 +201,15 @@ bool SettingsManager::EnableMasterPassword() {
     SaveSettings();
     return true;
 }
+#else
+bool SettingsManager::EnableMasterPassword(const std::wstring& password) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.EnableMasterPassword(password)) return false;
+    settings_["master_password"] = secureStorage_.GetConfig();
+    SaveSettings();
+    return true;
+}
+#endif
 
 void SettingsManager::DisableMasterPassword() {
     std::unique_lock<std::shared_mutex> lock(mutex_);
@@ -185,6 +218,7 @@ void SettingsManager::DisableMasterPassword() {
     SaveSettings();
 }
 
+#ifdef _WIN32
 bool SettingsManager::UnlockWithHello() {
     std::unique_lock<std::shared_mutex> lock(mutex_);
     if (!secureStorage_.IsMasterPasswordEnabled()) return true;
@@ -192,6 +226,15 @@ bool SettingsManager::UnlockWithHello() {
     DecryptSensitiveFields();
     return true;
 }
+#else
+bool SettingsManager::UnlockWithPassword(const std::wstring& password) {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (!secureStorage_.IsMasterPasswordEnabled()) return true;
+    if (!secureStorage_.UnlockWithPassword(password)) return false;
+    DecryptSensitiveFields();
+    return true;
+}
+#endif
 
 void SettingsManager::Lock() {
     std::unique_lock<std::shared_mutex> lock(mutex_);

@@ -8,8 +8,7 @@
 #include <unordered_map>
 #include <deque>
 #include <mutex>
-#include <windows.h>
-#include <winhttp.h>
+#include "platform_compat.h"
 #include <functional>
 #include "api_key_profile.h"
 #include "pii_detector.h"
@@ -17,7 +16,9 @@
 #include "keyword_engine.h"
 #include "log_manager.h"
 
+#ifdef _WIN32
 #pragma comment(lib, "winhttp.lib")
+#endif
 
 namespace AgentRedactor {
 

@@ -24,6 +24,13 @@ from mock_llm import MockLLM
 from gui_process import GuiAppProcess, _find_free_port
 from windows.gui_driver import quit_app
 
+# The GUI exists on Windows only; on Linux the headless engine/CLI suites
+# (tests/cli, tests/linux) cover the port. Ignore this whole directory so a
+# bare `pytest tests/` on Linux does not error trying to launch
+# AgentRedactorUI.exe.
+if sys.platform != "win32":
+    collect_ignore_glob = ["*"]
+
 
 @pytest.fixture
 def proxy_port() -> int:

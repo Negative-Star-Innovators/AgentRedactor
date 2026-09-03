@@ -9,7 +9,10 @@ last but one.
 
 from __future__ import annotations
 
+import sys
 import time
+
+import pytest
 
 from conftest import CliEngine, TEST_API_KEY
 
@@ -304,13 +307,17 @@ def test_unlock_command_removed(engine: CliEngine) -> None:
 
     r = engine.run_cli("password", "disable")
     assert r.returncode == 0
-    assert "windows hello protection is not enabled" in r.stdout
+    if sys.platform == "win32":
+        assert "windows hello protection is not enabled" in r.stdout
+    else:
+        assert "master password protection is not enabled" in r.stdout
 
     r = engine.run_cli("status")
     assert r.returncode == 0
     assert "password enabled: false" in r.stdout
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows Hello consent flow is Windows-only; Linux uses the typed master password (test_cli_linux_password.py)")
 def test_password_hello_consent_gate(engine: CliEngine) -> None:
     """Windows-Hello-only protection: `password enable` (no password anywhere),
     a fresh engine session starts locked, and EVERY gated command demands a
@@ -368,6 +375,7 @@ def test_password_hello_consent_gate(engine: CliEngine) -> None:
         assert "password enabled: false" in r.stdout
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows Hello suppress-prompt invariant is Windows-only; Linux uses the typed master password (test_cli_linux_password.py)")
 def test_hello_suppress_prompt_flag_never_grants_access(engine: CliEngine) -> None:
     """SECURITY INVARIANT for the AGENTREDACTOR_HELLO_SUPPRESS_PROMPT test
     hook (set in conftest for the whole suite): the flag must behave exactly

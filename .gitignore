@@ -1,6 +1,10 @@
 # Build outputs
 windows/build/
 windows/packages/
+linux/build*/
+
+# Vendored prebuilt Velopack C/C++ library (fetched via linux/fetch-velopack.sh)
+linux/third_party/
 
 # Temporary scripts and artifacts
 temp/
@@ -25,3 +29,9 @@ windows/store-listing/
 
 # Internal planning docs (not for public release)
 docs/linux-port-plan.md
+
+# Translation/CI tooling venv (lrelease, deep-translator)
+.transvenv/
+
+# Sparse-attention re-export scratch (cloned source repo, intermediate models)
+_sparse_export/

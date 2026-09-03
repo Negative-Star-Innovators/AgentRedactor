@@ -135,7 +135,7 @@ jobs:
           echo OK
 
           echo '== update feeds =='
-          for ch in win win-arm64; do
+          for ch in win win-arm64 linux linux-arm64; do
             code=$(curl -s -o /dev/null -w '%{http_code}' "$base/updates/$ch/releases.$ch.json")
             if [ "$code" = "404" ]; then
               echo "::warning::channel $ch has no release yet (404) — fine before its first publish"

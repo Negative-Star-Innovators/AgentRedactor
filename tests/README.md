@@ -49,3 +49,31 @@ pytest -v gui/
 - `gui/conftest.py` — backs up the user's real data, creates a clean test profile, and restores it after the test.
 - `config_factory.py` generates a plaintext `settings.json`.
 - `mock_llm.py` is an `aiohttp` mock server that echoes redacted text back in OpenAI or Anthropic format.
+
+## Headless CLI and Linux engine tests
+
+`cli/`, `migration/`, and `linux/` drive the headless `agentredactor`
+binary (no GUI) and also run on Linux, where the binary comes from
+`linux/build/engine/agentredactor` (override with `AGENTREDACTOR_ENGINE_BIN`
+for `cli/`, `AGENTREDACTOR_EXE` for `migration/`). The `gui/` directory is
+ignored on non-Windows.
+
+```bash
+cd tests
+pytest -v cli/
+pytest -v migration/test_settings_migration.py
+pytest -v linux/
+```
+
+On Linux the protection model is a typed master password instead of Windows
+Hello: the Hello-consent tests in `cli/test_cli.py` skip, and
+`cli/test_cli_linux_password.py` covers the equivalent password flow by
+piping the password to stdin.
+
+`linux/test_gui_smoke.py` additionally launches the real Qt GUI
+(`linux/build/gui/agentredactor-gui`, override with `AGENTREDACTOR_GUI_BIN`)
+offscreen (`QT_QPA_PLATFORM=offscreen`) and asserts engine spawn/stop
+ownership, lock-on-quit when protected, and XDG autostart reconciliation.
+
+Run each suite in its own pytest process (as above): the suites share the
+`conftest` module name and cannot be collected in a single invocation.

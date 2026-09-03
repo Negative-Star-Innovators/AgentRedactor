@@ -1,0 +1,79 @@
+{
+  "reference": "windows/models/onnx/model_quantized.onnx",
+  "candidate": "_sparse_export/out/model_quantized.onnx",
+  "cases": [
+    {
+      "name": "pii_dense_500",
+      "tokens": 500,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 1.3e-05,
+      "non_o_ref": 234
+    },
+    {
+      "name": "pii_dense_2000",
+      "tokens": 2000,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 1.9e-05,
+      "non_o_ref": 227
+    },
+    {
+      "name": "pii_dense_4000",
+      "tokens": 4000,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 1.9e-05,
+      "non_o_ref": 218
+    },
+    {
+      "name": "pii_dense_8000",
+      "tokens": 8000,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 2.3e-05,
+      "non_o_ref": 195
+    },
+    {
+      "name": "pii_dense_12000",
+      "tokens": 12000,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 2.7e-05,
+      "non_o_ref": 172
+    },
+    {
+      "name": "pii_dense_16000",
+      "tokens": 16000,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 2.3e-05,
+      "non_o_ref": 263
+    },
+    {
+      "name": "boundary_entities",
+      "tokens": 6000,
+      "pad": 0,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 2.1e-05,
+      "non_o_ref": 231
+    },
+    {
+      "name": "padded_tail",
+      "tokens": 3000,
+      "pad": 200,
+      "label_mismatches": 0,
+      "entity_disagreements": 0,
+      "max_abs_logit_diff": 2.2e-05,
+      "non_o_ref": 141
+    }
+  ],
+  "labels_exact_all_cases": true
+}

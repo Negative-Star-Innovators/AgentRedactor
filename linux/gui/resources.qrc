@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="app.png">assets/app.png</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <!-- Hicolor set downscaled from the 2160px master; installed to
+             ~/.local/share/icons/hicolor at runtime by desktop_integration. -->
+        <file alias="agentredactor-16.png">assets/icons/agentredactor-16.png</file>
+        <file alias="agentredactor-32.png">assets/icons/agentredactor-32.png</file>
+        <file alias="agentredactor-48.png">assets/icons/agentredactor-48.png</file>
+        <file alias="agentredactor-64.png">assets/icons/agentredactor-64.png</file>
+        <file alias="agentredactor-128.png">assets/icons/agentredactor-128.png</file>
+        <file alias="agentredactor-256.png">assets/icons/agentredactor-256.png</file>
+        <file alias="agentredactor-512.png">assets/icons/agentredactor-512.png</file>
+    </qresource>
+    <!-- Translation catalogs (:/i18n/agentredactor_<locale>.qm) are compiled
+         from i18n/*.ts by CMake into a generated i18n.qrc — see
+         linux/gui/CMakeLists.txt. -->
+</RCC>

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <windows.h>
+#include "platform_compat.h"
 
 namespace AgentRedactor {
 
@@ -18,7 +18,9 @@ constexpr const wchar_t* APP_VERSION = AR_STRINGIZE(AR_VERSION_STRING);
 #else
 constexpr const wchar_t* APP_VERSION = L"1.0.0";
 #endif
+#ifdef _WIN32
 constexpr UINT WM_TRAYICON = WM_USER + 1;
+#endif
 
 constexpr size_t MAX_TOKENS_PER_CHUNK = 128000;
 constexpr size_t TOKEN_OVERLAP = 128;
@@ -51,12 +53,14 @@ inline const std::vector<PIICategory> PII_CATEGORIES = {
     {L"DIGITAL", L"Digital & Secrets", {L"private_url", L"secret"}},
 };
 
+#ifdef _WIN32
 enum MenuIDs : UINT {
     ID_TRAY_OPEN = 1001,
     ID_TRAY_LANGUAGE_FIRST = 2000,
     ID_TRAY_START_ON_BOOT = 3001,
     ID_TRAY_QUIT,
 };
+#endif
 
 struct SupportedLanguage {
     std::wstring tag;
@@ -153,6 +157,7 @@ inline bool LanguageMatches(const std::wstring& current, const std::wstring& sup
 
 } // namespace AgentRedactor
 
+#ifdef _WIN32
 inline void RegisterStartupTask() {
     HKEY hKey;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
@@ -171,3 +176,4 @@ inline void UnregisterStartupTask() {
         RegCloseKey(hKey);
     }
 }
+#endif

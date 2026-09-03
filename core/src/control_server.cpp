@@ -1,11 +1,17 @@
 #include "control_server.h"
 #include "utils.h"
 #include "logging.h"
+#ifdef _WIN32
 #include <bcrypt.h>
 #include <sddl.h>
 #include <aclapi.h>
 
 #pragma comment(lib, "bcrypt.lib")
+#else
+#include <openssl/rand.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
 
 namespace AgentRedactor {
 
@@ -90,9 +96,15 @@ HttpResponse ControlServer::HandleRequest(const HttpRequest& request) {
 
 std::wstring ControlServer::GenerateToken() const {
     unsigned char bytes[16] = {};
+#ifdef _WIN32
     if (BCryptGenRandom(nullptr, bytes, sizeof(bytes), BCRYPT_USE_SYSTEM_PREFERRED_RNG) != 0) {
         return L"";
     }
+#else
+    if (RAND_bytes(bytes, sizeof(bytes)) != 1) {
+        return L"";
+    }
+#endif
     static const wchar_t hex[] = L"0123456789abcdef";
     std::wstring token;
     token.reserve(sizeof(bytes) * 2);
@@ -104,6 +116,7 @@ std::wstring ControlServer::GenerateToken() const {
 }
 
 bool ControlServer::WriteControlFile(const std::filesystem::path& path) const {
+#ifdef _WIN32
     // Build a security descriptor that grants full control to the current
     // user only (D:P = protected DACL, no inheritance).
     std::wstring sddl = L"D:P(A;;FA;;;";
@@ -150,6 +163,25 @@ bool ControlServer::WriteControlFile(const std::filesystem::path& path) const {
     if (tokenUser) LocalFree(tokenUser);
     if (tokenHandle) CloseHandle(tokenHandle);
     return ok;
+#else
+    // Owner-only file (0600), replacing the Windows per-user ACL. umask may
+    // widen nothing here: open() with 0600 then fchmod to strip any umask
+    // bits is unnecessary (umask only removes bits), so 0600 is guaranteed.
+    std::string content = "{\"port\": " + std::to_string(port_) +
+        ", \"token\": \"" + Utils::WideToUtf8(token_) + "\"" +
+        ", \"pid\": " + std::to_string(getpid()) + "}\n";
+    int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    if (fd < 0) return false;
+    bool ok = true;
+    size_t written = 0;
+    while (written < content.size()) {
+        ssize_t n = write(fd, content.data() + written, content.size() - written);
+        if (n <= 0) { ok = false; break; }
+        written += static_cast<size_t>(n);
+    }
+    close(fd);
+    return ok;
+#endif
 }
 
 } // namespace AgentRedactor

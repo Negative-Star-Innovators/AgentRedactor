@@ -3,7 +3,9 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#ifdef _WIN32
 #include <winrt/Windows.Foundation.h>
+#endif
 
 namespace AgentRedactor {
 
@@ -31,8 +33,10 @@ std::wstring GetLanguageOverride();
 // (e.g. Arabic, Hebrew, Urdu).
 bool IsCurrentLanguageRtl();
 
+#ifdef _WIN32
 // Apply RightToLeft/LeftToRight FlowDirection to a FrameworkElement based on
 // the current effective UI language. Call after InitializeComponent().
 void ApplyCurrentFlowDirection(const winrt::Windows::Foundation::IInspectable& element);
+#endif
 
 } // namespace AgentRedactor

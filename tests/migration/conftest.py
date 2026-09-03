@@ -10,11 +10,14 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_EXE = REPO_ROOT / "windows" / "build" / "x64" / "Release" / "AgentRedactorUI.exe"
+if sys.platform == "win32":
+    DEFAULT_EXE = REPO_ROOT / "windows" / "build" / "x64" / "Release" / "AgentRedactorUI.exe"
+else:
+    DEFAULT_EXE = REPO_ROOT / "linux" / "build" / "engine" / "agentredactor"
 
 
 def resolve_exe() -> Path | None:
-    """AGENTREDACTOR_EXE wins; otherwise fall back to the local Release build."""
+    """AGENTREDACTOR_EXE wins; otherwise fall back to the local build."""
     env_path = os.environ.get("AGENTREDACTOR_EXE")
     if env_path:
         return Path(env_path)
@@ -23,14 +26,12 @@ def resolve_exe() -> Path | None:
 
 @pytest.fixture(scope="session")
 def agentredactor_exe() -> Path:
-    if sys.platform != "win32":
-        pytest.skip("AgentRedactorUI.exe is Windows-only")
     exe = resolve_exe()
     if exe is None or not exe.is_file():
         pytest.skip(
-            "AgentRedactorUI.exe not found (looked at "
-            f"{DEFAULT_EXE}). Build the Release configuration or point "
-            "AGENTREDACTOR_EXE at a built exe."
+            "agentredactor binary not found (looked at "
+            f"{DEFAULT_EXE}). Build the Release configuration (Windows) or "
+            "the linux/build tree, or point AGENTREDACTOR_EXE at a built binary."
         )
     return exe
 

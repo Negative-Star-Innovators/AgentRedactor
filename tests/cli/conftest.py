@@ -30,8 +30,15 @@ from config_factory import create_settings  # noqa: E402
 from gui_process import _find_free_port, _kill_existing_agent_redactor, _wait_for_port  # noqa: E402
 
 PROJECT_ROOT = _tests_root.parent
-_BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
-ENGINE_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" / "agentredactor.exe"
+if sys.platform == "win32":
+    _BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
+    _DEFAULT_ENGINE = (
+        PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" / "agentredactor.exe"
+    )
+else:
+    _DEFAULT_ENGINE = PROJECT_ROOT / "linux" / "build" / "engine" / "agentredactor"
+# AGENTREDACTOR_ENGINE_BIN overrides the default build-tree location.
+ENGINE_EXE = Path(os.environ.get("AGENTREDACTOR_ENGINE_BIN") or _DEFAULT_ENGINE)
 
 TEST_API_KEY = "sk-cli-test-key"
 
@@ -88,16 +95,22 @@ class CliEngine:
             self.stop()
             raise RuntimeError(f"engine did not start listening on port {self.proxy_port}")
 
-    def run_cli(self, *args: str) -> subprocess.CompletedProcess:
-        # stdin=DEVNULL: no interactive console, so a locked engine must
-        # reject commands instead of prompting (and hanging the test).
+    def run_cli(self, *args: str, input: str | None = None) -> subprocess.CompletedProcess:
+        # stdin=DEVNULL by default: no interactive console, so a locked engine
+        # must reject commands instead of prompting (and hanging the test).
+        # Pass input= to pipe a typed master password (Linux password mode).
+        kwargs: dict = {}
+        if input is None:
+            kwargs["stdin"] = subprocess.DEVNULL
+        else:
+            kwargs["input"] = input
         return subprocess.run(
             [str(ENGINE_EXE), *args],
             env=self._env(),
-            stdin=subprocess.DEVNULL,
             capture_output=True,
             text=True,
             timeout=30,
+            **kwargs,
         )
 
     def stop(self) -> None:

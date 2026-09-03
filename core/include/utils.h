@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <functional>
 #include <optional>
-#include <windows.h>
+#include "platform_compat.h"
 #include "logging.h"
 
 namespace AgentRedactor {
@@ -65,7 +65,7 @@ double ParseLocalizedFloat(const std::wstring& text);
 std::wstring FormatLocalizedTime(const std::time_t& time);
 std::wstring FormatLocalizedDateTime(const std::time_t& time);
 
-// Simple synchronous HTTP(S) GET helpers (WinHTTP), shared by the update
+// Simple synchronous HTTP(S) GET helpers, shared by the update
 // manager and the first-run model downloader. Follow redirects across hosts
 // (the update feed and GitHub release assets both 302). Never throw.
 bool HttpGetString(const std::wstring& url, std::string& outBody);

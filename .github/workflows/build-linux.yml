@@ -1,0 +1,234 @@
+name: Build Linux
+
+# Linux port CI: builds the core + engine + Qt GUI on Ubuntu (x64 and arm64,
+# mirroring the win / win-arm64 split in release-selfrelease.yml), runs the
+# cross-platform suites (cli, migration) plus the Linux-only suite, and packs
+# the Velopack AppImage. Publishing is gated the same way as
+# release-selfrelease.yml: only tag pushes (v*) or manual dispatches with
+# publish checked upload to R2 (channels "linux" / "linux-arm64"); PRs get a
+# pack dry-run with the packages as artifacts.
+on:
+  push:
+    tags: ['v*']
+    branches: ['main']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to R2 (agentredactor-releases bucket, prefixes linux/linux-arm64). Off = dry-run.'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: build-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      # One arch failing must not cancel the other; publish only runs when
+      # both succeed anyway (same pattern as release-selfrelease.yml).
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    # Native runners per arch, same pattern as the Windows ARM64 leg.
+    runs-on: ${{ matrix.arch == 'x64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    env:
+      ONNXRUNTIME_DIR: ${{ github.workspace }}/onnxruntime
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build + test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build pkg-config \
+            libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
+            qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse \
+            xvfb python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11
+
+      # onnxruntime has no apt package; official tarball per arch, same as
+      # linux/README.md documents for local builds.
+      - name: Download onnxruntime
+        run: |
+          mkdir -p "$ONNXRUNTIME_DIR"
+          rid="${{ matrix.arch == 'x64' && 'x64' || 'aarch64' }}"
+          curl -sL "https://github.com/microsoft/onnxruntime/releases/download/v1.29.0/onnxruntime-linux-${rid}-1.29.0.tgz" \
+            | tar xz -C "$ONNXRUNTIME_DIR" --strip-components=1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: pip install -r tests/requirements.txt
+
+      # The engine refuses to serve (proxy ports stay closed) until the NER
+      # model weights exist, and the CLI/linux suites spawn the real engine —
+      # so the ~1.6 GB weights must be present. Companions come from the repo
+      # checkout (windows/models/, same files the Windows build ships); only
+      # the gitignored weights are downloaded, from the same R2 models
+      # endpoint the app itself uses. Cached across runs.
+      - name: Cache ONNX model weights
+        id: model-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/agentredactor/models
+          key: onnx-model-ner-${{ runner.arch }}-v1
+
+      - name: Stage model files (cache miss only)
+        if: steps.model-cache.outputs.cache-hit != 'true'
+        run: |
+          dest=~/.local/share/agentredactor/models
+          mkdir -p "$dest/onnx"
+          cp windows/models/config.json windows/models/tokenizer.json \
+            windows/models/viterbi_calibration.json "$dest/"
+          cp windows/models/onnx/model_quantized.onnx "$dest/onnx/"
+          curl -fL --retry 3 -o "$dest/onnx/model_quantized.onnx_data" \
+            https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
+
+      - name: Build (dev config, updater off)
+        run: |
+          cmake -S linux -B linux/build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DONNXRUNTIME_INCLUDE_DIR="$ONNXRUNTIME_DIR/include" \
+            -DONNXRUNTIME_LIB="$ONNXRUNTIME_DIR/lib/libonnxruntime.so"
+          cmake --build linux/build
+
+      # The three suites must each run in their own pytest process: tests/cli
+      # and tests/migration both ship a top-level conftest.py and a shared
+      # module name breaks a combined run.
+      - name: Run CLI tests
+        run: python -m pytest tests/cli -q
+
+      - name: Run migration tests
+        run: python -m pytest tests/migration -q
+
+      - name: Run Linux tests (offscreen GUI smoke)
+        run: python -m pytest tests/linux -q -m "not atspi"
+
+      # The AT-SPI suite (tests/linux/test_gui_atspi.py) drives the real GUI
+      # through the accessibility bus: Qt only registers there under
+      # QT_QPA_PLATFORM=xcb, so it needs a display (Xvfb) and a D-Bus session
+      # for the a11y bus. The gi/Atspi bindings come from the distro packages
+      # above; PYTHONPATH exposes them to the setup-python interpreter.
+      - name: Run Linux GUI tests (AT-SPI, Xvfb)
+        run: |
+          PYTHONPATH=/usr/lib/python3/dist-packages \
+            dbus-run-session -- xvfb-run -a -s "-screen 0 1280x800x24" \
+            python -m pytest tests/linux/test_gui_atspi.py -q
+
+      # On AT-SPI failures upload the per-test GUI logs and the accessibility
+      # tree dumps the driver writes on lookup timeouts.
+      - name: Upload AT-SPI failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atspi-diagnostics-${{ matrix.arch }}
+          path: |
+            /tmp/pytest-of-runner/**/gui_atspi.log
+            /tmp/pytest-of-runner/**/atspi_tree_dump.txt
+          retention-days: 14
+
+      - name: Set up .NET (for vpk)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      # Pinned to the Velopack library version vendored by
+      # linux/fetch-velopack.sh — keep the two in sync.
+      - name: Install vpk 1.2.0 (Velopack CLI)
+        run: dotnet tool install -g vpk --version 1.2.0
+
+      # build-release.sh derives the vpk runtime/channel from the host arch
+      # (linux-x64/'linux', linux-arm64/'linux-arm64').
+      - name: Build and pack AppImage (build-release.sh)
+        env:
+          ONNXRUNTIME_INCLUDE_DIR: ${{ github.workspace }}/onnxruntime/include
+          ONNXRUNTIME_LIB: ${{ github.workspace }}/onnxruntime/lib/libonnxruntime.so
+        run: linux/build-release.sh
+
+      - name: Verify Velopack output
+        run: |
+          dir=linux/build-release/velopack
+          channel="${{ matrix.arch == 'x64' && 'linux' || 'linux-arm64' }}"
+          test -f "$dir/releases.${channel}.json" || { echo "missing releases.${channel}.json"; exit 1; }
+          ls "$dir"/*-full.nupkg >/dev/null || { echo "no full nupkg"; exit 1; }
+          ls "$dir"/*.AppImage >/dev/null || { echo "no AppImage"; exit 1; }
+          echo "Velopack output OK:" && ls "$dir"
+
+      - name: Upload Velopack output artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-velopack-linux-${{ matrix.arch }}
+          path: linux/build-release/velopack
+          retention-days: 30
+
+      # Full self-update cycle against a loopback feed: packs a vNext release
+      # from the staged AppDir and asserts the shipped AppImage swaps itself.
+      # Runs after packing since it consumes the pack output; skips locally
+      # when vpk or the pack output is missing.
+      - name: Run update E2E (AppImage self-update)
+        run: python -m pytest tests/linux/test_update_feed.py -q
+
+  # Publish is deliberately OUT of the matrix: both arch legs must pass first,
+  # then ONE job uploads both channels to R2 — same shape as
+  # release-selfrelease.yml. Tag pushes always publish; manual dispatches only
+  # when publish is checked. Same R2 secrets and bucket as the Windows flow.
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || inputs.publish
+    steps:
+      - name: Download Velopack outputs (both arches)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AgentRedactor-velopack-linux-*
+          path: velopack-linux
+      # Lands in velopack-linux/AgentRedactor-velopack-linux-x64 and ...-arm64.
+
+      - name: Set up .NET (for vpk)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install vpk 1.2.0 (Velopack CLI)
+        run: dotnet tool install -g vpk --version 1.2.0
+
+      - name: Check R2 secrets are configured
+        run: |
+          missing=""
+          [ -z '${{ secrets.R2_ACCOUNT_ID }}' ] && missing="$missing R2_ACCOUNT_ID"
+          [ -z '${{ secrets.R2_ACCESS_KEY_ID }}' ] && missing="$missing R2_ACCESS_KEY_ID"
+          [ -z '${{ secrets.R2_SECRET_ACCESS_KEY }}' ] && missing="$missing R2_SECRET_ACCESS_KEY"
+          [ -n "$missing" ] && { echo "Missing repo secrets:$missing"; exit 1; }
+
+      # Publishes the linux channel (releases.linux.json + nupkg + AppImage)
+      # to R2 so installed Linux x64 instances can auto-update. vpk rejects
+      # --region together with --endpoint (custom endpoint implies it).
+      - name: Publish linux (x64) channel to R2
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} -c linux --prefix linux --outputDir velopack-linux/AgentRedactor-velopack-linux-x64
+
+      # Same for the linux-arm64 channel (prefix linux-arm64/).
+      - name: Publish linux-arm64 channel to R2
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} -c linux-arm64 --prefix linux-arm64 --outputDir velopack-linux/AgentRedactor-velopack-linux-arm64
+
+      # vpk uploads its own bookkeeping files no client ever downloads
+      # (assets.*.json upload manifest, legacy RELEASES file); keep the bucket
+      # to client files only.
+      - name: Remove non-client files from R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          for channel in linux linux-arm64; do
+            aws s3 rm "s3://agentredactor-releases/${channel}/" \
+              --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+              --region auto --recursive --exclude "*" --include "assets.*.json" --include "RELEASES*"
+          done

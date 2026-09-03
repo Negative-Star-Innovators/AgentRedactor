@@ -9,13 +9,17 @@
 namespace AgentRedactor {
 
 HttpServer::HttpServer() {
+#ifdef _WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
 }
 
 HttpServer::~HttpServer() {
     Stop();
+#ifdef _WIN32
     WSACleanup();
+#endif
 }
 
 bool HttpServer::Start(int port, std::function<HttpResponse(const HttpRequest&)> handler, bool loopbackOnly) {
@@ -66,7 +70,7 @@ bool HttpServer::Start(int port, std::function<HttpResponse(const HttpRequest&)>
     // Resolve the actual bound port (relevant when port 0 was requested).
     {
         sockaddr_in6 bound = {};
-        int boundLen = sizeof(bound);
+        ar_socklen_t boundLen = sizeof(bound);
         if (getsockname(listenSocket_, (sockaddr*)&bound, &boundLen) == 0) {
             port_ = ntohs(bound.sin6_port);
         }
@@ -92,12 +96,19 @@ void HttpServer::Stop() {
     running_ = false;
 
     if (listenSocket_ != INVALID_SOCKET) {
-        closesocket(listenSocket_);
-        listenSocket_ = INVALID_SOCKET;
+        // Wake the listener's select() so it can exit; the socket is only
+        // closed AFTER the thread is joined. Closing it first races with
+        // FD_SET on POSIX (glibc aborts on the invalidated descriptor).
+        shutdown(listenSocket_, SD_BOTH);
     }
 
     if (listenerThread_.joinable()) {
         listenerThread_.join();
+    }
+
+    if (listenSocket_ != INVALID_SOCKET) {
+        closesocket(listenSocket_);
+        listenSocket_ = INVALID_SOCKET;
     }
 
     // Wait for all client connections to finish
@@ -113,12 +124,13 @@ void HttpServer::RunListener() {
         FD_ZERO(&readSet);
         FD_SET(listenSocket_, &readSet);
         timeval tv = {0, 100000}; // 100ms timeout
-        int selectResult = select(0, &readSet, nullptr, nullptr, &tv);
+        // nfds is ignored on Windows; POSIX requires the highest fd + 1.
+        int selectResult = select(static_cast<int>(listenSocket_) + 1, &readSet, nullptr, nullptr, &tv);
         if (selectResult <= 0) continue;
         if (!FD_ISSET(listenSocket_, &readSet)) continue;
 
         sockaddr_in6 clientAddr;
-        int addrLen = sizeof(clientAddr);
+        ar_socklen_t addrLen = sizeof(clientAddr);
         SOCKET clientSocket = accept(listenSocket_, (sockaddr*)&clientAddr, &addrLen);
         if (clientSocket == INVALID_SOCKET) continue;
 
@@ -189,7 +201,7 @@ void HttpServer::HandleClient(SOCKET clientSocket) {
         FD_ZERO(&readSet);
         FD_SET(clientSocket, &readSet);
         timeval tv = {0, 50000}; // 50ms
-        if (select(0, &readSet, nullptr, nullptr, &tv) > 0 && FD_ISSET(clientSocket, &readSet)) {
+        if (select(static_cast<int>(clientSocket) + 1, &readSet, nullptr, nullptr, &tv) > 0 && FD_ISSET(clientSocket, &readSet)) {
             drainResult = recv(clientSocket, drain, sizeof(drain), 0);
             if (drainResult == 0 || drainResult == SOCKET_ERROR) break;
         }
@@ -417,14 +429,18 @@ bool HttpServer::SendChunkedEnd(SOCKET clientSocket) {
 }
 
 bool IsPortAvailable(int port) {
+#ifdef _WIN32
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         return false;
     }
+#endif
 
     SOCKET testSocket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
     if (testSocket == INVALID_SOCKET) {
+#ifdef _WIN32
         WSACleanup();
+#endif
         return false;
     }
 
@@ -442,7 +458,9 @@ bool IsPortAvailable(int port) {
 
     bool available = (bind(testSocket, (sockaddr*)&addr, sizeof(addr)) == 0);
     closesocket(testSocket);
+#ifdef _WIN32
     WSACleanup();
+#endif
     return available;
 }
 
