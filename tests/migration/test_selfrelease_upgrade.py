@@ -98,15 +98,26 @@ def _latest_feed_version(feed_dir: Path, channel: str) -> str:
 
 def _kill_install_processes(install_root: Path) -> None:
     """Kill AgentRedactorUI.exe / agentredactor.exe / Update.exe instances running from the install."""
+    for pid in _process_pids_in_install(install_root):
+        try:
+            psutil.Process(pid).kill()
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    time.sleep(1)
+
+
+def _process_pids_in_install(install_root: Path) -> list[int]:
+    """Return PIDs of AgentRedactor processes whose exe lives under install_root."""
     root = str(install_root).lower()
+    out = []
     for proc in psutil.process_iter(["exe"]):
         try:
             exe = proc.info.get("exe")
             if exe and str(exe).lower().startswith(root):
-                proc.kill()
+                out.append(proc.pid)
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
-    time.sleep(1)
+    return out
 
 
 def _layout_listing(install_root: Path) -> str:
@@ -199,6 +210,7 @@ def test_selfrelease_upgrade(tmp_path):
                 "AGENTREDACTOR_CONFIG_DIR": str(config_dir),
             }
         )
+        procs_before = set(_process_pids_in_install(install_root))
         subprocess.Popen([str(installed_exe)], env=env)
 
         # 6. Poll until the installed current\AgentRedactorUI.exe is the vNext
@@ -222,6 +234,23 @@ def test_selfrelease_upgrade(tmp_path):
                 f"upgrade did not complete within {POLL_TIMEOUT_S}s: "
                 f"last seen file version '{seen}', expected >= '{expected}'"
             )
+
+        # 6b. The updater should have restarted the app. Verify a new process
+        #     spawned from the install root and stayed alive briefly.
+        relaunch_deadline = time.monotonic() + 15.0
+        relaunched = []
+        while time.monotonic() < relaunch_deadline:
+            relaunched = [
+                p for p in _process_pids_in_install(install_root)
+                if p not in procs_before
+            ]
+            if relaunched:
+                break
+            time.sleep(0.5)
+        assert relaunched, "Update.exe did not restart the app after applying the upgrade"
+        time.sleep(3)
+        still_alive = [p for p in relaunched if psutil.Process(p).is_running()]
+        assert still_alive, "Restarted app process died shortly after the upgrade"
 
         # 7. Settings survived the upgrade and still migrate cleanly on the
         #    new build.

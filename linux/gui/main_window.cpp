@@ -31,6 +31,7 @@
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <cstdlib>
 #include <functional>
 #include <regex>
 
@@ -142,10 +143,24 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
                         tr("Couldn't check for updates. Try again later."));
             });
         // The Velopack updater is already waiting for this process to exit;
-        // skip the quit confirmation and shut down immediately.
+        // skip the quit confirmation and shut down immediately. Stop the engine
+        // synchronously so the updater's 60-second wait is never starved, and
+        // arm a watchdog that force-exits if Qt's event loop does not wind down
+        // promptly (e.g. a stuck signal handler or modal dialog).
         connect(updateMgr_, &AppUpdateManager::restartRequested, this, [this] {
             quitting_ = true;
+            qInfo("[MainWindow] Restart requested; stopping engine and quitting");
+            // aboutToQuit also calls Shutdown, but do it now so the updater sees
+            // the process exit quickly. Pass false: do not leave the engine
+            // running/locked during an update restart.
+            appState_->Shutdown(false);
             QApplication::quit();
+            // If the event loop is stuck and the process is still alive after a
+            // short grace period, exit hard so Velopack can swap the AppImage.
+            QTimer::singleShot(3000, this, [] {
+                qWarning("[MainWindow] Forced exit after update-restart timeout");
+                std::_Exit(0);
+            });
         });
         QTimer::singleShot(0, this, [this] { updateMgr_->CheckForUpdates(false); });
     }

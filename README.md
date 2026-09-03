@@ -42,6 +42,7 @@ x64 build on ARM64 if no native package is published yet) and installs per-user
 under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
 Windows SmartScreen may warn on first run.
 
+
 ## Repository layout
 
 | Path | Contents |

@@ -43,12 +43,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve version from version.txt
+        run: |
+          version=$(tr -d '[:space:]' < windows/version.txt)
+          echo "VERSION_FROM_VERSION_TXT=$version" >> "$GITHUB_ENV"
+          echo "Building version $version"
+
       - name: Install build + test dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake ninja-build pkg-config \
             libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
-            qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse \
+            qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse libfuse2t64 \
             xvfb python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11
 
       # onnxruntime has no apt package; official tarball per arch, same as
@@ -176,6 +182,56 @@ jobs:
       # when vpk or the pack output is missing.
       - name: Run update E2E (AppImage self-update)
         run: python -m pytest tests/linux/test_update_feed.py -q
+
+      # Grab the previous LIVE release's AppImage from R2 for the upgrade E2E.
+      # The fixed-name AppImage at the channel root is always the latest live
+      # build. Skipped gracefully when the channel has no live release yet, or
+      # when the live version is not older than this build's version.
+      - name: Download previous live AppImage from R2
+        id: prevappimage
+        run: |
+          channel="${{ matrix.arch == 'x64' && 'linux' || 'linux-arm64' }}"
+          appimage="AgentRedactor.AppImage"
+          if [ "$channel" = "linux-arm64" ]; then
+            appimage="AgentRedactor-linux-arm64.AppImage"
+          fi
+          base="https://api.agentredactor.negativestarinnovators.com/updates/$channel"
+          expected="${{ env.VERSION_FROM_VERSION_TXT }}"
+
+          feed=$(curl -fsSL "$base/releases.$channel.json" 2>/dev/null || true)
+          if [ -z "$feed" ]; then
+            echo "::warning::No live release on channel '$channel' yet; skipping upgrade E2E"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          latest=$(echo "$feed" | python3 -c "import sys,json; a=[x for x in json.load(sys.stdin).get('Assets',[]) if x.get('Version') and str(x.get('Type')) in ('1','Full')]; print(max(a,key=lambda x:tuple(map(int,x['Version'].lstrip('vV').split('-')[0].split('+')[0].split('.'))))['Version']) if a else '')")
+          if [ -z "$latest" ]; then
+            echo "::warning::No full-package asset on channel '$channel'; skipping upgrade E2E"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Latest live version on '$channel': $latest (this build: $expected)"
+          # Compare versions; skip if live is not older than expected.
+          newer=$(python3 -c "import sys; a=tuple(map(int,'$latest'.lstrip('vV').split('-')[0].split('+')[0].split('.'))); b=tuple(map(int,'$expected'.lstrip('vV').split('-')[0].split('+')[0].split('.'))); sys.exit(0 if b>a else 1)")
+          if [ "$newer" != "0" ]; then
+            echo "::warning::Live version $latest is not older than this build ($expected); skipping upgrade E2E"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p prev-appimage
+          curl -fL --fail -o "prev-appimage/$appimage" "$base/$appimage"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "appimage_path=$(pwd)/prev-appimage/$appimage" >> "$GITHUB_OUTPUT"
+
+      - name: Upgrade E2E (previous live release -> this build)
+        if: steps.prevappimage.outputs.found == 'true'
+        env:
+          AGENTREDACTOR_UPGRADE_TEST: "1"
+          AGENTREDACTOR_CHANNEL: ${{ matrix.arch == 'x64' && 'linux' || 'linux-arm64' }}
+          AGENTREDACTOR_PREV_APPIMAGE: ${{ steps.prevappimage.outputs.appimage_path }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/linux/build-release/velopack
+          AGENTREDACTOR_EXPECT_VERSION: ${{ env.VERSION_FROM_VERSION_TXT }}
+        run: python -m pytest tests/linux/test_update_from_live.py -q
 
   # Publish is deliberately OUT of the matrix: both arch legs must pass first,
   # then ONE job uploads both channels to R2 — same shape as
