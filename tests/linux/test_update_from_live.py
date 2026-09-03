@@ -221,6 +221,41 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
         if not upgraded:
             proc.kill()
             pytest.fail(f"AppImage was not upgraded to v{expected} within {POLL_TIMEOUT_S}s")
+
+        # Velopack replaces the AppImage and restarts the GUI; wait for the new
+        # instance to be alive so the engine is reachable for --cli status.
+        deadline = time.monotonic() + RELAUNCH_ALIVE_S
+        relaunched: list[psutil.Process] = []
+        while time.monotonic() < deadline:
+            relaunched = [
+                p for p in _all_gui_processes()
+                if original_pid is None or p.pid != original_pid
+            ]
+            if relaunched:
+                break
+            time.sleep(0.5)
+        assert relaunched, "updater did not spawn a new GUI process after the upgrade"
+        time.sleep(3)
+        still_alive = [p for p in relaunched if p.is_running()]
+        assert still_alive, "relaunched GUI process died shortly after the upgrade"
+
+        assert os.access(app, os.X_OK), f"upgraded AppImage is not executable: {app}"
+
+        cli_env = dict(os.environ)
+        cli_env.update({
+            "AGENTREDACTOR_CONFIG_DIR": str(config_dir),
+            "HOME": str(home_dir),
+            "XDG_CONFIG_HOME": str(home_dir / ".config"),
+            "XDG_DATA_HOME": str(home_dir / ".local" / "share"),
+        })
+        version_check = subprocess.run(
+            [str(app), "--cli", "status"], env=cli_env,
+            capture_output=True, text=True, timeout=60)
+        assert version_check.returncode == 0, (
+            f"upgraded AppImage failed to run --cli status: {version_check.stdout} {version_check.stderr}")
+        assert expected_core.group(0) in version_check.stdout, (
+            f"upgraded AppImage does not report expected version {expected_core.group(0)}: "
+            f"{version_check.stdout}")
     finally:
         server.terminate()
         for p in _gui_processes_for(tmp_path):
@@ -228,44 +263,6 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
                 p.terminate()
             except psutil.NoSuchProcess:
                 pass
-
-    assert os.access(app, os.X_OK), f"upgraded AppImage is not executable: {app}"
-
-    cli_env = dict(os.environ)
-    cli_env.update({
-        "AGENTREDACTOR_CONFIG_DIR": str(config_dir),
-        "HOME": str(home_dir),
-        "XDG_CONFIG_HOME": str(home_dir / ".config"),
-        "XDG_DATA_HOME": str(home_dir / ".local" / "share"),
-    })
-    version_check = subprocess.run(
-        [str(app), "--cli", "status"], env=cli_env,
-        capture_output=True, text=True, timeout=60)
-    assert version_check.returncode == 0, (
-        f"upgraded AppImage failed to run --cli status: {version_check.stdout} {version_check.stderr}")
-    assert expected_core.group(0) in version_check.stdout, (
-        f"upgraded AppImage does not report expected version {expected_core.group(0)}: "
-        f"{version_check.stdout}")
-
-    deadline = time.monotonic() + RELAUNCH_ALIVE_S
-    relaunched = []
-    while time.monotonic() < deadline:
-        relaunched = [
-            p for p in _all_gui_processes()
-            if original_pid is None or p.pid != original_pid
-        ]
-        if relaunched:
-            break
-        time.sleep(0.5)
-    assert relaunched, "updater did not spawn a new GUI process after the upgrade"
-    time.sleep(3)
-    still_alive = [p for p in relaunched if p.is_running()]
-    assert still_alive, "relaunched GUI process died shortly after the upgrade"
-    for p in still_alive:
-        try:
-            p.terminate()
-        except psutil.NoSuchProcess:
-            pass
 
     autostart = home_dir / ".config" / "autostart" / "agentredactor.desktop"
     applications = home_dir / ".local" / "share" / "applications" / "agentredactor.desktop"
