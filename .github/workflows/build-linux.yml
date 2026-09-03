@@ -204,10 +204,10 @@ jobs:
       - name: Check R2 secrets are configured
         run: |
           missing=""
-          [ -z '${{ secrets.R2_ACCOUNT_ID }}' ] && missing="$missing R2_ACCOUNT_ID"
-          [ -z '${{ secrets.R2_ACCESS_KEY_ID }}' ] && missing="$missing R2_ACCESS_KEY_ID"
-          [ -z '${{ secrets.R2_SECRET_ACCESS_KEY }}' ] && missing="$missing R2_SECRET_ACCESS_KEY"
-          [ -n "$missing" ] && { echo "Missing repo secrets:$missing"; exit 1; }
+          if [ -z '${{ secrets.R2_ACCOUNT_ID }}' ]; then missing="$missing R2_ACCOUNT_ID"; fi
+          if [ -z '${{ secrets.R2_ACCESS_KEY_ID }}' ]; then missing="$missing R2_ACCESS_KEY_ID"; fi
+          if [ -z '${{ secrets.R2_SECRET_ACCESS_KEY }}' ]; then missing="$missing R2_SECRET_ACCESS_KEY"; fi
+          if [ -n "$missing" ]; then echo "Missing repo secrets:$missing"; exit 1; fi
 
       # Publishes the linux channel (releases.linux.json + nupkg + AppImage)
       # to R2 so installed Linux x64 instances can auto-update. vpk rejects
