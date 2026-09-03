@@ -204,20 +204,46 @@ jobs:
             echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          latest=$(echo "$feed" | python3 -c "import sys,json; a=[x for x in json.load(sys.stdin).get('Assets',[]) if x.get('Version') and str(x.get('Type')) in ('1','Full')]; print(max(a,key=lambda x:tuple(map(int,x['Version'].lstrip('vV').split('-')[0].split('+')[0].split('.'))))['Version']) if a else '')
-          if [ -z "$latest" ]; then
-            echo "::warning::No full-package asset on channel '$channel'; skipping upgrade E2E"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+
+          cat > /tmp/resolve_prev.py <<'PY'
+          import sys, json
+          def parse(v):
+              return tuple(int(x) for x in v.lstrip('vV').split('-')[0].split('+')[0].split('.'))
+          expected = sys.argv[1]
+          assets = [a for a in json.load(sys.stdin).get('Assets', [])
+                    if a.get('Version') and str(a.get('Type')) in ('1', 'Full')]
+          if not assets:
+              print('__NO_ASSETS__')
+              sys.exit(0)
+          latest = max(assets, key=lambda a: parse(a['Version']))['Version']
+          if parse(expected) > parse(latest):
+              print('__OK__', latest)
+          else:
+              print('__SKIP__', latest)
+          PY
+
+          result=$(echo "$feed" | python3 /tmp/resolve_prev.py "$expected")
+          case "$result" in
+            __NO_ASSETS__)
+              echo "::warning::No full-package asset on channel '$channel'; skipping upgrade E2E"
+              echo "found=false" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+            __SKIP__*)
+              latest=${result#__SKIP__ }
+              echo "::warning::Live version $latest is not older than this build ($expected); skipping upgrade E2E"
+              echo "found=false" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+            __OK__*)
+              latest=${result#__OK__ }
+              ;;
+            *)
+              echo "Unexpected feed resolver result: $result"
+              exit 1
+              ;;
+          esac
           echo "Latest live version on '$channel': $latest (this build: $expected)"
-          # Compare versions; skip if live is not older than expected.
-          newer=$(python3 -c "import sys; a=tuple(map(int,'$latest'.lstrip('vV').split('-')[0].split('+')[0].split('.'))); b=tuple(map(int,'$expected'.lstrip('vV').split('-')[0].split('+')[0].split('.'))); sys.exit(0 if b>a else 1)")
-          if [ "$newer" != "0" ]; then
-            echo "::warning::Live version $latest is not older than this build ($expected); skipping upgrade E2E"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           mkdir -p prev-appimage
           curl -fL --fail -o "prev-appimage/$appimage" "$base/$appimage"
           echo "found=true" >> "$GITHUB_OUTPUT"

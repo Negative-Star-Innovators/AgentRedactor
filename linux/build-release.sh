@@ -136,7 +136,11 @@ vpk pack \
 # name because both channels are served from the same R2 bucket under different
 # prefixes. The nupkg/feed are unchanged (packId stays AgentRedactor).
 if [ "${CHANNEL}" = "linux-arm64" ]; then
-    mv "${OUT}/AgentRedactor.AppImage" "${OUT}/AgentRedactor-linux-arm64.AppImage"
+    target="${OUT}/AgentRedactor-linux-arm64.AppImage"
+    src=$(ls "${OUT}"/AgentRedactor*.AppImage 2>/dev/null | head -1)
+    if [ -n "$src" ] && [ "$src" != "$target" ]; then
+        mv "$src" "$target"
+    fi
 fi
 
 echo "==> Done. Artifacts in ${OUT}:"
