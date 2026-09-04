@@ -123,13 +123,22 @@ EOF
 # the AppDir to search its own directory first via RUNPATH=$ORIGIN. This is
 # more targeted than LD_LIBRARY_PATH and avoids pulling incompatible host
 # libs (e.g. host libgio needing a newer libmount than the bundled one).
-echo "==> Setting RUNPATH=\$ORIGIN on bundled binaries and libraries"
+#
+# Qt plugins live under plugins/<group>/ (and deeper), so their RUNPATH must
+# point back to the main AppDir root where the bundled Qt libs live.
+echo "==> Setting RUNPATH on bundled binaries, libraries and Qt plugins"
 command -v patchelf >/dev/null 2>&1 || { echo "ERROR: patchelf is required; install it with 'sudo apt-get install patchelf'" >&2; exit 1; }
 find "${STAGE}" -maxdepth 1 -type f \( -name '*.so' -o -name '*.so.*' \) -print0 | while IFS= read -r -d '' so; do
     patchelf --set-rpath '$ORIGIN' "$so" 2>/dev/null || true
 done
 patchelf --set-rpath '$ORIGIN' "${STAGE}/agentredactor-gui.real"
 patchelf --set-rpath '$ORIGIN' "${STAGE}/agentredactor"
+
+find "${STAGE}/plugins" -type f \( -name '*.so' -o -name '*.so.*' \) -print0 | while IFS= read -r -d '' so; do
+    # Path from the plugin's directory back to the AppDir root.
+    rel=$(realpath --relative-to="$(dirname "$so")" "${STAGE}")
+    patchelf --set-rpath "\$ORIGIN/${rel}" "$so" 2>/dev/null || true
+done
 
 # Velopack's generated AppRun only sets PATH. Use a tiny shell wrapper as the
 # main executable so the process name stays 'agentredactor-gui' (used by the
