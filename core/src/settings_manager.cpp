@@ -102,8 +102,12 @@ std::vector<ApiKeyProfile> SettingsManager::GetProfiles() const {
 void SettingsManager::SetProfiles(const std::vector<ApiKeyProfile>& profiles) {
     std::unique_lock<std::shared_mutex> lock(mutex_);
     json oldProfiles = settings_.value("profiles", json::array());
+    LOGF_LIFECYCLE(L"[SettingsManager] SetProfiles input count=%zu old profiles size=%zu",
+        profiles.size(), oldProfiles.size());
     json arr = json::array();
     for (const auto& p : profiles) {
+        LOGF_LIFECYCLE(L"[SettingsManager] SetProfiles profile id=%s keywords=%zu unavailable=%d",
+            p.id.c_str(), p.keywords.size(), p.keywordsUnavailable);
         json pj;
         p.ToJson(pj);
         // If decryption failed for a sensitive field, keep the existing encrypted
@@ -132,6 +136,8 @@ void SettingsManager::SetProfiles(const std::vector<ApiKeyProfile>& profiles) {
     }
     settings_["profiles"] = arr;
     SaveSettings();
+    LOGF_LIFECYCLE(L"[SettingsManager] SetProfiles after save keywords in settings=%zu",
+        settings_.value("profiles", json::array()).at(0).value("keywords", json::array()).size());
 }
 
 void SettingsManager::AddProfile(const ApiKeyProfile& profile) {
@@ -257,7 +263,9 @@ void SettingsManager::EncryptSensitiveFields() {
         if (profile.contains("keywords") && profile["keywords"].is_array()) {
             auto& field = profile["keywords"];
             std::wstring plaintext = Utils::Utf8ToWide(field.dump());
+            LOGF_LIFECYCLE(L"[SettingsManager] EncryptSensitiveFields keywords plaintext size=%zu", field.size());
             field = secureStorage_.Encrypt(plaintext);
+            LOGF_LIFECYCLE(L"[SettingsManager] EncryptSensitiveFields keywords encrypted is_object=%d", field.is_object());
         }
         if (profile.contains("regex_patterns") && profile["regex_patterns"].is_array()) {
             auto& field = profile["regex_patterns"];
@@ -280,11 +288,14 @@ void SettingsManager::DecryptSensitiveFields() {
         if (profile.contains("keywords") && profile["keywords"].is_object() && profile["keywords"].contains("_enc")) {
             auto& field = profile["keywords"];
             auto decrypted = secureStorage_.Decrypt(field);
+            LOGF_LIFECYCLE(L"[SettingsManager] DecryptSensitiveFields keywords decrypted=%d", decrypted.has_value());
             if (decrypted) {
                 try {
                     field = json::parse(Utils::WideToUtf8(*decrypted));
+                    LOGF_LIFECYCLE(L"[SettingsManager] DecryptSensitiveFields keywords parsed size=%zu", field.size());
                 } catch (...) {
                     field = json::array();
+                    LOGF_LIFECYCLE(L"[SettingsManager] DecryptSensitiveFields keywords parse failed");
                 }
             }
         }
@@ -310,7 +321,13 @@ void SettingsManager::SaveSettings() {
     };
 
     try {
+        const auto& kwBefore = settings_.value("profiles", json::array()).at(0).value("keywords", json::array());
+        LOGF_LIFECYCLE(L"[SettingsManager] SaveSettings before keywords is_array=%d size=%zu",
+            kwBefore.is_array(), kwBefore.size());
         EncryptionGuard guard(this);
+        const auto& kwAfterEnc = settings_.value("profiles", json::array()).at(0).find("keywords");
+        const bool kwIsArrayAfterEnc = kwAfterEnc != settings_.value("profiles", json::array()).at(0).end() && kwAfterEnc->is_array();
+        LOGF_LIFECYCLE(L"[SettingsManager] SaveSettings after encrypt keywords is_array=%d", kwIsArrayAfterEnc);
         std::ofstream file(settingsFile_);
         if (file) {
             file << settings_.dump(2);
