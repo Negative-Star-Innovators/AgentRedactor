@@ -657,6 +657,8 @@ void MainWindow::onSettingsChanged() {
     // Cheap full-reload trigger: profile mutations bump profilesRevision.
     const uint64_t revision = settings.value("profilesRevision", uint64_t{0});
     if (revision != prevProfilesRevision_) {
+        qInfo("[MainWindow] onSettingsChanged profilesRevision changed %llu -> %llu, dirty=%d",
+              prevProfilesRevision_, revision, dirty_);
         prevProfilesRevision_ = revision;
         if (!dirty_) reloadProfiles(true);
     }
@@ -802,6 +804,7 @@ void MainWindow::loadProfileIntoForm(int index) {
             for (auto& r : (*p)["regex_patterns"]) {
                 if (r.value("pattern", std::string()) == pat) r["enabled"] = enabled->isChecked();
             }
+            qInfo("[MainWindow] PutProfile from regex toggled, keywords=%zu", (*p)["keywords"].size());
             appState_->client().PutProfile(w(selectedProfileId()), *p);
         });
         connect(pattern, &QLineEdit::editingFinished, this, [this, pattern] {
@@ -819,6 +822,7 @@ void MainWindow::loadProfileIntoForm(int index) {
                 return;
             }
             dirty_ = true;
+            qInfo("[MainWindow] regex editingFinished -> onSaveProfile");
             onSaveProfile();
         });
         // Programmatic edits (AT-SPI) never fire editingFinished; without
@@ -833,6 +837,7 @@ void MainWindow::loadProfileIntoForm(int index) {
             arr.erase(std::remove_if(arr.begin(), arr.end(), [&](const json& r) {
                 return r.value("pattern", std::string()) == pat;
             }), arr.end());
+            qInfo("[MainWindow] PutProfile from regex delete, keywords=%zu", (*p)["keywords"].size());
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
                 appState_->client().RestartListeners();
                 reloadProfiles(true);
@@ -874,14 +879,17 @@ void MainWindow::loadProfileIntoForm(int index) {
             appState_->client().PutProfile(w(selectedProfileId()), *p);
         };
         connect(enabled, &QCheckBox::toggled, this, [this, mutateKeyword](bool on) {
+            qInfo("[MainWindow] PutProfile from keyword toggled");
             mutateKeyword([on](json& kw) { kw["enabled"] = on; });
         });
         connect(caseBtn, &QPushButton::clicked, this, [this, caseBtn, mutateKeyword] {
+            qInfo("[MainWindow] PutProfile from keyword case toggled");
             const bool newValue = caseBtn->text() == tr("Case: No");
             mutateKeyword([newValue](json& kw) { kw["case_sensitive"] = newValue; });
             caseBtn->setText(newValue ? tr("Case: Yes") : tr("Case: No"));
         });
         connect(text, &QLineEdit::editingFinished, this, [this] {
+            qInfo("[MainWindow] keyword editingFinished -> onSaveProfile");
             dirty_ = true;
             onSaveProfile();
         });
@@ -897,6 +905,7 @@ void MainWindow::loadProfileIntoForm(int index) {
             arr.erase(std::remove_if(arr.begin(), arr.end(), [&](const json& kw) {
                 return kw.value("text", std::string()) == t;
             }), arr.end());
+            qInfo("[MainWindow] PutProfile from keyword delete, keywords=%zu", (*p)["keywords"].size());
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
                 appState_->client().RestartListeners();
                 reloadProfiles(true);
@@ -1019,6 +1028,7 @@ bool MainWindow::validateForm(QString& error, bool& httpWarning) {
 void MainWindow::onSaveProfile() {
     json* p = selectedProfile();
     if (!p) return;
+    qInfo("[MainWindow] onSaveProfile keywordsInForm=%zu", gatherProfileFromForm().value("keywords", json::array()).size());
 
     QString error;
     bool httpWarning = false;
@@ -1134,6 +1144,7 @@ void MainWindow::onAddRegex() {
 
     (*p)["regex_patterns"].push_back(
         {{"pattern", Utils::WideToUtf8(normalized)}, {"enabled", true}});
+    qInfo("[MainWindow] onAddRegex PutProfile keywords=%zu", (*p)["keywords"].size());
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
         appState_->client().RestartListeners();
         newRegexBox_->clear();
@@ -1148,6 +1159,7 @@ void MainWindow::onAddKeyword() {
 
     (*p)["keywords"].push_back({{"text", text.toStdString()},
         {"case_sensitive", newKeywordCaseCheck_->isChecked()}, {"enabled", true}});
+    qInfo("[MainWindow] onAddKeyword PutProfile keywords=%zu", (*p)["keywords"].size());
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
         appState_->client().RestartListeners();
         newKeywordBox_->clear();
@@ -1245,6 +1257,7 @@ void MainWindow::onClearStatistics() {
     (*p)["stats"] = {{"total_requests", 0}, {"total_pii_detected", 0},
         {"total_regex_matches", 0}, {"total_keyword_matches", 0},
         {"pii_type_breakdown", json::object()}};
+    qInfo("[MainWindow] onClearStatistics PutProfile keywords=%zu", (*p)["keywords"].size());
     appState_->client().PutProfile(w(selectedProfileId()), *p);
     reloadProfiles(true);
 }
