@@ -124,12 +124,13 @@ EOF
 # wrapper lives at stage root; Velopack promotes it to usr/bin/ and the
 # generated desktop entry Exec=agentredactor-gui is resolved through PATH.
 cat > "${STAGE}/agentredactor-gui" <<'EOF'
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # In the packed AppImage this script is at $APPDIR/usr/bin/; its directory
-# is where all bundled libraries live.
+# is where all bundled libraries live. Keep argv[0] as 'agentredactor-gui'
+# so process-name detection (psutil, single-instance guard) stays consistent.
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export LD_LIBRARY_PATH="${HERE}:${LD_LIBRARY_PATH:-}"
-exec "${HERE}/agentredactor-gui.real" "$@"
+exec -a agentredactor-gui "${HERE}/agentredactor-gui.real" "$@"
 EOF
 chmod +x "${STAGE}/agentredactor-gui"
 
