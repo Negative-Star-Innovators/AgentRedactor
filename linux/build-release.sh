@@ -58,8 +58,8 @@ echo "==> Staging AppDir at ${STAGE}"
 rm -rf "${STAGE}" "${OUT}"
 mkdir -p "${STAGE}/plugins"
 
-cp "${BUILD}/gui/agentredactor-gui" "${STAGE}/"
-cp "${BUILD}/engine/agentredactor" "${STAGE}/"
+cp "${BUILD}/gui/agentredactor-gui" "${STAGE}/agentredactor-gui.real"
+cp "${BUILD}/engine/agentredactor" "${STAGE}/agentredactor"
 # DT_NEEDED records the lib-prefixed name (see gui/CMakeLists.txt).
 cp "${ROOT}/third_party/velopack/lib/velopack_libc_linux_${VP_ARCH}_gnu.so" \
     "${STAGE}/libvelopack_libc_linux_${VP_ARCH}_gnu.so"
@@ -79,7 +79,7 @@ cp "${MODELS_SRC}/onnx/model_quantized.onnx" "${STAGE}/models/onnx/"
 # Bundle the shared libraries the two binaries resolve to, minus the
 # AppImage-standard system set that must come from the host.
 EXCLUDE='^(linux-vdso|ld-linux|libc|libm|libdl|librt|libpthread|libresolv|libnsl|libutil|libz|libGL|libEGL|libX11|libxcb|libXau|libXdmcp|libdrm|libgbm|libwayland-|libxkbcommon|libfontconfig|libfreetype|libexpat|libdbus-1|libsystemd|libglib-2.0|libgobject-2.0|libgio-2.0)\.so'
-for bin in "${STAGE}/agentredactor-gui" "${STAGE}/agentredactor"; do
+for bin in "${STAGE}/agentredactor-gui.real" "${STAGE}/agentredactor"; do
     ldd "${bin}" | awk '/=> \// {print $1, $3}' | while read -r name path; do
         if [[ "${name}" =~ ${EXCLUDE} ]]; then continue; fi
         cp -n "${path}" "${STAGE}/${name}" || true
@@ -116,6 +116,23 @@ bundled Qt libraries with your own build. Qt source code is available from
 https://download.qt.io/official_releases/qt/ and corresponding source for the
 exact bundled version on request.
 EOF
+
+# Velopack's generated AppRun only sets PATH, so transitive library deps
+# (QtCore -> ICU, curl -> OpenSSL) can resolve to incompatible host copies.
+# Make the main executable a small shell wrapper that points LD_LIBRARY_PATH
+# at the bundled library directory before exec-ing the real GUI binary. The
+# wrapper lives at stage root; Velopack promotes it to usr/bin/ and the
+# generated desktop entry Exec=agentredactor-gui is resolved through PATH.
+cat > "${STAGE}/agentredactor-gui" <<'EOF'
+#!/usr/bin/env bash
+# In the packed AppImage this script is at $APPDIR/usr/bin/; its directory
+# is where all bundled libraries live. Keep argv[0] as 'agentredactor-gui'
+# so process-name detection (psutil, single-instance guard) stays consistent.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+export LD_LIBRARY_PATH="${HERE}:${LD_LIBRARY_PATH:-}"
+exec -a agentredactor-gui "${HERE}/agentredactor-gui.real" "$@"
+EOF
+chmod +x "${STAGE}/agentredactor-gui"
 
 echo "==> Packing Velopack release"
 vpk pack \
