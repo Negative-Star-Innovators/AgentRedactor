@@ -31,7 +31,7 @@ DEFAULT_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" /
 _PROCESS_NAMES = (
     ("agentredactorui.exe", "agentredactor.exe")
     if sys.platform == "win32"
-    else ("agentredactor",)
+    else ("agentredactor", "agentredactor-gui")
 )
 
 
