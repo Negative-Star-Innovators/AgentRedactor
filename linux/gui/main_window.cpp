@@ -678,7 +678,11 @@ void MainWindow::onConnectionLost() {
 
 void MainWindow::reloadProfiles(bool keepSelection) {
     json profiles;
-    if (!appState_->client().GetProfiles(profiles) || !profiles.is_array()) return;
+    if (!appState_->client().GetProfiles(profiles) || !profiles.is_array()) {
+        qWarning("[MainWindow] reloadProfiles: GetProfiles failed");
+        return;
+    }
+    qInfo("[MainWindow] reloadProfiles: got %zu profiles", profiles.size());
 
     if (profiles.empty()) {
         // Mirror the Windows GUI (HomePage::LoadProfileList): seed a default
@@ -735,6 +739,9 @@ void MainWindow::reloadProfiles(bool keepSelection) {
 
 void MainWindow::loadProfileIntoForm(int index) {
     if (index < 0 || index >= static_cast<int>(profiles_.size())) return;
+    const size_t kwCount = profiles_[index].value("keywords", json::array()).size();
+    const size_t rxCount = profiles_[index].value("regex_patterns", json::array()).size();
+    qInfo("[MainWindow] loadProfileIntoForm idx=%d keywords=%zu regexes=%zu", index, kwCount, rxCount);
     loading_ = true;
     const json& p = profiles_[index];
 
