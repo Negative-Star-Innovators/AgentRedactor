@@ -117,19 +117,29 @@ https://download.qt.io/official_releases/qt/ and corresponding source for the
 exact bundled version on request.
 EOF
 
-# Velopack's generated AppRun only sets PATH, so transitive library deps
-# (QtCore -> ICU, curl -> OpenSSL) can resolve to incompatible host copies.
-# Make the main executable a small shell wrapper that points LD_LIBRARY_PATH
-# at the bundled library directory before exec-ing the real GUI binary. The
-# wrapper lives at stage root; Velopack promotes it to usr/bin/ and the
-# generated desktop entry Exec=agentredactor-gui is resolved through PATH.
+# Bundled shared objects come from the CI host and may have no RUNPATH, so
+# transitive deps (QtCore -> ICU, curl -> OpenSSL) would resolve to the
+# user's host copies, which can be a different version. Force every ELF in
+# the AppDir to search its own directory first via RUNPATH=$ORIGIN. This is
+# more targeted than LD_LIBRARY_PATH and avoids pulling incompatible host
+# libs (e.g. host libgio needing a newer libmount than the bundled one).
+echo "==> Setting RUNPATH=\$ORIGIN on bundled binaries and libraries"
+command -v patchelf >/dev/null 2>&1 || { echo "ERROR: patchelf is required; install it with 'sudo apt-get install patchelf'" >&2; exit 1; }
+find "${STAGE}" -maxdepth 1 -type f \( -name '*.so' -o -name '*.so.*' \) -print0 | while IFS= read -r -d '' so; do
+    patchelf --set-rpath '$ORIGIN' "$so" 2>/dev/null || true
+done
+patchelf --set-rpath '$ORIGIN' "${STAGE}/agentredactor-gui.real"
+patchelf --set-rpath '$ORIGIN' "${STAGE}/agentredactor"
+
+# Velopack's generated AppRun only sets PATH. Use a tiny shell wrapper as the
+# main executable so the process name stays 'agentredactor-gui' (used by the
+# single-instance guard and test harnesses) while the real ELF is named
+# agentredactor-gui.real.
 cat > "${STAGE}/agentredactor-gui" <<'EOF'
 #!/usr/bin/env bash
-# In the packed AppImage this script is at $APPDIR/usr/bin/; its directory
-# is where all bundled libraries live. Keep argv[0] as 'agentredactor-gui'
-# so process-name detection (psutil, single-instance guard) stays consistent.
+# In the packed AppImage this script is at $APPDIR/usr/bin/; the real GUI
+# binary is right next to it and has RUNPATH=$ORIGIN for bundled libraries.
 HERE="$(cd "$(dirname "$0")" && pwd)"
-export LD_LIBRARY_PATH="${HERE}:${LD_LIBRARY_PATH:-}"
 exec -a agentredactor-gui "${HERE}/agentredactor-gui.real" "$@"
 EOF
 chmod +x "${STAGE}/agentredactor-gui"
