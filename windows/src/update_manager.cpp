@@ -93,8 +93,12 @@ std::filesystem::path FindUpdateExe() {
 // (Windows)" docs; restart-after-apply is the default, --norestart disables).
 std::wstring BuildApplyCommand(const std::filesystem::path& updateExe,
     const std::filesystem::path& packagePath, DWORD waitPid) {
+    // Pass --agentredactor-restarted as a restart argument so the new instance
+    // can wait for this process's single-instance mutex to be released before
+    // taking it. Velopack accepts extra app args after "--".
     return L"\"" + updateExe.wstring() + L"\" apply --package \"" + packagePath.wstring() +
-        L"\" --waitPid " + std::to_wstring(waitPid);
+        L"\" --waitPid " + std::to_wstring(waitPid) +
+        L" -- --agentredactor-restarted";
 }
 
 struct SemVersion { int parts[3] = { 0, 0, 0 }; bool valid = false; };
