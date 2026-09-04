@@ -513,7 +513,6 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
     }
 
     auto profile = *opt;
-    LOGF_LIFECYCLE(L"[EngineApp] HandleProxyRequest port=%d keywords=%zu", port, profile.keywords.size());
     profile.stats.totalRequests++;
 
     std::vector<std::pair<std::wstring, std::wstring>> headerVec;
@@ -819,8 +818,6 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
     profile.stats.totalPIIDetected += state.piiMap.size();
     profile.stats.totalRegexMatches += state.regexMap.size();
     profile.stats.totalKeywordMatches += state.keywordMap.size();
-    LOGF_LIFECYCLE(L"[EngineApp] UpdateProfile id=%s keywords=%zu keywordMatches=%zu",
-        profile.id.c_str(), profile.keywords.size(), state.keywordMap.size());
     settings_->UpdateProfile(profile);
 
     if (canStream) {
