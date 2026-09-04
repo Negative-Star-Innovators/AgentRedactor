@@ -6,7 +6,6 @@ numbers, secrets, and more) from outbound requests before they leave your
 machine — and un-redacting the responses coming back.
 
 - Windows: WinUI 3 (C++/WinRT) desktop app, self-contained Windows App SDK
-- Linux: Qt6 Widgets GUI shipped as a Velopack AppImage
 - Local HTTP proxy with on-device ONNX NER model — no cloud calls for detection
 - Custom keyword and regex redaction rules on top of model-based PII detection
 - Localized UI in 53 languages
