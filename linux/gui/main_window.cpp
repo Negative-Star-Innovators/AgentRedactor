@@ -59,6 +59,18 @@ QGroupBox* makeCard(const QString& title, QVBoxLayout*& layoutOut, QWidget* pare
     return box;
 }
 
+// Modal dialog that cannot be closed by the user. Used for the first-run
+// model download: the app cannot proxy traffic until the weights exist, so
+// the dialog must stay open (mirrors the Windows ContentDialog behavior).
+class NonDismissibleDialog : public QDialog {
+public:
+    using QDialog::QDialog;
+
+protected:
+    void closeEvent(QCloseEvent* event) override { event->ignore(); }
+    void reject() override { /* ignore Escape */ }
+};
+
 } // namespace
 
 MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* translator,
@@ -1330,15 +1342,28 @@ void MainWindow::updateModelDownloadDialog() {
     const bool failed = status.value("modelDownloadFailed", false);
 
     if (!required) {
-        if (modelDialog_) modelDialog_->hide();
+        if (modelDialog_) {
+            // Download finished (or was never needed): close the dialog, re-enable
+            // the main window, and let a future required download recreate it.
+            QDialog* d = modelDialog_;
+            modelDialog_ = nullptr;
+            modelStatusLabel_ = nullptr;
+            modelProgress_ = nullptr;
+            modelRetryBtn_ = nullptr;
+            if (auto* cw = centralWidget()) cw->setEnabled(true);
+            d->accept();
+            d->deleteLater();
+        }
         return;
     }
 
     if (!modelDialog_) {
-        modelDialog_ = new QDialog(this);
+        modelDialog_ = new NonDismissibleDialog(this);
         modelDialog_->setModal(true);
-        // No close button: the app cannot serve traffic until the weights exist.
-        modelDialog_->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+        // Keep a title bar but remove the close button; Escape is ignored in
+        // NonDismissibleDialog::reject(). The user can only Retry on failure.
+        modelDialog_->setWindowFlags((modelDialog_->windowFlags() & ~Qt::WindowCloseButtonHint)
+                                     | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
         auto* layout = new QVBoxLayout(modelDialog_);
         modelStatusLabel_ = new QLabel(modelDialog_);
         modelProgress_ = new QProgressBar(modelDialog_);
@@ -1366,7 +1391,15 @@ void MainWindow::updateModelDownloadDialog() {
         // Not started yet — kick it off.
         appState_->client().DownloadModel();
     }
-    if (!modelDialog_->isVisible()) modelDialog_->show();
+
+    if (!modelDialog_->isVisible()) {
+        // Block interaction with the main window (like Windows' ContentDialog)
+        // until the weights are present. The local event loop still processes
+        // status updates, so the progress bar updates live.
+        if (auto* cw = centralWidget()) cw->setEnabled(false);
+        modelDialog_->exec();
+        if (auto* cw = centralWidget()) cw->setEnabled(true);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1387,6 +1420,12 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+    if (modelDialog_ && modelDialog_->isVisible()) {
+        // The model download blocks the UI; don't allow close-to-tray while it
+        // is open (mirrors the Windows ContentDialog behavior).
+        event->ignore();
+        return;
+    }
     if (quitting_ || !tray_->available()) {
         // Real quit (control-panel mode: closing the window exits the GUI;
         // the engine keeps running).

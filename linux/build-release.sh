@@ -78,7 +78,7 @@ cp "${MODELS_SRC}/onnx/model_quantized.onnx" "${STAGE}/models/onnx/"
 
 # Bundle the shared libraries the two binaries resolve to, minus the
 # AppImage-standard system set that must come from the host.
-EXCLUDE='^(linux-vdso|ld-linux|libc|libm|libdl|librt|libpthread|libresolv|libnsl|libutil|libz|libGL|libEGL|libX11|libxcb|libXau|libXdmcp|libdrm|libgbm|libwayland-|libxkbcommon|libfontconfig|libfreetype|libexpat|libdbus-1|libsystemd|libglib-2.0|libgobject-2.0|libgio-2.0)\.so'
+EXCLUDE='^(linux-vdso.*|ld-linux.*|libc|libm|libdl|librt|libpthread|libresolv|libnsl|libutil|libz|libGL.*|libEGL.*|libX11(-.*)?|libxcb(-.*)?|libXau|libXdmcp|libdrm(-.*)?|libgbm|libwayland(-.*)?|libxkbcommon(-.*)?|libfontconfig|libfreetype|libexpat|libdbus-1|libsystemd|libglib-2\.0|libgobject-2\.0|libgio-2\.0)\.so'
 for bin in "${STAGE}/agentredactor-gui.real" "${STAGE}/agentredactor"; do
     ldd "${bin}" | awk '/=> \// {print $1, $3}' | while read -r name path; do
         if [[ "${name}" =~ ${EXCLUDE} ]]; then continue; fi
