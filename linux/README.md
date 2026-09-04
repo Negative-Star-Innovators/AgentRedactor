@@ -6,7 +6,7 @@ on Linux:
 ```bash
 sudo apt install -y build-essential cmake ninja-build pkg-config \
   libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
-  qt6-base-dev qt6-l10n-tools libgl1-mesa-dev \
+  qt6-base-dev qt6-l10n-tools libgl1-mesa-dev patchelf \
   python3-pytest python3-pytest-asyncio python3-aiohttp python3-psutil
 
 # onnxruntime is not packaged in apt; use the official linux-x64 tarball
