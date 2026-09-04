@@ -683,7 +683,7 @@ class AtspiGui:
         self.press_until(
             "delete keyword",
             lambda: self._keyword_row_child(text, "button", "Delete"),
-            lambda: text not in self.keywords,
+            lambda: text not in self.keywords(),
         )
 
     def add_regex(self, pattern: str) -> None:
