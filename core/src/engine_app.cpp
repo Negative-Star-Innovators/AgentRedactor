@@ -1108,6 +1108,7 @@ HttpResponse EngineApp::ApiUnlock(const std::string& body) {
 HttpResponse EngineApp::ApiGetProfiles() {
     json arr = json::array();
     for (auto p : settings_->GetProfiles()) {
+        LOGF_LIFECYCLE(L"[EngineApp] ApiGetProfiles profile id=%s keywords=%zu", p.id.c_str(), p.keywords.size());
         // Never leak the API key over the wire; the GUI only displays it masked.
         if (!p.apiKey.empty()) {
             p.apiKey = p.apiKey.substr(0, std::min<size_t>(3, p.apiKey.size())) + L"...****";
@@ -1150,6 +1151,9 @@ HttpResponse EngineApp::ApiPutProfile(const std::wstring& id, const std::string&
         return JsonResponse(404, "{\"error\": \"unknown profile\"}");
     }
     json j = json::parse(body);
+    LOGF_LIFECYCLE(L"[EngineApp] ApiPutProfile id=%s bodySize=%zu keywordsInBody=%zu",
+        id.c_str(), body.size(),
+        j.contains("keywords") && j["keywords"].is_array() ? j["keywords"].size() : SIZE_MAX);
     ApiKeyProfile profile = ApiKeyProfile::FromJson(j);
     profile.id = id;
     // A masked apiKey means "unchanged": keep the stored key.
