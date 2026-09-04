@@ -678,8 +678,13 @@ class AtspiGui:
         wait_until("keyword renamed", self.keywords, lambda ks: new in ks and old not in ks)
 
     def delete_keyword(self, text: str) -> None:
-        self.press_refound(lambda: self._keyword_row_child(text, "button", "Delete"))
-        wait_until("keyword deleted", self.keywords, lambda ks: text not in ks)
+        # Retry the delete press until the row actually disappears; a press
+        # that lands during the settings-poll reload can be swallowed.
+        self.press_until(
+            "delete keyword",
+            lambda: self._keyword_row_child(text, "button", "Delete"),
+            lambda: text not in self.keywords(),
+        )
 
     def add_regex(self, pattern: str) -> None:
         card = self.panel("Regex Patterns")

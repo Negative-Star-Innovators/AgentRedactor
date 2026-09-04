@@ -24,10 +24,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 _BUILD_PLATFORM = "ARM64" if platform.machine().upper() == "ARM64" else "x64"
 DEFAULT_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" / "AgentRedactorUI.exe"
 
-# Process image names to clean up between tests: the GUI and the engine it
-# spawns (the engine owns the proxy ports and the control API, so a stale one
-# would leak settings state and ports into the next test). On Linux only the
-# headless engine exists (no GUI yet) and binaries carry no .exe suffix.
+# Process image names to clean up between tests: the engine owns the proxy
+# ports and the control API, so a stale one would leak settings state and
+# ports into the next test. On Linux the GUI test harness (tests/linux/)
+# owns its own agentredactor-gui lifecycle; killing it here between regular
+# tests races the AT-SPI accessibility tree and can leave rows missing.
 _PROCESS_NAMES = (
     ("agentredactorui.exe", "agentredactor.exe")
     if sys.platform == "win32"

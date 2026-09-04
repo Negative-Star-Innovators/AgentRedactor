@@ -137,6 +137,29 @@ def _all_gui_processes() -> list[psutil.Process]:
     return out
 
 
+def _kill_all_gui_processes(timeout: float = 10.0) -> None:
+    """Terminate every agentredactor-gui process before launching an AppImage.
+
+    A stale GUI would cause the new AppImage's single-instance guard to
+    forward to it instead of starting the update flow.
+    """
+    targets = _all_gui_processes()
+    if not targets:
+        return
+    for p in targets:
+        try:
+            p.terminate()
+        except psutil.NoSuchProcess:
+            pass
+    gone, alive = psutil.wait_procs(targets, timeout=2.0)
+    for p in alive:
+        try:
+            p.kill()
+        except psutil.NoSuchProcess:
+            pass
+    psutil.wait_procs(alive, timeout=timeout)
+
+
 def _read_desktop_exec(path: Path) -> str:
     """Return the first token of the Exec= line from a .desktop file."""
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -162,10 +185,14 @@ def update_env(tmp_path: Path):
         pytest.skip("vpk (Velopack CLI) not installed")
     if not _fuse2_available():
         pytest.skip("libfuse2 is not installed (AppImage FUSE mount required for update test)")
+    # A stale GUI from an earlier test/run would make the AppImage forward to
+    # it through the single-instance guard, so clear all GUI processes first.
+    _kill_all_gui_processes()
     _kill_existing_agent_redactor()
     # No leftover staged packages from a previous run (theirs or ours).
     shutil.rmtree(VELOPACK_STATE, ignore_errors=True)
     yield tmp_path, vpk
+    _kill_all_gui_processes()
     _kill_existing_agent_redactor()
     for p in _gui_processes_for(tmp_path):
         try:

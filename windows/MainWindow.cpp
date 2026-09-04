@@ -339,8 +339,9 @@ namespace winrt::AgentRedactor::implementation
         if (!appWindow) return;
 
         auto titleBar = appWindow.TitleBar();
-        bool dark = IsSystemDarkMode();
+        if (!titleBar) return;
 
+        bool dark = IsSystemDarkMode();
         auto darkBg = Windows::UI::ColorHelper::FromArgb(255, 32, 32, 32);
         auto darkBtnHover = Windows::UI::ColorHelper::FromArgb(255, 50, 50, 50);
         auto darkBtnPressed = Windows::UI::ColorHelper::FromArgb(255, 60, 60, 60);

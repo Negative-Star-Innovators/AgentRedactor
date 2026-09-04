@@ -113,6 +113,27 @@ def _all_gui_processes() -> list[psutil.Process]:
     return out
 
 
+def _kill_all_gui_processes(timeout: float = 10.0) -> None:
+    """Terminate every agentredactor-gui process; needed before the upgrade
+    E2E because a stale GUI would cause the new AppImage's single-instance
+    guard to forward to it instead of starting fresh."""
+    targets = _all_gui_processes()
+    if not targets:
+        return
+    for p in targets:
+        try:
+            p.terminate()
+        except psutil.NoSuchProcess:
+            pass
+    gone, alive = psutil.wait_procs(targets, timeout=2.0)
+    for p in alive:
+        try:
+            p.kill()
+        except psutil.NoSuchProcess:
+            pass
+    psutil.wait_procs(alive, timeout=timeout)
+
+
 def _read_desktop_exec(path: Path) -> str:
     for raw in path.read_text(encoding="utf-8").splitlines():
         if raw.startswith("Exec="):
@@ -139,15 +160,14 @@ def upgrade_env(tmp_path: Path):
         )
     if not _fuse2_available():
         pytest.skip("libfuse2 is not installed (AppImage FUSE mount required for upgrade test)")
+    # A stale GUI from an earlier test/run would make the AppImage forward to
+    # it through the single-instance guard, so clear all GUI processes first.
+    _kill_all_gui_processes()
     _kill_existing_agent_redactor()
     shutil.rmtree(VELOPACK_STATE, ignore_errors=True)
     yield tmp_path, Path(prev), channel, Path(feed_dir)
+    _kill_all_gui_processes()
     _kill_existing_agent_redactor()
-    for p in _gui_processes_for(tmp_path):
-        try:
-            p.kill()
-        except psutil.NoSuchProcess:
-            pass
     shutil.rmtree(VELOPACK_STATE, ignore_errors=True)
 
 
