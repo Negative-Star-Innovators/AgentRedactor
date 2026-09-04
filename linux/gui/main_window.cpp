@@ -1363,12 +1363,20 @@ void MainWindow::updateModelDownloadDialog() {
     if (!modelDialog_) {
         modelDialog_ = new NonDismissibleDialog(this);
         modelDialog_->setModal(true);
-        // Keep a title bar but remove the close button; Escape is ignored in
-        // NonDismissibleDialog::reject(). The user can only Retry on failure.
-        modelDialog_->setWindowFlags((modelDialog_->windowFlags() & ~Qt::WindowCloseButtonHint)
-                                     | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+        // Frameless: no title bar, no min/max/close buttons, no OS decorations.
+        // We draw the title ourselves so the dialog matches Windows' ContentDialog
+        // and cannot be dismissed until the model is ready.
+        modelDialog_->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
         auto* layout = new QVBoxLayout(modelDialog_);
+        auto* titleLabel = new QLabel(tr("Downloading AI model"), modelDialog_);
+        QFont titleFont = titleLabel->font();
+        titleFont.setBold(true);
+        titleFont.setPointSize(titleFont.pointSize() + 2);
+        titleLabel->setFont(titleFont);
+        titleLabel->setAlignment(Qt::AlignCenter);
+        layout->addWidget(titleLabel);
         modelStatusLabel_ = new QLabel(modelDialog_);
+        modelStatusLabel_->setAlignment(Qt::AlignCenter);
         modelProgress_ = new QProgressBar(modelDialog_);
         modelProgress_->setRange(0, 100);
         modelRetryBtn_ = new QPushButton(modelDialog_);
@@ -1378,9 +1386,8 @@ void MainWindow::updateModelDownloadDialog() {
         });
         layout->addWidget(modelStatusLabel_);
         layout->addWidget(modelProgress_);
-        layout->addWidget(modelRetryBtn_, 0, Qt::AlignLeft);
+        layout->addWidget(modelRetryBtn_, 0, Qt::AlignCenter);
     }
-    modelDialog_->setWindowTitle(tr("Downloading AI model"));
     modelRetryBtn_->setText(tr("Retry"));
 
     const int percent = status.value("modelDownloadPercent", 0);
@@ -1399,6 +1406,11 @@ void MainWindow::updateModelDownloadDialog() {
         // Block interaction with the main window (like Windows' ContentDialog)
         // until the weights are present. The local event loop still processes
         // status updates, so the progress bar updates live.
+        modelDialog_->setMinimumWidth(360);
+        modelDialog_->adjustSize();
+        if (auto* parent = qobject_cast<QWidget*>(modelDialog_->parent())) {
+            modelDialog_->move(parent->frameGeometry().center() - modelDialog_->rect().center());
+        }
         if (auto* cw = centralWidget()) cw->setEnabled(false);
         modelDialog_->exec();
         if (auto* cw = centralWidget()) cw->setEnabled(true);

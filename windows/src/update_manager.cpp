@@ -316,6 +316,7 @@ void SetUiDispatch(UiDispatch dispatch) {
 }
 
 void CheckAndDownloadInBackground() {
+    LOGF_LIFECYCLE(L"[UpdateManager] Starting background update check (feed %s)", GetUpdateFeedUrl().c_str());
     RunPipeline(nullptr);
 }
 

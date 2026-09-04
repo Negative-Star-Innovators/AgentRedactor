@@ -212,6 +212,27 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     if (!ec && partialSize == kWeightsExpectedBytes) {
         ok = true;
     } else {
+        if (!ec && partialSize > kWeightsExpectedBytes) {
+            // Oversized partial means the previous attempt wrote garbage or the
+            // server reported a wrong length. Delete it so the next attempt
+            // starts clean instead of resuming from a corrupt offset forever.
+            LOGF_LIFECYCLE(L"[ModelDownloader] Deleting oversized partial (size %llu, expected %llu): %s",
+                static_cast<unsigned long long>(partialSize),
+                static_cast<unsigned long long>(kWeightsExpectedBytes),
+                partial.wstring().c_str());
+            std::filesystem::remove(partial, ec);
+        }
+        // Also drop any stale segmented part files from an earlier attempt; an
+        // updated server or changed total size can leave them inconsistent.
+        for (size_t i = 0; i < 16; ++i) {
+            auto part = partial;
+            part += L".part" + std::to_wstring(i);
+            std::error_code partEc;
+            if (std::filesystem::exists(part, partEc)) {
+                LOGF_LIFECYCLE(L"[ModelDownloader] Removing stale segment file: %s", part.wstring().c_str());
+                std::filesystem::remove(part, partEc);
+            }
+        }
         for (const auto* url : kWeightsUrls) {
             LOGF_LIFECYCLE(L"[ModelDownloader] Downloading model weights (~1.6 GB) from %s", url);
             ok = Utils::HttpDownloadFileSegmented(url, partial, progressCallback);

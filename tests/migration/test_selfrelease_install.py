@@ -169,6 +169,19 @@ def _assert_own_updater_healthy(current_exe: Path, install_root: Path,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    # Wait until the server is actually accepting connections so the app's
+    # first update check does not race a not-yet-ready listener.
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        try:
+            with socket.create_connection(("127.0.0.1", port), timeout=1):
+                break
+        except OSError:
+            time.sleep(0.2)
+    else:
+        server.kill()
+        pytest.fail(f"local feed server on port {port} did not become ready")
+
     env = {
         **os.environ,
         "AGENTREDACTOR_UPDATE_FEED": f"http://127.0.0.1:{port}",

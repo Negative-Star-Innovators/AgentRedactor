@@ -569,7 +569,9 @@ bool HttpGetInternal(const std::wstring& url,
         if (uc.dwExtraInfoLength > 0) path += std::wstring(uc.lpszExtraInfo, uc.dwExtraInfoLength);
         if (path.empty()) path = L"/";
 
-        WinHttpHandle session{ WinHttpOpen(L"AgentRedactor/1.0", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+        // NO_PROXY avoids WPAD auto-detection hangs in CI and is correct for
+        // our direct HTTPS downloads (model weights, update feed, packages).
+        WinHttpHandle session{ WinHttpOpen(L"AgentRedactor/1.0", WINHTTP_ACCESS_TYPE_NO_PROXY,
             WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0) };
         if (!session.h) return false;
         WinHttpHandle connect{ WinHttpConnect(session.h, host.c_str(), uc.nPort, 0) };
