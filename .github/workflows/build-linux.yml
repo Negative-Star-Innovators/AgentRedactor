@@ -140,7 +140,6 @@ jobs:
             /tmp/pytest-of-runner/**/gui_atspi.log
             /tmp/pytest-of-runner/**/atspi_tree_dump.txt
             /tmp/pytest-of-runner/**/config/agent_redactor.log
-            /tmp/pytest-of-runner/**/config/settings.json
           retention-days: 14
 
       - name: Set up .NET (for vpk)
