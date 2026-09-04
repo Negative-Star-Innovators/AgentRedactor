@@ -295,7 +295,7 @@ void SettingsManager::DecryptSensitiveFields() {
                     LOGF_LIFECYCLE(L"[SettingsManager] DecryptSensitiveFields keywords parsed size=%zu", field.size());
                 } catch (...) {
                     field = json::array();
-                    LOGF_LIFECYCLE(L"[SettingsManager] DecryptSensitiveFields keywords parse failed");
+                    LOG_LIFECYCLE(L"[SettingsManager] DecryptSensitiveFields keywords parse failed");
                 }
             }
         }
