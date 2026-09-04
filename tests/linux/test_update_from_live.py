@@ -204,46 +204,23 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
             "XDG_CONFIG_HOME": str(home_dir / ".config"),
             "XDG_DATA_HOME": str(home_dir / ".local" / "share"),
         })
-        out_path = tmp_path / "app.stdout.log"
-        err_path = tmp_path / "app.stderr.log"
-        with out_path.open("w") as out_f, err_path.open("w") as err_f:
-            proc = subprocess.Popen([str(app)], env=env,
-                                    stdout=out_f, stderr=err_f)
-            original_pid = proc.pid
+        proc = subprocess.Popen([str(app)], env=env,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        original_pid = proc.pid
 
-            deadline = time.monotonic() + POLL_TIMEOUT_S
-            upgraded = False
-            while time.monotonic() < deadline:
-                time.sleep(POLL_INTERVAL_S)
-                try:
-                    if app.is_file() and _sha256(app) != before:
-                        upgraded = True
-                        break
-                except OSError:
-                    continue
-            if not upgraded:
-                proc.kill()
-                try:
-                    proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    pass
-                stdout_text = out_path.read_text(encoding="utf-8", errors="replace")
-                stderr_text = err_path.read_text(encoding="utf-8", errors="replace")
-                # Dump Velopack state for post-mortem.
-                state_lines: list[str] = []
-                if VELOPACK_STATE.is_dir():
-                    for p in sorted(VELOPACK_STATE.rglob("*")):
-                        try:
-                            state_lines.append(f"{p.relative_to(VELOPACK_STATE)} size={p.stat().st_size}")
-                        except OSError:
-                            state_lines.append(str(p))
-                pytest.fail(
-                    f"AppImage was not upgraded to v{expected} within {POLL_TIMEOUT_S}s.\n"
-                    f"process alive={proc.poll() is None} returncode={proc.poll()}\n"
-                    f"--- stdout ---\n{stdout_text}\n"
-                    f"--- stderr ---\n{stderr_text}\n"
-                    f"--- velopack state ({VELOPACK_STATE}) ---\n" + "\n".join(state_lines)
-                )
+        deadline = time.monotonic() + POLL_TIMEOUT_S
+        upgraded = False
+        while time.monotonic() < deadline:
+            time.sleep(POLL_INTERVAL_S)
+            try:
+                if app.is_file() and _sha256(app) != before:
+                    upgraded = True
+                    break
+            except OSError:
+                continue
+        if not upgraded:
+            proc.kill()
+            pytest.fail(f"AppImage was not upgraded to v{expected} within {POLL_TIMEOUT_S}s")
 
         # Velopack replaces the AppImage and restarts the GUI; wait for the new
         # instance to be alive so the engine is reachable for --cli status.
