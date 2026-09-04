@@ -110,9 +110,20 @@ void AppUpdateManager::onWorkFinished(QString version, QString error, bool userI
 
 void AppUpdateManager::ApplyAndRestart() {
     if (!impl_->pending.has_value()) return;
+
+    // Preserve the original launch arguments (e.g. --tray-only) across the
+    // Velopack restart. argv[0] is the executable path and must be excluded;
+    // Velopack restarts the AppImage file itself and appends these args.
+    std::vector<std::string> restartArgs;
+    const QStringList allArgs = QCoreApplication::arguments();
+    for (int i = 1; i < allArgs.size(); ++i) {
+        restartArgs.push_back(allArgs[i].toStdString());
+    }
+
     try {
         Velopack::UpdateManager manager(GetUpdateFeedUrl());
-        manager.WaitExitThenApplyUpdates(impl_->pending.value());
+        manager.WaitExitThenApplyUpdates(impl_->pending.value(), /*silent=*/false,
+            /*restart=*/true, std::move(restartArgs));
     } catch (const std::exception& e) {
         qWarning("[UpdateManager] apply failed: %s", e.what());
         emit checkFailed(QString::fromUtf8(e.what()), true);

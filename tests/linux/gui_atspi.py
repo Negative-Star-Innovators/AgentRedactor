@@ -386,7 +386,8 @@ class AtspiGui:
         raise last  # type: ignore[misc]
 
     def press_until(self, description: str, finder: Callable[[], Any],
-                    predicate: Callable[[], bool], timeout: float = 30.0) -> None:
+                    predicate: Callable[[], bool], timeout: float = 30.0,
+                    interval: float = 1.0) -> None:
         """Press, then verify the effect; re-press if the click was lost.
 
         A press that lands while the settings-poll reload is rebuilding the
@@ -406,7 +407,7 @@ class AtspiGui:
                 finder().get_action_iface().do_action(0)
             except (GLib.GError, AssertionError) as exc:
                 last = exc
-            time.sleep(1.0)
+            time.sleep(interval)
         raise AssertionError(f"press_until({description}) never took effect; last: {last!r}")
 
     def set_text_refound(self, finder: Callable[[], Any], value: str) -> None:
@@ -727,8 +728,16 @@ class AtspiGui:
         )
 
     def delete_regex(self, pattern: str) -> None:
-        self.press_refound(lambda: self._regex_row_child(pattern, "button", "Delete"))
-        wait_until("regex deleted", self.regexes, lambda rs: pattern not in rs)
+        # ARM64 CI can be slow enough that the settings-poll rebuild collides
+        # with the accessible click; retry rapidly and for longer.
+        time.sleep(0.5)
+        self.press_until(
+            f"regex {pattern!r} deleted",
+            lambda: self._regex_row_child(pattern, "button", "Delete"),
+            lambda: pattern not in self.regexes(),
+            timeout=60.0,
+            interval=0.25,
+        )
 
     # -- PII / detection ---------------------------------------------------------
 

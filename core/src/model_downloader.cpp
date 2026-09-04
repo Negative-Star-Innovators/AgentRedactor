@@ -127,7 +127,10 @@ bool RefreshCompanions(const std::filesystem::path& fallbackModelDir, bool weigh
         std::error_code ec;
         if (!std::filesystem::exists(src, ec)) {
             if (!weightsPresent) {
-                LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe: %s", src.wstring().c_str());
+                LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe (exe dir: %s): %s",
+                    exeModels.wstring().c_str(), src.wstring().c_str());
+                LOG_LIFECYCLE(L"[ModelDownloader] Cannot download model weights without the bundled model bundle; "
+                    L"the app package or dev build is missing its models/ directory.");
                 return false;
             }
             continue;  // nothing bundled (dev layout); keep the existing dest
@@ -182,9 +185,12 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     std::error_code ec;
     std::filesystem::create_directories(weightsDest.parent_path(), ec);
     if (ec) {
-        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s", weightsDest.parent_path().wstring().c_str());
+        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s: %s",
+            weightsDest.parent_path().wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
         return false;
     }
+
+    LOGF_LIFECYCLE(L"[ModelDownloader] Weights will be downloaded to %s", weightsDest.wstring().c_str());
 
     auto lastPercent = -1;
     auto progressCallback = [&](uint64_t downloaded, uint64_t total) {

@@ -1,6 +1,7 @@
 #include "autostart.h"
 
 #include <QCoreApplication>
+#include <QtDebug>
 
 #include <cstdlib>
 #include <fstream>
@@ -45,7 +46,18 @@ std::filesystem::path ResolveExecPath() {
     if (const char* appImage = std::getenv("APPIMAGE"); appImage && *appImage) {
         return std::filesystem::path(appImage);
     }
-    return QCoreApplication::applicationFilePath().toStdString();
+    // If $APPIMAGE is missing but we are running from an AppImage mount, there
+    // is no stable path to persist. Return empty so callers can skip writing
+    // entries that would break on the next launch.
+    const std::string exe = QCoreApplication::applicationFilePath().toStdString();
+    if (exe.rfind("/tmp/.mount_", 0) == 0) {
+        return {};
+    }
+    return std::filesystem::path(exe);
+}
+
+bool HasStableExecPath() {
+    return !ResolveExecPath().empty();
 }
 
 std::string DesktopFileContents() {
@@ -72,11 +84,69 @@ bool IsUpToDate() {
         std::istreambuf_iterator<char>()) == DesktopFileContents();
 }
 
+// Parse the Exec= line from an existing .desktop file and return the first
+// quoted/unquoted argument (the executable path). Returns empty on parse failure.
+std::filesystem::path ReadExistingExecPath() {
+    std::ifstream in(DesktopFilePath(), std::ios::binary);
+    if (!in) return {};
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.rfind("Exec=", 0) != 0) continue;
+        std::string rest = line.substr(5);
+        // Strip trailing \r if the file uses CRLF.
+        if (!rest.empty() && rest.back() == '\r') rest.pop_back();
+        std::string path;
+        bool inQuotes = false;
+        for (size_t i = 0; i < rest.size(); ++i) {
+            char c = rest[i];
+            if (c == '\\' && i + 1 < rest.size()) {
+                path += rest[++i];
+                continue;
+            }
+            if (c == '"') {
+                inQuotes = !inQuotes;
+                continue;
+            }
+            if (!inQuotes && (c == ' ' || c == '\t')) break;
+            path += c;
+        }
+        return std::filesystem::path(path);
+    }
+    return {};
+}
+
+bool ExistingEntryIsValid() {
+    const auto exec = ReadExistingExecPath();
+    if (exec.empty()) return false;
+    std::error_code ec;
+    return std::filesystem::exists(exec, ec) &&
+           std::filesystem::is_regular_file(exec, ec);
+}
+
 void SetEnabled(bool enabled) {
     const auto path = DesktopFilePath();
     if (!enabled) {
         std::error_code ec;
         std::filesystem::remove(path, ec);
+        return;
+    }
+    if (!HasStableExecPath()) {
+        // Running inside an AppImage without $APPIMAGE (e.g. extract-and-run).
+        // Do not overwrite an existing stable entry with a transient path, and
+        // do not create a broken new one. If the existing entry already points
+        // at a missing file, remove it so the user is not left with a dead
+        // launcher.
+        if (std::filesystem::exists(path)) {
+            if (ExistingEntryIsValid()) {
+                qInfo("[Autostart] Keeping existing autostart entry (no $APPIMAGE this launch)");
+            } else {
+                qWarning("[Autostart] Removing stale autostart entry: executable no longer exists");
+                std::error_code ec;
+                std::filesystem::remove(path, ec);
+            }
+        } else {
+            qWarning("[Autostart] Skipping autostart entry: no stable AppImage path ($APPIMAGE missing)");
+        }
         return;
     }
     std::filesystem::create_directories(path.parent_path());

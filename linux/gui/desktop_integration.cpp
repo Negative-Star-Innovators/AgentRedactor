@@ -59,12 +59,17 @@ void InstallIcons() {
 }
 
 void InstallDesktopEntry() {
+    const auto execPath = Autostart::ResolveExecPath();
+    if (execPath.empty()) {
+        qWarning("[DesktopIntegration] Skipping applications-menu entry: no stable AppImage path ($APPIMAGE missing)");
+        return;
+    }
     std::ostringstream ss;
     ss << "[Desktop Entry]\n"
        << "Type=Application\n"
        << "Name=Agent Redactor\n"
        << "Comment=Local PII redaction proxy for AI agents\n"
-       << "Exec=" << QuoteExecArg(Autostart::ResolveExecPath().string()) << "\n"
+       << "Exec=" << QuoteExecArg(execPath.string()) << "\n"
        << "Icon=agentredactor\n"
        << "Terminal=false\n"
        << "Categories=Utility;Security;\n"

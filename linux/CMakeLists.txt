@@ -38,3 +38,16 @@ endif()
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/gui/CMakeLists.txt)
     add_subdirectory(gui)
 endif()
+
+# Stage model companion files next to the dev build binaries so a local build
+# can refresh them into the fallback model dir and download the ~1.6 GB weights
+# on first run. The large weights file (*.onnx_data) is intentionally excluded.
+set(AR_MODELS_SRC ${CMAKE_CURRENT_SOURCE_DIR}/../windows/models)
+if (EXISTS ${AR_MODELS_SRC})
+    foreach(_dest ${CMAKE_BINARY_DIR}/engine/models ${CMAKE_BINARY_DIR}/gui/models)
+        file(COPY ${AR_MODELS_SRC}/ DESTINATION ${_dest}
+            FILES_MATCHING
+                PATTERN "*.json"
+                PATTERN "onnx/model_quantized.onnx")
+    endforeach()
+endif()

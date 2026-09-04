@@ -94,11 +94,11 @@ ApiKeyProfile ApiKeyProfile::FromJson(const json& j) {
     ApiKeyProfile profile;
     if (j.contains("id")) profile.id = Utils::Utf8ToWide(j.at("id").get<std::string>());
     if (j.contains("alias")) profile.alias = Utils::Utf8ToWide(j.at("alias").get<std::string>());
-    if (j.contains("upstream_url")) profile.upstreamUrl = Utils::Utf8ToWide(j.at("upstream_url").get<std::string>());
+    if (j.contains("upstream_url")) profile.upstreamUrl = Utils::Trim(Utils::Utf8ToWide(j.at("upstream_url").get<std::string>()));
     if (j.contains("api_key")) {
         const auto& keyField = j.at("api_key");
         if (keyField.is_string()) {
-            profile.apiKey = Utils::Utf8ToWide(keyField.get<std::string>());
+            profile.apiKey = Utils::Trim(Utils::Utf8ToWide(keyField.get<std::string>()));
         } else if (keyField.is_object() && keyField.contains("_enc")) {
             // Encrypted format - SettingsManager will decrypt before passing to us.
             // If we see this, the key hasn't been decrypted yet.

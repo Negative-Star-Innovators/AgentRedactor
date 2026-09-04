@@ -114,9 +114,40 @@ the .NET SDK and the pinned Velopack CLI
 linux/build-release.sh    # Release build (-DAR_SELFRELEASE=ON) + AppDir + vpk pack
 ```
 
-Artifacts land in `linux/build-release/velopack/`: `AgentRedactor.AppImage`
-(fixed-name installer/portable binary), `*-linux-full.nupkg` and
-`releases.linux.json` (the update feed). Upload mirrors the Windows workflow:
+Artifacts land in `linux/build-release/velopack/`:
+- x64: `AgentRedactor.AppImage`
+- ARM64: `AgentRedactor-linux-arm64.AppImage`
+- `*-linux-full.nupkg` and `releases.<channel>.json` (the update feed)
+
+### Running the AppImage locally
+
+AppImages need a FUSE 2 runtime. On Ubuntu 24.04 and other distros that ship
+FUSE 3 only, install `libfuse2` (package name may be `libfuse2t64`):
+
+```bash
+sudo apt install libfuse2   # or libfuse2t64 on Ubuntu 24.04
+```
+
+Then make the AppImage executable and run it:
+
+```bash
+chmod +x linux/build-release/velopack/AgentRedactor.AppImage
+./linux/build-release/velopack/AgentRedactor.AppImage
+# Start hidden to the system tray:
+./linux/build-release/velopack/AgentRedactor.AppImage --tray-only
+# Use the bundled CLI:
+./linux/build-release/velopack/AgentRedactor.AppImage --cli status
+```
+
+If FUSE is unavailable, extract and run as a fallback:
+
+```bash
+./AgentRedactor.AppImage --appimage-extract-and-run
+```
+
+### Publishing
+
+Upload mirrors the Windows workflow:
 
 ```bash
 vpk upload s3 --bucket agentredactor-releases \
@@ -125,17 +156,24 @@ vpk upload s3 --bucket agentredactor-releases \
   --prefix linux -c linux --outputDir linux/build-release/velopack
 ```
 
-Updater behavior: check at startup plus a "Check for updates" button in
-Settings (self-release builds only); when an update is downloaded the app
-offers "Restart now / later", applies via Velopack, and restarts. The engine
-binary ships inside the AppImage next to the GUI; on version mismatch the GUI
-stops and respawns it. Qt is bundled dynamically linked inside the AppImage
-with `LGPL-Qt-notice.txt`. First run exposes the CLI as
-`~/.local/bin/agentredactor`: a plain symlink in installed layouts, and under
-an AppImage a two-line wrapper that re-runs the AppImage file with `--cli`
-(the GUI binary then execs the bundled dual-mode engine/CLI binary; a symlink
-cannot reach inside the ephemeral mount). The wrapper is rewritten on every
-launch, so moving the AppImage self-heals on the next run.
+### Update behavior
+
+The app checks for updates at startup and offers a "Check for updates" button
+in Settings (self-release builds only). When an update is downloaded it shows
+"Restart now / later"; choosing restart applies the update via Velopack and
+relaunches the AppImage, preserving the original launch arguments such as
+`--tray-only`.
+
+The engine binary ships inside the AppImage next to the GUI; on version
+mismatch the GUI stops and respawns it. Qt is bundled dynamically linked
+inside the AppImage with `LGPL-Qt-notice.txt`.
+
+First run exposes the CLI as `~/.local/bin/agentredactor`: a plain symlink in
+installed layouts, and under an AppImage a two-line wrapper that re-runs the
+AppImage file with `--cli` (the GUI binary then execs the bundled dual-mode
+engine/CLI binary; a symlink cannot reach inside the ephemeral mount). The
+wrapper is rewritten on every launch, so moving the AppImage self-heals on the
+next run.
 
 Model files follow the Windows self-release split: the small companions
 (`config.json`, `tokenizer.json`, `viterbi_calibration.json`,
@@ -144,8 +182,14 @@ next to the binaries, while the ~1.6 GB `onnx/model_quantized.onnx_data`
 weights download on first run from the R2 endpoint into
 `~/.local/share/agentredactor/models/` (see `core/src/model_downloader.cpp`).
 
+### Tests
+
 Test hooks (self-release builds only, same contract as Windows):
 `AGENTREDACTOR_UPDATE_FEED` overrides the feed URL (loopback http only) and
 `AGENTREDACTOR_UPDATE_AUTOAPPLY=1` skips the restart prompt.
-`tests/linux/test_update_feed.py` runs the full pack-vNext → update → swap
-cycle against a local feed; it skips when the pack output or vpk is missing.
+
+- `tests/linux/test_update_feed.py` — packs a vNext release from the same
+  AppDir and asserts the shipped AppImage swaps itself, mounts, and runs.
+- `tests/linux/test_update_from_live.py` — downloads the previous live AppImage
+  from R2 and asserts it upgrades to the just-built release. Wired into the
+  `build-linux.yml` workflow.

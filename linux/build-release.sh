@@ -131,5 +131,17 @@ vpk pack \
     --categories "Utility;Security" \
     --outputDir "${OUT}"
 
+# Align the portable AppImage filename with the documented download URLs:
+# x64 keeps the original AgentRedactor.AppImage; ARM64 uses the arch-qualified
+# name because both channels are served from the same R2 bucket under different
+# prefixes. The nupkg/feed are unchanged (packId stays AgentRedactor).
+if [ "${CHANNEL}" = "linux-arm64" ]; then
+    target="${OUT}/AgentRedactor-linux-arm64.AppImage"
+    src=$(ls "${OUT}"/AgentRedactor*.AppImage 2>/dev/null | head -1)
+    if [ -n "$src" ] && [ "$src" != "$target" ]; then
+        mv "$src" "$target"
+    fi
+fi
+
 echo "==> Done. Artifacts in ${OUT}:"
 ls -la "${OUT}"
