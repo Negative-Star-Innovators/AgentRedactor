@@ -17,7 +17,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QMenuBar>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
@@ -469,18 +468,11 @@ void MainWindow::buildUi() {
     setCentralWidget(central);
     centralStack_->setCurrentIndex(0);
 
-    // Menu bar (titles set in retranslateUi).
-    fileMenu_ = menuBar()->addMenu(QString());
-    quitMenuAction_ = fileMenu_->addAction(QString());
-    connect(quitMenuAction_, &QAction::triggered, this, &MainWindow::onQuitRequested);
-
     retranslateUi();
 }
 
 void MainWindow::retranslateUi() {
     setWindowTitle(tr("Agent Redactor"));
-    fileMenu_->setTitle(tr("&File"));
-    quitMenuAction_->setText(tr("&Quit"));
     findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("Profile"));
     findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("Detection"));
     findChild<QGroupBox*>(QStringLiteral("regexCard"))->setTitle(tr("Regex Patterns"));

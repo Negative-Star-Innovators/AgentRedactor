@@ -16,7 +16,6 @@ class AppUpdateManager;
 class TrayIcon;
 class TranslatorLoader;
 
-class QAction;
 class QCheckBox;
 class QCloseEvent;
 class QComboBox;
@@ -24,7 +23,6 @@ class QDialog;
 class QLabel;
 class QLineEdit;
 class QListWidget;
-class QMenu;
 class QProgressBar;
 class QPushButton;
 class QStackedLayout;
@@ -111,10 +109,6 @@ private:
     AppState* appState_ = nullptr;
     TrayIcon* tray_ = nullptr;
     TranslatorLoader* translator_ = nullptr;
-
-    // Menu bar (kept for retranslateUi; built once in buildUi)
-    QMenu* fileMenu_ = nullptr;
-    QAction* quitMenuAction_ = nullptr;
 
     // Central stack: page 0 = content, page 1 = lock overlay.
     QStackedLayout* centralStack_ = nullptr;
