@@ -173,15 +173,6 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
         }
     }
 
-#ifdef AGENTREDACTOR_SELFRELEASE
-    // Velopack invokes the app with --veloapp-* lifecycle arguments (install,
-    // updated, obsolete, uninstall hooks); exit immediately so the installer
-    // is never blocked by the single-instance mutex or the UI.
-    if (lpCmdLine && wcsstr(lpCmdLine, L"--veloapp-") != nullptr) {
-        return 0;
-    }
-#endif
-
     {
         // Keep the previous run's crash details: rotate debug.log ->
         // debug.prev.log instead of deleting it (the "Fatal error" dialog
@@ -193,7 +184,27 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
         std::filesystem::create_directories(logDir, ec);
         std::filesystem::rename(logDir / L"debug.log", logDir / L"debug.prev.log", ec);
     }
-    DbgLog(L"wWinMain: started");
+    // Log the command line early to diagnose Velopack lifecycle/restart args.
+    if (lpCmdLine) {
+        std::wstring cmdLineLog = L"wWinMain: started, cmdLine=";
+        cmdLineLog += lpCmdLine;
+        DbgLog(cmdLineLog.c_str());
+    } else {
+        DbgLog(L"wWinMain: started, cmdLine=(null)");
+    }
+
+    // Velopack invokes the app with lifecycle hooks for install/updated/obsolete/
+    // uninstall. Only install/obsolete/uninstall are silent one-shot hooks; the
+    // "updated" hook means Update.exe just restarted the app after an upgrade,
+    // so we must continue normal startup (the single-instance mutex logic below
+    // handles any race with the previous process).
+    if (lpCmdLine &&
+        (wcsstr(lpCmdLine, L"--veloapp-install") != nullptr ||
+         wcsstr(lpCmdLine, L"--veloapp-obsolete") != nullptr ||
+         wcsstr(lpCmdLine, L"--veloapp-uninstall") != nullptr)) {
+        DbgLog(L"wWinMain: Velopack lifecycle hook, exiting");
+        return 0;
+    }
 
     // Velopack restart marker: Update.exe relaunches the app after applying an
     // update. The old process may still be releasing its single-instance mutex,
