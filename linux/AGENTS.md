@@ -5,7 +5,7 @@
 Run the local Linux build to catch compile errors before pushing. This should take seconds on a configured machine:
 
 ```bash
-cmake -B linux/build -G Ninja \
+cmake -S linux -B linux/build -G Ninja \
   -DONNXRUNTIME_INCLUDE_DIR="${ONNXRUNTIME_INCLUDE_DIR:-$HOME/onnxruntime/include}" \
   -DONNXRUNTIME_LIB="${ONNXRUNTIME_LIB:-$HOME/onnxruntime/lib/libonnxruntime.so}"
 cmake --build linux/build

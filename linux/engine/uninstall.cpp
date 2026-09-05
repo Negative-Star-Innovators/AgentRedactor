@@ -10,7 +10,9 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <signal.h>
 #include <string>
+#include <sys/types.h>
 #include <thread>
 #include <vector>
 
@@ -84,20 +86,20 @@ void StopOtherInstances() {
     if (targets.empty()) return;
 
     std::fprintf(stderr, "Stopping running Agent Redactor processes...\n");
-    for (pid_t pid : targets) std::kill(pid, SIGTERM);
+    for (pid_t pid : targets) ::kill(pid, SIGTERM);
 
     // Give them a moment to shut down gracefully.
     for (int i = 0; i < 20; ++i) {
         bool anyAlive = false;
         for (pid_t pid : targets) {
-            if (std::kill(pid, 0) == 0) anyAlive = true;
+            if (::kill(pid, 0) == 0) anyAlive = true;
         }
         if (!anyAlive) return;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     for (pid_t pid : targets) {
-        if (std::kill(pid, 0) == 0) std::kill(pid, SIGKILL);
+        if (::kill(pid, 0) == 0) ::kill(pid, SIGKILL);
     }
 }
 
@@ -173,7 +175,9 @@ void ScheduleSelfDelete(const fs::path& appImage) {
         quoted += c;
     }
     std::string script = "(sleep 2; rm -f \"" + quoted + "\") >/dev/null 2>&1 &";
-    std::system(script.c_str());
+    if (std::system(script.c_str()) < 0) {
+        std::fprintf(stderr, "Warning: failed to schedule AppImage deletion\n");
+    }
 }
 
 } // namespace
