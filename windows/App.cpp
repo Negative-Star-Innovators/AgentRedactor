@@ -195,11 +195,41 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
     }
     DbgLog(L"wWinMain: started");
 
+    // Velopack restart marker: Update.exe relaunches the app after applying an
+    // update. The old process may still be releasing its single-instance mutex,
+    // so a restart instance waits for that mutex instead of exiting immediately.
+    const bool isVelopackRestart = lpCmdLine && wcsstr(lpCmdLine, L"--agentredactor-restarted") != nullptr;
+
     HANDLE hMutex = CreateMutexW(nullptr, TRUE, L"AgentRedactor_WinUI3_Mutex");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
-        DbgLog(L"wWinMain: already running");
-        if (hMutex) { ReleaseMutex(hMutex); CloseHandle(hMutex); }
-        return 1;
+        if (isVelopackRestart && hMutex) {
+            DbgLog(L"wWinMain: restart detected; waiting for previous instance to release mutex");
+            constexpr DWORD kRestartMutexTimeoutMs = 30000;
+            DWORD wait = WaitForSingleObject(hMutex, kRestartMutexTimeoutMs);
+            if (wait == WAIT_OBJECT_0 || wait == WAIT_ABANDONED_0) {
+                ReleaseMutex(hMutex);
+                CloseHandle(hMutex);
+                // Re-create the mutex for this instance now that the previous
+                // process has exited.
+                hMutex = CreateMutexW(nullptr, TRUE, L"AgentRedactor_WinUI3_Mutex");
+                if (GetLastError() != ERROR_ALREADY_EXISTS) {
+                    DbgLog(L"wWinMain: mutex acquired after restart wait");
+                } else {
+                    DbgLog(L"wWinMain: another instance appeared during restart wait; exiting");
+                    if (hMutex) { ReleaseMutex(hMutex); CloseHandle(hMutex); }
+                    return 1;
+                }
+            } else {
+                DbgLog(L"wWinMain: timed out waiting for previous instance mutex; exiting");
+                ReleaseMutex(hMutex);
+                CloseHandle(hMutex);
+                return 1;
+            }
+        } else {
+            DbgLog(L"wWinMain: already running");
+            if (hMutex) { ReleaseMutex(hMutex); CloseHandle(hMutex); }
+            return 1;
+        }
     }
     DbgLog(L"wWinMain: mutex ok");
 

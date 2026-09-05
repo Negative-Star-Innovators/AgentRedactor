@@ -127,6 +127,23 @@ def _layout_listing(install_root: Path) -> str:
     return "\n".join(sorted(entries)[:200])
 
 
+def _debug_log_text() -> str:
+    """Return recent debug.log / debug.prev.log contents for failure diagnosis."""
+    app_data = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+    log_dir = app_data / "AgentRedactor"
+    out = []
+    for name in ("debug.log", "debug.prev.log"):
+        path = log_dir / name
+        if path.is_file():
+            try:
+                text = path.read_text(encoding="utf-8", errors="replace").strip()
+                if text:
+                    out.append(f"===== {name} =====\n{text[-4000:]}")
+            except Exception as e:
+                out.append(f"===== {name} (read error: {e}) =====")
+    return "\n\n".join(out) if out else "(no debug logs found)"
+
+
 def test_selfrelease_upgrade(tmp_path):
     prev_setup = os.environ.get("AGENTREDACTOR_PREV_SETUP")
     if not prev_setup or not Path(prev_setup).is_file():
@@ -256,7 +273,11 @@ def test_selfrelease_upgrade(tmp_path):
                     still_alive.append(p)
             except psutil.NoSuchProcess:
                 pass
-        assert still_alive, "Restarted app process died shortly after the upgrade"
+        if not still_alive:
+            pytest.fail(
+                "Restarted app process died shortly after the upgrade\n\n"
+                + _debug_log_text()
+            )
 
         # 7. Settings survived the upgrade and still migrate cleanly on the
         #    new build.
