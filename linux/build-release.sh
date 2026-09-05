@@ -149,6 +149,12 @@ cat > "${STAGE}/agentredactor-gui" <<'EOF'
 # In the packed AppImage this script is at $APPDIR/usr/bin/; the real GUI
 # binary is right next to it and has RUNPATH=$ORIGIN for bundled libraries.
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# GNOME/Wayland does not provide server-side window decorations, and the
+# bundled Qt Wayland client-side decoration plugin leaves the main window
+# without a title bar (no min/max/close buttons). Force the XCB/XWayland
+# platform so the host window manager draws the normal frame, while still
+# allowing an explicit user override (e.g. QT_QPA_PLATFORM=wayland).
+export QT_QPA_PLATFORM=${QT_QPA_PLATFORM:-xcb}
 exec -a agentredactor-gui "${HERE}/agentredactor-gui.real" "$@"
 EOF
 chmod +x "${STAGE}/agentredactor-gui"
