@@ -1,8 +1,0 @@
-set(__QT_DEPLOY_TARGET_agentredactor-core_FILE /home/polar/Documents/Projects/AgentRedactor/linux/linux/build/core/libagentredactor-core.a)
-set(__QT_DEPLOY_TARGET_agentredactor-core_TYPE STATIC_LIBRARY)
-set(__QT_DEPLOY_TARGET_agentredactor_FILE /home/polar/Documents/Projects/AgentRedactor/linux/linux/build/engine/agentredactor)
-set(__QT_DEPLOY_TARGET_agentredactor_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_core-smoke_FILE /home/polar/Documents/Projects/AgentRedactor/linux/linux/build/engine/core-smoke)
-set(__QT_DEPLOY_TARGET_core-smoke_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_agentredactor-gui_FILE /home/polar/Documents/Projects/AgentRedactor/linux/linux/build/gui/agentredactor-gui)
-set(__QT_DEPLOY_TARGET_agentredactor-gui_TYPE EXECUTABLE)
