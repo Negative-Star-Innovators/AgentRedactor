@@ -9,6 +9,7 @@
 #include "control_api_client.h"
 #include "utils.h"
 #include "logging.h"
+#include "uninstall.h"
 
 #include <csignal>
 #include <cstdio>
@@ -153,6 +154,9 @@ int main(int argc, char* argv[]) {
 
     if (args.empty() || args[0] == L"--console") {
         return RunEngine();
+    }
+    if (!args.empty() && args[0] == L"uninstall") {
+        return RunUninstaller(args);
     }
     return RunCliCommand(args);
 }

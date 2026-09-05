@@ -4,6 +4,7 @@ add_executable(agentredactor
     main.cpp
     control_api_client.cpp
     engine_loc.cpp
+    uninstall.cpp
 )
 target_link_libraries(agentredactor PRIVATE agentredactor-core)
 
