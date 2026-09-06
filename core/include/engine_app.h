@@ -90,6 +90,13 @@ private:
     bool modelDownloadRequired_ = false;
     bool modelDownloadInProgress_ = false;
     bool modelDownloadFailed_ = false;
+    bool modelDownloadWaitingToRetry_ = false;
+
+    // Retry signalling: StartModelDownloadIfNeeded() can wake a sleeping
+    // download thread so a manual retry happens immediately.
+    std::mutex retryMutex_;
+    std::condition_variable retryCv_;
+    bool retryNowRequested_ = false;
 
     // Monotonic counter bumped on every profile mutation; exposed via
     // /settings so the GUI poll can detect CLI-side profile changes

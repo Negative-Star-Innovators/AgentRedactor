@@ -221,18 +221,23 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
                 static_cast<unsigned long long>(kWeightsExpectedBytes),
                 partial.wstring().c_str());
             std::filesystem::remove(partial, ec);
-        }
-        // Also drop any stale segmented part files from an earlier attempt; an
-        // updated server or changed total size can leave them inconsistent.
-        for (size_t i = 0; i < 16; ++i) {
-            auto part = partial;
-            part += L".part" + std::to_wstring(i);
-            std::error_code partEc;
-            if (std::filesystem::exists(part, partEc)) {
-                LOGF_LIFECYCLE(L"[ModelDownloader] Removing stale segment file: %s", part.wstring().c_str());
-                std::filesystem::remove(part, partEc);
+            // The oversized partial means the segment layout is untrustworthy;
+            // remove the part files too so the next attempt starts clean.
+            for (size_t i = 0; i < 16; ++i) {
+                auto part = partial;
+                part += L".part" + std::to_wstring(i);
+                std::error_code partEc;
+                if (std::filesystem::exists(part, partEc)) {
+                    LOGF_LIFECYCLE(L"[ModelDownloader] Removing stale segment file: %s", part.wstring().c_str());
+                    std::filesystem::remove(part, partEc);
+                }
             }
         }
+        // Keep any existing .partN segment files: the segmented downloader
+        // resumes each segment individually, so a retry should not throw away
+        // already-downloaded data. They are only deleted when the .partial file
+        // itself is corrupt/oversized (above) or by the downloader when a part
+        // is oversized.
         for (const auto* url : kWeightsUrls) {
             LOGF_LIFECYCLE(L"[ModelDownloader] Downloading model weights (~1.6 GB) from %s", url);
             ok = Utils::HttpDownloadFileSegmented(url, partial, progressCallback);
