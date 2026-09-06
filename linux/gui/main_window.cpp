@@ -1354,10 +1354,9 @@ void MainWindow::updateModelDownloadDialog() {
 
     if (!modelDialog_) {
         modelDialog_ = new NonDismissibleDialog(this);
-        modelDialog_->setModal(true);
-        // Frameless: no title bar, no min/max/close buttons, no OS decorations.
-        // We draw the title ourselves so the dialog matches Windows' ContentDialog
-        // and cannot be dismissed until the model is ready.
+        // Non-modal: the window manager must still allow minimizing/closing the
+        // main window. We disable the central widget below to block interaction
+        // with the rest of the UI while the model downloads.
         modelDialog_->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
         auto* layout = new QVBoxLayout(modelDialog_);
         auto* titleLabel = new QLabel(tr("Downloading AI model"), modelDialog_);
