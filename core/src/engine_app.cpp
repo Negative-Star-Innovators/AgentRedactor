@@ -390,9 +390,17 @@ bool EngineApp::IsModelDownloadRequired() const {
 void EngineApp::StartModelDownloadIfNeeded() {
     {
         std::lock_guard lock(stateMutex_);
-        if (modelDownloadInProgress_) return;
+        if (modelDownloadInProgress_) {
+            // Already downloading or waiting between retries. Wake the sleeping
+            // thread immediately so a manual retry request takes effect now.
+            std::lock_guard retryLock(retryMutex_);
+            retryNowRequested_ = true;
+            retryCv_.notify_all();
+            return;
+        }
         modelDownloadInProgress_ = true;
         modelDownloadFailed_ = false;
+        modelDownloadWaitingToRetry_ = false;
         modelDownloadPercent_ = -1;
         modelDownloadStatus_.clear();
     }
@@ -408,10 +416,43 @@ void EngineApp::StartModelDownloadIfNeeded() {
         };
 
         bool ok = false;
-        try {
-            ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
-        } catch (...) {
-            ok = false;
+        int attempt = 0;
+        const int maxAttempts = 10;
+        int delayMs = 2000;
+        const int maxDelayMs = 60000;
+
+        while (!ok && attempt < maxAttempts) {
+            ++attempt;
+            LOGF_LIFECYCLE(L"[EngineApp] Model download attempt %d/%d", attempt, maxAttempts);
+            try {
+                ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
+            } catch (...) {
+                ok = false;
+            }
+
+            if (!ok && attempt < maxAttempts) {
+                std::unique_lock retryLock(retryMutex_);
+                retryNowRequested_ = false;
+                {
+                    std::lock_guard stateLock(stateMutex_);
+                    modelDownloadWaitingToRetry_ = true;
+                    modelDownloadStatus_ = Utils::FormatString(L"Retrying in %d s...", delayMs / 1000);
+                    modelDownloadPercent_ = -1;
+                }
+                bool woken = retryCv_.wait_for(retryLock, std::chrono::milliseconds(delayMs),
+                    [&] { return retryNowRequested_; });
+                {
+                    std::lock_guard stateLock(stateMutex_);
+                    modelDownloadWaitingToRetry_ = false;
+                }
+                if (woken && retryNowRequested_) {
+                    LOG_LIFECYCLE(L"[EngineApp] Manual retry requested; restarting immediately");
+                    attempt = 0;
+                    delayMs = 2000;
+                } else {
+                    delayMs = std::min(delayMs * 2, maxDelayMs);
+                }
+            }
         }
 
         if (ok) {
@@ -444,13 +485,14 @@ void EngineApp::StartModelDownloadIfNeeded() {
                 : L"[EngineApp] Model downloaded but detector initialization failed");
             ok = initOk;
         } else {
-            LOG_LIFECYCLE(L"[EngineApp] Model download failed");
+            LOGF_LIFECYCLE(L"[EngineApp] Model download failed after %d attempts", maxAttempts);
         }
 
         {
             std::lock_guard lock(stateMutex_);
             modelDownloadInProgress_ = false;
             modelDownloadFailed_ = !ok;
+            modelDownloadWaitingToRetry_ = false;
             modelDownloadPercent_ = ok ? 100 : -1;
             if (ok) modelDownloadRequired_ = false;
         }
@@ -945,6 +987,7 @@ HttpResponse EngineApp::ApiGetStatus() {
     j["modelDownloadRequired"] = modelDownloadRequired_;
     j["modelDownloadInProgress"] = modelDownloadInProgress_;
     j["modelDownloadFailed"] = modelDownloadFailed_;
+    j["modelDownloadWaitingToRetry"] = modelDownloadWaitingToRetry_;
     j["modelDownloadPercent"] = modelDownloadPercent_;
     j["modelDownloadStatus"] = Utils::WideToUtf8(modelDownloadStatus_);
     json profiles = json::array();

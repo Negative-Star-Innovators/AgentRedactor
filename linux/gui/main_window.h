@@ -25,6 +25,8 @@ class QLineEdit;
 class QListWidget;
 class QProgressBar;
 class QPushButton;
+class QShowEvent;
+class QHideEvent;
 class QStackedLayout;
 class QTimer;
 class QVBoxLayout;
@@ -46,6 +48,8 @@ public slots:
 protected:
     void closeEvent(QCloseEvent* event) override;
     void changeEvent(QEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:

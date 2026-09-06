@@ -2,7 +2,9 @@
 
 ## Before opening or updating a Linux pull request
 
-Run the local Linux build to catch compile errors before pushing. This should take seconds on a configured machine:
+Run the local build **and** the Linux test suite before pushing. This surfaces compile and runtime failures in seconds instead of waiting for the full GitHub Actions pipeline.
+
+1. Build:
 
 ```bash
 cmake -S linux -B linux/build -G Ninja \
@@ -11,18 +13,16 @@ cmake -S linux -B linux/build -G Ninja \
 cmake --build linux/build
 ```
 
-The build must pass before the PR is opened. Do not rely on CI as the first compile check.
-
-## Linux tests
-
-After the build succeeds, run the Linux test suite from the `tests/` directory:
+2. Test:
 
 ```bash
 cd tests
-python -m pytest linux -q
+python3 -m pytest linux -q
 ```
 
 The AT-SPI GUI tests require a display and the AT-SPI bindings; they skip cleanly without them.
+
+3. Push only after both steps pass. Do not rely on CI as the first compile or test check.
 
 ## Key files and concepts
 

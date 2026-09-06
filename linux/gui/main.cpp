@@ -112,6 +112,12 @@ void EnsureCliShim() {
         }
         if (!appImageEnv || !*appImageEnv) return; // extract-and-run: no stable path
 
+        // Never write a wrapper pointing at a non-existent AppImage. Tests and
+        // stale launchers can set APPIMAGE to a fake path; leaving the shim
+        // alone lets a previous valid install keep working.
+        std::error_code existsEc;
+        if (!fs::is_regular_file(fs::path(appImageEnv), existsEc)) return;
+
         std::error_code ec2;
         fs::create_directories(binDir, ec2);
         const std::string script = "#!/bin/sh\nexec \"" +

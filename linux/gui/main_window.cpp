@@ -21,7 +21,9 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QScreen>
+#include <QHideEvent>
 #include <QScrollArea>
+#include <QShowEvent>
 #include <QSplitter>
 #include <QStackedLayout>
 #include <QStatusBar>
@@ -58,16 +60,14 @@ QGroupBox* makeCard(const QString& title, QVBoxLayout*& layoutOut, QWidget* pare
     return box;
 }
 
-// Modal dialog that cannot be closed by the user. Used for the first-run
-// model download: the app cannot proxy traffic until the weights exist, so
-// the dialog must stay open (mirrors the Windows ContentDialog behavior).
+// Modal dialog that cannot be dismissed by the user via Escape, but can be
+// hidden programmatically while the main window is closed/minimized to tray.
 class NonDismissibleDialog : public QDialog {
 public:
     using QDialog::QDialog;
 
 protected:
-    void closeEvent(QCloseEvent* event) override { event->ignore(); }
-    void reject() override { /* ignore Escape */ }
+    void reject() override { /* ignore Escape and any external dismiss request */ }
 };
 
 } // namespace
@@ -1346,7 +1346,7 @@ void MainWindow::updateModelDownloadDialog() {
             modelProgress_ = nullptr;
             modelRetryBtn_ = nullptr;
             if (auto* cw = centralWidget()) cw->setEnabled(true);
-            d->accept();
+            d->hide();
             d->deleteLater();
         }
         return;
@@ -1354,11 +1354,10 @@ void MainWindow::updateModelDownloadDialog() {
 
     if (!modelDialog_) {
         modelDialog_ = new NonDismissibleDialog(this);
-        modelDialog_->setModal(true);
-        // Frameless: no title bar, no min/max/close buttons, no OS decorations.
-        // We draw the title ourselves so the dialog matches Windows' ContentDialog
-        // and cannot be dismissed until the model is ready.
-        modelDialog_->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        // Non-modal: the window manager must still allow minimizing/closing the
+        // main window. We disable the central widget below to block interaction
+        // with the rest of the UI while the model downloads.
+        modelDialog_->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
         auto* layout = new QVBoxLayout(modelDialog_);
         auto* titleLabel = new QLabel(tr("Downloading AI model"), modelDialog_);
         QFont titleFont = titleLabel->font();
@@ -1385,7 +1384,7 @@ void MainWindow::updateModelDownloadDialog() {
     const int percent = status.value("modelDownloadPercent", 0);
     modelProgress_->setValue(percent);
     modelStatusLabel_->setText(tr("The PII detection model is downloading (%1%).").arg(percent));
-    modelRetryBtn_->setEnabled(failed);
+    modelRetryBtn_->setEnabled(failed || status.value("modelDownloadWaitingToRetry", false));
     if (failed) {
         modelStatusLabel_->setText(tr("The model download failed. Check your internet "
             "connection, then retry. PII detection is unavailable until the download completes."));
@@ -1394,18 +1393,19 @@ void MainWindow::updateModelDownloadDialog() {
         appState_->client().DownloadModel();
     }
 
-    if (!modelDialog_->isVisible()) {
+    if (!modelDialog_->isVisible() && isVisible()) {
         // Block interaction with the main window (like Windows' ContentDialog)
-        // until the weights are present. The local event loop still processes
-        // status updates, so the progress bar updates live.
+        // until the weights are present. Using show() instead of exec() lets the
+        // user minimize or close-to-tray the main window while downloading.
         modelDialog_->setMinimumWidth(360);
         modelDialog_->adjustSize();
         if (auto* parent = qobject_cast<QWidget*>(modelDialog_->parent())) {
             modelDialog_->move(parent->frameGeometry().center() - modelDialog_->rect().center());
         }
         if (auto* cw = centralWidget()) cw->setEnabled(false);
-        modelDialog_->exec();
-        if (auto* cw = centralWidget()) cw->setEnabled(true);
+        modelDialog_->show();
+        modelDialog_->raise();
+        modelDialog_->activateWindow();
     }
 }
 
@@ -1427,11 +1427,10 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-    if (modelDialog_ && modelDialog_->isVisible()) {
-        // The model download blocks the UI; don't allow close-to-tray while it
-        // is open (mirrors the Windows ContentDialog behavior).
-        event->ignore();
-        return;
+    // Hide the modal download dialog while the main window is closed/minimized
+    // to tray; it will be re-shown when the window is reopened.
+    if (modelDialog_) {
+        modelDialog_->hide();
     }
     if (quitting_ || !tray_->available()) {
         // Real quit (control-panel mode: closing the window exits the GUI;
@@ -1449,7 +1448,22 @@ void MainWindow::openWindow() {
     showNormal();
     raise();
     activateWindow();
+    updateModelDownloadDialog();
     ensureLockState(true);
+}
+
+void MainWindow::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+    if (modelDialog_) {
+        updateModelDownloadDialog();
+    }
+}
+
+void MainWindow::hideEvent(QHideEvent* event) {
+    if (modelDialog_) {
+        modelDialog_->hide();
+    }
+    QMainWindow::hideEvent(event);
 }
 
 void MainWindow::onQuitRequested() {
