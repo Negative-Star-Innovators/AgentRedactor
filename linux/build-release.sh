@@ -157,8 +157,15 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 export QT_QPA_PLATFORM=${QT_QPA_PLATFORM:-xcb}
 # On GNOME/GTK desktops the default Qt platform theme does not follow the OS
 # dark/light preference. Load the bundled gtk3 platform theme so the GUI
-# respects the system theme and updates live when it changes.
-export QT_QPA_PLATFORMTHEME=${QT_QPA_PLATFORMTHEME:-gtk3}
+# respects the system theme and updates live when it changes. Skip it for
+# headless platforms (offscreen, minimal) because gtk3 needs a display/GTK
+# session and would abort the process in CI.
+if [ -z "${QT_QPA_PLATFORMTHEME+x}" ]; then
+    case "${QT_QPA_PLATFORM:-}" in
+        offscreen|minimal) ;;
+        *) export QT_QPA_PLATFORMTHEME=gtk3 ;;
+    esac
+fi
 exec -a agentredactor-gui "${HERE}/agentredactor-gui.real" "$@"
 EOF
 chmod +x "${STAGE}/agentredactor-gui"
