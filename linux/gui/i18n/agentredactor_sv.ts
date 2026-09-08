@@ -35,6 +35,10 @@
       <translation>Det gick inte att söka efter uppdateringar. Försök igen senare.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Så här använder du Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Förtroendetröskel:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiler</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurera din profil nedan (eller använd standardprofilen)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. peka din LLM-klient (Claude Code, OpenClaw, etc.) mot den lokala URL som visas nedan</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Vi sitter mellan din klient och det riktiga API:et. Allt stannar på din maskin. Känsliga data redigeras lokalt innan någon begäran lämnar din dator, vilket säkerställer att dina data aldrig når vår server</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adressen som din LLM-klient pekar på</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Den riktiga API-slutpunkten som tar emot dina redigerade begäranden</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI-driven detektion körs lokalt som ett extra försvarsskikt. Den kan missa data eller redigera för mycket. Använd Regex-mönster och Nyckelord nedan för deterministisk redigering.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Förvänta dig något långsammare svar när aktiverad. Modellen skannar varje meddelande lokalt.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Text som matchar dessa mönster redigeras innan den skickas till API:et</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Meddelanden som innehåller dessa ord markeras för redigering</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Faktiska redigeringar upptäckta i den aktuella sessionen.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Inga redigeringar i den aktuella sessionen.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Loggar lagras på den här datorn. Redakterade loggar kan fortfarande innehålla känslig data som missade upptäckten.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor är låst</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiler</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy-URL kopierad till urklipp</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 är tillgänglig</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 används redan</translation>
     </message>
     <message>
       <source>Wrong password.</source>

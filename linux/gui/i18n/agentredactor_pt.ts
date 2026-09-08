@@ -35,6 +35,10 @@
       <translation>Não foi possível procurar atualizações. Tente novamente mais tarde.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Como utilizar o Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Perfil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Limite de confiança:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Perfis</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Configure o seu perfil abaixo (ou utilize o predefinido)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Aponte o seu cliente LLM (Claude Code, OpenClaw, etc.) para o URL local apresentado abaixo</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Intermediamos entre o seu cliente e a API real. Tudo permanece na sua máquina. Os dados sensíveis são redigidos localmente antes de qualquer pedido sair do seu computador, garantindo que os seus dados nunca chegam ao nosso servidor</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>O endereço para onde o seu cliente LLM aponta</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>O endpoint real da API que recebe os seus pedidos redigidos</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>A deteção alimentada por IA é executada localmente como uma camada adicional de defesa. Pode omitir dados ou redigir em excesso. Utilize os Padrões de regex e Palavras-chave abaixo para redação determinística.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Espere respostas ligeiramente mais lentas quando ativado. O modelo analisa cada mensagem localmente.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>O texto que corresponder a estes padrões será redigido antes de ser enviado para a API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>As mensagens que contenham estas palavras serão marcadas para redação</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Redações reais detetadas na sessão atual.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Nenhuma redação na sessão atual.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Os logs são armazenados neste PC. Os logs redigidos ainda podem conter dados confidenciais que não foram detectados pela detecção.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>O Agente Redator está bloqueado</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Perfis</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL do proxy copiado para a área de transferência</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>A porta %1 está disponível</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>A porta %1 já está em uso</translation>
     </message>
     <message>
       <source>Wrong password.</source>

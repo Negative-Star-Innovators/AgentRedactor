@@ -35,6 +35,10 @@
       <translation>புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor ஐ எவ்வாறு பயன்படுத்துவது</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>சுயவிவரம்</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>நம்பிக்கை வரம்பு:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>சுயவிவரங்கள்</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. கீழே உங்கள் சுயவிவரத்தை உள்ளமைக்கவும் (அல்லது இயல்புநிலையைப் பயன்படுத்தவும்)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. உங்கள் LLM கிளையன்டை (Claude Code, OpenClaw போன்றவை) கீழே காட்டப்பட்டுள்ள உள்ளூர் URL க்கு நோக்கி வைக்கவும்</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. நாங்கள் உங்கள் கிளையன்டுக்கும் உண்மையான API க்கும் இடையில் இருக்கிறோம். அனைத்தும் உங்கள் கணினியிலேயே உள்ளது. உங்கள் கணினியை விட்டு எந்தக் கோரிக்கையும் வெளியேறுவதற்கு முன்பு முக்கியமான தரவுகள் உள்ளூரில் மறைக்கப்படுகின்றன, இதனால் உங்கள் தரவு எங்கள் சேவையகத்தை எட்டாது</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>உங்கள் LLM கிளையன்ட் சுட்டிக்காட்டும் முகவரி</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>உங்கள் மறைக்கப்பட்ட கோரிக்கைகளைப் பெறும் உண்மையான API முனையம்</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI இயக்கிய கண்டறிதல் கூடுதல் பாதுகாப்பு அடுக்காக உள்ளூரில் இயங்குகிறது. தரவுகளைத் தவறவிடலாம் அல்லது அதிகமாக மறைக்கலாம். தீர்மானிக்கும் மறைப்புக்கு கீழே உள்ள Regex முறைகளையும் முக்கியசொற்களையும் பயன்படுத்தவும்.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>இயக்கப்படும்போது சற்று மெதுவான பதில்களை எதிர்பார்க்கவும். மாதிரி ஒவ்வொரு செய்தியையும் உள்ளூரில் பரிசோதிக்கிறது.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>இந்த முறைகளுடன் பொருந்தும் உரை API க்கு அனுப்புவதற்கு முன் மறைக்கப்படும்</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>இந்த சொற்களைக் கொண்ட செய்திகள் மறைப்புக்காகக் குறிக்கப்படும்</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>தற்போதைய அமர்வில் கண்டறியப்பட்ட உண்மையான மறைப்புகள்.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>தற்போதைய அமர்வில் மறைப்புகள் இல்லை.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>இந்த கணினியில் பதிவுகள் சேமிக்கப்படுகின்றன. திருத்தப்பட்ட பதிவுகளில், கண்டறிதல் தவறவிட்ட முக்கியமான தரவு இன்னும் இருக்கலாம்.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>ஏஜென்ட் ரெடாக்டர் பூட்டப்பட்டுள்ளது</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>சுயவிவரங்கள்</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>ப்ராக்ஸி URL கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>போர்ட் %1 கிடைக்கிறது</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>போர்ட் %1 ஏற்கனவே பயன்பாட்டில் உள்ளது</translation>
     </message>
     <message>
       <source>Wrong password.</source>

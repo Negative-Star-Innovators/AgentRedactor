@@ -35,6 +35,10 @@
       <translation>Haikuweza kuangalia sasisho. Jaribu tena baadaye.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Jinsi ya kutumia Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Wasifu</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Kiwango cha Kujiamini:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Wasifu</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Sanidi wasifu wako hapa chini (au tumia chaguo-msingi)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Elekeza mteja wako wa LLM (Claude Code, OpenClaw, n.k.) kwenye URL ya Mitaa inayoonekana hapa chini</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Tuko kati ya mteja wako na API halisi. Kila kitu hubaki kwenye mashine yako. Data nyeti hufutwa kwa ndani kabla ya ombi lolote kuondoka kwenye kompyuta yako, ikihakikisha data yako haiwahi kugusa seva yetu</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Anwani ambayo mteja wako wa LLM unaelekeza</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Mwisho wa API halisi unapokea maombi yako yaliyofutwa</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Utambuzi unaotumia AI unakimbia kwa ndani kama safu ya ziada ya ulinzi. Unaweza kukosa data au kufuta zaidi ya inavyohitajika. Tumia Mistarifa ya Regex na Maneno Muhimu hapa chini kwa ajili ya kufuta kwa uhakika.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Tarajia majibu kidogo ya polepole wakati ukiwashwa. Mfano unachunguza kila ujumbe kwa ndani.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Maandishi yanayolingana na mistarifa hii yatafutwa kabla ya kutumwa kwenye API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Ujumbe unaao maneno haya utawekwa alama kwa ajili ya kufutwa</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Kufutwa halisi kiliyogunduliwa katika kipindi cha sasa.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Hakuna kufutwa katika kipindi cha sasa.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Kumbukumbu zimehifadhiwa kwenye Kompyuta hii. Kumbukumbu zilizorekebishwa bado zinaweza kuwa na data nyeti ambayo utambuzi ulikosa.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Wakala Redactor imefungwa</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Wasifu</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL ya seva mbadala imenakiliwa kwenye ubao wa kunakili</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Bandari %1 inapatikana</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Bandari %1 tayari inatumika</translation>
     </message>
     <message>
       <source>Wrong password.</source>

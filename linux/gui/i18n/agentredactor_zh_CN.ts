@@ -35,6 +35,10 @@
       <translation>无法检查更新。请稍后重试。</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>如何使用 Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>轮廓</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>置信阈值：</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>配置文件</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. 在下方配置您的配置文件（或使用默认配置）</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. 将您的 LLM 客户端（Claude Code、OpenClaw 等）指向下方显示的本地 URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. 我们位于您的客户端与真实 API 之间。所有内容都保留在您的设备上。敏感数据会在任何请求离开您的计算机之前本地脱敏，确保您的数据绝不会到达我们的服务器</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>您的 LLM 客户端指向的地址</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>接收您脱敏后请求的真实 API 端点</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI 驱动检测在本地运行，作为额外防御层。可能会遗漏数据或过度脱敏。请使用下方的正则表达式模式和关键词进行确定性脱敏。</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>启用后响应速度可能会稍慢。模型会在本地扫描每条消息。</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>与这些模式匹配的文本将在发送至 API 之前脱敏</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>包含这些词的消息将被标记为脱敏</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>当前会话中检测到的实际脱敏。</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>当前会话中无脱敏。</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>日志存储在此 PC 上。编辑后的日志可能仍包含检测遗漏的敏感数据。</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>代理编辑器已锁定</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>配置文件</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>代理 URL 已复制到剪贴板</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>端口 %1 可用</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>端口 %1 已被占用</translation>
     </message>
     <message>
       <source>Wrong password.</source>

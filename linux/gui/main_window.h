@@ -1,9 +1,9 @@
 #pragma once
 
 // Linux mirror of windows/MainWindow + HomePage: a single window with a
-// profile sidebar and the settings cards (profile, regex, keywords,
-// detection, password, statistics, session redactions, logs), plus the lock
-// overlay, the blocking model-download dialog, close-to-tray and the
+// profile sidebar and the settings cards (quick start, profile, detection,
+// regex, keywords, password, statistics, session redactions, logs), plus the
+// lock overlay, the blocking model-download dialog, close-to-tray and the
 // inactivity re-lock. All strings go through tr(); retranslateUi() applies
 // language changes live (TranslatorLoader drives QEvent::LanguageChange).
 
@@ -106,6 +106,10 @@ private:
     void retranslateUi();
     void setCardsEnabled(bool enabled);
 
+    // Colored "Port N is available / already in use" hint under the Port box
+    // (mirrors Windows HomePage::UpdateProxyStatus).
+    void updatePortStatus();
+
     // PII type display label (translated; English source matches the
     // PII_Type_<type> values in the Windows resw catalogs).
     static QString piiTypeLabel(const std::wstring& type);
@@ -118,15 +122,24 @@ private:
     QStackedLayout* centralStack_ = nullptr;
 
     // Sidebar
+    QLabel* profilesHeader_ = nullptr;
     QListWidget* profileList_ = nullptr;
     QPushButton* addProfileBtn_ = nullptr;
     QPushButton* removeProfileBtn_ = nullptr;
+
+    // Quick start card
+    QLabel* quickStep1Label_ = nullptr;
+    QLabel* quickStep2Label_ = nullptr;
+    QLabel* quickStep3Label_ = nullptr;
 
     // Profile card
     QLabel* aliasLabel_ = nullptr;
     QLabel* portLabel_ = nullptr;
     QLabel* urlLabel_ = nullptr;
     QLabel* apiKeyLabel_ = nullptr;
+    QLabel* localUrlHint_ = nullptr;
+    QLabel* forwardToHint_ = nullptr;
+    QLabel* portStatusLabel_ = nullptr;
     QLineEdit* aliasBox_ = nullptr;
     QLineEdit* portBox_ = nullptr;
     QLineEdit* urlBox_ = nullptr;
@@ -138,11 +151,15 @@ private:
     // Detection card
     QLabel* useAiLabel_ = nullptr;
     QLabel* confidenceLabel_ = nullptr;
+    QLabel* detectionDescLabel_ = nullptr;
+    QLabel* detectionSlowLabel_ = nullptr;
     QCheckBox* useAiCheck_ = nullptr;
     QLineEdit* confidenceBox_ = nullptr;
     std::vector<std::pair<std::wstring, QCheckBox*>> piiChecks_;
 
     // Regex / keywords cards (rows owned by layout)
+    QLabel* regexDescLabel_ = nullptr;
+    QLabel* keywordsDescLabel_ = nullptr;
     QVBoxLayout* regexRows_ = nullptr;
     QVBoxLayout* keywordRows_ = nullptr;
     QLineEdit* newRegexBox_ = nullptr;
@@ -156,11 +173,14 @@ private:
     QLabel* statsLabel_ = nullptr;
 
     // Session redactions card
+    QLabel* matchesDescLabel_ = nullptr;
+    QLabel* matchesEmptyLabel_ = nullptr;
     QListWidget* matchesList_ = nullptr;
 
     // Logs card
     QCheckBox* loggingCheck_ = nullptr;
     QCheckBox* showSensitiveCheck_ = nullptr;
+    QLabel* logsDisclaimerLabel_ = nullptr;
 
     // Settings card
     QCheckBox* startOnBootCheck_ = nullptr;
@@ -193,4 +213,5 @@ private:
 
     QTimer* inactivityTimer_ = nullptr;
     QTimer* lockRetryTimer_ = nullptr;
+    QTimer* portStatusTimer_ = nullptr;
 };

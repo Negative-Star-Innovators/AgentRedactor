@@ -35,6 +35,10 @@
       <translation>Posodobitev ni bilo mogoče preveriti. Poskusite znova pozneje.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Kako uporabljati Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Prag zaupanja:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profili</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurirajte svoj profil spodaj (ali uporabite privzeti)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Usmerite svojega LLM odjemalca (Claude Code, OpenClaw itd.) na lokalni URL, prikazan spodaj</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Smo med vašim odjemalcem in pravim API-jem. Vse ostane na vašem računalniku. Občutljivi podatki se lokalno uredijo, preden katera koli zahteva zapusti vaš računalnik, kar zagotavlja, da vaši podatki nikoli ne dosežejo našega strežnika</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Naslov, na katerega kaže vaš LLM odjemalec</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Pravi API končna točka, ki prejme vaše urejene zahteve</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Zaznava z umetno inteligenco teče lokalno kot dodatni obrambni sloj. Lahko spregleda podatke ali predobro uredi. Uporabite Regex vzorce in Ključne besede spodaj za deterministično urejanje.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Pričakujte nekoliko počasnejše odgovore, ko je omogočeno. Model pregleda vsako sporočilo lokalno.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Besedilo, ki se ujema s temi vzorci, bo urejeno pred pošiljanjem v API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Sporočila, ki vsebujejo te besede, bodo označena za urejanje</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Dejanska urejanja zaznana v trenutni seji.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>V trenutni seji ni urejanj.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Dnevniki so shranjeni na tem računalniku. Redigirani dnevniki lahko še vedno vsebujejo občutljive podatke, ki jih zaznavanje ni zaznalo.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor je zaklenjen</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profili</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL posrednika je kopiran v odložišče</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Vrata %1 so na voljo</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Vrata %1 so že v uporabi</translation>
     </message>
     <message>
       <source>Wrong password.</source>

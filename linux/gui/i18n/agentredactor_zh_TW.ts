@@ -35,6 +35,10 @@
       <translation>無法檢查更新。請稍後重試。</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>如何使用 Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>輪廓</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>信賴閾值：</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>設定檔</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. 在下方設定您的設定檔（或使用預設設定）</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. 將您的 LLM 用戶端（Claude Code、OpenClaw 等）指向下方顯示的本機 URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. 我們位於您的用戶端與真實 API 之間。所有內容都保留在您的裝置上。敏感資料會在任何要求離開您的電腦之前於本機去識別化，確保您的資料絕不會到達我們的伺服器</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>您的 LLM 用戶端指向的位址</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>接收您去識別化後要求的真實 API 端點</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI 驅動偵測在本機執行，作為額外防禦層。可能會遺漏資料或過度去識別化。請使用下方的規則運算式模式和關鍵字進行確定性去識別化。</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>啟用後回應速度可能會稍慢。模型會在本機掃描每則訊息。</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>與這些模式相符的文字將在傳送至 API 之前去識別化</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>包含這些詞彙的訊息將被標記為去識別化</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>目前工作階段中偵測到的實際去識別化。</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>目前工作階段中無去識別化。</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>日誌儲存在此 PC 上。編輯後的日誌可能仍包含檢測遺漏的敏感資料。</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>代理編輯器已鎖定</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>設定檔</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>代理 URL 已複製到剪貼簿</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>連接埠 %1 可用</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>連接埠 %1 已被使用</translation>
     </message>
     <message>
       <source>Wrong password.</source>

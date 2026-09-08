@@ -35,6 +35,10 @@
       <translation>Δεν ήταν δυνατός ο έλεγχος για ενημερώσεις. Δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Πώς να χρησιμοποιήσετε το Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Προφίλ</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Όριο εμπιστοσύνης:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Προφίλ</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Ρυθμίστε το προφίλ σας παρακάτω (ή χρησιμοποιήστε το προεπιλεγμένο)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Κατευθύνετε τον LLM πελάτη σας (Claude Code, OpenClaw, κλπ.) στην Τοπική URL που εμφανίζεται παρακάτω</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Βρισκόμαστε μεταξύ του πελάτη σας και του πραγματικού API. Όλα παραμένουν στον υπολογιστή σας. Ευαίσθητα δεδομένα αποκρύπτονται τοπικά πριν από οποιοδήποτε αίτημα εγκαταλείψει τον υπολογιστή σας, διασφαλίζοντας ότι τα δεδομένα σας δεν αγγίζουν ποτέ τον διακομιστή μας</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Η διεύθυνση στην οποία δείχνει ο LLM πελάτης σας</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Το πραγματικό τελικό σημείο API που λαμβάνει τα αποκρυμμένα αιτήματά σας</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Η ανίχνευση με τεχνητή νοημοσύνη εκτελείται τοπικά ως επιπλέον επίπεδο άμυνας. Μπορεί να χάσει δεδομένα ή να αποκρύψει υπερβολικά. Χρησιμοποιήστε τα Μοτίβα Regex και τις Λέξεις-κλειδιά παρακάτω για ντετερμινιστική απόκρυψη.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Αναμένετε κάπως πιο αργές απαντήσεις όταν είναι ενεργοποιημένο. Το μοντέλο σαρώνει κάθε μήνυμα τοπικά.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Το κείμενο που ταιριάζει με αυτά τα μοτίβα θα αποκρύπτεται πριν σταλεί στο API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Μηνύματα που περιέχουν αυτές τις λέξεις θα σημανθούν για απόκρυψη</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Πραγματικές αποκρύψεις που εντοπίστηκαν στην τρέχουσα συνεδρία.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Καμία απόκρυψη στην τρέχουσα συνεδρία.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Τα αρχεία καταγραφής αποθηκεύονται σε αυτόν τον υπολογιστή. Τα αρχεία καταγραφής που έχουν διορθωθεί ενδέχεται να εξακολουθούν να περιέχουν ευαίσθητα δεδομένα που δεν εντοπίστηκαν.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Το Agent Redactor είναι κλειδωμένο</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Προφίλ</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Η διεύθυνση URL του διακομιστή μεσολάβησης αντιγράφηκε στο πρόχειρο</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Η θύρα %1 είναι διαθέσιμη</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Η θύρα %1 χρησιμοποιείται ήδη</translation>
     </message>
     <message>
       <source>Wrong password.</source>

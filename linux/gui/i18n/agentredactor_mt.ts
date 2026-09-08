@@ -35,6 +35,10 @@
       <translation>Ma setax jiġi ċċekkjat għal aġġornamenti. Erġa' pprova aktar tard.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Kif tuża Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Limitu ta' kunfidenza:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profili</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Kunfigura l-profil tiegħek hawn taħt (jew uża d-defolt)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Immira l-klijent LLM tiegħek (Claude Code, OpenClaw, eċċ.) lejn il-URL Lokali murija hawn taħt</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Aħna nsibu bejn il-klijent tiegħek u l-API reali. Kollox jibqa' fuq il-magna tiegħek. Id-data sensittiva tiġi redatta lokalment qabel kwalunkwe talba tħalli l-kompjuter tiegħek, biex tiżgura li d-data tiegħek qatt ma tmiss is-server tagħna</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>L-indirizz li l-klijent LLM tiegħek jimira lejh</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>L-endpoint API reali li jirċievi t-talbiet redatti tiegħek</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Id-dettazzjoni bil-AI taħdem lokalment bħala saff addizzjonali ta' difiża. Tista' titlef data jew tagħmel redazzjoni żejda. Uża l-Mudelli Regex u l-Kelmiet Muftieħa hawn taħt għar-redazzjoni deterministika.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Stenna risposti ftit aktar bil-mod meta attivat. Il-mudell jiskanna kull messaġġ lokalment.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>It-test li jaqbel ma' dawn il-mudelli jiġi redatt qabel ma jintbagħat lill-API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Messaġġi li fihom din il-kliem jiġu mmarkati għar-redazzjoni</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Redazzjonijiet reali detettati fis-sessjoni attwali.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ebda redazzjoni fis-sessjoni attwali.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Iz-zkuk huma maħżuna fuq dan il-PC. Ir-reġistri skambjati xorta jista' jkun fihom dejta sensittiva li s-sejbien insejt.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>L-aġent Redactor huwa msakkar</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profili</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL tal-prokura kkupjat fil-clipboard</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Il-port %1 huwa disponibbli</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Il-port %1 diġà qed jintuża</translation>
     </message>
     <message>
       <source>Wrong password.</source>

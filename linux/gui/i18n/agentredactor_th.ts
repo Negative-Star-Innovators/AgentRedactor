@@ -35,6 +35,10 @@
       <translation>ไม่สามารถตรวจสอบการอัปเดตได้ ลองอีกครั้งในภายหลัง</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>วิธีใช้ Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>ประวัติโดยย่อ</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>เกณฑ์ความเชื่อมั่น:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>โปรไฟล์</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. กำหนดค่าโปรไฟล์ของคุณด้านล่าง (หรือใช้ค่าเริ่มต้น)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. ชี้ไคลเอ็นต์ LLM ของคุณ (Claude Code, OpenClaw เป็นต้น) ไปยัง URL ภายในเครื่องที่แสดงด้านล่าง</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. เราอยู่ระหว่างไคลเอ็นต์ของคุณกับ API จริง ทุกอย่างอยู่บนเครื่องของคุณ ข้อมูลที่ละเอียดอ่อนจะถูกลบบางส่วนในเครื่องก่อนที่คำขอใด ๆ จะออกจากคอมพิวเตอร์ของคุณ เพื่อให้มั่นใจว่าข้อมูลของคุณจะไม่ถึงเซิร์ฟเวอร์ของเรา</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>ที่อยู่ที่ไคลเอ็นต์ LLM ของคุณชี้ไป</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>จุดสิ้นสุด API จริงที่รับคำขอที่ถูกลดความละเอียดของคุณ</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>การตรวจจับที่ขับเคลื่อนด้วย AI ทำงานในเครื่องเป็นชั้นการป้องกันเพิ่มเติม อาจพลาดข้อมูลหรือลบมากเกินไป ใช้รูปแบบ Regex และคำสำคัญด้านล่างเพื่อการลดความละเอียดแบบกำหนดได้</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>เมื่อเปิดใช้งาน อาจได้รับการตอบสนองช้าลงเล็กน้อย โมเดลจะสแกนข้อความทุกข้อความในเครื่อง</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>ข้อความที่ตรงกับรูปแบบเหล่านี้จะถูกลดความละเอียดก่อนส่งไปยัง API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>ข้อความที่มีคำเหล่านี้จะถูกทำเครื่องหมายเพื่อลดความละเอียด</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>การลดความละเอียดจริงที่ตรวจพบในเซสชันปัจจุบัน</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>ไม่มีการลดความละเอียดในเซสชันปัจจุบัน</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>บันทึกจะถูกจัดเก็บไว้ในพีซีเครื่องนี้ บันทึกที่แก้ไขอาจยังคงมีข้อมูลที่ละเอียดอ่อนซึ่งพลาดการตรวจจับ</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor ถูกล็อค</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>โปรไฟล์</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>คัดลอก URL พร็อกซีไปยังคลิปบอร์ดแล้ว</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>พอร์ต %1 พร้อมใช้งาน</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>พอร์ต %1 ถูกใช้งานแล้ว</translation>
     </message>
     <message>
       <source>Wrong password.</source>

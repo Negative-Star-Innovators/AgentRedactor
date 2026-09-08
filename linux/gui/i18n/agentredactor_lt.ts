@@ -35,6 +35,10 @@
       <translation>Nepavyko patikrinti naujinimų. Bandykite dar kartą vėliau.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Kaip naudotis Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profilis</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Pasitikėjimo slenkstis:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiliai</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Suformuokite savo profilį žemiau (arba naudokite numatytąjį)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Nukreipkite savo LLM klientą (Claude Code, OpenClaw ir kt.) į žemiau rodomą vietinį URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Mes esame tarp jūsų kliento ir tikrojo API. V viskas lieka jūsų įrenginyje. Jautrūs duomenys redaguojami lokaliai, prieš bet kokią užklausą paliekant jūsų kompiuterį, užtikrinant, kad jūsų duomenys niekada nepasiektų mūsų serverio</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adresas, į kurį nukreiptas jūsų LLM klientas</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Tikrasis API galinis taškas, gaunantis jūsų redaguotas užklausas</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>DI varomas aptikimas veikia lokaliai kaip papildomas apsaugos sluoksnis. Jis gali praleisti duomenis arba per daug redaguoti. Naudokite žemiau esančius Regex šablonus ir Raktinius žodžius deterministiniam redagavimui.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Įjungus tikėkitės šiek tiek lėtesnių atsakymų. Modelis skenuoja kiekvieną žinutę lokaliai.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Tekstas, atitinkantis šiuos šablonus, bus redaguojamas prieš siunčiant į API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Žinutės, kuriose yra šie žodžiai, bus pažymėtos redagavimui</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Faktiniai redagavimai, aptikti dabartinėje sesijoje.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Dabartinėje sesijoje redagavimų nėra.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Žurnalai saugomi šiame kompiuteryje. Redaguotuose žurnaluose vis tiek gali būti neskelbtinų duomenų, kurių aptikti nepavyko.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agento redaktorius užrakintas</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiliai</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Tarpinio serverio URL nukopijuotas į mainų sritį</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Prievadas %1 yra laisvas</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Prievadas %1 jau naudojamas</translation>
     </message>
     <message>
       <source>Wrong password.</source>

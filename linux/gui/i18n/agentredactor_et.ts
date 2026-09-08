@@ -35,6 +35,10 @@
       <translation>Värskendusi ei saanud kontrollida. Proovige hiljem uuesti.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Kuidas kasutada Agent Redactorit</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profiil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Usalduslävi:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiilid</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigureerige oma profiil allpool (või kasutage vaikimisi profiili)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Suunake oma LLM klient (Claude Code, OpenClaw jne) allpool kuvatavasse kohalikku URL-i</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Me asume teie kliendi ja tegeliku API vahel. Kõik jääb teie masinasse. Tundlikud andmed redigeeritakse kohapeal enne, kui mõni päring teie arvutist lahkub, tagades, et teie andmed ei puutuks kunagi meie serveriga</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Aadress, millele teie LLM klient viitab</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Tegelik API lõpp-punkt, mis saab teie redigeeritud päringuid</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Tehisintellektil põhinev tuvastus töötab kohapeal täiendava kaitsekihina. See võib andmeid vahele jätta või üle redigeerida. Kasutage deterministlikuks redigeerimiseks allpool olevaid Regex mustreid ja Märksõnu.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Lubamisel oodake veidi aeglasemaid vastuseid. Mudel skaneerib iga sõnumi kohapeal.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Nende mustritele vastav tekst redigeeritakse enne API-sse saatmist</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Sõnumid, mis sisaldavad neid sõnu, märgistatakse redigeerimiseks</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Praeguses seansis tuvastatud tegelikud redigeerimised.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Praeguses seansis redigeerimisi pole.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Logid salvestatakse sellesse arvutisse. Redigeeritud logid võivad endiselt sisaldada tundlikke andmeid, mille tuvastamine ei õnnestunud.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor on lukus</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiilid</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Puhverserveri URL on lõikelauale kopeeritud</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 on saadaval</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 on juba kasutusel</translation>
     </message>
     <message>
       <source>Wrong password.</source>

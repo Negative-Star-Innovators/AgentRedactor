@@ -35,6 +35,10 @@
       <translation>Enweghị ike ịlele mmelite. Gbalịa ọzọ mgbe e mesịrị.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Ka e si eji Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profaịlụ</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Oke ntụkwasị obi:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profaịlụ</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Hazi profaịlụ gị n'okpuru (ma ọ bụ iji nke ndabere)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Duzie onye ahịa LLM gị (Claude Code, OpenClaw, wdg.) gaa na URL Obodo egosiri n'okpuru</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Anyị nọdụ n'etere onye ahịa gị na API ezigbo. Ihe niile nọ n'igwe gị. Data mmetụta emetụtara emebi emebi n'obodo tupu arịrịọ ọ bụla pụọ n'kọmputa gị, na-ekpuchitere na data gị agaghị akpọtụrụ server anyị</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adreesị onye ahịa LLM gị na-elekwasị anya</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Ebe API ezigbo na-anabata arịrịọ gị e mebiri emebi</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Nchọpụta na-akwọ AI na-arụ ọrụ n'obodo dị ka ihe ndịchebe ọzọ. Ọ nwere ike tụfuo data ma ọ bụ emebi emebi ihe karịrị. Jiri Regex Patterns na Keywords n'okpuru maka emebi emebi zuru oke.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Cheta na azịza ga-adị nwayọọ mgbe e kwụsịrị ya. Model na-enyocha ozi ọ bụla n'obodo.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Ederede na-egosi patterns ndị a ga-emebi emebi tupu e zipụọ API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Ozi nwere okwu ndị a ga-egosi ọkwa maka emebi emebi</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Mmebi emebi ziri ezi achọpụtara na session ugbu a.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ọ dịghị mmebi emebi na session ugbu a.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>A na-echekwa ndekọ na PC a. Ndekọ ndị emegharịrị ka nwere ike ịnwe data nwere mmetụta nke furu efu.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Akpọchiri onye ọrụ Redactor</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profaịlụ</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Eṅomiri URL proxy na klipbọọdụ</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 dị</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 na-arụ ọrụ</translation>
     </message>
     <message>
       <source>Wrong password.</source>

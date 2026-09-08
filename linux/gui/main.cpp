@@ -28,6 +28,7 @@
 #include "app_state.h"
 #include "desktop_integration.h"
 #include "main_window.h"
+#include "theme.h"
 #include "tray_icon.h"
 #include "translator_loader.h"
 #include "utils.h"
@@ -205,6 +206,7 @@ int main(int argc, char* argv[]) {
     }
 
     QApplication app(argc, argv);
+    Theme::Apply(app);
     QApplication::setApplicationName(QStringLiteral("agentredactor"));
     QApplication::setOrganizationName(QStringLiteral("NegativeStarInnovators"));
     QApplication::setWindowIcon(QIcon(QStringLiteral(":/app.png")));

@@ -35,6 +35,10 @@
       <translation>Güncelleştirmeler denetlenemedi. Daha sonra yeniden deneyin.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor Nasıl Kullanılır</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Güven eşiği:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiller</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Profilinizi aşağıdan yapılandırın (veya varsayılanı kullanın)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. LLM istemcinizi (Claude Code, OpenClaw vb.) aşağıda gösterilen Yerel URL'ye yönlendirin</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. İstemciniz ile gerçek API arasında yer alıyoruz. Her şey makinenizde kalıyor. Hassas veriler, herhangi bir istek bilgisayarınızdan ayrılmadan önce yerel olarak düzenlenir; böylece verileriniz asla sunucularımıza ulaşmaz</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>LLM istemcinizin işaret ettiği adres</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Düzenlenmiş isteklerinizi alan gerçek API uç noktası</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI destekli algılama, ek bir savunma katmanı olarak yerel olarak çalışır. Verileri atlayabilir veya aşırı düzenleyebilir. Belirleyici düzenleme için aşağıdaki Regex Desenleri ve Anahtar Kelimeleri kullanın.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Etkinleştirildiğinde yanıtların biraz daha yavaş olmasını bekleyin. Model her mesajı yerel olarak tarar.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Bu desenlerle eşleşen metin, API'ye gönderilmeden önce düzenlenecek</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Bu kelimeleri içeren mesajlar düzenleme için işaretlenecek</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Geçerli oturumda tespit edilen gerçek düzenlemeler.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Geçerli oturumda düzenleme yok.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Günlükler bu bilgisayarda depolanır. Düzenlenen günlükler hâlâ algılamanın gözden kaçırdığı hassas verileri içerebilir.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Ajan Redaktörü kilitli</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiller</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy URL'si panoya kopyalandı</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 kullanılabilir</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 zaten kullanımda</translation>
     </message>
     <message>
       <source>Wrong password.</source>

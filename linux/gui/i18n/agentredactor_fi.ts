@@ -35,6 +35,10 @@
       <translation>Päivityksiä ei voitu tarkistaa. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Kuinka käyttää Agent Redactoria</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profiili</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Luottamusraja:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiilit</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Määritä profiilisi alla (tai käytä oletusta)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Ohjaa LLM-asiakkaasi (Claude Code, OpenClaw, jne.) alla näkyvään paikalliseen URL-osoitteeseen</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Olemme asiakkaasi ja oikean API:n välissä. Kaikki pysyy koneellasi. Arkaluonteiset tiedot peitataan paikallisesti ennen kuin mikään pyyntö lähtee tietokoneeltasi, jotta tietosi eivät koskaan päädy palvelimellemme</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Osoite, johon LLM-asiakkaasi osoittaa</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Oikea API-päätepiste, joka vastaanottaa peitatuista pyynnöistäsi</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Tekoälypohjainen havaitseminen toimii paikallisesti lisäpuolustuskerroksena. Se voi jättää tiedot huomaamatta tai peittaa liikaa. Käytä alla olevia Regex-kuvioita ja Avainsanoja deterministiseen peittämiseen.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Odota hieman hitaampia vastauksia, kun käytössä. Malli skannaa jokaisen viestin paikallisesti.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Nämä kuviot vastaava teksti peitataan ennen API:lle lähettämistä</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Viestit, jotka sisältävät nämä sanat, merkitään peitattaviksi</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Nykyisessä istunnossa havaittuja todellisia peittämisiä.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ei peittämisiä nykyisessä istunnossa.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Lokit tallennetaan tälle tietokoneelle. Muokatut lokit voivat silti sisältää arkaluontoisia tietoja, jotka tunnistus ei onnistunut.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor on lukittu</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiilit</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Välityspalvelimen URL-osoite kopioitu leikepöydälle</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Portti %1 on käytettävissä</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Portti %1 on jo käytössä</translation>
     </message>
     <message>
       <source>Wrong password.</source>

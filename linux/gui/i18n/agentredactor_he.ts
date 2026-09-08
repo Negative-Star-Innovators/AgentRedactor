@@ -35,6 +35,10 @@
       <translation>לא ניתן היה לבדוק עדכונים. נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>איך להשתמש ב-Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>פּרוֹפִיל</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>סף ביטחון:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>פרופילים</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. הגדר את הפרופיל שלך למטה (או השתמש בברירת המחדל)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. הפנה את לקוח ה-LLM שלך (Claude Code, OpenClaw וכו') אל כתובת ה-URL המקומית המוצגת למטה</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. אנחנו יושבים בין הלקוח שלך לבין ה-API האמיתי. הכל נשאר על המחשב שלך. נתונים רגישים מוסרים מקומית לפני שבקשה כלשהי יוצאת מהמחשב שלך, כך שהנתונים שלך לעולם לא יגיעו לשרתים שלנו</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>הכתובת שאליה לקוח ה-LLM שלך מצביע</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>נקודת הקצה האמיתית של ה-API שמקבלת את הבקשות המעודכנות שלך</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>זיהוי מונע AI פועל מקומית כשכבת הגנה נוספת. ייתכן שיפספס נתונים או יסיר יתר על המידה. השתמש בתבניות ה-Regex ובמילות המפתח שלמטה להסרה דטרמיניסטית.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>צפה לתגובות מעט אטיות יותר כאשר מופעל. המודל סורק כל הודעה מקומית.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>טקסט התואם לתבניות אלה יוסר לפני השליחה ל-API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>הודעות המכילות מילים אלה יסומנו להסרה</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>הסרות בפועל שזוהו בהפעלה הנוכחית.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>אין הסרות בהפעלה הנוכחית.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>יומנים שעברו עריכה עשויים עדיין להכיל נתונים רגישים שפספס הזיהוי. היומנים נשמרים על מחשב זה.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>הסוכן Redactor נעול</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>פרופילים</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>כתובת ה-proxy הועתקה ללוח</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>פורט %1 זמין</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>פורט %1 כבר בשימוש</translation>
     </message>
     <message>
       <source>Wrong password.</source>

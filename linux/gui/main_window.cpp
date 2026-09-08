@@ -8,6 +8,7 @@
 #include <QDesktopServices>
 #include <QDialog>
 #include <QFile>
+#include <QFontDatabase>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -27,6 +28,7 @@
 #include <QSplitter>
 #include <QStackedLayout>
 #include <QStatusBar>
+#include <QStyle>
 #include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -53,11 +55,29 @@ namespace {
 QString q(const std::wstring& ws) { return QString::fromStdWString(ws); }
 std::wstring w(const QString& s) { return s.toStdWString(); }
 
-// Card container helper: titled group box with a vertical layout.
+// Card container helper: titled group box with a vertical layout. Inner
+// spacing/margins come from the app stylesheet (theme.cpp).
 QGroupBox* makeCard(const QString& title, QVBoxLayout*& layoutOut, QWidget* parent) {
     auto* box = new QGroupBox(title, parent);
     layoutOut = new QVBoxLayout(box);
+    layoutOut->setContentsMargins(0, 0, 0, 0);
+    layoutOut->setSpacing(8);
     return box;
+}
+
+// Dimmed wrapping help text (styled via the hint property in theme.cpp).
+QLabel* makeHint(QWidget* parent) {
+    auto* label = new QLabel(parent);
+    label->setWordWrap(true);
+    label->setProperty("hint", true);
+    return label;
+}
+
+// Fixed-pitch font for regex/keyword text (Windows uses Consolas 13).
+QFont rowFont() {
+    QFont f = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    f.setPointSize(13);
+    return f;
 }
 
 // Modal dialog that cannot be dismissed by the user via Escape, but can be
@@ -199,7 +219,11 @@ void MainWindow::buildUi() {
 
     // Sidebar: profile list + add/remove
     auto* sidebar = new QWidget(splitter);
+    sidebar->setObjectName(QStringLiteral("sidebar"));
     auto* sidebarLayout = new QVBoxLayout(sidebar);
+    profilesHeader_ = new QLabel(sidebar);
+    profilesHeader_->setObjectName(QStringLiteral("profilesHeader"));
+    sidebarLayout->addWidget(profilesHeader_);
     profileList_ = new QListWidget(sidebar);
     connect(profileList_, &QListWidget::currentRowChanged,
         this, &MainWindow::onProfileSelectionChanged);
@@ -221,8 +245,25 @@ void MainWindow::buildUi() {
     scroll->setWidgetResizable(true);
     auto* cards = new QWidget(scroll);
     auto* cardsLayout = new QVBoxLayout(cards);
+    cardsLayout->setContentsMargins(24, 24, 24, 24);
+    cardsLayout->setSpacing(16);
 
     auto markDirty = [this] { if (!loading_) dirty_ = true; };
+
+    // -- Quick start card --
+    QVBoxLayout* quickStartLayout;
+    auto* quickStartCard = makeCard(QString(), quickStartLayout, cards); // title set in retranslateUi
+    quickStartCard->setObjectName(QStringLiteral("quickStartCard"));
+    quickStep1Label_ = new QLabel(quickStartCard);
+    quickStep1Label_->setWordWrap(true);
+    quickStep2Label_ = new QLabel(quickStartCard);
+    quickStep2Label_->setWordWrap(true);
+    quickStep3Label_ = new QLabel(quickStartCard);
+    quickStep3Label_->setWordWrap(true);
+    quickStartLayout->addWidget(quickStep1Label_);
+    quickStartLayout->addWidget(quickStep2Label_);
+    quickStartLayout->addWidget(quickStep3Label_);
+    cardsLayout->addWidget(quickStartCard);
 
     // -- Profile card --
     QVBoxLayout* profileLayout;
@@ -240,7 +281,14 @@ void MainWindow::buildUi() {
     apiKeyBox_->setEchoMode(QLineEdit::Password);
     profileForm->addRow(aliasLabel_, aliasBox_);
     profileForm->addRow(portLabel_, portBox_);
+    localUrlHint_ = makeHint(profileCard);
+    profileForm->addRow(localUrlHint_);
+    portStatusLabel_ = new QLabel(profileCard);
+    portStatusLabel_->setVisible(false);
+    profileForm->addRow(portStatusLabel_);
     profileForm->addRow(urlLabel_, urlBox_);
+    forwardToHint_ = makeHint(profileCard);
+    profileForm->addRow(forwardToHint_);
     profileForm->addRow(apiKeyLabel_, apiKeyBox_);
     profileLayout->addLayout(profileForm);
     // textChanged (not textEdited): programmatic edits — assistive tech like
@@ -259,6 +307,7 @@ void MainWindow::buildUi() {
     copyUrlBtn_ = new QPushButton(profileCard);
     connect(copyUrlBtn_, &QPushButton::clicked, this, &MainWindow::onCopyUrl);
     saveBtn_ = new QPushButton(profileCard);
+    saveBtn_->setProperty("accent", true);
     connect(saveBtn_, &QPushButton::clicked, this, &MainWindow::onSaveProfile);
     profileBtns->addWidget(showKeyCheck_);
     profileBtns->addStretch();
@@ -267,10 +316,21 @@ void MainWindow::buildUi() {
     profileLayout->addLayout(profileBtns);
     cardsLayout->addWidget(profileCard);
 
+    // Debounced port availability check (mirrors Windows UpdateProxyStatus).
+    portStatusTimer_ = new QTimer(this);
+    portStatusTimer_->setSingleShot(true);
+    portStatusTimer_->setInterval(300);
+    connect(portStatusTimer_, &QTimer::timeout, this, &MainWindow::updatePortStatus);
+    connect(portBox_, &QLineEdit::textChanged, this, [this] { portStatusTimer_->start(); });
+
     // -- Detection card --
     QVBoxLayout* detectionLayout;
     auto* detectionCard = makeCard(QString(), detectionLayout, cards);
     detectionCard->setObjectName(QStringLiteral("detectionCard"));
+    detectionDescLabel_ = makeHint(detectionCard);
+    detectionLayout->addWidget(detectionDescLabel_);
+    detectionSlowLabel_ = makeHint(detectionCard);
+    detectionLayout->addWidget(detectionSlowLabel_);
     auto* detectionForm = new QFormLayout;
     useAiLabel_ = new QLabel(detectionCard);
     confidenceLabel_ = new QLabel(detectionCard);
@@ -297,6 +357,8 @@ void MainWindow::buildUi() {
     QVBoxLayout* regexLayout;
     auto* regexCard = makeCard(QString(), regexLayout, cards);
     regexCard->setObjectName(QStringLiteral("regexCard"));
+    regexDescLabel_ = makeHint(regexCard);
+    regexLayout->addWidget(regexDescLabel_);
     regexRows_ = new QVBoxLayout;
     regexLayout->addLayout(regexRows_);
     auto* newRegexRow = new QHBoxLayout;
@@ -314,6 +376,8 @@ void MainWindow::buildUi() {
     QVBoxLayout* keywordsLayout;
     auto* keywordsCard = makeCard(QString(), keywordsLayout, cards);
     keywordsCard->setObjectName(QStringLiteral("keywordsCard"));
+    keywordsDescLabel_ = makeHint(keywordsCard);
+    keywordsLayout->addWidget(keywordsDescLabel_);
     keywordRows_ = new QVBoxLayout;
     keywordsLayout->addLayout(keywordRows_);
     auto* newKeywordRow = new QHBoxLayout;
@@ -355,6 +419,10 @@ void MainWindow::buildUi() {
     QVBoxLayout* matchesLayout2;
     auto* matchesCard = makeCard(QString(), matchesLayout2, cards);
     matchesCard->setObjectName(QStringLiteral("matchesCard"));
+    matchesDescLabel_ = makeHint(matchesCard);
+    matchesLayout2->addWidget(matchesDescLabel_);
+    matchesEmptyLabel_ = makeHint(matchesCard);
+    matchesLayout2->addWidget(matchesEmptyLabel_);
     matchesList_ = new QListWidget(matchesCard);
     matchesList_->setMinimumHeight(120);
     matchesLayout2->addWidget(matchesList_);
@@ -389,6 +457,8 @@ void MainWindow::buildUi() {
     logBtns->addWidget(clearLogsBtn);
     logBtns->addStretch();
     logsLayout->addLayout(logBtns);
+    logsDisclaimerLabel_ = makeHint(logsCard);
+    logsLayout->addWidget(logsDisclaimerLabel_);
     cardsLayout->addWidget(logsCard);
 
     // -- Settings card --
@@ -438,6 +508,7 @@ void MainWindow::buildUi() {
     auto* overlayOuter = new QVBoxLayout(lockOverlay_);
     overlayOuter->addStretch();
     auto* overlayBox = new QVBoxLayout;
+    overlayBox->setSpacing(12);
     auto* lockTitle = new QLabel(lockOverlay_);
     lockTitle->setObjectName(QStringLiteral("lockTitle"));
     lockTitle->setAlignment(Qt::AlignCenter);
@@ -473,6 +544,7 @@ void MainWindow::buildUi() {
 
 void MainWindow::retranslateUi() {
     setWindowTitle(tr("Agent Redactor"));
+    findChild<QGroupBox*>(QStringLiteral("quickStartCard"))->setTitle(tr("How to use Agent Redactor"));
     findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("Profile"));
     findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("Detection"));
     findChild<QGroupBox*>(QStringLiteral("regexCard"))->setTitle(tr("Regex Patterns"));
@@ -489,6 +561,22 @@ void MainWindow::retranslateUi() {
     apiKeyLabel_->setText(tr("API Key"));
     useAiLabel_->setText(tr("Use AI model:"));
     confidenceLabel_->setText(tr("Confidence threshold:"));
+
+    // Help text reused verbatim from the Windows HomePage resw strings so the
+    // existing per-language catalogs translate them for free.
+    profilesHeader_->setText(tr("Profiles"));
+    quickStep1Label_->setText(tr("1. Configure your profile below (or use the default)"));
+    quickStep2Label_->setText(tr("2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below"));
+    quickStep3Label_->setText(tr("3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server"));
+    localUrlHint_->setText(tr("The address your LLM client points at"));
+    forwardToHint_->setText(tr("The real API endpoint that receives your redacted requests"));
+    detectionDescLabel_->setText(tr("AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction."));
+    detectionSlowLabel_->setText(tr("Expect slightly slower responses when enabled. The model scans every message locally."));
+    regexDescLabel_->setText(tr("Text matching these patterns will be redacted before sending to the API"));
+    keywordsDescLabel_->setText(tr("Messages containing these words will be flagged for redaction"));
+    matchesDescLabel_->setText(tr("Actual redactions detected in the current session."));
+    matchesEmptyLabel_->setText(tr("No redactions in current session."));
+    logsDisclaimerLabel_->setText(tr("Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed."));
 
     // Hint text reused from the Windows HomePage placeholders so the existing
     // per-language catalogs translate them for free.
@@ -539,6 +627,9 @@ void MainWindow::retranslateUi() {
 
     // PII grid labels are translated too (Windows PII_Type_* strings).
     for (auto& [type, check] : piiChecks_) check->setText(piiTypeLabel(type));
+
+    // Re-render the port status in the new language.
+    updatePortStatus();
 }
 
 QString MainWindow::piiTypeLabel(const std::wstring& type) {
@@ -614,6 +705,7 @@ void MainWindow::onStatusUpdated() {
                 matchesList_->addItem(line);
             }
         }
+        matchesEmptyLabel_->setVisible(matchesList_->count() == 0);
     }
 }
 
@@ -784,7 +876,10 @@ void MainWindow::loadProfileIntoForm(int index) {
         enabled->setAccessibleName(tr("Enable pattern"));
         auto* pattern = new QLineEdit(QString::fromStdString(r.value("pattern", std::string())));
         pattern->setAccessibleName(tr("Regex pattern"));
-        auto* del = new QPushButton(tr("Delete"));
+        pattern->setFont(rowFont());
+        auto* del = new QPushButton(QString::fromUtf8("✕"));
+        del->setProperty("danger", true);
+        del->setAccessibleName(tr("Delete"));
         rowLayout->addWidget(enabled);
         rowLayout->addWidget(pattern, 1);
         rowLayout->addWidget(del);
@@ -852,7 +947,10 @@ void MainWindow::loadProfileIntoForm(int index) {
         caseBtn->setFixedWidth(90);
         auto* text = new QLineEdit(QString::fromStdString(k.value("text", std::string())));
         text->setAccessibleName(tr("Keyword text"));
-        auto* del = new QPushButton(tr("Delete"));
+        text->setFont(rowFont());
+        auto* del = new QPushButton(QString::fromUtf8("✕"));
+        del->setProperty("danger", true);
+        del->setAccessibleName(tr("Delete"));
         rowLayout->addWidget(enabled);
         rowLayout->addWidget(caseBtn);
         rowLayout->addWidget(text, 1);
@@ -901,6 +999,7 @@ void MainWindow::loadProfileIntoForm(int index) {
 
     loading_ = false;
     dirty_ = false;
+    updatePortStatus();
 }
 
 QString MainWindow::selectedProfileId() const {
@@ -1109,6 +1208,33 @@ void MainWindow::onToggleApiKeyVisible(bool visible) {
     apiKeyBox_->setEchoMode(visible ? QLineEdit::Normal : QLineEdit::Password);
 }
 
+void MainWindow::updatePortStatus() {
+    bool ok = false;
+    const int port = portBox_->text().toInt(&ok);
+    if (!ok || port < 1024 || port > 65535) {
+        portStatusLabel_->setVisible(false);
+        return;
+    }
+    // A port the engine already listens on (this profile's running proxy)
+    // counts as available, mirroring Windows HomePage::UpdateProxyStatus.
+    bool running = false;
+    for (const auto& sp : appState_->lastStatus().value("profiles", json::array())) {
+        if (sp.value("port", 0) == port && sp.value("proxyRunning", false)) {
+            running = true;
+            break;
+        }
+    }
+    const bool available = running || IsPortAvailable(port);
+    portStatusLabel_->setText(available
+        ? tr("Port %1 is available").arg(port)
+        : tr("Port %1 is already in use").arg(port));
+    portStatusLabel_->setProperty("statusOk", available);
+    portStatusLabel_->setProperty("statusErr", !available);
+    portStatusLabel_->style()->unpolish(portStatusLabel_);
+    portStatusLabel_->style()->polish(portStatusLabel_);
+    portStatusLabel_->setVisible(true);
+}
+
 // ---------------------------------------------------------------------------
 // Regex / keyword add
 // ---------------------------------------------------------------------------
@@ -1249,6 +1375,7 @@ void MainWindow::onClearMatches() {
     if (!p) return;
     if (appState_->client().DeleteMatches(w(selectedProfileId()))) {
         matchesList_->clear();
+        matchesEmptyLabel_->setVisible(true);
     }
 }
 

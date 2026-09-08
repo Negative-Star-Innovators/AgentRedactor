@@ -66,6 +66,7 @@ add_executable(agentredactor-gui
     desktop_integration.cpp
     main_window.cpp
     password_dialog.cpp
+    theme.cpp
     translator_loader.cpp
     tray_icon.cpp
     update_manager.cpp

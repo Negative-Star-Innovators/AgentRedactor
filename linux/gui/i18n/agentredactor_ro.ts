@@ -35,6 +35,10 @@
       <translation>Nu s-au putut verifica actualizările. Încercați din nou mai târziu.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Cum să utilizați Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Pragul de încredere:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiluri</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Configurați profilul mai jos (sau utilizați cel implicit)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Îndreptați clientul LLM (Claude Code, OpenClaw etc.) către URL-ul local afișat mai jos</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Ne aflăm între clientul dvs. și API-ul real. Totul rămâne pe mașina dvs. Datele sensibile sunt redactate local înainte ca orice cerere să părăsească computerul, asigurându-se că datele dvs. nu ajung niciodată la serverul nostru</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adresa la care indică clientul dvs. LLM</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Endpoint-ul API real care primește cererile dvs. redactate</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Detectarea alimentată de IA rulează local ca strat suplimentar de apărare. Poate omite date sau redacta excesiv. Utilizați Modelele Regex și Cuvintele cheie de mai jos pentru redactare deterministă.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Așteptați-vă la răspunsuri ușor mai lente când este activat. Modelul scanează fiecare mesaj local.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Textul care se potrivește acestor modele va fi redactat înainte de trimiterea către API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Mesajele care conțin aceste cuvinte vor fi marcate pentru redactare</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Redactări reale detectate în sesiunea curentă.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Nu există redactări în sesiunea curentă.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Jurnalele sunt stocate pe acest computer. Jurnalele eliminate pot conține în continuare date sensibile pe care le-au ratat detectarea.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor este blocat</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiluri</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Adresa URL proxy a fost copiată în clipboard</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Portul %1 este disponibil</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Portul %1 este deja utilizat</translation>
     </message>
     <message>
       <source>Wrong password.</source>

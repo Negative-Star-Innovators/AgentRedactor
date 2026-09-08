@@ -35,6 +35,10 @@
       <translation>اپڈیٹس چیک نہیں ہو سکیں۔ بعد میں دوبارہ کوشش کریں۔</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor کا استعمال کیسے کریں</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>پروفائل</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>اعتماد کی حد:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>پروفائلز</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. نیچے اپنی پروفائل کنفیگر کریں (یا طے شدہ استعمال کریں)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. اپنے LLM کلائنٹ (Claude Code، OpenClaw، وغیرہ) کو نیچے دکھائے گئے مقامی URL کی طرف رہنمائی کریں</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. ہم آپ کے کلائنٹ اور حقیقی API کے درمیان ہیں۔ سب کچھ آپ کی مشین پر ہی رہتا ہے۔ حساس ڈیٹا کو مقامی طور پر اس وقت سے پہلے ہی حذف کر دیا جاتا ہے کہ کوئی بھی درخواست آپ کے کمپیوٹر سے باہر جائے، جس سے یہ یقینی بنتا ہے کہ آپ کا ڈیٹا کبھی بھی ہمارے سرور تک نہیں پہنچتا</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>وہ پتہ جس کی طرف آپ کا LLM کلائنٹ اشارہ کرتا ہے</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>وہ حقیقی API نقطہِ اختتام جو آپ کی حذف شدہ درخواستیں وصول کرتا ہے</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI پر مبنی نشاندہی ایک اضافی دفاعی پرت کے طور پر مقامی طور پر چلتی ہے۔ یہ ڈیٹا چھوڑ سکتی ہے یا زیادہ حذف کر سکتی ہے۔ قطعی حذف کرنے کے لیے نیچے دیے گئے Regex پیٹرن اور مطلوبہ الفاظ استعمال کریں۔</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>فعال ہونے پر جوابات میں معمولی تاخیر متوقع ہے۔ ماڈل ہر پیغام کو مقامی طور پر اسکین کرتا ہے۔</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>ان پیٹرنز سے مماثل متن API بھیجنے سے پہلے حذف کر دیا جائے گا</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>ان الفاظ پر مشتمل پیغامات کو حذف کرنے کے لیے نشان زد کیا جائے گا</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>موجودہ سیشن میں دریافت شدہ حقیقی حذفیاں۔</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>موجودہ سیشن میں کوئی حذفیاں نہیں۔</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>نوشتہ جات اس پی سی پر محفوظ ہیں۔ ترمیم شدہ لاگز میں اب بھی حساس ڈیٹا ہو سکتا ہے جس کا پتہ لگانا چھوٹ گیا ہے۔</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>ایجنٹ ریڈیکٹر مقفل ہے۔</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>پروفائلز</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>پراکسی یو آر ایل کلپ بورڈ پر کاپی ہو گیا۔</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>پورٹ %1 دستیاب ہے</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>پورٹ %1 پہلے سے استعمال میں ہے</translation>
     </message>
     <message>
       <source>Wrong password.</source>

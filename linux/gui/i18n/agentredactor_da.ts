@@ -35,6 +35,10 @@
       <translation>Kunne ikke søge efter opdateringer. Prøv igen senere.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Sådan bruger du Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Tillidsgrænse:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiler</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurer din profil nedenfor (eller brug standardprofilen)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Peg din LLM-klient (Claude Code, OpenClaw osv.) mod den lokale URL nedenfor</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Vi sidder mellem din klient og den rigtige API. Alt forbliver på din maskine. Følsomme data redigeres lokalt, før nogen anmodning forlader din computer, så dine data aldrig når vores server</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adressen, som din LLM-klient peger på</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Det rigtige API-endepunkt, der modtager dine redigerede anmodninger</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI-drevet registrering kører lokalt som et ekstra forsvarslag. Den kan overse data eller redigere for meget. Brug Regex-mønstre og Nøgleord nedenfor til deterministisk redigering.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Forvent lidt langsommere svar, når funktionen er aktiveret. Modellen scanner hver besked lokalt.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Tekst, der matcher disse mønstre, redigeres, før den sendes til API'et</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Beskeder, der indeholder disse ord, markeres til redigering</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Faktiske redigeringer registreret i den aktuelle session.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ingen redigeringer i den aktuelle session.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Logs gemmes på denne pc. Redakterede logfiler kan stadig indeholde følsomme data, som registreringen er gået glip af.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor er låst</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Profiler</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy-URL kopieret til udklipsholder</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 er tilgængelig</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 er allerede i brug</translation>
     </message>
     <message>
       <source>Wrong password.</source>

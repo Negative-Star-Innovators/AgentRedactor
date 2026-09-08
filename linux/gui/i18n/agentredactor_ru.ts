@@ -35,6 +35,10 @@
       <translation>Не удалось проверить обновления. Повторите попытку позже.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Как использовать Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Профиль</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Порог уверенности:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Профили</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Настройте свой профиль ниже (или используйте профиль по умолчанию)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Направьте свой LLM-клиент (Claude Code, OpenClaw и т. д.) на локальный URL, указанный ниже</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Мы находимся между вашим клиентом и реальным API. Все остается на вашем компьютере. Конфиденциальные данные редактируются локально, прежде чем какой-либо запрос покинет ваш компьютер, гарантируя, что ваши данные никогда не попадут на наш сервер</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Адрес, на который указывает ваш LLM-клиент</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Реальная конечная точка API, которая получает ваши отредактированные запросы</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Обнаружение на основе ИИ работает локально как дополнительный уровень защиты. Может пропустить данные или отредактировать лишнее. Используйте шаблоны регулярных выражений и ключевые слова ниже для детерминированного редактирования.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Ожидайте небольшого замедления ответов при включении. Модель сканирует каждое сообщение локально.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Текст, соответствующий этим шаблонам, будет отредактирован перед отправкой в API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Сообщения, содержащие эти слова, будут помечены для редактирования</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Фактические редактирования, обнаруженные в текущем сеансе.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>В текущем сеансе редактирований нет.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Журналы хранятся на этом компьютере. Отредактированные журналы могут по-прежнему содержать конфиденциальные данные, которые не были обнаружены.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Редактор агента заблокирован</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Профили</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL-адрес прокси-сервера скопирован в буфер обмена.</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Порт %1 доступен</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Порт %1 уже используется</translation>
     </message>
     <message>
       <source>Wrong password.</source>

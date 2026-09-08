@@ -35,6 +35,10 @@
       <translation>Hindi nagawang mag-check ng mga update. Subukan ulit mamaya.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Paano gamitin ang Agent Redactor</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Profile</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Threshold ng kumpiyansa:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Mga Profile</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. I-configure ang iyong profile sa ibaba (o gamitin ang default)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Ituro ang iyong LLM client (Claude Code, OpenClaw, atbp.) sa Local URL na ipinapakita sa ibaba</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Nasa pagitan kami ng iyong client at ng tunay na API. Lahat ay nananatili sa iyong makina. Ang sensitibong data ay nire-redact nang lokal bago ang anumang request ay umalis sa iyong computer, na tinitiyak na ang iyong data ay hindi kailanman makakaabot sa aming server</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Ang address na tinuturo ng iyong LLM client</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Ang tunay na API endpoint na tumatanggap ng iyong nire-redact na mga request</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Ang AI-powered detection ay tumatakbo nang lokal bilang karagdagang layer ng depensa. Maaaring makaligtaan ang data o sobrang mag-redact. Gamitin ang mga Regex Pattern at Keyword sa ibaba para sa deterministic redaction.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Asahan ang bahagyang mas mabagal na mga tugon kapag naka-enable. Sinusuri ng model ang bawat mensahe nang lokal.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Ang text na tumutugma sa mga pattern na ito ay ire-redact bago ipadala sa API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Ang mga mensaheng naglalaman ng mga salitang ito ay mamarkahan para sa redaction</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Mga aktwal na redaction na nakita sa kasalukuyang session.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Walang redaction sa kasalukuyang session.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Ang mga log ay nakaimbak sa PC na ito. Ang mga na-redact na log ay maaari pa ring maglaman ng sensitibong data na hindi natukoy.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Naka-lock ang Agent Redactor</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Mga Profile</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Nakopya ang proxy URL sa clipboard</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Ang port %1 ay available</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Ang port %1 ay ginagamit na</translation>
     </message>
     <message>
       <source>Wrong password.</source>

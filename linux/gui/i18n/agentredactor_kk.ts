@@ -35,6 +35,10 @@
       <translation>Жаңартуларды тексеру мүмкін болмады. Кейінірек қайталап көріңіз.</translation>
     </message>
     <message>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor қалай пайдалануға болады</translation>
+    </message>
+    <message>
       <source>Profile</source>
       <translation>Профиль</translation>
     </message>
@@ -93,6 +97,58 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Сенімділік шегі:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Профильдер</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Төменде профиліңізді конфигурациялаңыз (немесе әдепкі параметрді пайдаланыңыз)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. LLM клиентін (Клод коды, OpenClaw, т.б.) төменде көрсетілген жергілікті URL мекенжайына бағыттаңыз.</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Біз сіздің клиентіңіз бен нақты API арасында отырамыз. Барлығы сіздің құрылғыңызда қалады. Кез келген сұрау компьютерден шықпас бұрын құпия деректер жергілікті түрде өңделеді, бұл сіздің деректеріңіз ешқашан біздің серверімізге тиіп кетпеуі үшін</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>LLM клиенті көрсететін мекенжай</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Түзетілген сұрауларды қабылдайтын нақты API соңғы нүктесі</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI-мен жұмыс істейтін анықтау қосымша қорғаныс қабаты ретінде жергілікті түрде жұмыс істейді. Деректерді жіберіп алуы немесе шамадан тыс түзетуі мүмкін. Детерминирленген өңдеу үшін төмендегі Regex үлгілерін және кілт сөздерді пайдаланыңыз.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Қосылған кезде сәл баяу жауаптар күтіңіз. Модель әрбір хабарды жергілікті түрде сканерлейді.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Осы үлгілерге сәйкес мәтін API-ге жібермес бұрын өңделеді</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Осы сөздерден тұратын хабарлар редакциялау үшін белгіленеді</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Ағымдағы сеанста нақты түзетулер анықталды.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ағымдағы сеанста түзетулер жоқ.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Журналдар осы компьютерде сақталады. Түзетілген журналдарда әлі де анықталмаған құпия деректер болуы мүмкін.</translation>
     </message>
     <message>
       <source>e.g., Work OpenAI</source>
@@ -193,10 +249,6 @@
     <message>
       <source>Agent Redactor is locked</source>
       <translation>Agent Redactor құлыпталған</translation>
-    </message>
-    <message>
-      <source>Profiles</source>
-      <translation>Профильдер</translation>
     </message>
     <message>
       <source>Profile name</source>
@@ -365,6 +417,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Прокси URL алмасу буферіне көшірілді</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>%1 порты қолжетімді</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>%1 порты әлдеқашан қолданыста</translation>
     </message>
     <message>
       <source>Wrong password.</source>
