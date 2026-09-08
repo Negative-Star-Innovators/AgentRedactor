@@ -35,14 +35,6 @@
       <translation>Nepavyko patikrinti naujinimų. Bandykite dar kartą vėliau.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Failas</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Išeiti</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profilis</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Pasitikėjimo slenkstis:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>pvz., Darbas OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>pvz. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>pvz. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>pvz. slaptažodis</translation>
     </message>
     <message>
       <source>Add</source>

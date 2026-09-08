@@ -35,14 +35,6 @@
       <translation>업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;파일</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>종료</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>윤곽</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>신뢰도 임계값:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>예: 업무용 OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>예: https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>예: sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>예: password</translation>
     </message>
     <message>
       <source>Add</source>

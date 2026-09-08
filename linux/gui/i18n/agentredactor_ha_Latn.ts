@@ -35,14 +35,6 @@
       <translation>Ba a iya duba sabuntawa ba. Sake gwadawa daga baya.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fayil</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Dakata</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Bayanan martaba</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Ƙofar amincewa:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>misali, Aiki OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>misali https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>misali sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>misali kalmar sirri</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>Enweghị ike ịlele mmelite. Gbalịa ọzọ mgbe e mesịrị.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Faịlụ</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Pụọ</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profaịlụ</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Oke ntụkwasị obi:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>dị ka, OpenAI Ọrụ</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>dị ka https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>dị ka sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>dị ka password</translation>
     </message>
     <message>
       <source>Add</source>

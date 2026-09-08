@@ -35,14 +35,6 @@
       <translation>تعذّر التحقق من التحديثات. حاول مرة أخرى لاحقًا.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;ملف</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>يترك</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>حساب تعريفي</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>عتبة الثقة:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>على سبيل المثال، العمل OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>على سبيل المثال https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>على سبيل المثال س-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>على سبيل المثال كلمة المرور</translation>
     </message>
     <message>
       <source>Add</source>

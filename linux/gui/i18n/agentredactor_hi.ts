@@ -35,14 +35,6 @@
       <translation>अपडेट जांचे नहीं जा सके। बाद में पुनः प्रयास करें।</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;फ़ाइल</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>बाहर निकलें</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>प्रोफ़ाइल</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>आत्मविश्वास की सीमा:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>उदा., कार्य OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>उदा. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>उदा. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>उदा. password</translation>
     </message>
     <message>
       <source>Add</source>

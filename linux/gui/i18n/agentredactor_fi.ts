@@ -35,14 +35,6 @@
       <translation>Päivityksiä ei voitu tarkistaa. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Tiedosto</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Lopeta</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profiili</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Luottamusraja:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>esim., Työ OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>esim. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>esim. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>esim. salasana</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>Haikuweza kuangalia sasisho. Jaribu tena baadaye.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Faili</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Toka</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Wasifu</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Kiwango cha Kujiamini:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>mfano, OpenAI ya Kazi</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>mfano https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>mfano sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>mfano password</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>לא ניתן היה לבדוק עדכונים. נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;קוֹבֶץ</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>צא</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>פּרוֹפִיל</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>סף ביטחון:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>למשל, OpenAI עבודה</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>למשל https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>למשל sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>למשל password</translation>
     </message>
     <message>
       <source>Add</source>

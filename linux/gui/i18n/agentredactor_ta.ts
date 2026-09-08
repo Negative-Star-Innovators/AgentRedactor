@@ -35,14 +35,6 @@
       <translation>புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;கோப்பு</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>வெளியேறு</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>சுயவிவரம்</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>நம்பிக்கை வரம்பு:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>எ.கா., பணி OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>எ.கா. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>எ.கா. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>எ.கா. password</translation>
     </message>
     <message>
       <source>Add</source>

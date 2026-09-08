@@ -35,14 +35,6 @@
       <translation>Nie można sprawdzić aktualizacji. Spróbuj ponownie później.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Plik</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Zakończ</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Próg ufności:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>np., Praca OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>np. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>np. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>np. hasło</translation>
     </message>
     <message>
       <source>Add</source>

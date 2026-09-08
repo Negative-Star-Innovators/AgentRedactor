@@ -35,14 +35,6 @@
       <translation>Tidak dapat menyemak kemas kini. Cuba lagi kemudian.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fail</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Berhenti</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Ambang keyakinan:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>cth., Work OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>cth. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>cth. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>cth. kata laluan</translation>
     </message>
     <message>
       <source>Add</source>

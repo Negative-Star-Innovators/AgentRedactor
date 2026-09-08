@@ -35,14 +35,6 @@
       <translation>更新を確認できませんでした。後でもう一度お試しください。</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>＆ファイル</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>終了</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>プロフィール</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>信頼度のしきい値:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>例: 仕事用 OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>例: https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>例: sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>例: password</translation>
     </message>
     <message>
       <source>Add</source>

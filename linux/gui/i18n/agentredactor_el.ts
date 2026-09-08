@@ -35,14 +35,6 @@
       <translation>Δεν ήταν δυνατός ο έλεγχος για ενημερώσεις. Δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Αρχείο</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Έξοδος</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Προφίλ</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Όριο εμπιστοσύνης:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>π.χ., Εργασία OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>π.χ. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>π.χ. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>π.χ. κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>Nepodarilo sa skontrolovať aktualizácie. Skúste to znova neskôr.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Súbor</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Ukončiť</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Prah spoľahlivosti:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>napr., Práca OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>napr. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>napr. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>napr. heslo</translation>
     </message>
     <message>
       <source>Add</source>

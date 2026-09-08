@@ -35,14 +35,6 @@
       <translation>Güncelleştirmeler denetlenemedi. Daha sonra yeniden deneyin.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Dosya</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Çık</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Güven eşiği:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>örn., İş OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>örn. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>örn. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>örn. password</translation>
     </message>
     <message>
       <source>Add</source>

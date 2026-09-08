@@ -35,14 +35,6 @@
       <translation>Kon nie vir opdaterings soek nie. Probeer later weer.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Lêer</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Maak toe</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profiel</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Vertrouensdrempel:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>bv., Werk OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>bv. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>bv. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>bv. wagwoord</translation>
     </message>
     <message>
       <source>Add</source>

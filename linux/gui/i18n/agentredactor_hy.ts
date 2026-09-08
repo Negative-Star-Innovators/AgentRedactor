@@ -35,14 +35,6 @@
       <translation>Չհաջողվեց ստուգել թարմացումները։ Փորձեք ավելի ուշ։</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Ֆայլ</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Դուրս գալ</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Անձնագիր</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Վստահության շեմ.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>օր., Աշխատանք OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>օր. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>օր. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>օր. գաղտնաբառ</translation>
     </message>
     <message>
       <source>Add</source>

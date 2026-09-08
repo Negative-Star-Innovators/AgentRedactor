@@ -35,14 +35,6 @@
       <translation>Det gick inte att söka efter uppdateringar. Försök igen senare.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fil</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Avsluta</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Förtroendetröskel:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>t.ex., Arbete OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>t.ex. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>t.ex. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>t.ex. lösenord</translation>
     </message>
     <message>
       <source>Add</source>

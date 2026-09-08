@@ -35,14 +35,6 @@
       <translation>Posodobitev ni bilo mogoče preveriti. Poskusite znova pozneje.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Datoteka</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Izhod</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Prag zaupanja:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>npr., Delo OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>npr. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>npr. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>npr. geslo</translation>
     </message>
     <message>
       <source>Add</source>

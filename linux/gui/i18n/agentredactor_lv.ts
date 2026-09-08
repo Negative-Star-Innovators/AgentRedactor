@@ -35,14 +35,6 @@
       <translation>Neizdevās pārbaudīt atjauninājumus. Mēģiniet vēlāk vēlreiz.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fails</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Iziet</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profils</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Pārliecības slieksnis:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>piem., Darbs OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>piem. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>piem. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>piem. parole</translation>
     </message>
     <message>
       <source>Add</source>

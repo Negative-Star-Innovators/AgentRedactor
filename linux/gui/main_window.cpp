@@ -490,6 +490,13 @@ void MainWindow::retranslateUi() {
     useAiLabel_->setText(tr("Use AI model:"));
     confidenceLabel_->setText(tr("Confidence threshold:"));
 
+    // Hint text reused from the Windows HomePage placeholders so the existing
+    // per-language catalogs translate them for free.
+    aliasBox_->setPlaceholderText(tr("e.g., Work OpenAI"));
+    urlBox_->setPlaceholderText(tr("e.g. https://openrouter.ai/api/v1"));
+    newRegexBox_->setPlaceholderText(tr("e.g. sk-[a-zA-Z0-9]{20,}"));
+    newKeywordBox_->setPlaceholderText(tr("e.g. password"));
+
     addProfileBtn_->setText(tr("Add"));
     removeProfileBtn_->setText(tr("Remove"));
     showKeyCheck_->setText(tr("Show API key"));
@@ -1393,10 +1400,13 @@ void MainWindow::updateModelDownloadDialog() {
         appState_->client().DownloadModel();
     }
 
-    if (!modelDialog_->isVisible() && isVisible()) {
+    if (!modelDialog_->isVisible() && isVisible() && !isMinimized()) {
         // Block interaction with the main window (like Windows' ContentDialog)
         // until the weights are present. Using show() instead of exec() lets the
         // user minimize or close-to-tray the main window while downloading.
+        // Do not show the dialog while minimized: Qt still reports isVisible()
+        // for minimized windows, and showing the child dialog can restore the
+        // parent. showEvent re-runs this once the window is restored.
         modelDialog_->setMinimumWidth(360);
         modelDialog_->adjustSize();
         if (auto* parent = qobject_cast<QWidget*>(modelDialog_->parent())) {

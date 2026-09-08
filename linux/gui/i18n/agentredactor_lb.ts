@@ -35,14 +35,6 @@
       <translation>Et konnt net no Updates gesicht ginn. Probéiert et méi spéit nach eng Kéier.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp; Datei</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Zoumaachen</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Vertrauensgrenz:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>z. B., Aarbecht OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>z. B. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>z. B. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>z. B. Passwuert</translation>
     </message>
     <message>
       <source>Add</source>

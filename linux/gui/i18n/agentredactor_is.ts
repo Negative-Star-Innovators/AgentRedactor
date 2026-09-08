@@ -35,14 +35,6 @@
       <translation>Ekki tókst að athuga uppfærslur. Reyndu aftur síðar.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Skrá</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Hætta</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Prófíll</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Sjálfstraustsþröskuldur:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>t.d., Vinnu OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>t.d. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>t.d. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>t.d. lykilorð</translation>
     </message>
     <message>
       <source>Add</source>

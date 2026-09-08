@@ -35,14 +35,6 @@
       <translation>Värskendusi ei saanud kontrollida. Proovige hiljem uuesti.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fail</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Välju</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profiil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Usalduslävi:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>nt., Töö OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>nt. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>nt. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>nt. parool</translation>
     </message>
     <message>
       <source>Add</source>

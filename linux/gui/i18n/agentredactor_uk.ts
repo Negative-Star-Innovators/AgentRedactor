@@ -35,14 +35,6 @@
       <translation>Не вдалося перевірити оновлення. Спробуйте пізніше.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Файл</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Вийти</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Профіль</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Поріг впевненості:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>напр., Робота OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>напр. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>напр. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>напр. пароль</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>Жаңартуларды тексеру мүмкін болмады. Кейінірек қайталап көріңіз.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Файл</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Шығу</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Профиль</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Сенімділік шегі:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>мысалы, OpenAI жұмысы</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>мысалы https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>мысалы sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>мысалы құпия сөз</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>განახლებების შემოწმება ვერ მოხერხდა. სცადეთ მოგვიანებით.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;ფაილი</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>გამოსვლა</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>პროფილი</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>ნდობის ზღვარი:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>მაგ., სამუშაო OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>მაგ. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>მაგ. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>მაგ. პაროლი</translation>
     </message>
     <message>
       <source>Add</source>

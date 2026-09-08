@@ -35,14 +35,6 @@
       <translation>Kan niet controleren op updates. Probeer het later opnieuw.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Bestand</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Afsluiten</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profiel</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Vertrouwensdrempel:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>bijv., Werk OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>bijv. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>bijv. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>bijv. wachtwoord</translation>
     </message>
     <message>
       <source>Add</source>

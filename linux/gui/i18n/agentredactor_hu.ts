@@ -35,14 +35,6 @@
       <translation>Nem sikerült frissítéseket keresni. Próbálja újra később.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fájl</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Kilépés</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Bizalmi küszöb:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>pl., Munka OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>pl. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>pl. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>pl. jelszó</translation>
     </message>
     <message>
       <source>Add</source>

@@ -35,14 +35,6 @@
       <translation>无法检查更新。请稍后重试。</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>＆文件</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>退出</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>轮廓</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>置信阈值：</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>例如，工作 OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>例如 https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>例如 sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>例如 password</translation>
     </message>
     <message>
       <source>Add</source>

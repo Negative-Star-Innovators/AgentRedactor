@@ -35,14 +35,6 @@
       <translation>Não foi possível procurar atualizações. Tente novamente mais tarde.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Arquivo</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Sair</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Perfil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Limite de confiança:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>p. ex., Trabalho OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>p. ex. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>p. ex. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>p. ex. palavra-passe</translation>
     </message>
     <message>
       <source>Add</source>

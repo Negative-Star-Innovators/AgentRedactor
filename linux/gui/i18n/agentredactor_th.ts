@@ -35,14 +35,6 @@
       <translation>ไม่สามารถตรวจสอบการอัปเดตได้ ลองอีกครั้งในภายหลัง</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;ไฟล์</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>ออก</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>ประวัติโดยย่อ</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>เกณฑ์ความเชื่อมั่น:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>เช่น OpenAI สำหรับงาน</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>เช่น https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>เช่น sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>เช่น password</translation>
     </message>
     <message>
       <source>Add</source>

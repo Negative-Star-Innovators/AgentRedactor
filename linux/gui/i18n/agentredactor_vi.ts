@@ -35,14 +35,6 @@
       <translation>Không thể kiểm tra cập nhật. Thử lại sau.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Tài liệu</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Thoát</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Hồ sơ</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Ngưỡng tin cậy:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>ví dụ: OpenAI công việc</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>ví dụ: https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>ví dụ: sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>ví dụ: password</translation>
     </message>
     <message>
       <source>Add</source>

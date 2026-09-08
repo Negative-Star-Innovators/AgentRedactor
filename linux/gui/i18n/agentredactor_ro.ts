@@ -35,14 +35,6 @@
       <translation>Nu s-au putut verifica actualizările. Încercați din nou mai târziu.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fişier</translation>
-    </message>
-    <message>
-      <source>&amp;Quit</source>
-      <translation>Ieșire</translation>
-    </message>
-    <message>
       <source>Profile</source>
       <translation>Profil</translation>
     </message>
@@ -101,6 +93,22 @@
     <message>
       <source>Confidence threshold:</source>
       <translation>Pragul de încredere:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>ex., Muncă OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>ex. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>ex. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>ex. parolă</translation>
     </message>
     <message>
       <source>Add</source>
