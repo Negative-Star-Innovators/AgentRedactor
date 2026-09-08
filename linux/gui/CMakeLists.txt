@@ -47,7 +47,12 @@ if (AR_TS_FILES)
         set_source_files_properties(${AR_I18N_QRC} PROPERTIES
             OBJECT_DEPENDS "${AR_QM_FILES}")
     else()
-        message(WARNING "lrelease not found — building without translations (English only)")
+        if (AR_SELFRELEASE)
+            message(FATAL_ERROR "lrelease not found — release builds must embed translations "
+                "(install qt6-l10n-tools or make lrelease available)")
+        else()
+            message(WARNING "lrelease not found — building without translations (English only)")
+        endif()
     endif()
 endif()
 
