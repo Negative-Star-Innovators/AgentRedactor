@@ -243,6 +243,13 @@ void MainWindow::buildUi() {
     // Cards in a scroll area
     auto* scroll = new QScrollArea;
     scroll->setWidgetResizable(true);
+    // Qt's AT-SPI bridge answers GetChildAtIndex without bounds checks while
+    // QAccessibleAbstractScrollArea exposes scrollbar containers only when the
+    // scrollbar is visible — a client holding a stale child count (e.g. an
+    // AT-SPI test walking the tree during a language switch) crashes the app.
+    // Pin scrollbar visibility so the accessible child set never changes.
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     auto* cards = new QWidget(scroll);
     auto* cardsLayout = new QVBoxLayout(cards);
     cardsLayout->setContentsMargins(24, 24, 24, 24);
