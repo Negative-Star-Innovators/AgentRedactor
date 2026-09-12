@@ -24,6 +24,15 @@ The AT-SPI GUI tests require a display and the AT-SPI bindings; they skip cleanl
 
 3. Push only after both steps pass. Do not rely on CI as the first compile or test check.
 
+4. If your change touches the Linux codebase at all (GUI widgets/strings, engine,
+   libraries Qt the release bundles), also check whether `linux/build-release.sh`
+   (the Velopack AppImage packager) must change to stay consistent with it. Do not
+   assume it is frozen: GUI source and `.ts`/i18n changes are compiled into the
+   GUI binary by CMake and need no script edit, but anything that adds a runtime
+   Qt plugin group, shared library, model companion file, or an expected output
+   artifact naming does. When in doubt, run `linux/build-release.sh` and confirm it
+   still produces a valid AppImage, then update the notes below if the flow changes.
+
 ## Key files and concepts
 
 - `linux/gui/` — Qt6 GUI (`agentredactor-gui`)
