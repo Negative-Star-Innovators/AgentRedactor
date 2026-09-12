@@ -307,9 +307,9 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
             }
         }
         if (!reasoningEventIdx.empty()) {
-            LOGF(L"[RebuildSSE] reasoning events=%zu, fullReasoning=[%s]", reasoningEventIdx.size(), fullReasoning.c_str());
+            LOGF(L"[RebuildSSE] reasoning events=%zu, fullReasoning=[%ls]", reasoningEventIdx.size(), fullReasoning.c_str());
             std::wstring unredacted = UnredactAll(fullReasoning, state);
-            LOGF(L"[RebuildSSE] unredacted reasoning=[%s]", unredacted.c_str());
+            LOGF(L"[RebuildSSE] unredacted reasoning=[%ls]", unredacted.c_str());
             std::vector<std::wstring> chunks;
             redistribute(unredacted, reasoningOriginals, chunks);
             for (size_t i = 0; i < reasoningEventIdx.size(); ++i) {
@@ -414,9 +414,9 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
             }
         }
         if (!anthropicFields.empty()) {
-            LOGF(L"[RebuildSSE] anthropic fields=%zu, fullText=[%s]", anthropicFields.size(), anthropicFull.c_str());
+            LOGF(L"[RebuildSSE] anthropic fields=%zu, fullText=[%ls]", anthropicFields.size(), anthropicFull.c_str());
             std::wstring unredacted = UnredactAll(anthropicFull, state);
-            LOGF(L"[RebuildSSE] unredacted anthropic text=[%s]", unredacted.c_str());
+            LOGF(L"[RebuildSSE] unredacted anthropic text=[%ls]", unredacted.c_str());
             std::vector<std::string> originals;
             originals.reserve(anthropicFields.size());
             for (const auto& f : anthropicFields) originals.push_back(f.original);

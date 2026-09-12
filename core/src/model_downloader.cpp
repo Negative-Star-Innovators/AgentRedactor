@@ -93,7 +93,7 @@ bool HasModelWeights(const std::filesystem::path& modelDir) {
     // A wrong-sized file is a truncated or corrupt download: treat it as
     // missing and delete it so the next launch re-downloads (self-heal)
     // instead of failing to initialize the detector forever.
-    LOGF_LIFECYCLE(L"[ModelDownloader] Deleting corrupt weights (size %llu, expected %llu): %s",
+    LOGF_LIFECYCLE(L"[ModelDownloader] Deleting corrupt weights (size %llu, expected %llu): %ls",
         static_cast<unsigned long long>(size), static_cast<unsigned long long>(kWeightsExpectedBytes),
         weights.wstring().c_str());
     std::filesystem::remove(weights, ec);
@@ -127,7 +127,7 @@ bool RefreshCompanions(const std::filesystem::path& fallbackModelDir, bool weigh
         std::error_code ec;
         if (!std::filesystem::exists(src, ec)) {
             if (!weightsPresent) {
-                LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe (exe dir: %s): %s",
+                LOGF_LIFECYCLE(L"[ModelDownloader] Companion file missing next to exe (exe dir: %ls): %ls",
                     exeModels.wstring().c_str(), src.wstring().c_str());
                 LOG_LIFECYCLE(L"[ModelDownloader] Cannot download model weights without the bundled model bundle; "
                     L"the app package or dev build is missing its models/ directory.");
@@ -138,7 +138,7 @@ bool RefreshCompanions(const std::filesystem::path& fallbackModelDir, bool weigh
         if (CompanionMatches(src, dest)) continue;
         std::filesystem::create_directories(dest.parent_path(), ec);
         if (ec) {
-            LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s: %s",
+            LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %ls: %ls",
                 dest.parent_path().wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
             if (!weightsPresent) return false;
             continue;
@@ -150,7 +150,7 @@ bool RefreshCompanions(const std::filesystem::path& fallbackModelDir, bool weigh
         std::filesystem::copy_file(src, tmp, std::filesystem::copy_options::overwrite_existing, ec);
         if (!ec) std::filesystem::rename(tmp, dest, ec);
         if (ec) {
-            LOGF_LIFECYCLE(L"[ModelDownloader] Failed to refresh %s: %s",
+            LOGF_LIFECYCLE(L"[ModelDownloader] Failed to refresh %ls: %ls",
                 src.wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
             std::filesystem::remove(tmp, ec);
             if (!weightsPresent) return false;
@@ -185,12 +185,12 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     std::error_code ec;
     std::filesystem::create_directories(weightsDest.parent_path(), ec);
     if (ec) {
-        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %s: %s",
+        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to create %ls: %ls",
             weightsDest.parent_path().wstring().c_str(), Utils::Utf8ToWide(ec.message()).c_str());
         return false;
     }
 
-    LOGF_LIFECYCLE(L"[ModelDownloader] Weights will be downloaded to %s", weightsDest.wstring().c_str());
+    LOGF_LIFECYCLE(L"[ModelDownloader] Weights will be downloaded to %ls", weightsDest.wstring().c_str());
 
     auto lastPercent = -1;
     auto progressCallback = [&](uint64_t downloaded, uint64_t total) {
@@ -216,7 +216,7 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
             // Oversized partial means the previous attempt wrote garbage or the
             // server reported a wrong length. Delete it so the next attempt
             // starts clean instead of resuming from a corrupt offset forever.
-            LOGF_LIFECYCLE(L"[ModelDownloader] Deleting oversized partial (size %llu, expected %llu): %s",
+            LOGF_LIFECYCLE(L"[ModelDownloader] Deleting oversized partial (size %llu, expected %llu): %ls",
                 static_cast<unsigned long long>(partialSize),
                 static_cast<unsigned long long>(kWeightsExpectedBytes),
                 partial.wstring().c_str());
@@ -228,7 +228,7 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
                 part += L".part" + std::to_wstring(i);
                 std::error_code partEc;
                 if (std::filesystem::exists(part, partEc)) {
-                    LOGF_LIFECYCLE(L"[ModelDownloader] Removing stale segment file: %s", part.wstring().c_str());
+                    LOGF_LIFECYCLE(L"[ModelDownloader] Removing stale segment file: %ls", part.wstring().c_str());
                     std::filesystem::remove(part, partEc);
                 }
             }
@@ -239,10 +239,10 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
         // itself is corrupt/oversized (above) or by the downloader when a part
         // is oversized.
         for (const auto* url : kWeightsUrls) {
-            LOGF_LIFECYCLE(L"[ModelDownloader] Downloading model weights (~1.6 GB) from %s", url);
+            LOGF_LIFECYCLE(L"[ModelDownloader] Downloading model weights (~1.6 GB) from %ls", url);
             ok = Utils::HttpDownloadFileSegmented(url, partial, progressCallback);
             if (ok) break;
-            LOGF_LIFECYCLE(L"[ModelDownloader] Weight download failed from %s", url);
+            LOGF_LIFECYCLE(L"[ModelDownloader] Weight download failed from %ls", url);
         }
     }
 
@@ -255,7 +255,7 @@ bool EnsureModelFiles(const std::filesystem::path& fallbackModelDir,
     if (ec) {
         // Keep the complete .partial; the next retry finalizes it without
         // downloading again.
-        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to finalize %s", weightsDest.wstring().c_str());
+        LOGF_LIFECYCLE(L"[ModelDownloader] Failed to finalize %ls", weightsDest.wstring().c_str());
         return false;
     }
 

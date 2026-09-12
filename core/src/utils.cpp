@@ -302,6 +302,58 @@ size_t HashWString(const std::wstring& str) {
     return std::hash<std::wstring>{}(str);
 }
 
+SystemMemory GetSystemMemory() {
+    SystemMemory mem;
+#ifdef _WIN32
+    MEMORYSTATUSEX m = {};
+    m.dwLength = sizeof(m);
+    if (GlobalMemoryStatusEx(&m)) {
+        mem.totalBytes = static_cast<size_t>(m.ullTotalPhys);
+        mem.availableBytes = static_cast<size_t>(m.ullAvailPhys);
+    }
+#else
+    // /proc/meminfo: "MemTotal: <n> kB", "MemAvailable: <n> kB", ... The
+    // trailing unit token must be consumed so the key/value pairs stay aligned
+    // (each line is key + value + "kB").
+    std::ifstream f(std::filesystem::path(L"/proc/meminfo"));
+    if (f) {
+        std::string key, unit;
+        unsigned long long kb = 0;
+        while (f >> key >> kb >> unit) {
+            if (key == "MemTotal:") mem.totalBytes = static_cast<size_t>(kb) * 1024;
+            else if (key == "MemAvailable:") mem.availableBytes = static_cast<size_t>(kb) * 1024;
+        }
+    }
+#endif
+    return mem;
+}
+
+size_t GetProcessRssBytes() {
+#ifdef _WIN32
+    MEMORYSTATUSEX m = {};
+    m.dwLength = sizeof(m);
+    if (GlobalMemoryStatusEx(&m)) {
+        // Not per-process, but a rough diagnostic on Windows.
+        return static_cast<size_t>(m.ullTotalPhys - m.ullAvailPhys);
+    }
+    return 0;
+#else
+    std::ifstream f(std::filesystem::path(L"/proc/self/status"));
+    if (f) {
+        std::string line;
+        while (std::getline(f, line)) {
+            if (line.rfind("VmRSS:", 0) == 0) {
+                unsigned long long kb = 0;
+                if (std::sscanf(line.c_str() + 6, " %llu", &kb) >= 1) {
+                    return static_cast<size_t>(kb) * 1024;
+                }
+            }
+        }
+    }
+    return 0;
+#endif
+}
+
 std::optional<std::wstring> ReadFileAsString(const std::filesystem::path& path) {
     try {
         std::ifstream file(path, std::ios::binary);
@@ -692,13 +744,13 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
 
     size_t segmentCount = static_cast<size_t>(std::min<uint64_t>(maxSegments, totalSize / kMinSegmentedBytes));
     if (!rangesSupported || segmentCount < 2) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %s (ranges %s, size %llu)",
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %ls (ranges %ls, size %llu)",
             url.c_str(), rangesSupported ? L"supported" : L"unsupported",
             static_cast<unsigned long long>(totalSize));
         return HttpDownloadFile(url, destPath, progress);
     }
 
-    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %s",
+    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %ls",
         static_cast<unsigned long long>(totalSize), segmentCount, url.c_str());
 
     const uint64_t segmentSize = totalSize / segmentCount;
@@ -788,7 +840,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     for (size_t i = 0; i < segmentCount; ++i) {
         if (!results[i]) {
             // Part files are kept so the next retry resumes each segment.
-            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %s", i, url.c_str());
+            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %ls", i, url.c_str());
             return false;
         }
     }
@@ -814,7 +866,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     std::error_code ec;
     auto finalSize = std::filesystem::file_size(destPath, ec);
     if (ec || finalSize != totalSize) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %s", url.c_str());
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %ls", url.c_str());
         std::filesystem::remove(destPath, ec);
         return false;
     }
@@ -1018,13 +1070,13 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
 
     size_t segmentCount = static_cast<size_t>(std::min<uint64_t>(maxSegments, totalSize / kMinSegmentedBytes));
     if (!rangesSupported || segmentCount < 2) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %s (ranges %s, size %llu)",
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %ls (ranges %ls, size %llu)",
             url.c_str(), rangesSupported ? L"supported" : L"unsupported",
             static_cast<unsigned long long>(totalSize));
         return HttpDownloadFile(url, destPath, progress);
     }
 
-    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %s",
+    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %ls",
         static_cast<unsigned long long>(totalSize), segmentCount, url.c_str());
 
     const uint64_t segmentSize = totalSize / segmentCount;
@@ -1111,7 +1163,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     for (size_t i = 0; i < segmentCount; ++i) {
         if (!results[i]) {
             // Part files are kept so the next retry resumes each segment.
-            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %s", i, url.c_str());
+            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %ls", i, url.c_str());
             return false;
         }
     }
@@ -1137,7 +1189,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     std::error_code ec;
     auto finalSize = std::filesystem::file_size(destPath, ec);
     if (ec || finalSize != totalSize) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %s", url.c_str());
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %ls", url.c_str());
         std::filesystem::remove(destPath, ec);
         return false;
     }

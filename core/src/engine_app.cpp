@@ -76,7 +76,7 @@ namespace {
             LOGF(L"[StreamingSSEUnredactor] created, maxLabelLen=%zu, prefixes=%zu, pii=%zu, regex=%zu, keyword=%zu",
                 maxLabelLen_, labelPrefixes_.size(), state.piiMap.size(), state.regexMap.size(), state.keywordMap.size());
             for (const auto& [label, original] : state.keywordMap) {
-                LOGF(L"[StreamingSSEUnredactor] keyword map: [%s] -> [%s]",
+                LOGF(L"[StreamingSSEUnredactor] keyword map: [%ls] -> [%ls]",
                     label.c_str(), original.c_str());
             }
         }
@@ -511,11 +511,11 @@ void EngineApp::StartProxyServers() {
             return this->HandleProxyRequest(port, Utils::WideToUtf8(req.method), req.path, req.headers, req.body);
         };
         if (server->Start(port, handler)) {
-            LOGF_LIFECYCLE(L"[EngineApp] Started proxy on port %d for profile '%s'", port, profile.alias.c_str());
+            LOGF_LIFECYCLE(L"[EngineApp] Started proxy on port %d for profile '%ls'", port, profile.alias.c_str());
             runningPorts_.insert(port);
             servers_.push_back(std::move(server));
         } else {
-            LOGF_LIFECYCLE(L"[EngineApp] FAILED to start proxy on port %d for profile '%s'", port, profile.alias.c_str());
+            LOGF_LIFECYCLE(L"[EngineApp] FAILED to start proxy on port %d for profile '%ls'", port, profile.alias.c_str());
         }
     }
 }
@@ -581,7 +581,7 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
         stream = false;
     }
     bool canStream = (isChatCompletions || isAnthropicMessagesPath) && stream;
-    LOGF(L"[EngineApp] Stream eligibility: isChatCompletions=%s, isAnthropicMessages=%s, canStream=%s",
+    LOGF(L"[EngineApp] Stream eligibility: isChatCompletions=%ls, isAnthropicMessages=%ls, canStream=%ls",
         isChatCompletions ? L"true" : L"false",
         isAnthropicMessagesPath ? L"true" : L"false",
         canStream ? L"true" : L"false");
@@ -595,7 +595,7 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
     bool isSSE = false;
 
     if (canStream) {
-        LOGF(L"[EngineApp] Using chunked streaming proxy on port %d for %s", port, upstreamPath.c_str());
+        LOGF(L"[EngineApp] Using chunked streaming proxy on port %d for %ls", port, upstreamPath.c_str());
         clientResp.isStreaming = true;
         clientResp.streamWriterOwnsHeaders = true;
         clientResp.streamWriter = [this, profile, method, path, upstreamPath, headerVec, requestBody, state](SOCKET clientSocket) {
@@ -990,6 +990,15 @@ HttpResponse EngineApp::ApiGetStatus() {
     j["modelDownloadWaitingToRetry"] = modelDownloadWaitingToRetry_;
     j["modelDownloadPercent"] = modelDownloadPercent_;
     j["modelDownloadStatus"] = Utils::WideToUtf8(modelDownloadStatus_);
+    {
+        // Diagnostics for the planned ONNX Runtime CPU-arena bounding:
+        // observed host memory plus the detector's chunk/arena suggestion.
+        const Utils::SystemMemory mem = Utils::GetSystemMemory();
+        j["systemMemoryTotal"] = mem.totalBytes;
+        j["systemMemoryAvailable"] = mem.availableBytes;
+        j["modelChunkTokens"] = detector_ ? detector_->GetModelChunkTokens() : size_t{0};
+        j["modelArenaSuggestionBytes"] = detector_ ? detector_->GetSuggestedArenaBytes() : size_t{0};
+    }
     json profiles = json::array();
     for (const auto& p : settings_->GetProfiles()) {
         json pj;

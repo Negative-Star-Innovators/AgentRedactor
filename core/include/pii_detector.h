@@ -9,6 +9,8 @@
 #include <atomic>
 #include <condition_variable>
 
+#include "constants.h"
+
 namespace Ort {
     class Session;
     class Env;
@@ -54,6 +56,15 @@ public:
     void SetConfidenceThreshold(float threshold) { confidenceThreshold_ = threshold; }
     float GetConfidenceThreshold() const { return confidenceThreshold_; }
 
+    // Effective single-chunk token budget this build feeds the model
+    // (MAX_TOKENS_PER_CHUNK). Left constant today; reported so diagnostics can
+    // reason about the largest activation workspace a Run() can request.
+    size_t GetModelChunkTokens() const { return MAX_TOKENS_PER_CHUNK; }
+    // Suggested ONNX Runtime CPU memory-arena cap (bytes) computed from the
+    // host's available RAM, for observability only — NOT applied yet. Returning
+    // 0 means no suggestion (memory unknown).
+    size_t GetSuggestedArenaBytes() const { return suggestedArenaBytes_; }
+
     std::vector<PIIEntity> DetectPII(
         const std::wstring& text,
         const std::vector<std::wstring>& enabledTypes,
@@ -93,6 +104,7 @@ private:
     bool useONNX = false;
     std::wstring preferredProvider_ = L"auto";
     std::wstring currentProvider_ = L"cpu";
+    size_t suggestedArenaBytes_ = 0;
     std::unordered_map<std::string, float> viterbiBiases_;
     float confidenceThreshold_ = 0.9f;
     std::unordered_map<int, std::wstring> id2label_;

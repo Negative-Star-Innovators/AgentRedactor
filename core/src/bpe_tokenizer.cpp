@@ -73,7 +73,7 @@ bool BPETokenizer::LoadTokenizerJson() {
         LOGF(L"[BPETokenizer] Loaded %zu merges", mergeTable_.size());
         return true;
     } catch (const std::exception& e) {
-        LOGF(L"[BPETokenizer] Error parsing tokenizer.json: %s", Utils::Utf8ToWide(e.what()).c_str());
+        LOGF(L"[BPETokenizer] Error parsing tokenizer.json: %ls", Utils::Utf8ToWide(e.what()).c_str());
         return false;
     }
 }

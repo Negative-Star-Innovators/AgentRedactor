@@ -31,7 +31,7 @@ PIIDetector::~PIIDetector() = default;
 
 void PIIDetector::SetProvider(const std::wstring& provider) {
     preferredProvider_ = provider;
-    LOGF(L"[PIIDetector] Provider preference set to: %s", provider.c_str());
+    LOGF(L"[PIIDetector] Provider preference set to: %ls", provider.c_str());
 }
 
 bool PIIDetector::Initialize() {
@@ -62,6 +62,28 @@ bool PIIDetector::Initialize() {
     useONNX = true;
     initialized_ = true;
     LOG_LIFECYCLE(L"[PIIDetector] Initialized successfully");
+
+    // Observability only (no behavior change yet): report what a bounded ONNX
+    // Runtime CPU memory-arena *would* be sized to, given the host's available
+    // RAM. The model's max_position_embeddings is 128K and the engine chunks at
+    // MAX_TOKENS_PER_CHUNK, so a single Run() can request a large activation
+    // workspace; ORT's default cpu arena grows power-of-two and unbounded, and
+    // has been seen to request ~the machine's total RAM in one go (kernel
+    // rejects via __vm_enough_memory -> std::bad_alloc). Log the raw numbers so
+    // the planned arena cap can be validated on real hardware before any config
+    // is applied. Suggested cap: 60% of available RAM, capped at 8 GiB.
+    {
+        const Utils::SystemMemory mem = Utils::GetSystemMemory();
+        size_t suggested = 0;
+        if (mem.availableBytes > 0) {
+            const size_t frac = mem.availableBytes / 10 * 6; // 60%
+            const size_t cap = static_cast<size_t>(8) * 1024 * 1024 * 1024; // 8 GiB
+            suggested = std::min(frac, cap);
+        }
+        suggestedArenaBytes_ = suggested;
+        LOGF_LIFECYCLE(L"[PIIDetector] MEM host_total=%zu host_available=%zu suggested_arena_cap=%zu chunk_tokens=%zu",
+            mem.totalBytes, mem.availableBytes, suggested, static_cast<size_t>(MAX_TOKENS_PER_CHUNK));
+    }
     return true;
 }
 
@@ -98,7 +120,7 @@ bool PIIDetector::LoadModel() {
                         gpuEnabled = true;
                         LOG(L"[PIIDetector] DirectML execution provider enabled");
                     } catch (const std::exception& e) {
-                        LOGF(L"[PIIDetector] DirectML append failed: %s", Utils::Utf8ToWide(e.what()).c_str());
+                        LOGF(L"[PIIDetector] DirectML append failed: %ls", Utils::Utf8ToWide(e.what()).c_str());
                     }
                 }
             }
@@ -112,7 +134,7 @@ bool PIIDetector::LoadModel() {
                         gpuEnabled = true;
                         LOG(L"[PIIDetector] CUDA execution provider enabled");
                     } catch (const std::exception& e) {
-                        LOGF(L"[PIIDetector] CUDA append failed: %s", Utils::Utf8ToWide(e.what()).c_str());
+                        LOGF(L"[PIIDetector] CUDA append failed: %ls", Utils::Utf8ToWide(e.what()).c_str());
                     }
                 }
             }
@@ -129,12 +151,14 @@ bool PIIDetector::LoadModel() {
 #else
         // ORTCHAR_T is narrow on Linux: the session path must be UTF-8.
         const std::string modelFileUtf8 = Utils::WideToUtf8(modelFile.wstring());
+        LOGF_LIFECYCLE(L"[PIIDetector] Before Ort::Session ctor rss_mb=%zu", Utils::GetProcessRssBytes() / (1024 * 1024));
         session_ = std::make_unique<Ort::Session>(*g_onnx_env, modelFileUtf8.c_str(), sessionOptions);
+        LOGF_LIFECYCLE(L"[PIIDetector] After Ort::Session ctor rss_mb=%zu", Utils::GetProcessRssBytes() / (1024 * 1024));
 #endif
-        LOGF_LIFECYCLE(L"[PIIDetector] Model loaded with provider: %s", currentProvider_.c_str());
+        LOGF_LIFECYCLE(L"[PIIDetector] Model loaded with provider: %ls", currentProvider_.c_str());
         return true;
     } catch (const std::exception& e) {
-        LOGF_LIFECYCLE(L"[PIIDetector] LoadModel error: %s", Utils::Utf8ToWide(e.what()).c_str());
+        LOGF_LIFECYCLE(L"[PIIDetector] LoadModel error: %ls", Utils::Utf8ToWide(e.what()).c_str());
         return false;
     }
 }
@@ -157,7 +181,7 @@ bool PIIDetector::LoadConfig() {
         LOG_LIFECYCLE(L"[PIIDetector] Config loaded, " + std::to_wstring(id2label_.size()) + L" labels");
         return true;
     } catch (const std::exception& e) {
-        LOGF_LIFECYCLE(L"[PIIDetector] LoadConfig error: %s", Utils::Utf8ToWide(e.what()).c_str());
+        LOGF_LIFECYCLE(L"[PIIDetector] LoadConfig error: %ls", Utils::Utf8ToWide(e.what()).c_str());
         return false;
     }
 }
@@ -510,7 +534,9 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
                 }
             }
 
+            LOGF(L"[PIIDetector] >>RUN seqlen=%zu rss_before_mb=%zu", seqLen, Utils::GetProcessRssBytes() / (1024 * 1024));
             auto outputTensors = session_->Run(runOptions, inputNames, inputTensors, 2, outputNamesArr, 1);
+            LOGF(L"[PIIDetector] <<RUN seqlen=%zu rss_after_mb=%zu", seqLen, Utils::GetProcessRssBytes() / (1024 * 1024));
 
             {
                 std::lock_guard<std::mutex> roLock(runOptionsMutex_);
@@ -543,7 +569,7 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
             activeInferenceCount_.fetch_sub(1);
             std::lock_guard<std::mutex> termLock(terminationMutex_);
             terminationCondition_.notify_all();
-            LOGF(L"[PIIDetector] Chunk %zu error: %s", chunkIdx, Utils::Utf8ToWide(e.what()).c_str());
+            LOGF(L"[PIIDetector] Chunk %zu error: %ls", chunkIdx, Utils::Utf8ToWide(e.what()).c_str());
         }
     }
 
@@ -628,7 +654,7 @@ DetectionResult PIIDetector::RedactText(
     } catch (const std::exception& e) {
         result.success = false;
         result.errorMessage = Utils::Utf8ToWide(e.what());
-        LOGF(L"[PIIDetector] RedactText error: %s", result.errorMessage.c_str());
+        LOGF(L"[PIIDetector] RedactText error: %ls", result.errorMessage.c_str());
     }
     return result;
 }

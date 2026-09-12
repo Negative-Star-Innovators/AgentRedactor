@@ -28,7 +28,12 @@ namespace Utils {
         return result;
 #else
         // glibc swprintf reports no would-be size on truncation; grow instead.
-        for (size_t size = 256;; size *= 2) {
+        // Cap the growth so a malformed format/arg (e.g. a wide `%s` where `%ls`
+        // was needed, or an invalid multibyte) cannot drive an allocation up to
+        // the machine's whole RAM and crash with std::bad_alloc. ~16 MiB of log
+        // text is far beyond any legitimate line this helper is asked to format.
+        const size_t kMaxBufferBytes = 16ull * 1024 * 1024;
+        for (size_t size = 256; size <= kMaxBufferBytes; size *= 2) {
             std::wstring result(size, L'\0');
             int n = swprintf(result.data(), result.size(), fmt, args...);
             if (n >= 0 && static_cast<size_t>(n) < result.size()) {
@@ -36,6 +41,9 @@ namespace Utils {
                 return result;
             }
         }
+        // swprintf kept failing (bad specifier / invalid conversion). Return a
+        // fixed placeholder rather than allocate without bound.
+        return L"[format error]";
 #endif
     }
 }
