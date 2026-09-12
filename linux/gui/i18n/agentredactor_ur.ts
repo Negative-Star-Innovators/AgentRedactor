@@ -35,16 +35,24 @@
       <translation>اپڈیٹس چیک نہیں ہو سکیں۔ بعد میں دوبارہ کوشش کریں۔</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>پر</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>آف</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor کا استعمال کیسے کریں</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>پروفائل</translation>
+      <source>API Proxy</source>
+      <translation>API پراکسی</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>پتہ لگانا</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI پر مبنی نشاندہی ماڈل</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>نام:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>پورٹ:</translation>
+      <source>Local URL</source>
+      <translation>مقامی URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API کلید</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI ماڈل استعمال کریں:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API کلید دکھائیں۔</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>پراکسی یو آر ایل کاپی کریں۔</translation>
+      <source>Copy</source>
+      <translation>کاپی کریں</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>ماسٹر پاس ورڈ</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>فعال</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex پیٹرن</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>کیس</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>مطلوبہ لفظ</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>اکاؤنٹ نمبر</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>کلیدی لفظ کو فعال کریں۔</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>کیس: ہاں</translation>
+      <source>Yes</source>
+      <translation>ہاں</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>کیس: نہیں۔</translation>
+      <source>No</source>
+      <translation>نہیں</translation>
     </message>
     <message>
       <source>Keyword text</source>

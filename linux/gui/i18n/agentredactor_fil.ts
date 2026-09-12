@@ -35,16 +35,24 @@
       <translation>Hindi nagawang mag-check ng mga update. Subukan ulit mamaya.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Naka-on</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Naka-off</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Paano gamitin ang Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profile</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Pagtuklas</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI Powered Detection Model</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Pangalan:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Lokal na URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API Key</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Gumamit ng modelo ng AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Ipakita ang API key</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopyahin ang proxy URL</translation>
+      <source>Copy</source>
+      <translation>Kopyahin</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Master password</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Naka-enable</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex Pattern</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Case</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Keyword</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Account number</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Paganahin ang keyword</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Kaso: Oo</translation>
+      <source>Yes</source>
+      <translation>Oo</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Kaso: Hindi</translation>
+      <source>No</source>
+      <translation>Hindi</translation>
     </message>
     <message>
       <source>Keyword text</source>

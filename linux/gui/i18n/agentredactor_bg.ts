@@ -35,16 +35,24 @@
       <translation>Не можа да се провери за актуализации. Опитайте отново по-късно.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>включено</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Изкл</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Как да използвате Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Профил</translation>
+      <source>API Proxy</source>
+      <translation>API прокси</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Откриване</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Модел за откриване с изкуствен интелект</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Име:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Порт:</translation>
+      <source>Local URL</source>
+      <translation>Локален URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API ключ</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Използвайте AI модел:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Показване на API ключ</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Копиране на прокси URL</translation>
+      <source>Copy</source>
+      <translation>Копиране</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Главна парола</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Активирано</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex шаблон</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Регистър</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ключова дума</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Номер на сметка</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Активиране на ключова дума</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Случай: Да</translation>
+      <source>Yes</source>
+      <translation>Да</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Случай: Не</translation>
+      <source>No</source>
+      <translation>Не</translation>
     </message>
     <message>
       <source>Keyword text</source>

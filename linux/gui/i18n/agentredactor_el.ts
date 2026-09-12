@@ -35,16 +35,24 @@
       <translation>Δεν ήταν δυνατός ο έλεγχος για ενημερώσεις. Δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Επί</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Μακριά από</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Πώς να χρησιμοποιήσετε το Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Προφίλ</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Ανίχνευση</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Μοντέλο ανίχνευσης με τεχνητή νοημοσύνη</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Ονομα:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Λιμάνι:</translation>
+      <source>Local URL</source>
+      <translation>Τοπική URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Κλειδί API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Χρησιμοποιήστε το μοντέλο AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Εμφάνιση κλειδιού API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Αντιγραφή διεύθυνσης URL διακομιστή μεσολάβησης</translation>
+      <source>Copy</source>
+      <translation>Αντιγραφή</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Κύριος κωδικός πρόσβασης</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Ενεργοποιημένο</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Μοτίβο Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Κεφαλαία/μικρά</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Λέξη-κλειδί</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Αριθμός λογαριασμού</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Ενεργοποίηση λέξης-κλειδιού</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Υπόθεση: Ναι</translation>
+      <source>Yes</source>
+      <translation>Ναι</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Υπόθεση: Όχι</translation>
+      <source>No</source>
+      <translation>Όχι</translation>
     </message>
     <message>
       <source>Keyword text</source>

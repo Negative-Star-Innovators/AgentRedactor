@@ -35,16 +35,24 @@
       <translation>Kon nie vir opdaterings soek nie. Probeer later weer.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Aan</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Af</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Hoe om Agent Redactor te gebruik</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profiel</translation>
+      <source>API Proxy</source>
+      <translation>API-prossie</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Opsporing</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI-aangedrewe opsporingsmodel</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Naam:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Poort:</translation>
+      <source>Local URL</source>
+      <translation>Plaaslike URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API-sleutel</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Gebruik AI-model:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Wys API-sleutel</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopieer proxy-URL</translation>
+      <source>Copy</source>
+      <translation>Kopieer</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Hoofwagwoord</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Geaktiveer</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-patroon</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Hooflettergebruik</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Sleutelwoord</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Rekeningnommer</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Aktiveer sleutelwoord</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Geval: Ja</translation>
+      <source>Yes</source>
+      <translation>Ja</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Geval: Nee</translation>
+      <source>No</source>
+      <translation>Nee</translation>
     </message>
     <message>
       <source>Keyword text</source>

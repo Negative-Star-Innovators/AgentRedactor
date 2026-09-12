@@ -61,6 +61,7 @@ set(CMAKE_AUTORCC ON)
 
 add_executable(agentredactor-gui
     main.cpp
+    agent_toggle_switch.cpp
     app_state.cpp
     autostart.cpp
     desktop_integration.cpp

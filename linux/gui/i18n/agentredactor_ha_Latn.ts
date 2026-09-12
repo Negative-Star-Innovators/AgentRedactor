@@ -35,16 +35,24 @@
       <translation>Ba a iya duba sabuntawa ba. Sake gwadawa daga baya.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Kunna</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Kashe</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Yadda ake amfani da Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Bayanan martaba</translation>
+      <source>API Proxy</source>
+      <translation>API ɗin Wakili</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Ganewa</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Samfurin Gano Mai ƙarfi AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Suna:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>URL na gida</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Maɓallin API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Yi amfani da samfurin AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Nuna maɓallin API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kwafi URL na wakili</translation>
+      <source>Copy</source>
+      <translation>Kwafi</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Babban kalmar sirri</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>An kunna</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Tsarin Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Harka</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Mabuɗin kalma</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Lambar akant</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Kunna kalma mai mahimmanci</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Case: E</translation>
+      <source>Yes</source>
+      <translation>Ee</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Harka: A'a</translation>
+      <source>No</source>
+      <translation>A'a</translation>
     </message>
     <message>
       <source>Keyword text</source>

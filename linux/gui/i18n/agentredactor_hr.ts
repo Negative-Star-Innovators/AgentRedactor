@@ -35,16 +35,24 @@
       <translation>Nije moguće provjeriti ažuriranja. Pokušajte ponovno kasnije.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Na</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Isključeno</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Kako koristiti Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Otkrivanje</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model detekcije pokretan umjetnom inteligencijom</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Ime:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Luka:</translation>
+      <source>Local URL</source>
+      <translation>Lokalni URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API ključ</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Koristi AI model:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Prikaži API ključ</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopiraj proxy URL</translation>
+      <source>Copy</source>
+      <translation>Kopiraj</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Glavna lozinka</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Omogućeno</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex uzorak</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Velika/mala slova</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ključna riječ</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Broj računa</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Omogući ključnu riječ</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Slučaj: Da</translation>
+      <source>Yes</source>
+      <translation>Da</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Slučaj: br</translation>
+      <source>No</source>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Keyword text</source>

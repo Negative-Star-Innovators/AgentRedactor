@@ -35,16 +35,24 @@
       <translation>无法检查更新。请稍后重试。</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>在</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>离开</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>如何使用 Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>轮廓</translation>
+      <source>API Proxy</source>
+      <translation>API 代理</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>检测</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI 驱动检测模型</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>姓名：</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>港口：</translation>
+      <source>Local URL</source>
+      <translation>本地 URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API 密钥</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>使用AI模型：</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>显示 API 密钥</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>复制代理网址</translation>
+      <source>Copy</source>
+      <translation>复制</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>主密码</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>已启用</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>正则表达式模式</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>大小写</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>关键词</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>账号</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>启用关键字</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>案例：是</translation>
+      <source>Yes</source>
+      <translation>是</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>案例：无</translation>
+      <source>No</source>
+      <translation>否</translation>
     </message>
     <message>
       <source>Keyword text</source>

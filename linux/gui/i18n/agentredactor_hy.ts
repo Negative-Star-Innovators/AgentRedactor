@@ -35,16 +35,24 @@
       <translation>Չհաջողվեց ստուգել թարմացումները։ Փորձեք ավելի ուշ։</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Միացված է</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Անջատված</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Ինչպես օգտագործել Agent Redactor-ը</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Անձնագիր</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Հայտնաբերում</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Արհեստական բանականությամբ աշխատող հայտնաբերման մոդել</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Անունը:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Նավահանգիստ:</translation>
+      <source>Local URL</source>
+      <translation>Տեղական URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API բանալի</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Օգտագործեք AI մոդելը.</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Ցույց տալ API ստեղնը</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Պատճենել վստահված անձի URL-ը</translation>
+      <source>Copy</source>
+      <translation>Պատճենել</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Հիմնական գաղտնաբառը</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Միացված է</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex նմուշ</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Տառատեսակի ռեգիստր</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Բանալի բառ</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Հաշվի համարը</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Միացնել հիմնաբառը</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Դեպք: Այո</translation>
+      <source>Yes</source>
+      <translation>Այո</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Դեպք՝ ոչ</translation>
+      <source>No</source>
+      <translation>Ոչ</translation>
     </message>
     <message>
       <source>Keyword text</source>

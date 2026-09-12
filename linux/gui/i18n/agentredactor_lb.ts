@@ -35,16 +35,24 @@
       <translation>Et konnt net no Updates gesicht ginn. Probéiert et méi spéit nach eng Kéier.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Op</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Off</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Wéi Dir Agent Redactor benotzt</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API-Proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detektioun</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>KI-gestëtzten Erkennungsmodell</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Numm:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Lokal URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API-Schlëssel</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Benotzt AI Modell:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Show API Schlëssel</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proxy URL kopéieren</translation>
+      <source>Copy</source>
+      <translation>Kopéieren</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Master Passwuert</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Aktivéiert</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-Muster</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Schreifweis</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Schlësselwuert</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Kontonummer</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Schlësselwuert aktivéieren</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Fall: Jo</translation>
+      <source>Yes</source>
+      <translation>Jo</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Fall: Nee</translation>
+      <source>No</source>
+      <translation>Neen</translation>
     </message>
     <message>
       <source>Keyword text</source>

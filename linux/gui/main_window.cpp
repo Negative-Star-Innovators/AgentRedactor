@@ -40,6 +40,7 @@
 
 #include "app_state.h"
 #include "autostart.h"
+#include "agent_toggle_switch.h"
 #include "constants.h"
 #include "http_server.h"
 #include "password_dialog.h"
@@ -80,6 +81,19 @@ QFont rowFont() {
     return f;
 }
 
+// Row column widths shared by the regex/keyword rows and their headers so the
+// header labels sit exactly over their columns (Windows: 70px Enabled column,
+// 100px Case column — the case toggle button is 90px here).
+constexpr int kEnabledColumnWidth = 70;
+constexpr int kCaseColumnWidth = 90;
+
+// Dimmed semi-bold column header label (styled via the colHeader property).
+QLabel* makeColHeader(QWidget* parent) {
+    auto* label = new QLabel(parent);
+    label->setProperty("colHeader", true);
+    return label;
+}
+
 // Modal dialog that cannot be dismissed by the user via Escape, but can be
 // hidden programmatically while the main window is closed/minimized to tray.
 class NonDismissibleDialog : public QDialog {
@@ -117,6 +131,7 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
         // settings-poll round-trip; the poll later reconciles the persisted
         // tag (no restart, unlike Windows).
         translator_->applyLanguage(tag);
+        syncLanguageSelectors(tag);
         appState_->client().PutSetting(L"appLanguage", tag.toStdString());
     });
 
@@ -272,13 +287,13 @@ void MainWindow::buildUi() {
     quickStartLayout->addWidget(quickStep3Label_);
     cardsLayout->addWidget(quickStartCard);
 
-    // -- Profile card --
+    // -- API Proxy card (Windows: HomePage_ApiProxy) --
     QVBoxLayout* profileLayout;
     auto* profileCard = makeCard(QString(), profileLayout, cards); // title set in retranslateUi
     profileCard->setObjectName(QStringLiteral("profileCard"));
     auto* profileForm = new QFormLayout;
     aliasLabel_ = new QLabel(profileCard);
-    portLabel_ = new QLabel(profileCard);
+    portLabel_ = new QLabel(profileCard); // "Local URL" (labels the port box row)
     urlLabel_ = new QLabel(profileCard);
     apiKeyLabel_ = new QLabel(profileCard);
     aliasBox_ = new QLineEdit(profileCard);
@@ -287,16 +302,31 @@ void MainWindow::buildUi() {
     apiKeyBox_ = new QLineEdit(profileCard);
     apiKeyBox_->setEchoMode(QLineEdit::Password);
     profileForm->addRow(aliasLabel_, aliasBox_);
-    profileForm->addRow(portLabel_, portBox_);
+    // Local URL row (windows/HomePage.xaml): literal prefix, editable port,
+    // literal suffix, Copy button on the same line; hint underneath.
+    auto* localUrlRow = new QWidget(profileCard);
+    auto* localUrlLayout = new QHBoxLayout(localUrlRow);
+    localUrlLayout->setContentsMargins(0, 0, 0, 0);
+    localUrlLayout->addWidget(new QLabel(QStringLiteral("http://localhost:"), localUrlRow));
+    portBox_->setFixedWidth(72);
+    localUrlLayout->addWidget(portBox_);
+    localUrlLayout->addWidget(new QLabel(QStringLiteral("/"), localUrlRow));
+    copyUrlBtn_ = new QPushButton(localUrlRow);
+    connect(copyUrlBtn_, &QPushButton::clicked, this, &MainWindow::onCopyUrl);
+    localUrlLayout->addWidget(copyUrlBtn_);
+    localUrlLayout->addStretch();
+    profileForm->addRow(portLabel_, localUrlRow);
     localUrlHint_ = makeHint(profileCard);
     profileForm->addRow(localUrlHint_);
-    portStatusLabel_ = new QLabel(profileCard);
-    portStatusLabel_->setVisible(false);
-    profileForm->addRow(portStatusLabel_);
     profileForm->addRow(urlLabel_, urlBox_);
     forwardToHint_ = makeHint(profileCard);
     profileForm->addRow(forwardToHint_);
     profileForm->addRow(apiKeyLabel_, apiKeyBox_);
+    // Windows shows the reveal toggle under the password box, not in the
+    // button row.
+    showKeyCheck_ = new QCheckBox(profileCard);
+    connect(showKeyCheck_, &QCheckBox::toggled, this, &MainWindow::onToggleApiKeyVisible);
+    profileForm->addRow(QString(), showKeyCheck_);
     profileLayout->addLayout(profileForm);
     // textChanged (not textEdited): programmatic edits — assistive tech like
     // AT-SPI setTextContents, which never emits textEdited — must also mark
@@ -308,17 +338,16 @@ void MainWindow::buildUi() {
     connect(urlBox_, &QLineEdit::textChanged, this, markDirty);
     connect(apiKeyBox_, &QLineEdit::textChanged, this, markDirty);
 
+    // Bottom row (Windows Grid.Row=4): port availability status on the left,
+    // Save on the right.
     auto* profileBtns = new QHBoxLayout;
-    showKeyCheck_ = new QCheckBox(profileCard);
-    connect(showKeyCheck_, &QCheckBox::toggled, this, &MainWindow::onToggleApiKeyVisible);
-    copyUrlBtn_ = new QPushButton(profileCard);
-    connect(copyUrlBtn_, &QPushButton::clicked, this, &MainWindow::onCopyUrl);
+    portStatusLabel_ = new QLabel(profileCard);
+    portStatusLabel_->setVisible(false);
     saveBtn_ = new QPushButton(profileCard);
     saveBtn_->setProperty("accent", true);
     connect(saveBtn_, &QPushButton::clicked, this, &MainWindow::onSaveProfile);
-    profileBtns->addWidget(showKeyCheck_);
+    profileBtns->addWidget(portStatusLabel_);
     profileBtns->addStretch();
-    profileBtns->addWidget(copyUrlBtn_);
     profileBtns->addWidget(saveBtn_);
     profileLayout->addLayout(profileBtns);
     cardsLayout->addWidget(profileCard);
@@ -330,42 +359,24 @@ void MainWindow::buildUi() {
     connect(portStatusTimer_, &QTimer::timeout, this, &MainWindow::updatePortStatus);
     connect(portBox_, &QLineEdit::textChanged, this, [this] { portStatusTimer_->start(); });
 
-    // -- Detection card --
-    QVBoxLayout* detectionLayout;
-    auto* detectionCard = makeCard(QString(), detectionLayout, cards);
-    detectionCard->setObjectName(QStringLiteral("detectionCard"));
-    detectionDescLabel_ = makeHint(detectionCard);
-    detectionLayout->addWidget(detectionDescLabel_);
-    detectionSlowLabel_ = makeHint(detectionCard);
-    detectionLayout->addWidget(detectionSlowLabel_);
-    auto* detectionForm = new QFormLayout;
-    useAiLabel_ = new QLabel(detectionCard);
-    confidenceLabel_ = new QLabel(detectionCard);
-    useAiCheck_ = new QCheckBox(detectionCard);
-    confidenceBox_ = new QLineEdit(detectionCard);
-    detectionForm->addRow(useAiLabel_, useAiCheck_);
-    detectionForm->addRow(confidenceLabel_, confidenceBox_);
-    detectionLayout->addLayout(detectionForm);
-    connect(useAiCheck_, &QCheckBox::toggled, this, markDirty);
-    connect(confidenceBox_, &QLineEdit::textEdited, this, markDirty);
-    auto* piiGrid = new QGridLayout;
-    int row = 0, col = 0;
-    for (const auto& type : DEFAULT_PII_TYPES) {
-        auto* check = new QCheckBox(piiTypeLabel(type), detectionCard);
-        connect(check, &QCheckBox::toggled, this, markDirty);
-        piiChecks_.emplace_back(type, check);
-        piiGrid->addWidget(check, row, col);
-        if (++col == 4) { col = 0; ++row; }
-    }
-    detectionLayout->addLayout(piiGrid);
-    cardsLayout->addWidget(detectionCard);
-
     // -- Regex card --
     QVBoxLayout* regexLayout;
     auto* regexCard = makeCard(QString(), regexLayout, cards);
     regexCard->setObjectName(QStringLiteral("regexCard"));
     regexDescLabel_ = makeHint(regexCard);
     regexLayout->addWidget(regexDescLabel_);
+    // Column headers aligned over the row columns (Windows RegexHeaderGrid);
+    // hidden while the list is empty (HomePage::LoadRegexList).
+    regexHeader_ = new QWidget(regexCard);
+    auto* regexHeaderLayout = new QHBoxLayout(regexHeader_);
+    regexHeaderLayout->setContentsMargins(0, 0, 0, 0);
+    regexEnabledHeader_ = makeColHeader(regexHeader_);
+    regexEnabledHeader_->setFixedWidth(kEnabledColumnWidth);
+    regexPatternHeader_ = makeColHeader(regexHeader_);
+    regexHeaderLayout->addWidget(regexEnabledHeader_);
+    regexHeaderLayout->addWidget(regexPatternHeader_, 1);
+    regexHeader_->setVisible(false);
+    regexLayout->addWidget(regexHeader_);
     regexRows_ = new QVBoxLayout;
     regexLayout->addLayout(regexRows_);
     auto* newRegexRow = new QHBoxLayout;
@@ -385,6 +396,21 @@ void MainWindow::buildUi() {
     keywordsCard->setObjectName(QStringLiteral("keywordsCard"));
     keywordsDescLabel_ = makeHint(keywordsCard);
     keywordsLayout->addWidget(keywordsDescLabel_);
+    // Column headers aligned over the row columns (Windows KeywordHeaderGrid);
+    // hidden while the list is empty (HomePage::LoadKeywordList).
+    keywordHeader_ = new QWidget(keywordsCard);
+    auto* keywordHeaderLayout = new QHBoxLayout(keywordHeader_);
+    keywordHeaderLayout->setContentsMargins(0, 0, 0, 0);
+    keywordEnabledHeader_ = makeColHeader(keywordHeader_);
+    keywordEnabledHeader_->setFixedWidth(kEnabledColumnWidth);
+    keywordCaseHeader_ = makeColHeader(keywordHeader_);
+    keywordCaseHeader_->setFixedWidth(kCaseColumnWidth);
+    keywordKeywordHeader_ = makeColHeader(keywordHeader_);
+    keywordHeaderLayout->addWidget(keywordEnabledHeader_);
+    keywordHeaderLayout->addWidget(keywordCaseHeader_);
+    keywordHeaderLayout->addWidget(keywordKeywordHeader_, 1);
+    keywordHeader_->setVisible(false);
+    keywordsLayout->addWidget(keywordHeader_);
     keywordRows_ = new QVBoxLayout;
     keywordsLayout->addLayout(keywordRows_);
     auto* newKeywordRow = new QHBoxLayout;
@@ -400,6 +426,43 @@ void MainWindow::buildUi() {
     newKeywordRow->addWidget(addKeywordBtn);
     keywordsLayout->addLayout(newKeywordRow);
     cardsLayout->addWidget(keywordsCard);
+
+    // -- AI Powered Detection Model card (Windows: SecurityCardBorder) --
+    QVBoxLayout* detectionLayout;
+    auto* detectionCard = makeCard(QString(), detectionLayout, cards);
+    detectionCard->setObjectName(QStringLiteral("detectionCard"));
+    detectionDescLabel_ = makeHint(detectionCard);
+    detectionLayout->addWidget(detectionDescLabel_);
+    // Windows ToggleSwitch: a self-drawn sliding switch (AgentToggleSwitch,
+    // based on QCheckBox so its accessible role/checked/name contract is
+    // unchanged). The visible text is the On/Off state; the accessible name
+    // stays fixed so assistive tech can find the control regardless of state.
+    useAiCheck_ = new AgentToggleSwitch(detectionCard);
+    useAiCheck_->setObjectName(QStringLiteral("useAiSwitch"));
+    connect(useAiCheck_, &QCheckBox::toggled, this, markDirty);
+    connect(useAiCheck_, &QCheckBox::toggled, this, [this](bool on) {
+        useAiCheck_->setText(on ? tr("On") : tr("Off"));
+    });
+    detectionLayout->addWidget(useAiCheck_, 0, Qt::AlignLeft);
+    detectionSlowLabel_ = makeHint(detectionCard);
+    detectionLayout->addWidget(detectionSlowLabel_);
+    auto* detectionForm = new QFormLayout;
+    confidenceLabel_ = new QLabel(detectionCard);
+    confidenceBox_ = new QLineEdit(detectionCard);
+    detectionForm->addRow(confidenceLabel_, confidenceBox_);
+    detectionLayout->addLayout(detectionForm);
+    connect(confidenceBox_, &QLineEdit::textEdited, this, markDirty);
+    auto* piiGrid = new QGridLayout;
+    int row = 0, col = 0;
+    for (const auto& type : DEFAULT_PII_TYPES) {
+        auto* check = new QCheckBox(piiTypeLabel(type), detectionCard);
+        connect(check, &QCheckBox::toggled, this, markDirty);
+        piiChecks_.emplace_back(type, check);
+        piiGrid->addWidget(check, row, col);
+        if (++col == 4) { col = 0; ++row; }
+    }
+    detectionLayout->addLayout(piiGrid);
+    cardsLayout->addWidget(detectionCard);
 
     // -- Password card --
     QVBoxLayout* passwordLayout;
@@ -552,8 +615,8 @@ void MainWindow::buildUi() {
 void MainWindow::retranslateUi() {
     setWindowTitle(tr("Agent Redactor"));
     findChild<QGroupBox*>(QStringLiteral("quickStartCard"))->setTitle(tr("How to use Agent Redactor"));
-    findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("Profile"));
-    findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("Detection"));
+    findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("API Proxy"));
+    findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("AI Powered Detection Model"));
     findChild<QGroupBox*>(QStringLiteral("regexCard"))->setTitle(tr("Regex Patterns"));
     findChild<QGroupBox*>(QStringLiteral("keywordsCard"))->setTitle(tr("Keywords"));
     findChild<QGroupBox*>(QStringLiteral("passwordCard"))->setTitle(tr("Password"));
@@ -563,10 +626,9 @@ void MainWindow::retranslateUi() {
     findChild<QGroupBox*>(QStringLiteral("settingsCard"))->setTitle(tr("Settings"));
 
     aliasLabel_->setText(tr("Name:"));
-    portLabel_->setText(tr("Port:"));
+    portLabel_->setText(tr("Local URL"));
     urlLabel_->setText(tr("Forward To"));
     apiKeyLabel_->setText(tr("API Key"));
-    useAiLabel_->setText(tr("Use AI model:"));
     confidenceLabel_->setText(tr("Confidence threshold:"));
 
     // Help text reused verbatim from the Windows HomePage resw strings so the
@@ -595,9 +657,12 @@ void MainWindow::retranslateUi() {
     addProfileBtn_->setText(tr("Add"));
     removeProfileBtn_->setText(tr("Remove"));
     showKeyCheck_->setText(tr("Show API key"));
-    copyUrlBtn_->setText(tr("Copy proxy URL"));
+    copyUrlBtn_->setText(tr("Copy"));
     saveBtn_->setText(tr("Save"));
-    useAiCheck_->setText(tr("Use AI model for PII detection"));
+    // The master detection toggle is a switch: its visible text is the On/Off
+    // state, its accessible name identifies the control.
+    useAiCheck_->setText(useAiCheck_->isChecked() ? tr("On") : tr("Off"));
+    useAiCheck_->setAccessibleName(tr("Use AI model for PII detection"));
     newKeywordCaseCheck_->setText(tr("Case sensitive"));
     findChild<QPushButton*>(QStringLiteral("addRegexBtn"))->setText(tr("Add"));
     findChild<QPushButton*>(QStringLiteral("addKeywordBtn"))->setText(tr("Add"));
@@ -635,8 +700,20 @@ void MainWindow::retranslateUi() {
     // PII grid labels are translated too (Windows PII_Type_* strings).
     for (auto& [type, check] : piiChecks_) check->setText(piiTypeLabel(type));
 
+    // Regex/keyword column headers (the rows themselves are rebuilt by
+    // reloadProfiles on language change).
+    regexEnabledHeader_->setText(tr("Enabled"));
+    regexPatternHeader_->setText(tr("Regex Pattern"));
+    keywordEnabledHeader_->setText(tr("Enabled"));
+    keywordCaseHeader_->setText(tr("Case"));
+    keywordKeywordHeader_->setText(tr("Keyword"));
+
     // Re-render the port status in the new language.
     updatePortStatus();
+
+    // The Statistics card content holds localized "Requests: ..." text; render
+    // it again so it follows tr() without waiting for the next status tick.
+    refreshStats();
 }
 
 QString MainWindow::piiTypeLabel(const std::wstring& type) {
@@ -692,12 +769,7 @@ void MainWindow::onStatusUpdated() {
                 }
             }
         }
-        const json& stats = (*p)["stats"];
-        statsLabel_->setText(tr("Requests: %1   PII: %2   Regex: %3   Keywords: %4")
-            .arg(stats.value("total_requests", 0))
-            .arg(stats.value("total_pii_detected", 0))
-            .arg(stats.value("total_regex_matches", 0))
-            .arg(stats.value("total_keyword_matches", 0)));
+        refreshStats();
 
         const std::wstring id = w(QString::fromStdString((*p)["id"].get<std::string>()));
         json matches;
@@ -714,6 +786,12 @@ void MainWindow::onStatusUpdated() {
         }
         matchesEmptyLabel_->setVisible(matchesList_->count() == 0);
     }
+
+    // The port verdict depends on the profiles snapshot (cross-profile
+    // conflicts) and on proxyRunning, both of which change under the feet of
+    // a debounced textChanged evaluation; recompute every poll so the label
+    // never stays stale (Windows: UpdateProxyStatus on the same cadence).
+    updatePortStatus();
 }
 
 void MainWindow::onSettingsChanged() {
@@ -870,24 +948,32 @@ void MainWindow::loadProfileIntoForm(int index) {
     }
 
     // Rebuild regex rows (each row is a widget so takeAt/delete cleans up).
+    const auto regexPatterns = p.value("regex_patterns", json::array());
+    regexHeader_->setVisible(!regexPatterns.empty());
     while (QLayoutItem* item = regexRows_->takeAt(0)) {
         delete item->widget();
         delete item;
     }
-    for (const auto& r : p.value("regex_patterns", json::array())) {
+    for (const auto& r : regexPatterns) {
         auto* rowWidget = new QWidget;
         auto* rowLayout = new QHBoxLayout(rowWidget);
         rowLayout->setContentsMargins(0, 0, 0, 0);
         auto* enabled = new QCheckBox;
         enabled->setChecked(r.value("enabled", true));
         enabled->setAccessibleName(tr("Enable pattern"));
+        // Fixed-width column so the rows line up under the header labels.
+        auto* enabledCol = new QWidget(rowWidget);
+        auto* enabledColLayout = new QHBoxLayout(enabledCol);
+        enabledColLayout->setContentsMargins(0, 0, 0, 0);
+        enabledColLayout->addWidget(enabled);
+        enabledCol->setFixedWidth(kEnabledColumnWidth);
         auto* pattern = new QLineEdit(QString::fromStdString(r.value("pattern", std::string())));
         pattern->setAccessibleName(tr("Regex pattern"));
         pattern->setFont(rowFont());
         auto* del = new QPushButton(QString::fromUtf8("✕"));
         del->setProperty("danger", true);
         del->setAccessibleName(tr("Delete"));
-        rowLayout->addWidget(enabled);
+        rowLayout->addWidget(enabledCol);
         rowLayout->addWidget(pattern, 1);
         rowLayout->addWidget(del);
         regexRows_->addWidget(rowWidget);
@@ -938,27 +1024,36 @@ void MainWindow::loadProfileIntoForm(int index) {
     }
 
     // Rebuild keyword rows.
+    const auto keywords = p.value("keywords", json::array());
+    keywordHeader_->setVisible(!keywords.empty());
     while (QLayoutItem* item = keywordRows_->takeAt(0)) {
         delete item->widget();
         delete item;
     }
-    for (const auto& k : p.value("keywords", json::array())) {
+    for (const auto& k : keywords) {
         auto* rowWidget = new QWidget;
         auto* rowLayout = new QHBoxLayout(rowWidget);
         rowLayout->setContentsMargins(0, 0, 0, 0);
         auto* enabled = new QCheckBox;
         enabled->setChecked(k.value("enabled", true));
         enabled->setAccessibleName(tr("Enable keyword"));
+        // Fixed-width columns so the rows line up under the header labels.
+        auto* enabledCol = new QWidget(rowWidget);
+        auto* enabledColLayout = new QHBoxLayout(enabledCol);
+        enabledColLayout->setContentsMargins(0, 0, 0, 0);
+        enabledColLayout->addWidget(enabled);
+        enabledCol->setFixedWidth(kEnabledColumnWidth);
+        // Windows uses a borderless Yes/No toggle button in the Case column.
         auto* caseBtn = new QPushButton(k.value("case_sensitive", true)
-            ? tr("Case: Yes") : tr("Case: No"));
-        caseBtn->setFixedWidth(90);
+            ? tr("Yes") : tr("No"));
+        caseBtn->setFixedWidth(kCaseColumnWidth);
         auto* text = new QLineEdit(QString::fromStdString(k.value("text", std::string())));
         text->setAccessibleName(tr("Keyword text"));
         text->setFont(rowFont());
         auto* del = new QPushButton(QString::fromUtf8("✕"));
         del->setProperty("danger", true);
         del->setAccessibleName(tr("Delete"));
-        rowLayout->addWidget(enabled);
+        rowLayout->addWidget(enabledCol);
         rowLayout->addWidget(caseBtn);
         rowLayout->addWidget(text, 1);
         rowLayout->addWidget(del);
@@ -976,10 +1071,12 @@ void MainWindow::loadProfileIntoForm(int index) {
         connect(enabled, &QCheckBox::toggled, this, [this, mutateKeyword](bool on) {
             mutateKeyword([on](json& kw) { kw["enabled"] = on; });
         });
+        // The Case column is a Yes/No toggle with the real value in the label
+        // (Windows: keywordCaseButtons_ content = Common_Yes / Common_No).
         connect(caseBtn, &QPushButton::clicked, this, [this, caseBtn, mutateKeyword] {
-            const bool newValue = caseBtn->text() == tr("Case: No");
+            const bool newValue = caseBtn->text() != tr("Yes"); // was No -> now Yes
             mutateKeyword([newValue](json& kw) { kw["case_sensitive"] = newValue; });
-            caseBtn->setText(newValue ? tr("Case: Yes") : tr("Case: No"));
+            caseBtn->setText(newValue ? tr("Yes") : tr("No"));
         });
         connect(text, &QLineEdit::editingFinished, this, [this] {
             dirty_ = true;
@@ -1069,7 +1166,7 @@ json MainWindow::gatherProfileFromForm() {
         auto* text = rowWidget->findChild<QLineEdit*>();
         if (!enabled || !caseBtn || !text) continue;
         keywords.push_back({{"text", text->text().toStdString()},
-            {"case_sensitive", caseBtn->text() == tr("Case: Yes")},
+            {"case_sensitive", caseBtn->text() == tr("Yes")},
             {"enabled", enabled->isChecked()}});
     }
     p["keywords"] = keywords;
@@ -1221,6 +1318,26 @@ void MainWindow::updatePortStatus() {
     if (!ok || port < 1024 || port > 65535) {
         portStatusLabel_->setVisible(false);
         return;
+    }
+    // A port owned by another saved profile is always shown as taken,
+    // mirroring Windows HomePage::UpdateProxyStatus. This must be checked
+    // before the running/availability branch (an external listener would not
+    // be caught by the profile loop, and another profile's running proxy would
+    // otherwise be reported as "available").
+    const int currentRow = profileList_->currentRow();
+    for (int i = 0; i < static_cast<int>(profiles_.size()); ++i) {
+        if (i == currentRow) continue;
+        if (profiles_[i].value("port", 0) == port) {
+            portStatusLabel_->setText(tr("Port %1 is already used by profile '%2'.")
+                .arg(port)
+                .arg(QString::fromStdString(profiles_[i].value("alias", std::string()))));
+            portStatusLabel_->setProperty("statusOk", false);
+            portStatusLabel_->setProperty("statusErr", true);
+            portStatusLabel_->style()->unpolish(portStatusLabel_);
+            portStatusLabel_->style()->polish(portStatusLabel_);
+            portStatusLabel_->setVisible(true);
+            return;
+        }
     }
     // A port the engine already listens on (this profile's running proxy)
     // counts as available, mirroring Windows HomePage::UpdateProxyStatus.
@@ -1464,7 +1581,36 @@ void MainWindow::onLanguageSelected(int index) {
     // settings-poll round-trip; the poll later re-applies the persisted tag.
     const QString tag = languageCombo_->itemData(index).toString();
     translator_->applyLanguage(tag);
+    syncLanguageSelectors(tag);
     appState_->client().PutSetting(L"appLanguage", tag.toStdString());
+}
+
+void MainWindow::refreshStats() {
+    // Mirrors Windows HomePage::UpdateStats: localize "Requests: ..." with
+    // the selected profile's stats. The status poll refreshes (*p)["stats"]
+    // just before calling this; a language change re-renders the cached
+    // numbers so the format string follows tr() even if no new tick arrives.
+    json* p = selectedProfile();
+    if (!p) return;
+    const json& st = (*p)["stats"];
+    statsLabel_->setText(tr("Requests: %1   PII: %2   Regex: %3   Keywords: %4")
+        .arg(st.value("total_requests", 0))
+        .arg(st.value("total_pii_detected", 0))
+        .arg(st.value("total_regex_matches", 0))
+        .arg(st.value("total_keyword_matches", 0)));
+}
+
+void MainWindow::syncLanguageSelectors(const QString& tag) {
+    // Keep the Settings-combo and the tray submenu agreed on the effective
+    // tag. The combo entry index 0 carries an empty data tag for "System
+    // default" (the engine resolves the OS locale); anything unrecognized
+    // maps back to index 0, mirroring onSettingsChanged.
+    {
+        QSignalBlocker b(languageCombo_);
+        const int idx = languageCombo_->findData(tag);
+        languageCombo_->setCurrentIndex(idx < 0 ? 0 : idx);
+    }
+    tray_->setCurrentLanguage(tag);
 }
 
 // ---------------------------------------------------------------------------

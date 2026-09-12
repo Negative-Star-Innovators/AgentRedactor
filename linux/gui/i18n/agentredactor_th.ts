@@ -35,16 +35,24 @@
       <translation>ไม่สามารถตรวจสอบการอัปเดตได้ ลองอีกครั้งในภายหลัง</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>บน</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>ปิด</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>วิธีใช้ Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>ประวัติโดยย่อ</translation>
+      <source>API Proxy</source>
+      <translation>พร็อกซี API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>การตรวจจับ</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>โมเดลตรวจจับที่ขับเคลื่อนด้วย AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>ชื่อ:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>ท่าเรือ:</translation>
+      <source>Local URL</source>
+      <translation>URL ภายในเครื่อง</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>คีย์ API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>ใช้โมเดล AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>แสดงคีย์ API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>คัดลอก URL พร็อกซี</translation>
+      <source>Copy</source>
+      <translation>คัดลอก</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>รหัสผ่านหลัก</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>เปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>รูปแบบ Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>ตัวพิมพ์</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>คำสำคัญ</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>หมายเลขบัญชี</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>เปิดใช้งานคำหลัก</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>กรณี: ใช่</translation>
+      <source>Yes</source>
+      <translation>ใช่</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>กรณี: ไม่ใช่</translation>
+      <source>No</source>
+      <translation>ไม่</translation>
     </message>
     <message>
       <source>Keyword text</source>

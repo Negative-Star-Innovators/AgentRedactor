@@ -35,16 +35,24 @@
       <translation>Neizdevās pārbaudīt atjauninājumus. Mēģiniet vēlāk vēlreiz.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Ieslēgts</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Izslēgts</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Kā izmantot Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profils</translation>
+      <source>API Proxy</source>
+      <translation>API starpniekserveris</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Atklāšana</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Mākslīgā intelekta pamatots atklāšanas modelis</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Vārds:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Ports:</translation>
+      <source>Local URL</source>
+      <translation>Vietējais URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API atslēga</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Izmantojiet AI modeli:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Rādīt API atslēgu</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopēt starpniekservera URL</translation>
+      <source>Copy</source>
+      <translation>Kopēt</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Galvenā parole</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Iespējots</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex paraugs</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Reģistrs</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Atslēgvārds</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Konta numurs</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Iespējot atslēgvārdu</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Lieta: Jā</translation>
+      <source>Yes</source>
+      <translation>Jā</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Lieta: Nē</translation>
+      <source>No</source>
+      <translation>Nē</translation>
     </message>
     <message>
       <source>Keyword text</source>

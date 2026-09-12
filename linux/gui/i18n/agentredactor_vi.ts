@@ -35,16 +35,24 @@
       <translation>Không thể kiểm tra cập nhật. Thử lại sau.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>TRÊN</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Tắt</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Cách sử dụng Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Hồ sơ</translation>
+      <source>API Proxy</source>
+      <translation>Proxy API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Phát hiện</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Mô hình phát hiện do AI cung cấp</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Tên:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Cảng:</translation>
+      <source>Local URL</source>
+      <translation>URL cục bộ</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Khóa API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Sử dụng mô hình AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Hiển thị khóa API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Sao chép URL proxy</translation>
+      <source>Copy</source>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Mật khẩu chính</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Đã bật</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Mẫu Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Chữ hoa/chữ thường</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Từ khóa</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Số tài khoản</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Bật từ khóa</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Trường hợp: Có</translation>
+      <source>Yes</source>
+      <translation>Có</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Trường hợp: Không</translation>
+      <source>No</source>
+      <translation>Không</translation>
     </message>
     <message>
       <source>Keyword text</source>

@@ -35,16 +35,24 @@
       <translation>Não foi possível procurar atualizações. Tente novamente mais tarde.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Sobre</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Desligado</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Como utilizar o Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Perfil</translation>
+      <source>API Proxy</source>
+      <translation>Proxy de API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detecção</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Modelo de deteção alimentado por IA</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Nome:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Porta:</translation>
+      <source>Local URL</source>
+      <translation>URL local</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Chave de API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Use o modelo de IA:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Mostrar chave de API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Copiar URL do proxy</translation>
+      <source>Copy</source>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Senha mestra</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Ativado</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Padrão de regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Maiúsculas/minúsculas</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Palavra-chave</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Número de conta</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Ativar palavra-chave</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Caso: Sim</translation>
+      <source>Yes</source>
+      <translation>Sim</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Caso: Não</translation>
+      <source>No</source>
+      <translation>Não</translation>
     </message>
     <message>
       <source>Keyword text</source>

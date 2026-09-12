@@ -35,16 +35,24 @@
       <translation>Tidak dapat menyemak kemas kini. Cuba lagi kemudian.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>hidup</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Mati</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Cara menggunakan Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>Proksi API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Pengesanan</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model Pengesanan Berkuasa AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>nama:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Pelabuhan:</translation>
+      <source>Local URL</source>
+      <translation>URL tempatan</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Kunci API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Gunakan model AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Tunjukkan kunci API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Salin URL proksi</translation>
+      <source>Copy</source>
+      <translation>salin</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Kata laluan induk</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Didayakan</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Corak Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Kes</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kata kunci</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Nombor akaun</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Dayakan kata kunci</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Kes: Ya</translation>
+      <source>Yes</source>
+      <translation>ya</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Kes: Tidak</translation>
+      <source>No</source>
+      <translation>Tidak</translation>
     </message>
     <message>
       <source>Keyword text</source>

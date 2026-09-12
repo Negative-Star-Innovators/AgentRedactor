@@ -35,16 +35,24 @@
       <translation>Ma setax jiġi ċċekkjat għal aġġornamenti. Erġa' pprova aktar tard.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Fuq</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Mitfi</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Kif tuża Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>Proxy API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Sejbien</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Mudell ta' Dettazzjoni bil-AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Isem:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>URL Lokali</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Ċavetta API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Uża mudell AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Uri ċ-ċavetta API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Ikkopja l-URL tal-prokura</translation>
+      <source>Copy</source>
+      <translation>Ikkopja</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Password prinċipali</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Attivat</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Mudell Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Każ</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kelma Muftieħa</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Numru tal-kont</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Ippermetti keyword</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Każ: Iva</translation>
+      <source>Yes</source>
+      <translation>Iva</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Każ: Le</translation>
+      <source>No</source>
+      <translation>Le</translation>
     </message>
     <message>
       <source>Keyword text</source>

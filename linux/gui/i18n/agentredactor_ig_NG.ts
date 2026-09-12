@@ -35,16 +35,24 @@
       <translation>Enweghị ike ịlele mmelite. Gbalịa ọzọ mgbe e mesịrị.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Gbanye</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Gbanyụọ</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Ka e si eji Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profaịlụ</translation>
+      <source>API Proxy</source>
+      <translation>Proxy API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Nchọpụta</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Nchọpụta Model na-akwọ AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Aha:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>URL Obodo</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Akụkọ API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Jiri ụdị AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Gosi igodo API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Detuo URL proxy</translation>
+      <source>Copy</source>
+      <translation>Detuo</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Nna-ukwu paswọọdụ</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Kwụsịrị</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex Pattern</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Case</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Keyword</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Nọmba akaụntụ</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Kwado isiokwu</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Ikpe: Ee</translation>
+      <source>Yes</source>
+      <translation>Ee</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Ikpe: Mba</translation>
+      <source>No</source>
+      <translation>Mba</translation>
     </message>
     <message>
       <source>Keyword text</source>

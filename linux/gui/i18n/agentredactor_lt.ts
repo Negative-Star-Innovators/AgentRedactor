@@ -35,16 +35,24 @@
       <translation>Nepavyko patikrinti naujinimų. Bandykite dar kartą vėliau.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Įjungta</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Išjungta</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Kaip naudotis Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profilis</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Aptikimas</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>DI varomas aptikimo modelis</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Vardas:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Uostas:</translation>
+      <source>Local URL</source>
+      <translation>Vietinis URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API raktas</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Naudokite AI modelį:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Rodyti API raktą</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Nukopijuokite tarpinio serverio URL</translation>
+      <source>Copy</source>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Pagrindinis slaptažodis</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Įjungta</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex šablonas</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Didžiosios/mažosios raidės</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Raktinis žodis</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Sąskaitos numeris</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Įgalinti raktinį žodį</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Byla: Taip</translation>
+      <source>Yes</source>
+      <translation>Taip</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Byla: Ne</translation>
+      <source>No</source>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Keyword text</source>

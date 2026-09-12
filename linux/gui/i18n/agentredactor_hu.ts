@@ -35,16 +35,24 @@
       <translation>Nem sikerült frissítéseket keresni. Próbálja újra később.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>On</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Le</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Hogyan használja az Agent Redactor-t</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Érzékelés</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Mesterséges intelligenciával működő észlelési modell</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Név:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Kikötő:</translation>
+      <source>Local URL</source>
+      <translation>Helyi URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API kulcs</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI modell használata:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API-kulcs megjelenítése</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proxy URL másolása</translation>
+      <source>Copy</source>
+      <translation>Másolás</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Mester jelszó</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Engedélyezve</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex minta</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Kis- és nagybetű</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kulcsszó</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Számlaszám</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Kulcsszó engedélyezése</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Eset: Igen</translation>
+      <source>Yes</source>
+      <translation>Igen</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Eset: Nem</translation>
+      <source>No</source>
+      <translation>Nem</translation>
     </message>
     <message>
       <source>Keyword text</source>

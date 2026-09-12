@@ -35,16 +35,24 @@
       <translation>Nu s-au putut verifica actualizările. Încercați din nou mai târziu.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Pe</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Oprit</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Cum să utilizați Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>Proxy API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detectare</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model de detectare alimentat de IA</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Nume:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>URL local</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Cheie API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Utilizați modelul AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Afișați cheia API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Copiați adresa URL proxy</translation>
+      <source>Copy</source>
+      <translation>Copiază</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Parola principală</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Activat</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Model Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Majuscule/minuscule</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Cuvânt cheie</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Număr cont</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Activați cuvântul cheie</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Caz: Da</translation>
+      <source>Yes</source>
+      <translation>Da</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Caz: Nu</translation>
+      <source>No</source>
+      <translation>Nu</translation>
     </message>
     <message>
       <source>Keyword text</source>

@@ -35,16 +35,24 @@
       <translation>Kunne ikke søge efter opdateringer. Prøv igen senere.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>På</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Slukket</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Sådan bruger du Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API-proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Opdagelse</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI-drevet detektionsmodel</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Navn:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Havn:</translation>
+      <source>Local URL</source>
+      <translation>Lokal URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API-nøgle</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Brug AI-model:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Vis API-nøgle</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopiér proxy-URL</translation>
+      <source>Copy</source>
+      <translation>Kopiér</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Hovedadgangskode</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Aktiveret</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-mønster</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Store/små bogstaver</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Nøgleord</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Kontonummer</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Aktiver søgeord</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Sag: Ja</translation>
+      <source>Yes</source>
+      <translation>Ja</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Sag: Nej</translation>
+      <source>No</source>
+      <translation>Nej</translation>
     </message>
     <message>
       <source>Keyword text</source>

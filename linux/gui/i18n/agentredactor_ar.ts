@@ -35,16 +35,24 @@
       <translation>تعذّر التحقق من التحديثات. حاول مرة أخرى لاحقًا.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>على</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>عن</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>كيفية استخدام وكيل Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>حساب تعريفي</translation>
+      <source>API Proxy</source>
+      <translation>وكيل واجهة برمجة التطبيقات</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>كشف</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>نموذج الكشف المدعوم بالذكاء الاصطناعي</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>اسم:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>ميناء:</translation>
+      <source>Local URL</source>
+      <translation>عنوان URL المحلي</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>مفتاح واجهة برمجة التطبيقات</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>استخدم نموذج الذكاء الاصطناعي:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>إظهار مفتاح API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>انسخ عنوان URL للوكيل</translation>
+      <source>Copy</source>
+      <translation>ينسخ</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>كلمة المرور الرئيسية</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>ممكّن</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>نمط ريكس</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>قضية</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>الكلمة الرئيسية</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>رقم الحساب</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>تمكين الكلمة الرئيسية</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>الحالة: نعم</translation>
+      <source>Yes</source>
+      <translation>نعم</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>الحالة: لا</translation>
+      <source>No</source>
+      <translation>لا</translation>
     </message>
     <message>
       <source>Keyword text</source>

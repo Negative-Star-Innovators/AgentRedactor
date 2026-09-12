@@ -1,11 +1,12 @@
 #pragma once
 
 // Linux mirror of windows/MainWindow + HomePage: a single window with a
-// profile sidebar and the settings cards (quick start, profile, detection,
-// regex, keywords, password, statistics, session redactions, logs), plus the
-// lock overlay, the blocking model-download dialog, close-to-tray and the
-// inactivity re-lock. All strings go through tr(); retranslateUi() applies
-// language changes live (TranslatorLoader drives QEvent::LanguageChange).
+// profile sidebar and the settings cards (quick start, API Proxy, regex,
+// keywords, AI detection, password, statistics, session redactions, logs),
+// plus the lock overlay, the blocking model-download dialog, close-to-tray
+// and the inactivity re-lock. All strings go through tr(); retranslateUi()
+// applies language changes live (TranslatorLoader drives
+// QEvent::LanguageChange).
 
 #include <QMainWindow>
 
@@ -15,6 +16,7 @@ class AppState;
 class AppUpdateManager;
 class TrayIcon;
 class TranslatorLoader;
+class AgentToggleSwitch;
 
 class QCheckBox;
 class QCloseEvent;
@@ -110,6 +112,16 @@ private:
     // (mirrors Windows HomePage::UpdateProxyStatus).
     void updatePortStatus();
 
+    // Re-render the Statistics card label from the selected profile's cached
+    // stats (mirrors Windows HomePage::UpdateStats). Called by both the status
+    // poll and a language change so the localized text follows tr().
+    void refreshStats();
+
+    // Make both language selectors (Settings-combo + tray submenu) reflect the
+    // same effective tag, so a change from either source is echoed immediately
+    // without waiting for the settings-poll round-trip.
+    void syncLanguageSelectors(const QString& tag);
+
     // PII type display label (translated; English source matches the
     // PII_Type_<type> values in the Windows resw catalogs).
     static QString piiTypeLabel(const std::wstring& type);
@@ -149,11 +161,10 @@ private:
     QPushButton* saveBtn_ = nullptr;
 
     // Detection card
-    QLabel* useAiLabel_ = nullptr;
     QLabel* confidenceLabel_ = nullptr;
     QLabel* detectionDescLabel_ = nullptr;
     QLabel* detectionSlowLabel_ = nullptr;
-    QCheckBox* useAiCheck_ = nullptr;
+    AgentToggleSwitch* useAiCheck_ = nullptr;
     QLineEdit* confidenceBox_ = nullptr;
     std::vector<std::pair<std::wstring, QCheckBox*>> piiChecks_;
 
@@ -165,6 +176,15 @@ private:
     QLineEdit* newRegexBox_ = nullptr;
     QLineEdit* newKeywordBox_ = nullptr;
     QCheckBox* newKeywordCaseCheck_ = nullptr;
+
+    // Regex / keywords column headers (Windows RegexHeaderGrid / KeywordHeaderGrid).
+    QWidget* regexHeader_ = nullptr;
+    QLabel* regexEnabledHeader_ = nullptr;
+    QLabel* regexPatternHeader_ = nullptr;
+    QWidget* keywordHeader_ = nullptr;
+    QLabel* keywordEnabledHeader_ = nullptr;
+    QLabel* keywordCaseHeader_ = nullptr;
+    QLabel* keywordKeywordHeader_ = nullptr;
 
     // Password card
     QCheckBox* requirePasswordCheck_ = nullptr;

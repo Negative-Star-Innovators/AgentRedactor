@@ -35,16 +35,24 @@
       <translation>புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>அன்று</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>ஆஃப்</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor ஐ எவ்வாறு பயன்படுத்துவது</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>சுயவிவரம்</translation>
+      <source>API Proxy</source>
+      <translation>API ப்ராக்ஸி</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>கண்டறிதல்</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI இயக்கிய கண்டறிதல் மாதிரி</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>பெயர்:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>துறைமுகம்:</translation>
+      <source>Local URL</source>
+      <translation>உள்ளூர் URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API விசை</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI மாதிரியைப் பயன்படுத்தவும்:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API விசையைக் காட்டு</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>ப்ராக்ஸி URL ஐ நகலெடுக்கவும்</translation>
+      <source>Copy</source>
+      <translation>நகலெடு</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>முதன்மை கடவுச்சொல்</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>இயக்கப்பட்டது</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex முறை</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>எழுத்துப்பிரிவு</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>முக்கியசொல்</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>கணக்கு எண்</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>முக்கிய சொல்லை இயக்கு</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>வழக்கு: ஆம்</translation>
+      <source>Yes</source>
+      <translation>ஆம்</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>வழக்கு: இல்லை</translation>
+      <source>No</source>
+      <translation>இல்லை</translation>
     </message>
     <message>
       <source>Keyword text</source>

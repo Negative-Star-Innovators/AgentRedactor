@@ -35,16 +35,24 @@
       <translation>अपडेट जांचे नहीं जा सके। बाद में पुनः प्रयास करें।</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>पर</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>बंद</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor का उपयोग कैसे करें</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>प्रोफ़ाइल</translation>
+      <source>API Proxy</source>
+      <translation>API प्रॉक्सी</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>खोज</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI-संचालित पहचान मॉडल</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>नाम:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>पत्तन:</translation>
+      <source>Local URL</source>
+      <translation>लोकल URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API कुंजी</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>एआई मॉडल का प्रयोग करें:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>एपीआई कुंजी दिखाएँ</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>प्रॉक्सी यूआरएल कॉपी करें</translation>
+      <source>Copy</source>
+      <translation>कॉपी करें</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>मास्टर पासवर्ड</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>सक्षम</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex पैटर्न</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>केस</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>कीवर्ड</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>खाता संख्या</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>कीवर्ड सक्षम करें</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>केस: हाँ</translation>
+      <source>Yes</source>
+      <translation>हाँ</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>केस: नहीं</translation>
+      <source>No</source>
+      <translation>नहीं</translation>
     </message>
     <message>
       <source>Keyword text</source>

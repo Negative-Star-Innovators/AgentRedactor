@@ -35,16 +35,24 @@
       <translation>Не удалось проверить обновления. Повторите попытку позже.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>На</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Выключенный</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Как использовать Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Профиль</translation>
+      <source>API Proxy</source>
+      <translation>API-прокси</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Обнаружение</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Модель обнаружения на основе ИИ</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Имя:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Порт:</translation>
+      <source>Local URL</source>
+      <translation>Локальный URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Ключ API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Использовать модель AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Показать ключ API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Скопировать URL-адрес прокси-сервера</translation>
+      <source>Copy</source>
+      <translation>Копировать</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Мастер-пароль</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Включено</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Шаблон регулярного выражения</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Регистр</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ключевое слово</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Номер счета</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Включить ключевое слово</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Корпус: Да</translation>
+      <source>Yes</source>
+      <translation>Да</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Корпус: Нет</translation>
+      <source>No</source>
+      <translation>Нет</translation>
     </message>
     <message>
       <source>Keyword text</source>

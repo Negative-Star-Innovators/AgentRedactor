@@ -35,16 +35,24 @@
       <translation>Yeniləmələri yoxlamaq mümkün olmadı. Daha sonra yenidən cəhd edin.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Aktiv</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Söndür</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor necə istifadə olunur</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API Proksi</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Aşkarlama</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI Güclü Aşkarlama Modeli</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Adı:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Liman:</translation>
+      <source>Local URL</source>
+      <translation>Yerli URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API Açarı</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI modelindən istifadə edin:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API açarını göstərin</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proksi URL-ni kopyalayın</translation>
+      <source>Copy</source>
+      <translation>Kopyalayın</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Master parol</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Aktivdir</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex nümunəsi</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Case</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Açar söz</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Hesab nömrəsi</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Açar sözü aktivləşdirin</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Dava: Bəli</translation>
+      <source>Yes</source>
+      <translation>Bəli</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Dava: Xeyr</translation>
+      <source>No</source>
+      <translation>yox</translation>
     </message>
     <message>
       <source>Keyword text</source>

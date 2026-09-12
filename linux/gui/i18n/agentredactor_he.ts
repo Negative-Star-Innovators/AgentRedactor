@@ -35,16 +35,24 @@
       <translation>לא ניתן היה לבדוק עדכונים. נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>עַל</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>כבוי</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>איך להשתמש ב-Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>פּרוֹפִיל</translation>
+      <source>API Proxy</source>
+      <translation>פרוקסי API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>איתור</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>מודל זיהוי מונע AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>שֵׁם:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>נָמָל:</translation>
+      <source>Local URL</source>
+      <translation>URL מקומי</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>מפתח API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>השתמש במודל AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>הצג מפתח API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>העתק את כתובת ה-proxy</translation>
+      <source>Copy</source>
+      <translation>העתק</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>סיסמת מאסטר</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>מופעל</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>תבנית Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>רישיות</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>מילת מפתח</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>מספר חשבון</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>אפשר מילת מפתח</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>מקרה: כן</translation>
+      <source>Yes</source>
+      <translation>כן</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>מקרה: לא</translation>
+      <source>No</source>
+      <translation>לא</translation>
     </message>
     <message>
       <source>Keyword text</source>

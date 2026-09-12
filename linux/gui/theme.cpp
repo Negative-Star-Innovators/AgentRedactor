@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QEvent>
 #include <QPalette>
+#include <QTimer>
 
 namespace {
 
@@ -21,7 +22,7 @@ QString stylesheet(bool dark) {
     const QString statusOk = dark ? QStringLiteral("#64FF64") : QStringLiteral("#009600");
     const QString statusErr = QStringLiteral("#DC3545");
 
-    return QStringLiteral(R"QSS(
+    QString qss = QStringLiteral(R"QSS(
 QMainWindow, QDialog {
     background: %1;
 }
@@ -85,7 +86,35 @@ QPushButton[danger="true"] {
     background: transparent;
     border: none;
 }
+QLabel[colHeader="true"] {
+    color: %5;
+    font-weight: 600;
+    font-size: 12px;
+    background: transparent;
+}
 )QSS").arg(page, card, border, sidebar, hint, statusOk, statusErr, accent, accentHover);
+
+    // Checkbox styling. Dark mode is left entirely to Qt's native checkbox
+    // (unchanged). Light mode only: the default box/border on the app's white
+    // cards can be too faint to see, so give the indicator a clearly visible
+    // box (strong border + white interior) while keeping Qt's own checkmark
+    // glyph — no solid fill, so it still reads as a checkbox.
+    if (!dark) {
+        qss += QStringLiteral(R"QSS(
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid )") + QStringLiteral("#4A4A4A") + QStringLiteral(R"QSS(;
+    border-radius: 3px;
+    background: white;
+}
+QCheckBox::indicator:hover {
+    border: 2px solid )") + accentHover + QStringLiteral(R"QSS(;
+}
+)QSS");
+    }
+
+    return qss;
 }
 
 void apply(QApplication& app) {
@@ -110,5 +139,14 @@ private:
 
 void Theme::Apply(QApplication& app) {
     apply(app);
+    // On X11/Wayland the system light/dark preference is resolved asynchronously
+    // (GTK3 platform theme / color-scheme portal), so the palette read right
+    // after QApplication construction can still be the default (light) even
+    // though the system is dark — and Qt does NOT emit ApplicationPaletteChange
+    // for that initial resolution, so only the constructed snapshot would stick.
+    // Re-apply once the event loop has started to pick up a late-settled theme.
+    // Applying the same stylesheet is idempotent, so this is a no-op when the
+    // palette already matched.
+    QTimer::singleShot(0, [&app] { apply(app); });
     app.installEventFilter(new PaletteChangeFilter(app));
 }

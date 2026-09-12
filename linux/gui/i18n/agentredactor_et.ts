@@ -35,16 +35,24 @@
       <translation>Värskendusi ei saanud kontrollida. Proovige hiljem uuesti.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Sees</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Väljas</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Kuidas kasutada Agent Redactorit</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profiil</translation>
+      <source>API Proxy</source>
+      <translation>API puhverserver</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Tuvastamine</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Tehisintellektil põhinev tuvastusmudel</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Nimi:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Kohalik URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API võti</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Kasutage AI mudelit:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Kuva API võti</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopeeri puhverserveri URL</translation>
+      <source>Copy</source>
+      <translation>Kopeeri</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Peaparool</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Lubatud</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex muster</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Suur- ja väiketähed</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Märksõna</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Kontonumber</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Luba märksõna</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Juhtum: Jah</translation>
+      <source>Yes</source>
+      <translation>Jah</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Juhtum: ei</translation>
+      <source>No</source>
+      <translation>Ei</translation>
     </message>
     <message>
       <source>Keyword text</source>

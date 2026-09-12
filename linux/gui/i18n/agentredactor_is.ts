@@ -35,16 +35,24 @@
       <translation>Ekki tókst að athuga uppfærslur. Reyndu aftur síðar.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Á</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Slökkt</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Hvernig á að nota Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Prófíll</translation>
+      <source>API Proxy</source>
+      <translation>API milliþjónn</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Uppgötvun</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Gervigreindardrifinn greiningarlíkan</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Nafn:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Höfn:</translation>
+      <source>Local URL</source>
+      <translation>Staðbundið URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API lykill</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Notaðu gervigreind líkan:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Sýna API lykil</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Afritaðu proxy-slóð</translation>
+      <source>Copy</source>
+      <translation>Afrita</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Aðal lykilorð</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Virkt</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex mynstur</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Hástafir/lágstafir</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Lykilorð</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Reikningsnúmer</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Virkja leitarorð</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Mál: Já</translation>
+      <source>Yes</source>
+      <translation>Já</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Mál: Nei</translation>
+      <source>No</source>
+      <translation>Nei</translation>
     </message>
     <message>
       <source>Keyword text</source>

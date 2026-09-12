@@ -35,16 +35,24 @@
       <translation>업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>~에</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>끄다</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor 사용 방법</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>윤곽</translation>
+      <source>API Proxy</source>
+      <translation>API 프록시</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>발각</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI 기반 검출 모델</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>이름:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>포트:</translation>
+      <source>Local URL</source>
+      <translation>로컬 URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API 키</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI 모델 사용:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API 키 표시</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>프록시 URL 복사</translation>
+      <source>Copy</source>
+      <translation>복사</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>마스터 비밀번호</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>사용</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>정규식 패턴</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>대소문자</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>키워드</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>계좌 번호</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>키워드 활성화</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>케이스: 예</translation>
+      <source>Yes</source>
+      <translation>예</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>케이스: 아니오</translation>
+      <source>No</source>
+      <translation>아니요</translation>
     </message>
     <message>
       <source>Keyword text</source>

@@ -35,16 +35,24 @@
       <translation>Haikuweza kuangalia sasisho. Jaribu tena baadaye.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Washa</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Imezimwa</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Jinsi ya kutumia Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Wasifu</translation>
+      <source>API Proxy</source>
+      <translation>Proxy ya API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Ugunduzi</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Mfano wa Utambuzi unaotumia AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Jina:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Bandari:</translation>
+      <source>Local URL</source>
+      <translation>URL ya Mitaa</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Ufunguo wa API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Tumia muundo wa AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Onyesha ufunguo wa API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Nakili URL ya seva mbadala</translation>
+      <source>Copy</source>
+      <translation>Nakili</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Nenosiri kuu</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Imewashwa</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Mistarifa ya Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Herufi kubwa/ndogo</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Neno Muhimu</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Nambari ya akaunti</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Washa nenomsingi</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Kesi: Ndiyo</translation>
+      <source>Yes</source>
+      <translation>Ndiyo</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Kesi: Hapana</translation>
+      <source>No</source>
+      <translation>Hapana</translation>
     </message>
     <message>
       <source>Keyword text</source>

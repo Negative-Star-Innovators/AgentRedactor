@@ -35,16 +35,24 @@
       <translation>Nepodarilo sa skontrolovať aktualizácie. Skúste to znova neskôr.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Zapnuté</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Vypnuté</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Ako používať Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detekcia</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model detekcie poháňaný umelou inteligenciou</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>meno:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Miestna URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API kľúč</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Použiť model AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Zobraziť kľúč API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Skopírujte adresu URL servera proxy</translation>
+      <source>Copy</source>
+      <translation>Kopírovať</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Hlavné heslo</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Povolené</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex vzor</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Veľkosť písmen</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kľúčové slovo</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Číslo účtu</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Povoliť kľúčové slovo</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Prípad: Áno</translation>
+      <source>Yes</source>
+      <translation>Áno</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Prípad: Nie</translation>
+      <source>No</source>
+      <translation>Nie</translation>
     </message>
     <message>
       <source>Keyword text</source>

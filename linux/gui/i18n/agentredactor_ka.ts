@@ -35,16 +35,24 @@
       <translation>განახლებების შემოწმება ვერ მოხერხდა. სცადეთ მოგვიანებით.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>ჩართულია</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>გამორთულია</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>როგორ გამოვიყენოთ Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>პროფილი</translation>
+      <source>API Proxy</source>
+      <translation>API პროქსი</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>გამოვლენა</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>ხელოვნური ინტელექტით მართული გამოვლენის მოდელი</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>სახელი:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>პორტი:</translation>
+      <source>Local URL</source>
+      <translation>ლოკალური URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API გასაღები</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>გამოიყენეთ AI მოდელი:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API გასაღების ჩვენება</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>დააკოპირეთ პროქსის URL</translation>
+      <source>Copy</source>
+      <translation>კოპირება</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>ძირითადი პაროლი</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>ჩართულია</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex ნიმუში</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>რეგისტრი</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>საკვანძო სიტყვა</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>ანგარიშის ნომერი</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>ჩართეთ საკვანძო სიტყვა</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>საქმე: დიახ</translation>
+      <source>Yes</source>
+      <translation>დიახ</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>საქმე: არა</translation>
+      <source>No</source>
+      <translation>არა</translation>
     </message>
     <message>
       <source>Keyword text</source>

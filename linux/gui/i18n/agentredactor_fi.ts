@@ -35,16 +35,24 @@
       <translation>Päivityksiä ei voitu tarkistaa. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Päällä</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Pois</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Kuinka käyttää Agent Redactoria</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profiili</translation>
+      <source>API Proxy</source>
+      <translation>API-välityspalvelin</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Havaitseminen</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Tekoälyä hyödyntävä havaintomalli</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Nimi:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Portti:</translation>
+      <source>Local URL</source>
+      <translation>Paikallinen URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API-avain</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Käytä AI-mallia:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Näytä API-avain</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopioi välityspalvelimen URL-osoite</translation>
+      <source>Copy</source>
+      <translation>Kopioi</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Pääsalasana</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Käytössä</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-kuvio</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Kirjainkoko</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Avainsana</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Tilinumero</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Ota avainsana käyttöön</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Tapaus: Kyllä</translation>
+      <source>Yes</source>
+      <translation>Kyllä</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Tapaus: Ei</translation>
+      <source>No</source>
+      <translation>Ei</translation>
     </message>
     <message>
       <source>Keyword text</source>

@@ -35,16 +35,24 @@
       <translation>Nepodařilo se zkontrolovat aktualizace. Zkuste to znovu později.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Na</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Vypnuto</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Jak používat Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detekce</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model detekce poháněný umělou inteligencí</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Jméno:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Přístav:</translation>
+      <source>Local URL</source>
+      <translation>Místní URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API klíč</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Použít model AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Zobrazit klíč API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Zkopírujte adresu URL proxy</translation>
+      <source>Copy</source>
+      <translation>Kopírovat</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Hlavní heslo</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Povoleno</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex vzor</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Velikost písmen</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Klíčové slovo</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Číslo účtu</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Povolit klíčové slovo</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Případ: Ano</translation>
+      <source>Yes</source>
+      <translation>Ano</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Případ: Ne</translation>
+      <source>No</source>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Keyword text</source>

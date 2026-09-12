@@ -35,16 +35,24 @@
       <translation>Güncelleştirmeler denetlenemedi. Daha sonra yeniden deneyin.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Açık</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Kapalı</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor Nasıl Kullanılır</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Algılama</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI Destekli Algılama Modeli</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>İsim:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Liman:</translation>
+      <source>Local URL</source>
+      <translation>Yerel URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API Anahtarı</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Yapay zeka modelini kullanın:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API anahtarını göster</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proxy URL'sini kopyala</translation>
+      <source>Copy</source>
+      <translation>Kopyala</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Ana şifre</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Etkin</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex Deseni</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Büyük/Küçük Harf</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Anahtar Kelime</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Hesap numarası</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Anahtar kelimeyi etkinleştir</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Durum: Evet</translation>
+      <source>Yes</source>
+      <translation>Evet</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Durum: Hayır</translation>
+      <source>No</source>
+      <translation>Hayır</translation>
     </message>
     <message>
       <source>Keyword text</source>

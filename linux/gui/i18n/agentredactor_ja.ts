@@ -35,16 +35,24 @@
       <translation>更新を確認できませんでした。後でもう一度お試しください。</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>の上</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>オフ</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor の使い方</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>プロフィール</translation>
+      <source>API Proxy</source>
+      <translation>API プロキシ</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>検出</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI 駆動検出モデル</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>名前：</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>ポート：</translation>
+      <source>Local URL</source>
+      <translation>ローカル URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API キー</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI モデルを使用します。</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>APIキーを表示</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>プロキシ URL をコピーする</translation>
+      <source>Copy</source>
+      <translation>コピー</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>マスターパスワード</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>有効</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>正規表現パターン</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>大文字小文字</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>キーワード</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>口座番号</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>キーワードを有効にする</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>ケース: はい</translation>
+      <source>Yes</source>
+      <translation>はい</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>ケース: いいえ</translation>
+      <source>No</source>
+      <translation>いいえ</translation>
     </message>
     <message>
       <source>Keyword text</source>

@@ -35,16 +35,24 @@
       <translation>Nuk u kontrolluan dot përditësimet. Provoni sërish më vonë.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Aktiv</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Joaktiv</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Si të përdorni Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profili</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Zbulimi</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model zbulimi i fuqizuar nga AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Emri:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Porti:</translation>
+      <source>Local URL</source>
+      <translation>URL lokale</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Çelësi API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Përdorni modelin e AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Shfaq çelësin API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopjo URL-në e përfaqësuesit</translation>
+      <source>Copy</source>
+      <translation>Kopjo</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Fjalëkalimi kryesor</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Aktivizuar</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Model Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Madhësia e shkronjave</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Fjalë kyçe</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Numri i llogarisë</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Aktivizo fjalën kyçe</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Rasti: Po</translation>
+      <source>Yes</source>
+      <translation>Po</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Rasti: Jo</translation>
+      <source>No</source>
+      <translation>Jo</translation>
     </message>
     <message>
       <source>Keyword text</source>

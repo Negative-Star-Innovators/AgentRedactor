@@ -35,16 +35,24 @@
       <translation>Не вдалося перевірити оновлення. Спробуйте пізніше.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Увімкнено</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Вимкнено</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Як використовувати Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Профіль</translation>
+      <source>API Proxy</source>
+      <translation>API-проксі</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>виявлення</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Модель виявлення на основі ШІ</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Ім'я:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Порт:</translation>
+      <source>Local URL</source>
+      <translation>Локальна URL-адреса</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Ключ API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Використовуйте модель ШІ:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Показати ключ API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Копіювати URL проксі</translation>
+      <source>Copy</source>
+      <translation>Копіювати</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Головний пароль</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Увімкнено</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Шаблон регулярного виразу</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Регістр</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ключове слово</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Номер рахунку</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Увімкнути ключове слово</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Справа: Так</translation>
+      <source>Yes</source>
+      <translation>Так</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Справа: немає</translation>
+      <source>No</source>
+      <translation>Ні</translation>
     </message>
     <message>
       <source>Keyword text</source>

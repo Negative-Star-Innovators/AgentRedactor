@@ -35,16 +35,24 @@
       <translation>Nie można sprawdzić aktualizacji. Spróbuj ponownie później.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>NA</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Wyłączony</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Jak używać Agent Redactor</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>API Proxy</source>
+      <translation>Proxy API</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Wykrywanie</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>Model detekcji zasilany przez AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Nazwa:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Lokalny URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>Klucz API</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>Użyj modelu AI:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>Pokaż klucz API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Skopiuj adres URL serwera proxy</translation>
+      <source>Copy</source>
+      <translation>Kopiuj</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Hasło główne</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Włączone</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Wzorzec Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Wielkość liter</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Słowo kluczowe</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Numer konta</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Włącz słowo kluczowe</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Sprawa: Tak</translation>
+      <source>Yes</source>
+      <translation>Tak</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Sprawa: Nie</translation>
+      <source>No</source>
+      <translation>Nie</translation>
     </message>
     <message>
       <source>Keyword text</source>

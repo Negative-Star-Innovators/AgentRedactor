@@ -35,16 +35,24 @@
       <translation>Жаңартуларды тексеру мүмкін болмады. Кейінірек қайталап көріңіз.</translation>
     </message>
     <message>
+      <source>On</source>
+      <translation>Қосулы</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Өшірулі</translation>
+    </message>
+    <message>
       <source>How to use Agent Redactor</source>
       <translation>Agent Redactor қалай пайдалануға болады</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Профиль</translation>
+      <source>API Proxy</source>
+      <translation>API прокси</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Анықтау</translation>
+      <source>AI Powered Detection Model</source>
+      <translation>AI қуат беретін анықтау үлгісі</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -79,8 +87,8 @@
       <translation>Аты:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Порт:</translation>
+      <source>Local URL</source>
+      <translation>Жергілікті URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -89,10 +97,6 @@
     <message>
       <source>API Key</source>
       <translation>API кілті</translation>
-    </message>
-    <message>
-      <source>Use AI model:</source>
-      <translation>AI үлгісін қолданыңыз:</translation>
     </message>
     <message>
       <source>Confidence threshold:</source>
@@ -179,8 +183,8 @@
       <translation>API кілтін көрсету</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Прокси URL мекенжайын көшіріңіз</translation>
+      <source>Copy</source>
+      <translation>Көшіру</translation>
     </message>
     <message>
       <source>Save</source>
@@ -287,6 +291,22 @@
       <translation>Негізгі құпия сөз</translation>
     </message>
     <message>
+      <source>Enabled</source>
+      <translation>Қосылған</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex үлгісі</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Іс</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Негізгі сөз</translation>
+    </message>
+    <message>
       <source>Account number</source>
       <translation>Есептік жазба нөмірі</translation>
     </message>
@@ -355,12 +375,12 @@
       <translation>Негізгі сөзді қосыңыз</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Іс: Иә</translation>
+      <source>Yes</source>
+      <translation>Иә</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Іс: Жоқ</translation>
+      <source>No</source>
+      <translation>Жоқ</translation>
     </message>
     <message>
       <source>Keyword text</source>
