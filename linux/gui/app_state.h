@@ -58,10 +58,15 @@ private slots:
 
 private:
     void PollThreadMain();
+    // Respawn the engine after a mid-session crash: tries a plain reconnect
+    // first (another GUI instance may have restarted it), then spawns a fresh
+    // engine and waits for it like EnsureEngineRunning does. Poll thread only.
+    void RespawnEngine();
 
     std::filesystem::path configDir_;
     AgentRedactor::EngineClient client_;
     bool engineSpawned_ = false;
+    int consecutivePollFailures_ = 0;
 
     std::thread pollThread_;
     std::atomic<bool> stopPolling_{false};

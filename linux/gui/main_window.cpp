@@ -271,6 +271,14 @@ void MainWindow::buildUi() {
     cardsLayout->setSpacing(16);
 
     auto markDirty = [this] { if (!loading_) dirty_ = true; };
+    // Controls with immediate effect: persist through the normal save path
+    // (validation included) instead of waiting for the Save button. Matches
+    // the keyword/regex row toggles, which already PUT on change.
+    auto autosave = [this] {
+        if (loading_) return;
+        dirty_ = true;
+        onSaveProfile();
+    };
 
     // -- Quick start card --
     QVBoxLayout* quickStartLayout;
@@ -439,7 +447,7 @@ void MainWindow::buildUi() {
     // stays fixed so assistive tech can find the control regardless of state.
     useAiCheck_ = new AgentToggleSwitch(detectionCard);
     useAiCheck_->setObjectName(QStringLiteral("useAiSwitch"));
-    connect(useAiCheck_, &QCheckBox::toggled, this, markDirty);
+    connect(useAiCheck_, &QCheckBox::toggled, this, autosave);
     connect(useAiCheck_, &QCheckBox::toggled, this, [this](bool on) {
         useAiCheck_->setText(on ? tr("On") : tr("Off"));
     });
@@ -452,11 +460,14 @@ void MainWindow::buildUi() {
     detectionForm->addRow(confidenceLabel_, confidenceBox_);
     detectionLayout->addLayout(detectionForm);
     connect(confidenceBox_, &QLineEdit::textEdited, this, markDirty);
+    // Autosave on commit (focus-out / Enter), not per keystroke: partial
+    // input like "0." would fail validation if saved mid-typing.
+    connect(confidenceBox_, &QLineEdit::editingFinished, this, autosave);
     auto* piiGrid = new QGridLayout;
     int row = 0, col = 0;
     for (const auto& type : DEFAULT_PII_TYPES) {
         auto* check = new QCheckBox(piiTypeLabel(type), detectionCard);
-        connect(check, &QCheckBox::toggled, this, markDirty);
+        connect(check, &QCheckBox::toggled, this, autosave);
         piiChecks_.emplace_back(type, check);
         piiGrid->addWidget(check, row, col);
         if (++col == 4) { col = 0; ++row; }
@@ -853,6 +864,18 @@ void MainWindow::onConnectionLost() {
 // ---------------------------------------------------------------------------
 
 void MainWindow::reloadProfiles(bool keepSelection) {
+    if (reloadingProfiles_) {
+        // A reload is already on the stack (e.g. the poll fired inside a
+        // nested event loop); run one more pass when it finishes.
+        reloadPending_ = true;
+        return;
+    }
+    reloadingProfiles_ = true;
+    struct ReloadGuard {
+        bool& flag;
+        ~ReloadGuard() { flag = false; }
+    } guard{reloadingProfiles_};
+
     json profiles;
     if (!appState_->client().GetProfiles(profiles) || !profiles.is_array()) {
         qWarning("[MainWindow] reloadProfiles: GetProfiles failed");
@@ -883,33 +906,41 @@ void MainWindow::reloadProfiles(bool keepSelection) {
             profile["enabled_pii_types"].push_back(Utils::WideToUtf8(t));
         std::wstring id;
         if (appState_->client().PostProfile(profile, id)) {
-            appState_->client().RestartListeners();
+            // POST /profiles already restarts the listeners engine-side.
+            // The re-entry guard defers this to a follow-up pass below.
             reloadProfiles(keepSelection);
         }
-        return;
-    }
+    } else {
+        const QString previousId = keepSelection ? selectedProfileId() : QString();
+        profiles_ = profiles;
 
-    const QString previousId = keepSelection ? selectedProfileId() : QString();
-    profiles_ = profiles;
-
-    loading_ = true;
-    profileList_->clear();
-    int selectRow = 0;
-    for (size_t i = 0; i < profiles_.size(); ++i) {
-        const auto& p = profiles_[i];
-        profileList_->addItem(QString::fromStdString(p.value("alias", std::string())));
-        if (!previousId.isEmpty() &&
-            previousId == QString::fromStdString(p.value("id", std::string()))) {
-            selectRow = static_cast<int>(i);
+        loading_ = true;
+        profileList_->clear();
+        int selectRow = 0;
+        for (size_t i = 0; i < profiles_.size(); ++i) {
+            const auto& p = profiles_[i];
+            profileList_->addItem(QString::fromStdString(p.value("alias", std::string())));
+            if (!previousId.isEmpty() &&
+                previousId == QString::fromStdString(p.value("id", std::string()))) {
+                selectRow = static_cast<int>(i);
+            }
         }
+        if (!profiles_.empty()) {
+            profileList_->setCurrentRow(selectRow);
+            loadProfileIntoForm(selectRow);
+        }
+        removeProfileBtn_->setEnabled(profiles_.size() > 1);
+        loading_ = false;
+        dirty_ = false;
     }
-    if (!profiles_.empty()) {
-        profileList_->setCurrentRow(selectRow);
-        loadProfileIntoForm(selectRow);
+
+    // A nested reload request arrived while this pass was running; do one
+    // follow-up pass with fresh data once the guard releases the flag.
+    if (reloadPending_) {
+        reloadPending_ = false;
+        reloadingProfiles_ = false;
+        reloadProfiles(keepSelection);
     }
-    removeProfileBtn_->setEnabled(profiles_.size() > 1);
-    loading_ = false;
-    dirty_ = false;
 }
 
 void MainWindow::loadProfileIntoForm(int index) {
@@ -1017,7 +1048,6 @@ void MainWindow::loadProfileIntoForm(int index) {
                 return r.value("pattern", std::string()) == pat;
             }), arr.end());
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-                appState_->client().RestartListeners();
                 reloadProfiles(true);
             }
         });
@@ -1095,7 +1125,6 @@ void MainWindow::loadProfileIntoForm(int index) {
                 return kw.value("text", std::string()) == t;
             }), arr.end());
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-                appState_->client().RestartListeners();
                 reloadProfiles(true);
             }
         });
@@ -1242,7 +1271,7 @@ void MainWindow::onSaveProfile() {
             tr("The engine rejected the profile. Check the engine log for details."));
         return;
     }
-    appState_->client().RestartListeners();
+    // PUT /profiles already restarts the listeners engine-side.
     dirty_ = false;
     reloadProfiles(true);
 }
@@ -1277,7 +1306,7 @@ void MainWindow::onAddProfile() {
             tr("The engine rejected the new profile."));
         return;
     }
-    appState_->client().RestartListeners();
+    // POST /profiles already restarts the listeners engine-side.
     dirty_ = false;
     reloadProfiles(false);
     // Select the new profile.
@@ -1296,7 +1325,6 @@ void MainWindow::onRemoveProfile() {
     if (answer != QMessageBox::Yes) return;
 
     if (appState_->client().DeleteProfile(w(selectedProfileId()))) {
-        appState_->client().RestartListeners();
         dirty_ = false;
         reloadProfiles(false);
     }
@@ -1380,7 +1408,6 @@ void MainWindow::onAddRegex() {
     (*p)["regex_patterns"].push_back(
         {{"pattern", Utils::WideToUtf8(normalized)}, {"enabled", true}});
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-        appState_->client().RestartListeners();
         newRegexBox_->clear();
         reloadProfiles(true);
     }
@@ -1394,7 +1421,6 @@ void MainWindow::onAddKeyword() {
     (*p)["keywords"].push_back({{"text", text.toStdString()},
         {"case_sensitive", newKeywordCaseCheck_->isChecked()}, {"enabled", true}});
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-        appState_->client().RestartListeners();
         newKeywordBox_->clear();
         reloadProfiles(true);
     }
@@ -1428,15 +1454,17 @@ void MainWindow::onRequirePasswordToggled(bool checked) {
         // Disabling strips all protection: unlock first (the engine's disable
         // endpoint requires an unlocked session), then disable.
         PasswordUnlockDialog dlg(this);
+        bool unlocked = false;
         for (;;) {
             if (dlg.exec() != QDialog::Accepted) break;
             if (!appState_->client().Unlock(dlg.password().toStdWString())) {
                 dlg.setError(tr("Wrong password."));
                 continue;
             }
+            unlocked = true;
             break;
         }
-        if (!appState_->client().DisableMasterPassword()) {
+        if (!unlocked || !appState_->client().DisableMasterPassword()) {
             QSignalBlocker b(requirePasswordCheck_);
             requirePasswordCheck_->setChecked(true);
             return;

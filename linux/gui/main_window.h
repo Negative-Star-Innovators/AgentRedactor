@@ -228,6 +228,12 @@ private:
     uint64_t prevProfilesRevision_ = UINT64_MAX;
     bool loading_ = false;  // suppress dirty-tracking while populating
     bool dirty_ = false;    // form edited since last load/save
+    // reloadProfiles re-entry guard: the poll timer (and modal dialogs' nested
+    // event loops) can trigger a reload while one is already rebuilding the
+    // profile list and rows. Re-entry during that teardown is a use-after-free
+    // risk, so a nested call is deferred instead.
+    bool reloadingProfiles_ = false;
+    bool reloadPending_ = false;
     bool quitting_ = false; // real quit in progress (vs close-to-tray)
     bool lockEnforcedOnce_ = false;
 
