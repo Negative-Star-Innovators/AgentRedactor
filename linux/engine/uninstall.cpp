@@ -78,7 +78,9 @@ std::vector<pid_t> PidsOf(const char* name) {
 void StopOtherInstances() {
     const pid_t self = getpid();
     std::vector<pid_t> targets;
-    for (const char* name : {"agentredactor-gui", "agentredactor"}) {
+    // "agentredactor-gui" is the bash wrapper in the AppImage/appdir layout;
+    // the process it exec's is "agentredactor-gui.real", so match both.
+    for (const char* name : {"agentredactor-gui", "agentredactor-gui.real", "agentredactor"}) {
         for (pid_t pid : PidsOf(name)) {
             if (pid != self && pid > 0) targets.push_back(pid);
         }
@@ -105,14 +107,14 @@ void StopOtherInstances() {
 
 void RemoveFile(const fs::path& p) {
     std::error_code ec;
-    fs::remove(p, ec);
-    if (!ec) std::fprintf(stderr, "Removed: %s\n", p.string().c_str());
+    // The error_code overload treats a missing file as success (returns false,
+    // ec clear), so check the return value to avoid printing bogus removals.
+    if (fs::remove(p, ec) && !ec) std::fprintf(stderr, "Removed: %s\n", p.string().c_str());
 }
 
 void RemoveAll(const fs::path& p) {
     std::error_code ec;
-    fs::remove_all(p, ec);
-    if (!ec) std::fprintf(stderr, "Removed: %s\n", p.string().c_str());
+    if (fs::remove_all(p, ec) > 0 && !ec) std::fprintf(stderr, "Removed: %s\n", p.string().c_str());
 }
 
 std::string Md5OfUri(const std::string& uri) {
@@ -210,8 +212,10 @@ int RunUninstaller(const std::vector<std::wstring>& args) {
         RemoveFile(iconDir / "agentredactor.png");
     }
 
-    // User data.
-    RemoveAll(home / ".config" / "AgentRedactor");
+    // User data (settings, logs, sessions). GetAppDataPath covers the XDG and
+    // AGENTREDACTOR_CONFIG_DIR locations; the app never writes to
+    // ~/.config/AgentRedactor.
+    RemoveAll(Utils::GetAppDataPath());
     RemoveAll(home / ".local" / "share" / "agentredactor");
 
     // Thumbnail cache (only meaningful when running from an AppImage).
