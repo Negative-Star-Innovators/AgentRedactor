@@ -500,7 +500,12 @@ void EngineApp::StartModelDownloadIfNeeded() {
 }
 
 void EngineApp::StartProxyServers() {
-    StopProxyServers();
+    std::lock_guard lock(proxyServersMutex_);
+    StopProxyServersLocked();
+    StartProxyServersLocked();
+}
+
+void EngineApp::StartProxyServersLocked() {
     auto profiles = settings_->GetProfiles();
     for (const auto& profile : profiles) {
         if (!profile.enabled) continue;
@@ -521,6 +526,11 @@ void EngineApp::StartProxyServers() {
 }
 
 void EngineApp::StopProxyServers() {
+    std::lock_guard lock(proxyServersMutex_);
+    StopProxyServersLocked();
+}
+
+void EngineApp::StopProxyServersLocked() {
     for (auto& server : servers_) {
         if (server) server->Stop();
     }
@@ -530,12 +540,14 @@ void EngineApp::StopProxyServers() {
 }
 
 bool EngineApp::IsProxyRunning(int port) const {
+    std::lock_guard lock(proxyServersMutex_);
     return runningPorts_.find(port) != runningPorts_.end();
 }
 
 void EngineApp::RestartProxyServers() {
-    StopProxyServers();
-    StartProxyServers();
+    std::lock_guard lock(proxyServersMutex_);
+    StopProxyServersLocked();
+    StartProxyServersLocked();
 }
 
 HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, const std::wstring& path,
@@ -1053,6 +1065,9 @@ static HWND ParseHwndQuery(const std::wstring& query);
 #endif
 
 HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body) {
+    // Log only the key: some bodies carry secrets (e.g. enableMasterPassword's
+    // new password), and this trail exists to explain unexplained setting flips.
+    LOGF(L"[EngineApp] Setting change: %ls", key.c_str());
     json j = json::parse(body);
     if (key == L"startOnBoot") {
         settings_->SetStartOnBoot(j.at("value").get<bool>());

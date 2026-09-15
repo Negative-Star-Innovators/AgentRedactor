@@ -134,13 +134,19 @@ void HttpServer::RunListener() {
         SOCKET clientSocket = accept(listenSocket_, (sockaddr*)&clientAddr, &addrLen);
         if (clientSocket == INVALID_SOCKET) continue;
 
+        // Count the connection BEFORE spawning the client thread: Stop()
+        // drains on activeConnections_ == 0, and a thread that has not
+        // incremented yet would otherwise run HandleClient on a destroyed
+        // server.
+        activeConnections_.fetch_add(1);
         std::thread clientThread(&HttpServer::HandleClient, this, clientSocket);
         clientThread.detach();
     }
 }
 
 void HttpServer::HandleClient(SOCKET clientSocket) {
-    activeConnections_.fetch_add(1);
+    // activeConnections_ was already incremented by RunListener before this
+    // thread was spawned (see the accept loop).
     HttpRequest request;
     if (ParseRequest(clientSocket, request)) {
         bool showSensitive = logManager_ && logManager_->IsShowSensitive();
