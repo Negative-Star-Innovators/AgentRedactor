@@ -1,7 +1,12 @@
 // Linux entry point for the dual-mode agentredactor binary (mirror of
 // windows/engine/main.cpp):
-//   - no args / --console  -> run the engine in the foreground (the GUI and
+//   - no args, no terminal -> run the engine in the foreground (the GUI and
 //                             the systemd --user unit launch it detached)
+//   - no args, in a terminal -> a human typed it: report engine state, start
+//                               the engine detached if it is not running, and
+//                               return the shell (headless servers over SSH
+//                               keep start-on-bare-invocation)
+//   - --console            -> run the engine in the foreground (debugging)
 //   - any other subcommand -> CLI client over the localhost control API
 //   - --selftest-migrate-settings -> headless settings-migration test hook
 #include "engine_app.h"
@@ -16,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
+#include <fstream>
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <termios.h>
@@ -121,6 +127,80 @@ int RunCliCommand(const std::vector<std::wstring>& args) {
     return RunCli(args, transport, console);
 }
 
+bool ProbeEngine(const std::filesystem::path& configDir, json& statusOut) {
+    ControlApiClient probe;
+    return probe.Connect(configDir) && probe.Get(L"/status", statusOut);
+}
+
+int ReadEnginePid(const std::filesystem::path& configDir) {
+    try {
+        std::ifstream in(configDir / "control.json");
+        if (!in) return 0;
+        return json::parse(in).value("pid", 0);
+    } catch (...) {
+        return 0;
+    }
+}
+
+void PrintEngineStateLine(const char* state, int pid) {
+    if (pid > 0) std::printf("Agent Redactor engine %s (pid %d).\n", state, pid);
+    else std::printf("Agent Redactor engine %s.\n", state);
+}
+
+// Bare `agentredactor` typed in a terminal: a human is at the keys, so never
+// be silent and never hold the terminal. Engine running -> say so; not
+// running -> start it detached and return the shell (headless servers reach
+// this over SSH, where the bare command is the only way to start the engine).
+int RunInteractiveStart() {
+    const auto configDir = Utils::GetAppDataPath();
+
+    json status;
+    if (ProbeEngine(configDir, status)) {
+        PrintEngineStateLine("is already running", ReadEnginePid(configDir));
+        RunCliCommand({L"status"});
+        std::fputs("Run 'agentredactor help' for available commands.\n", stdout);
+        return 0;
+    }
+
+    // The child re-execs this binary with all streams detached from the
+    // terminal, landing it in the non-interactive RunEngine path.
+    const pid_t pid = fork();
+    if (pid < 0) {
+        std::fputs("error: could not start the engine (fork failed)\n", stderr);
+        return 1;
+    }
+    if (pid == 0) {
+        setsid();
+        const int devnull = open("/dev/null", O_RDWR);
+        if (devnull >= 0) {
+            dup2(devnull, STDIN_FILENO);
+            dup2(devnull, STDOUT_FILENO);
+            dup2(devnull, STDERR_FILENO);
+            if (devnull > STDERR_FILENO) close(devnull);
+        }
+        execl("/proc/self/exe", "agentredactor", static_cast<char*>(nullptr));
+        _exit(1);
+    }
+
+    // First start can include the ~1.6 GB model load; allow 30 s like the GUI.
+    bool up = false;
+    for (int i = 0; i < 300; ++i) {
+        usleep(100000);
+        if (ProbeEngine(configDir, status)) { up = true; break; }
+    }
+    if (!up) {
+        std::fprintf(stderr,
+            "The engine process was started but is not responding yet.\n"
+            "Check the log: %s\n",
+            (configDir / "agent_redactor.log").string().c_str());
+        return 1;
+    }
+    PrintEngineStateLine("started", ReadEnginePid(configDir));
+    RunCliCommand({L"status"});
+    std::fputs("Run 'agentredactor help' for available commands.\n", stdout);
+    return 0;
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -152,7 +232,14 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (args.empty() || args[0] == L"--console") {
+    if (args.empty()) {
+        // A terminal means a human typed the bare command. Engine launches by
+        // the GUI/autostart/systemd arrive without one and keep the quiet
+        // blocking behavior; --console stays the explicit foreground mode.
+        if (isatty(STDIN_FILENO) || isatty(STDOUT_FILENO)) return RunInteractiveStart();
+        return RunEngine();
+    }
+    if (args[0] == L"--console") {
         return RunEngine();
     }
     if (!args.empty() && args[0] == L"uninstall") {
