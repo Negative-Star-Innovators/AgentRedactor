@@ -2,13 +2,23 @@
 
 #include <QApplication>
 #include <QEvent>
+#include <QGuiApplication>
 #include <QPalette>
+#include <QStyleHints>
 #include <QTimer>
+#include <QWidget>
 
 namespace {
 
-bool isDark(const QPalette& palette) {
-    return palette.color(QPalette::Window).lightness() < 128;
+bool isDark() {
+    // The platform theme's explicit color scheme (Qt 6.5+) is the source of
+    // truth: on early-login autostart the settings portal can resolve seconds
+    // after the palette was constructed, so the palette alone can report
+    // light while the system is dark. Fall back to the palette only while
+    // the scheme is unknown.
+    const auto scheme = QGuiApplication::styleHints()->colorScheme();
+    if (scheme != Qt::ColorScheme::Unknown) return scheme == Qt::ColorScheme::Dark;
+    return QGuiApplication::palette().color(QPalette::Window).lightness() < 128;
 }
 
 QString stylesheet(bool dark) {
@@ -117,8 +127,80 @@ QCheckBox::indicator:hover {
     return qss;
 }
 
+// Full application palette matching the stylesheet above. The platform theme
+// (gtk3) resolves the system preference asynchronously and can leave the
+// palette light while the scheme is already dark — styling from the scheme
+// while widgets render from the palette produced a hybrid window. Forcing
+// both together makes the window consistent regardless of what state the
+// platform theme happened to settle into.
+QPalette buildPalette(bool dark) {
+    QPalette p;
+    if (dark) {
+        const QColor window("#1A1A1A"), base("#2B2B2B"), alt("#1E1E1E"),
+            text("#E8E8E8"), disabled("#606060"), accent("#0067C0");
+        p.setColor(QPalette::Window, window);
+        p.setColor(QPalette::WindowText, text);
+        p.setColor(QPalette::Base, base);
+        p.setColor(QPalette::AlternateBase, alt);
+        p.setColor(QPalette::ToolTipBase, base);
+        p.setColor(QPalette::ToolTipText, text);
+        p.setColor(QPalette::Text, text);
+        p.setColor(QPalette::Button, base);
+        p.setColor(QPalette::ButtonText, text);
+        p.setColor(QPalette::BrightText, Qt::white);
+        p.setColor(QPalette::Link, QColor("#3B9BD8"));
+        p.setColor(QPalette::Highlight, accent);
+        p.setColor(QPalette::HighlightedText, Qt::white);
+        p.setColor(QPalette::PlaceholderText, QColor("#808080"));
+        p.setColor(QPalette::Disabled, QPalette::WindowText, disabled);
+        p.setColor(QPalette::Disabled, QPalette::Text, disabled);
+        p.setColor(QPalette::Disabled, QPalette::ButtonText, disabled);
+    } else {
+        const QColor window("#F5F5F5"), base("#FFFFFF"), text("#1A1A1A"),
+            disabled("#A0A0A0"), accent("#005FB8");
+        p.setColor(QPalette::Window, window);
+        p.setColor(QPalette::WindowText, text);
+        p.setColor(QPalette::Base, base);
+        p.setColor(QPalette::AlternateBase, window);
+        p.setColor(QPalette::ToolTipBase, base);
+        p.setColor(QPalette::ToolTipText, text);
+        p.setColor(QPalette::Text, text);
+        p.setColor(QPalette::Button, window);
+        p.setColor(QPalette::ButtonText, text);
+        p.setColor(QPalette::BrightText, Qt::red);
+        p.setColor(QPalette::Link, accent);
+        p.setColor(QPalette::Highlight, accent);
+        p.setColor(QPalette::HighlightedText, Qt::white);
+        p.setColor(QPalette::PlaceholderText, QColor("#808080"));
+        p.setColor(QPalette::Disabled, QPalette::WindowText, disabled);
+        p.setColor(QPalette::Disabled, QPalette::Text, disabled);
+        p.setColor(QPalette::Disabled, QPalette::ButtonText, disabled);
+    }
+    return p;
+}
+
+// The darkness the current stylesheet/palette were built for, so repeat
+// re-checks are no-ops unless the resolved theme actually flipped.
+bool g_appliedDark = false;
+bool g_appliedOnce = false;
+
 void apply(QApplication& app) {
-    app.setStyleSheet(stylesheet(isDark(app.palette())));
+    const bool dark = isDark();
+    if (!g_appliedOnce || dark != g_appliedDark) {
+        g_appliedDark = dark;
+        g_appliedOnce = true;
+        app.setPalette(buildPalette(dark));
+        app.setStyleSheet(stylesheet(dark));
+        return;
+    }
+    // Same mode as already applied, but an external palette update (the
+    // platform theme settling seconds after login, a live system theme
+    // switch) may have clobbered our palette while the stylesheet stayed —
+    // that mismatch is exactly the hybrid window. Re-force the palette
+    // whenever it drifted. Setting an identical stylesheet is skipped since
+    // it would needlessly re-polish every widget.
+    const QPalette expected = buildPalette(dark);
+    if (app.palette() != expected) app.setPalette(expected);
 }
 
 class PaletteChangeFilter : public QObject {
@@ -128,6 +210,13 @@ public:
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override {
         if (event->type() == QEvent::ApplicationPaletteChange) apply(app_);
+        // A top-level window opening is a natural re-check point: if the
+        // system theme settled while the app sat in the tray without any
+        // palette event, the window still appears with the right theme.
+        if (event->type() == QEvent::Show && watched->isWidgetType() &&
+            static_cast<QWidget*>(watched)->isWindow()) {
+            apply(app_);
+        }
         return QObject::eventFilter(watched, event);
     }
 
@@ -140,13 +229,15 @@ private:
 void Theme::Apply(QApplication& app) {
     apply(app);
     // On X11/Wayland the system light/dark preference is resolved asynchronously
-    // (GTK3 platform theme / color-scheme portal), so the palette read right
-    // after QApplication construction can still be the default (light) even
-    // though the system is dark — and Qt does NOT emit ApplicationPaletteChange
-    // for that initial resolution, so only the constructed snapshot would stick.
-    // Re-apply once the event loop has started to pick up a late-settled theme.
-    // Applying the same stylesheet is idempotent, so this is a no-op when the
-    // palette already matched.
-    QTimer::singleShot(0, [&app] { apply(app); });
+    // (color-scheme portal), so the value read right after QApplication
+    // construction can still be Unknown/default even though the system is
+    // dark — and early-login autostart stretches this further, the portal may
+    // not answer for the first seconds of the session. Re-check on a short
+    // schedule and whenever the scheme changes; apply() only re-styles when
+    // the resolved darkness actually changed.
+    for (const int delayMs : {0, 500, 2000, 5000})
+        QTimer::singleShot(delayMs, &app, [&app] { apply(app); });
+    QObject::connect(app.styleHints(), &QStyleHints::colorSchemeChanged,
+        &app, [&app] { apply(app); });
     app.installEventFilter(new PaletteChangeFilter(app));
 }
