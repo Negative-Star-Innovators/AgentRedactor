@@ -1046,7 +1046,14 @@ int CmdRegex(const Ctx& ctx) {
             return 2;
         }
         return MutateList(ctx, "regex_patterns", [&](json& entries) {
-            entries.push_back({{"pattern", Utils::WideToUtf8(pattern)}, {"enabled", true}});
+            const std::string pat8 = Utils::WideToUtf8(pattern);
+            for (const auto& e : entries) {
+                if (e.value("pattern", std::string()) == pat8) {
+                    ctx.Error(L"regex pattern already exists");
+                    return false;
+                }
+            }
+            entries.push_back({{"pattern", pat8}, {"enabled", true}});
             ctx.Print(L"ok");
             return true;
         });
@@ -1085,7 +1092,15 @@ int CmdKeywords(const Ctx& ctx) {
         const std::wstring text = ctx.opts.positional[2];
         const bool caseSensitive = !ctx.opts.ignoreCase;
         return MutateList(ctx, "keywords", [&](json& entries) {
-            entries.push_back({{"text", Utils::WideToUtf8(text)},
+            const std::string text8 = Utils::WideToUtf8(text);
+            for (const auto& e : entries) {
+                if (e.value("text", std::string()) == text8
+                    && e.value("case_sensitive", true) == caseSensitive) {
+                    ctx.Error(L"keyword already exists");
+                    return false;
+                }
+            }
+            entries.push_back({{"text", text8},
                                {"case_sensitive", caseSensitive},
                                {"enabled", true}});
             ctx.Print(L"ok");

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Tādējādi jūsu žurnālfailā diskā tiks ierakstītas nerediģētas sensitīvas vērtības (vārdi, e-pasta adreses, tālruņu numuri utt.) un jūsu API atslēga. Neiespējojiet to, ja citiem ir piekļuve šim datoram. Iestatījums tiek atiestatīts, aizverot lietotni.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Šis ieraksts jau eksistē.</value>
+  </data>
 </root>

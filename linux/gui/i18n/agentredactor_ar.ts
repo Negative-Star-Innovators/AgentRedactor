@@ -371,6 +371,10 @@
       <translation>بناء جملة التعبير العادي غير صالح.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>هذه المدخلة موجودة مسبقًا.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>تمكين الكلمة الرئيسية</translation>
     </message>

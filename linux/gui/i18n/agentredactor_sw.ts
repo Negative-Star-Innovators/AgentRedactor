@@ -371,6 +371,10 @@
       <translation>Mtiririko wa regex usiosahihi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Kiingilio hiki tayari kipo.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Washa nenomsingi</translation>
     </message>

@@ -371,6 +371,10 @@
       <translation>Virheellinen regex-syntaksi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Tämä tietue on jo olemassa.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Ota avainsana käyttöön</translation>
     </message>

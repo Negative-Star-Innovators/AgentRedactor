@@ -371,6 +371,10 @@
       <translation>غلط regex سنٹیکس۔</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>یہ اندراج پہلے سے موجود ہے۔</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>کلیدی لفظ کو فعال کریں۔</translation>
     </message>

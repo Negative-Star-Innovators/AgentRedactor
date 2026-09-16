@@ -371,6 +371,10 @@
       <translation>Անվավեր regex շարահյուսություն:</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Այս գրառումն արդեն գոյություն ունի։</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Միացնել հիմնաբառը</translation>
     </message>

@@ -371,6 +371,10 @@
       <translation>Di-wastong regex syntax.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Mayroon nang ganitong entry.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Paganahin ang keyword</translation>
     </message>

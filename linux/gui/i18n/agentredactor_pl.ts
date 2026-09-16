@@ -371,6 +371,10 @@
       <translation>Nieprawidłowa składnia regex.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ta pozycja już istnieje.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Włącz słowo kluczowe</translation>
     </message>

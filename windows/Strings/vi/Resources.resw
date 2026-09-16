@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Thao tác này sẽ ghi các giá trị nhạy cảm chưa được xác minh (tên, email, số điện thoại, v.v.) và khóa API vào tệp nhật ký của bạn trên đĩa. Không kích hoạt tính năng này nếu người khác có quyền truy cập vào máy tính này. Cài đặt sẽ đặt lại khi bạn đóng ứng dụng.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Mục nhập này đã tồn tại.</value>
+  </data>
 </root>

@@ -371,6 +371,10 @@
       <translation>Neteisinga regex sintaksė.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Toks įrašas jau yra.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Įgalinti raktinį žodį</translation>
     </message>

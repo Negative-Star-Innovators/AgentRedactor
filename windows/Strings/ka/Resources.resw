@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>ეს ჩაწერს არარედაქტირებულ მგრძნობიარე მნიშვნელობებს (სახელები, ელფოსტა, ტელეფონის ნომრები და ა.შ.) და თქვენს API გასაღებს თქვენს ჟურნალის ფაილზე დისკზე. არ ჩართოთ ეს, თუ სხვებს აქვთ წვდომა ამ კომპიუტერზე. პარამეტრი აღდგება აპის დახურვისას.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>ეს ჩანაწერი უკვე არსებობს.</value>
+  </data>
 </root>

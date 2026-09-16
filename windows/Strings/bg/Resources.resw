@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Това ще запише нередактирани чувствителни стойности (имена, имейли, телефонни номера и т.н.) и вашия API ключ във вашия лог файл на диска. Не разрешавайте това, ако други имат достъп до този компютър. Настройката се нулира, когато затворите приложението.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Вече има такъв елемент.</value>
+  </data>
 </root>

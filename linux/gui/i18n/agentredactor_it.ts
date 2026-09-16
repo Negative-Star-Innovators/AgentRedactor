@@ -371,6 +371,10 @@
       <translation>Sintassi regex non valida.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Questa voce esiste già.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Abilita parola chiave</translation>
     </message>

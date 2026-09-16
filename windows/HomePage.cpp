@@ -1149,6 +1149,13 @@ namespace winrt::AgentRedactor::implementation
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
         if (!opt) return;
         auto p = *opt;
+        const std::wstring want = ::AgentRedactor::Utils::NormalizeRegexBraces(txt.c_str());
+        for (const auto& r : p.regexPatterns) {
+            if (::AgentRedactor::Utils::NormalizeRegexBraces(r.pattern) == want) {
+                ShowErrorAsync(::AgentRedactor::LocString(L"Validation_DuplicateEntry"));
+                return;
+            }
+        }
         p.regexPatterns.push_back({ txt.c_str(), true });
         app->Settings()->UpdateProfile(p);
         LoadRegexList();
@@ -1164,7 +1171,14 @@ namespace winrt::AgentRedactor::implementation
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
         if (!opt) return;
         auto p = *opt;
-        p.keywords.push_back({ txt.c_str(), CaseSensitiveCheck().IsChecked().GetBoolean(), true });
+        const bool caseSensitive = CaseSensitiveCheck().IsChecked().GetBoolean();
+        for (const auto& k : p.keywords) {
+            if (k.text == txt.c_str() && k.caseSensitive == caseSensitive) {
+                ShowErrorAsync(::AgentRedactor::LocString(L"Validation_DuplicateEntry"));
+                return;
+            }
+        }
+        p.keywords.push_back({ txt.c_str(), caseSensitive, true });
         app->Settings()->UpdateProfile(p);
         LoadKeywordList();
         NewKeywordBox().Text(L"");

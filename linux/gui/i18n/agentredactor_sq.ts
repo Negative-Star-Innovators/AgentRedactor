@@ -371,6 +371,10 @@
       <translation>Sintaksë regex e pavlefshme.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Kjo hyrje tashmë ekziston.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktivizo fjalën kyçe</translation>
     </message>

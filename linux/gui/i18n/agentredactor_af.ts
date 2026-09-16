@@ -371,6 +371,10 @@
       <translation>Ongeldige regex-sintaksis.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Hierdie inskrywing bestaan reeds.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktiveer sleutelwoord</translation>
     </message>

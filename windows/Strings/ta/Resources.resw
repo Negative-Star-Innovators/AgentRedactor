@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>இது திருத்தப்படாத முக்கிய மதிப்புகள் (பெயர்கள், மின்னஞ்சல்கள், தொலைபேசி எண்கள் போன்றவை) மற்றும் உங்கள் API விசையை வட்டில் உள்ள உங்கள் பதிவுக் கோப்பில் எழுதும். இந்த கணினியை மற்றவர்கள் அணுகினால் இதை இயக்க வேண்டாம். நீங்கள் பயன்பாட்டை மூடும்போது அமைப்பு மீட்டமைக்கப்படும்.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>இந்த பதிவு ஏற்கனவே உள்ளது.</value>
+  </data>
 </root>

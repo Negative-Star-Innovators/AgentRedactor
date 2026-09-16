@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>При этом неотредактированные конфиденциальные значения (имена, адреса электронной почты, номера телефонов и т. д.) и ваш ключ API будут записаны в файл журнала на диске. Не включайте это, если у других есть доступ к этому компьютеру. Настройка сбрасывается при закрытии приложения.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Такая запись уже существует.</value>
+  </data>
 </root>

@@ -371,6 +371,10 @@
       <translation>தவறான regex தொடரமைப்பு.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>இந்த பதிவு ஏற்கனவே உள்ளது.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>முக்கிய சொல்லை இயக்கு</translation>
     </message>

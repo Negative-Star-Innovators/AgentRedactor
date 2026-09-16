@@ -1405,8 +1405,17 @@ void MainWindow::onAddRegex() {
         return;
     }
 
+    const std::string pat8 = Utils::WideToUtf8(normalized);
+    for (const auto& r : (*p)["regex_patterns"]) {
+        if (r.value("pattern", std::string()) == pat8) {
+            QMessageBox::warning(this, tr("Validation Error"),
+                tr("This entry already exists."));
+            return;
+        }
+    }
+
     (*p)["regex_patterns"].push_back(
-        {{"pattern", Utils::WideToUtf8(normalized)}, {"enabled", true}});
+        {{"pattern", pat8}, {"enabled", true}});
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
         newRegexBox_->clear();
         reloadProfiles(true);
@@ -1418,8 +1427,19 @@ void MainWindow::onAddKeyword() {
     const QString text = newKeywordBox_->text().trimmed();
     if (!p || text.isEmpty()) return;
 
-    (*p)["keywords"].push_back({{"text", text.toStdString()},
-        {"case_sensitive", newKeywordCaseCheck_->isChecked()}, {"enabled", true}});
+    const std::string text8 = text.toStdString();
+    const bool caseSensitive = newKeywordCaseCheck_->isChecked();
+    for (const auto& k : (*p)["keywords"]) {
+        if (k.value("text", std::string()) == text8
+            && k.value("case_sensitive", true) == caseSensitive) {
+            QMessageBox::warning(this, tr("Validation Error"),
+                tr("This entry already exists."));
+            return;
+        }
+    }
+
+    (*p)["keywords"].push_back({{"text", text8},
+        {"case_sensitive", caseSensitive}, {"enabled", true}});
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
         newKeywordBox_->clear();
         reloadProfiles(true);

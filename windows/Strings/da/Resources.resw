@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Dette vil skrive uredigerede følsomme værdier (navne, e-mails, telefonnumre osv.) og din API-nøgle til din logfil på disken. Aktiver ikke dette, hvis andre har adgang til denne computer. Indstillingen nulstilles, når du lukker appen.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Denne indgang findes allerede.</value>
+  </data>
 </root>

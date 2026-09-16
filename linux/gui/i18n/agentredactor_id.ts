@@ -371,6 +371,10 @@
       <translation>Sintaks regex tidak valid.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Entri ini sudah ada.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktifkan kata kunci</translation>
     </message>

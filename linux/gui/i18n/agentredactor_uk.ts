@@ -371,6 +371,10 @@
       <translation>Неправильний синтаксис регулярного виразу.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Цей елемент вже існує.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Увімкнути ключове слово</translation>
     </message>

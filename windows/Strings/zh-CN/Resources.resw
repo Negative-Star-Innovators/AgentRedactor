@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>这会将未编辑的敏感值（姓名、电子邮件、电话号码等）和 API 密钥写入磁盘上的日志文件。如果其他人有权访问此计算机，请勿启用此功能。当您关闭应用程序时，该设置将重置。</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>此条目已存在。</value>
+  </data>
 </root>

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Taip į žurnalo failą diske bus įrašytos neredaguotos jautrios reikšmės (vardai, el. pašto adresai, telefono numeriai ir kt.) ir API raktas. Neįjunkite šios funkcijos, jei kiti turi prieigą prie šio kompiuterio. Nustatymas iš naujo nustatomas uždarius programą.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Toks įrašas jau yra.</value>
+  </data>
 </root>

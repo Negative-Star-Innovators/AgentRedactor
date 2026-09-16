@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Esto escribirá valores confidenciales no redactados (nombres, correos electrónicos, números de teléfono, etc.) y su clave API en su archivo de registro en el disco. No habilite esto si otras personas tienen acceso a esta computadora. La configuración se restablece cuando cierras la aplicación.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Esta entrada ya existe.</value>
+  </data>
 </root>

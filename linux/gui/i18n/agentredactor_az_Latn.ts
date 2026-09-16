@@ -371,6 +371,10 @@
       <translation>Yanlış regex sintaksisi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Bu giriş artıq mövcuddur.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Açar sözü aktivləşdirin</translation>
     </message>

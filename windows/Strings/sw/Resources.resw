@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Hii itaandika thamani nyeti ambazo hazijarekebishwa (majina, barua pepe, nambari za simu, n.k.) na ufunguo wako wa API kwenye faili yako ya kumbukumbu kwenye diski. Usiruhusu hii ikiwa wengine wanaweza kufikia kompyuta hii. Mpangilio huwekwa upya unapofunga programu.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Kiingilio hiki tayari kipo.</value>
+  </data>
 </root>

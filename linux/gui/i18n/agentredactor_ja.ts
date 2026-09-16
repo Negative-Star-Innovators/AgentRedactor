@@ -371,6 +371,10 @@
       <translation>正規表現の構文が無効です。</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>このエントリは既に存在します。</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>キーワードを有効にする</translation>
     </message>

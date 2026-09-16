@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Nke a ga-ede ụkpụrụ nwere mmetụta na-adịghị edozi (aha, ozi-e, nọmba ekwentị, wdg) yana igodo API gị na faịlụ log gị na diski. Emela nke a ma ọ bụrụ na ndị ọzọ nwere ohere na kọmputa a. Ntọala ahụ na-atọgharị mgbe imechi ngwa ahụ.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Ntinye a adịla adị.</value>
+  </data>
 </root>

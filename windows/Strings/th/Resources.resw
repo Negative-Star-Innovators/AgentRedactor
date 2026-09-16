@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>การดำเนินการนี้จะเขียนค่าที่ละเอียดอ่อนที่ยังไม่ได้แก้ไข (ชื่อ อีเมล หมายเลขโทรศัพท์ ฯลฯ) และคีย์ API ของคุณไปยังไฟล์บันทึกบนดิสก์ อย่าเปิดใช้งานสิ่งนี้หากผู้อื่นสามารถเข้าถึงคอมพิวเตอร์เครื่องนี้ได้ การตั้งค่าจะรีเซ็ตเมื่อคุณปิดแอป</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>มีรายการนี้อยู่แล้ว</value>
+  </data>
 </root>

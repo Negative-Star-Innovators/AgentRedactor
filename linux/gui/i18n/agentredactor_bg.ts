@@ -371,6 +371,10 @@
       <translation>Невалиден regex синтаксис.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Вече има такъв елемент.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Активиране на ключова дума</translation>
     </message>

@@ -371,6 +371,10 @@
       <translation>Nederīga regex sintakse.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Šis ieraksts jau eksistē.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Iespējot atslēgvārdu</translation>
     </message>

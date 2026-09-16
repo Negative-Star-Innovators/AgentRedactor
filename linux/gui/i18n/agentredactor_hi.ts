@@ -371,6 +371,10 @@
       <translation>अमान्य regex सिंटैक्स।</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>यह प्रविष्टि पहले से ही अस्तित्व में है.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>कीवर्ड सक्षम करें</translation>
     </message>

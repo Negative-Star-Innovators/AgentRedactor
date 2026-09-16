@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Acest lucru va scrie valorile sensibile neredactate (nume, e-mailuri, numere de telefon etc.) și cheia API pe fișierul jurnal de pe disc. Nu activați acest lucru dacă alții au acces la acest computer. Setarea se resetează când închideți aplicația.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Această înregistrare există deja.</value>
+  </data>
 </root>

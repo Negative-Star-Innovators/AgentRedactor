@@ -371,6 +371,10 @@
       <translation>Ogiltig regex-syntax.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Den här posten finns redan.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktivera sökord</translation>
     </message>

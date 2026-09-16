@@ -253,6 +253,39 @@ def test_keywords_remove_honors_ignore_case_flag(engine: CliEngine) -> None:
         engine.run_cli("keywords", "remove", "Solo")
 
 
+def test_duplicate_keyword_and_regex_rejected(engine: CliEngine) -> None:
+    """Adding the same keyword (same text AND same case-sensitivity) or the
+    same regex pattern twice is rejected. The same keyword text with the other
+    case-sensitivity is a distinct entry and is allowed."""
+    try:
+        r = engine.run_cli("keywords", "add", "DupKw")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "DupKw")
+        assert r.returncode == 2, r.stdout
+        assert "keyword already exists" in r.stdout
+        # Same text with the other case-sensitivity: allowed, once.
+        r = engine.run_cli("keywords", "add", "DupKw", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "DupKw", "--ignore-case")
+        assert r.returncode == 2, r.stdout
+
+        r = engine.run_cli("regex", "add", r"dup-\d{3}")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("regex", "add", r"dup-\d{3}")
+        assert r.returncode == 2, r.stdout
+        assert "regex pattern already exists" in r.stdout
+        # A normalization-equivalent pattern ({,N} == {0,N}) is also a duplicate.
+        r = engine.run_cli("regex", "add", r"dupx-\d{,3}")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("regex", "add", r"dupx-\d{0,3}")
+        assert r.returncode == 2, r.stdout
+    finally:
+        engine.run_cli("keywords", "remove", "DupKw")
+        engine.run_cli("keywords", "remove", "DupKw", "--ignore-case")
+        engine.run_cli("regex", "remove", r"dup-\d{3}")
+        engine.run_cli("regex", "remove", r"dupx-\d{0,3}")
+
+
 def test_remove_missing_entry(engine: CliEngine) -> None:
     r = engine.run_cli("regex", "remove", "99")
     assert r.returncode == 2

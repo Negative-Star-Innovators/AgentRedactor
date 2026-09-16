@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Dadurch werden nicht geschwärzte vertrauliche Werte (Namen, E-Mails, Telefonnummern usw.) und Ihr API-Schlüssel in Ihre Protokolldatei auf der Festplatte geschrieben. Aktivieren Sie dies nicht, wenn andere Zugriff auf diesen Computer haben. Die Einstellung wird zurückgesetzt, wenn Sie die App schließen.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Dieser Eintrag existiert bereits.</value>
+  </data>
 </root>

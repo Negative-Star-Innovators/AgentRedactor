@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Dit sal ongeredigeerde sensitiewe waardes (name, e-pos, telefoonnommers, ens.) en jou API-sleutel na jou loglêer op skyf skryf. Moenie dit aktiveer as ander toegang tot hierdie rekenaar het nie. Die instelling word teruggestel wanneer jy die toepassing toemaak.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Hierdie inskrywing bestaan reeds.</value>
+  </data>
 </root>

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>이렇게 하면 수정되지 않은 민감한 값(이름, 이메일, 전화번호 등)과 API 키가 디스크의 로그 파일에 기록됩니다. 다른 사람이 이 컴퓨터에 액세스할 수 있는 경우에는 이 기능을 활성화하지 마십시오. 앱을 닫으면 설정이 재설정됩니다.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>이미 존재하는 항목입니다.</value>
+  </data>
 </root>

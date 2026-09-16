@@ -371,6 +371,10 @@
       <translation>Жарамсыз регекс синтаксисі.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Бұл жазба әлдеқашан бар.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Негізгі сөзді қосыңыз</translation>
     </message>

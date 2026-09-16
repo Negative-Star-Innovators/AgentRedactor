@@ -371,6 +371,10 @@
       <translation>Sintassi regex invalida.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Din id-dħula diġà teżisti.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Ippermetti keyword</translation>
     </message>

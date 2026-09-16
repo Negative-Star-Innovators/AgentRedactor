@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Ini akan menulis nilai sensitif yang tidak disunting (nama, email, nomor telepon, dll.) dan kunci API Anda ke file log Anda di disk. Jangan aktifkan ini jika orang lain memiliki akses ke komputer ini. Pengaturan ini diatur ulang ketika Anda menutup aplikasi.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Entri ini sudah ada.</value>
+  </data>
 </root>

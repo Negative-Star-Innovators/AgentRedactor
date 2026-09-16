@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Tým sa zapíšu nezreagované citlivé hodnoty (mená, e-maily, telefónne čísla atď.) a váš kľúč API do súboru denníka na disk. Toto nepovoľujte, ak k tomuto počítaču majú prístup iní. Po zatvorení aplikácie sa nastavenie resetuje.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Táto položka už existuje.</value>
+  </data>
 </root>

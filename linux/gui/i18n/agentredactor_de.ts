@@ -371,6 +371,10 @@
       <translation>Ungültige Regex-Syntax.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Dieser Eintrag existiert bereits.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Schlüsselwort aktivieren</translation>
     </message>

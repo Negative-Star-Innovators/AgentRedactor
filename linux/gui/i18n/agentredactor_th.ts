@@ -371,6 +371,10 @@
       <translation>รูปแบบ Regex ไม่ถูกต้อง</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>มีรายการนี้อยู่แล้ว</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>เปิดใช้งานคำหลัก</translation>
     </message>

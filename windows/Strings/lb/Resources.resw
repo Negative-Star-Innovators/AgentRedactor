@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Dëst schreift onredaktéiert sensibel Wäerter (Nimm, E-Mailen, Telefonsnummeren, asw.) an Ären API Schlëssel op Är Logdatei op der Disk. Aktivéiert dëst net wann anerer Zougang zu dësem Computer hunn. D&apos;Astellung gëtt zréckgesat wann Dir d&apos;App zoumaacht.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Dësen Eintrag existéiert schonn.</value>
+  </data>
 </root>

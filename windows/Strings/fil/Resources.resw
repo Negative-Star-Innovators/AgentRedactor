@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Isusulat nito ang mga hindi na-redact na sensitibong halaga (mga pangalan, email, numero ng telepono, atbp.) at ang iyong API key sa iyong log file sa disk. Huwag paganahin ito kung ang iba ay may access sa computer na ito. Nire-reset ang setting kapag isinara mo ang app.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Mayroon nang ganitong entry.</value>
+  </data>
 </root>

@@ -371,6 +371,10 @@
       <translation>規則運算式語法無效。</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>此條目已存在。</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>啟用關鍵字</translation>
     </message>

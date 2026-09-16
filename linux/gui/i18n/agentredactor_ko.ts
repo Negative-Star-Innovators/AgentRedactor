@@ -371,6 +371,10 @@
       <translation>정규식 구문이 잘못되었습니다.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>이미 존재하는 항목입니다.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>키워드 활성화</translation>
     </message>

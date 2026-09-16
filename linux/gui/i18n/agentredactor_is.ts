@@ -371,6 +371,10 @@
       <translation>Ógild regex setningafræði.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Þessi færsla er þegar til.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Virkja leitarorð</translation>
     </message>

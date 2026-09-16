@@ -371,6 +371,10 @@
       <translation>Sobimatu regex süntaks.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>See kirje on juba olemas.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Luba märksõna</translation>
     </message>

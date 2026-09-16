@@ -371,6 +371,10 @@
       <translation>Μη έγκυρη σύνταξη regex.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Αυτή η καταχώρηση υπάρχει ήδη.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Ενεργοποίηση λέξης-κλειδιού</translation>
     </message>

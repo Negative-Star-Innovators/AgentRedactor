@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Бұл өңделмеген құпия мәндерді (аттар, электрондық пошталар, телефон нөмірлері, т.б.) және API кілтін дискідегі журнал файлына жазады. Басқалардың осы компьютерге кіру мүмкіндігі болса, оны қоспаңыз. Параметр қолданбаны жапқанда қалпына келтіріледі.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Бұл жазба әлдеқашан бар.</value>
+  </data>
 </root>

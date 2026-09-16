@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>To bo zapisalo neredigirane občutljive vrednosti (imena, e-poštna sporočila, telefonske številke itd.) in vaš API ključ v vašo dnevniško datoteko na disku. Tega ne omogočite, če imajo drugi dostop do tega računalnika. Nastavitev se ponastavi, ko zaprete aplikacijo.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Ta vnos že obstaja.</value>
+  </data>
 </root>

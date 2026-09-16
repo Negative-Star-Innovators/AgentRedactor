@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Ez a módosítatlan bizalmas értékeket (nevek, e-mailek, telefonszámok stb.) és az API-kulcsot a lemezen lévő naplófájlba írja. Ne engedélyezze ezt, ha mások is hozzáférhetnek ehhez a számítógéphez. A beállítás visszaáll az alkalmazás bezárásakor.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Ilyen bejegyzés már létezik.</value>
+  </data>
 </root>

@@ -124,7 +124,12 @@ into two arguments, so the help text tells Linux users to quote patterns. `--ign
 ignore-case entry on `keywords remove <text>`; without it the first
 case-sensitive match is removed, falling back to an ignore-case entry when no
 case-sensitive one exists (deterministic — list order never decides);
-`regex remove` matches text only. The CLI deals only in **single PII types** (e.g.
+`regex remove` matches text only. Duplicates are rejected on add
+everywhere (CLI and both GUIs, showing the shared `Validation_DuplicateEntry`
+/ "This entry already exists." string): a keyword is a duplicate when both
+text and case-sensitivity match (the same text with the other case-sensitivity
+is a distinct entry), and a regex is a duplicate when the normalized pattern
+matches (`{,N}` == `{0,N}`). The CLI deals only in **single PII types** (e.g.
 `secret`, `private_email`) — there are no PII categories on the CLI, matching
 the GUI; a category name like `CONTACT` is rejected as an unknown type.
 

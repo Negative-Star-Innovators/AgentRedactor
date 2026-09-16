@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Ciò scriverà i valori sensibili non oscurati (nomi, e-mail, numeri di telefono, ecc.) e la chiave API nel file di registro su disco. Non abilitarlo se altri hanno accesso a questo computer. L&apos;impostazione si ripristina quando chiudi l&apos;app.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Questa voce esiste già.</value>
+  </data>
 </root>

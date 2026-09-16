@@ -371,6 +371,10 @@
       <translation>Cú pháp regex không hợp lệ.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Mục nhập này đã tồn tại.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Bật từ khóa</translation>
     </message>

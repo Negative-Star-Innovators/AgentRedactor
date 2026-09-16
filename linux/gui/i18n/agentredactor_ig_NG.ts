@@ -371,6 +371,10 @@
       <translation>Regex syntax ezighị ezi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ntinye a adịla adị.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Kwado isiokwu</translation>
     </message>

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Wannan zai rubuta ƙima mai mahimmanci (sunaye, imel, lambobin waya, da sauransu) da maɓallin API ɗin ku zuwa fayil ɗin log ɗin ku akan faifai. Kar a kunna wannan idan wasu suna da damar shiga wannan kwamfutar. Saitin yana sake saitawa lokacin da ka rufe ƙa&apos;idar.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Wannan shigarwa ta riga ta wanzu.</value>
+  </data>
 </root>

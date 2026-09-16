@@ -371,6 +371,10 @@
       <translation>Neplatná regex syntaxe.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Tato položka již existuje.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Povolit klíčové slovo</translation>
     </message>

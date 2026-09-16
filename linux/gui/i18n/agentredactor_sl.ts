@@ -371,6 +371,10 @@
       <translation>Neveljavna regex sintaksa.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ta vnos že obstaja.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Omogoči ključno besedo</translation>
     </message>

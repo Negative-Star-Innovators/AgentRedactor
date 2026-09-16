@@ -371,6 +371,10 @@
       <translation>Sintaxă regex invalidă.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Această înregistrare există deja.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Activați cuvântul cheie</translation>
     </message>

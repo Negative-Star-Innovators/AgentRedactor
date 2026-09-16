@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>פעולה זו תכתוב ערכים רגישים שלא הוסתרו (שמות, אימיילים, מספרי טלפון וכו&apos;) ואת מפתח ה-API שלך לקובץ היומן על הדיסק. אל תפעיל זאת אם לאחרים יש גישה למחשב זה. ההגדרה מתאפסת בעת סגירת האפליקציה.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>רשומה זו כבר קיימת.</value>
+  </data>
 </root>

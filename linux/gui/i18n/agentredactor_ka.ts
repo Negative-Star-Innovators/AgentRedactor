@@ -371,6 +371,10 @@
       <translation>არასწორი regex სინტაქსი.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>ეს ჩანაწერი უკვე არსებობს.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>ჩართეთ საკვანძო სიტყვა</translation>
     </message>

@@ -371,6 +371,10 @@
       <translation>Érvénytelen regex szintaxis.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ilyen bejegyzés már létezik.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Kulcsszó engedélyezése</translation>
     </message>

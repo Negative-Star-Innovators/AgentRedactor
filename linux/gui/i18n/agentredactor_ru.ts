@@ -371,6 +371,10 @@
       <translation>Неверный синтаксис регулярного выражения.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Такая запись уже существует.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Включить ключевое слово</translation>
     </message>

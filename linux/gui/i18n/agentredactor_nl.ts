@@ -371,6 +371,10 @@
       <translation>Ongeldige regex-syntaxis.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Dit item bestaat reeds.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Zoekwoord inschakelen</translation>
     </message>

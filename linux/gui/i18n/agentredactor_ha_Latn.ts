@@ -371,6 +371,10 @@
       <translation>Rubutun regex mara inganci.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Wannan shigarwa ta riga ta wanzu.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Kunna kalma mai mahimmanci</translation>
     </message>

@@ -371,6 +371,10 @@
       <translation>Geçersiz regex sözdizimi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Girdi zaten var.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Anahtar kelimeyi etkinleştir</translation>
     </message>

@@ -371,6 +371,10 @@
       <translation>תחביר regex לא חוקי.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>רשומה זו כבר קיימת.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>אפשר מילת מפתח</translation>
     </message>

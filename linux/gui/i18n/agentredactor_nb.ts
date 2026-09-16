@@ -371,6 +371,10 @@
       <translation>Ugyldig regex-syntaks.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Denne oppføringen finnes allerede.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktiver søkeord</translation>
     </message>

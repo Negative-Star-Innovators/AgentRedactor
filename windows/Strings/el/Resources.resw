@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Αυτό θα γράψει μη διορθωμένα ευαίσθητες τιμές (ονόματα, email, αριθμούς τηλεφώνου, κ.λπ.) και το κλειδί API σας στο αρχείο καταγραφής σας στο δίσκο. Μην το ενεργοποιήσετε εάν άλλοι έχουν πρόσβαση σε αυτόν τον υπολογιστή. Η ρύθμιση επαναφέρει όταν κλείσετε την εφαρμογή.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Αυτή η καταχώρηση υπάρχει ήδη.</value>
+  </data>
 </root>

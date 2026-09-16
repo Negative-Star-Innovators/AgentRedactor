@@ -371,6 +371,10 @@
       <translation>正则表达式语法无效。</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>此条目已存在。</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>启用关键字</translation>
     </message>
