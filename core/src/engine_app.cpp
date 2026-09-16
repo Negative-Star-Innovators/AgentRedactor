@@ -317,7 +317,7 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
     if (modelDir == ModelDownloader::GetFallbackModelDir()) {
         ModelDownloader::RefreshCompanionFiles(modelDir);
     }
-    detector_ = std::make_unique<PIIDetector>(modelDir);
+    detector_ = std::make_unique<PIIDetector>(modelDir, logManager_.get());
     // Set the provider BEFORE initializing so the model loads with the user's
     // chosen execution provider (CPU, GPU/Auto/DirectML/CUDA).
     detector_->SetProvider(settings_->GetOnnxProvider());

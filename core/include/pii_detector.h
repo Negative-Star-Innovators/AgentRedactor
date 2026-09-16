@@ -21,6 +21,7 @@ namespace Ort {
 namespace AgentRedactor {
 
 class BPETokenizer;
+class LogManager;
 
 struct PIIEntity {
     std::wstring type;
@@ -43,7 +44,8 @@ struct DetectionResult {
 
 class PIIDetector {
 public:
-    explicit PIIDetector(const std::filesystem::path& modelPath = L"models");
+    explicit PIIDetector(const std::filesystem::path& modelPath = L"models",
+                         LogManager* logManager = nullptr);
     ~PIIDetector();
     PIIDetector(const PIIDetector&) = delete;
     PIIDetector& operator=(const PIIDetector&) = delete;
@@ -100,6 +102,7 @@ private:
     std::unique_ptr<Ort::Session> session_;
     std::unique_ptr<BPETokenizer> tokenizer_;
     std::vector<std::wstring> supportedTypes_;
+    LogManager* logManager_ = nullptr;
     bool initialized_ = false;
     bool useONNX = false;
     std::wstring preferredProvider_ = L"auto";

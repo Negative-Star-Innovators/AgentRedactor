@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "constants.h"
 #include "logging.h"
+#include "log_manager.h"
 #include <onnxruntime_cxx_api.h>
 #include <algorithm>
 #ifdef _WIN32
@@ -22,8 +23,8 @@ namespace AgentRedactor {
 
 static Ort::Env* g_onnx_env = nullptr;
 
-PIIDetector::PIIDetector(const std::filesystem::path& modelPath)
-    : modelPath_(modelPath) {
+PIIDetector::PIIDetector(const std::filesystem::path& modelPath, LogManager* logManager)
+    : modelPath_(modelPath), logManager_(logManager) {
     supportedTypes_ = DEFAULT_PII_TYPES;
 }
 
@@ -459,7 +460,7 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
     std::vector<size_t> tokenCharEnds;
     for (const auto& piece : tokenPieces) allTokenIds.push_back(piece.id);
 
-    {
+    if (logManager_ && logManager_->IsShowSensitive()) {
         std::wstring tokenDebug = L"[DetectPII] Tokens: " + std::to_wstring(tokenPieces.size()) + L"\n";
         for (size_t i = 0; i < tokenPieces.size() && i < 30; ++i) {
             auto decoded = tokenizer_->Decode({tokenPieces[i].id});
@@ -612,13 +613,15 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
     }
     merged.erase(std::remove_if(merged.begin(), merged.end(),
         [this](const PIIEntity& ent) { return ent.confidence < confidenceThreshold_; }), merged.end());
-    for (const auto& ent : merged) {
-        std::wstring logMsg = L"[DetectPII] PII detected: type=" + ent.type
-            + L" start=" + std::to_wstring(ent.start)
-            + L" end=" + std::to_wstring(ent.end)
-            + L" text=[" + ent.text + L"]"
-            + L" confidence=" + std::to_wstring(ent.confidence);
-        LOG(logMsg);
+    if (logManager_ && logManager_->IsShowSensitive()) {
+        for (const auto& ent : merged) {
+            std::wstring logMsg = L"[DetectPII] PII detected: type=" + ent.type
+                + L" start=" + std::to_wstring(ent.start)
+                + L" end=" + std::to_wstring(ent.end)
+                + L" text=[" + ent.text + L"]"
+                + L" confidence=" + std::to_wstring(ent.confidence);
+            LOG(logMsg);
+        }
     }
     return merged;
 }

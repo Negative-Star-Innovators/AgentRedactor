@@ -104,12 +104,15 @@ void LogTrafficMessage(const std::wstring& direction, const std::wstring& messag
     if (g_debugTrafficLogFilePath.empty()) InitializeDebugTrafficLogging();
     std::lock_guard<std::mutex> lock(g_debugTrafficLogMutex);
     try {
-        std::wofstream logFile(g_debugTrafficLogFilePath, std::ios::app);
+        // Narrow stream + explicit UTF-8: wofstream in the default C locale
+        // silently drops any line containing non-ASCII (BPE markers, accented
+        // PII text) — the whole insertion fails, nothing is written.
+        std::ofstream logFile(g_debugTrafficLogFilePath, std::ios::app);
         if (logFile) {
             auto now = std::chrono::system_clock::now();
             auto time = std::chrono::system_clock::to_time_t(now);
             std::wstring timeStr = FormatLocalizedDateTime(time);
-            logFile << L"[" << timeStr << L"] [" << direction << L"] " << message << std::endl;
+            logFile << WideToUtf8(L"[" + timeStr + L"] [" + direction + L"] " + message + L"\n");
             logFile.flush();
         }
     } catch (...) {}
@@ -143,9 +146,11 @@ static void WriteLogLine(const std::wstring& message) {
             CloseHandle(h);
         }
 #else
-        std::wofstream logFile(g_logFilePath, std::ios::app);
+        // See LogTrafficMessage: narrow stream + explicit UTF-8 so non-ASCII
+        // content is not silently dropped in the C locale.
+        std::ofstream logFile(g_logFilePath, std::ios::app);
         if (logFile) {
-            logFile << L"[" << timeStr << L"] " << message << std::endl;
+            logFile << WideToUtf8(L"[" + timeStr + L"] " + message + L"\n");
             logFile.flush();
         }
 #endif
