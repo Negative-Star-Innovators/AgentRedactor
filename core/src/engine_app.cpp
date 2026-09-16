@@ -56,7 +56,8 @@ namespace {
     struct StreamingSSEUnredactor {
         StreamingSSEUnredactor(AgentRedactor::ProxyEngine* engine,
             const AgentRedactor::RedactionState& state,
-            std::function<bool(const std::string&)> emitChunk)
+            std::function<bool(const std::string&)> emitChunk,
+            bool showSensitive)
             : engine_(engine), state_(state), emitChunk_(std::move(emitChunk)) {
             auto consider = [&](const std::map<std::wstring, std::wstring>& m) {
                 for (const auto& [label, _] : m) {
@@ -75,9 +76,12 @@ namespace {
                 [](const std::string& a, const std::string& b) { return a.size() > b.size(); });
             LOGF(L"[StreamingSSEUnredactor] created, maxLabelLen=%zu, prefixes=%zu, pii=%zu, regex=%zu, keyword=%zu",
                 maxLabelLen_, labelPrefixes_.size(), state.piiMap.size(), state.regexMap.size(), state.keywordMap.size());
-            for (const auto& [label, original] : state.keywordMap) {
-                LOGF(L"[StreamingSSEUnredactor] keyword map: [%ls] -> [%ls]",
-                    label.c_str(), original.c_str());
+            // Raw values only when show-sensitive is on.
+            if (showSensitive) {
+                for (const auto& [label, original] : state.keywordMap) {
+                    LOGF(L"[StreamingSSEUnredactor] keyword map: [%ls] -> [%ls]",
+                        label.c_str(), original.c_str());
+                }
             }
         }
 
@@ -695,7 +699,8 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
             std::unique_ptr<StreamingSSEUnredactor> unredactor;
             if (needsUnredaction) {
                 unredactor = std::make_unique<StreamingSSEUnredactor>(
-                    proxyEngine_.get(), state, sendNormalized);
+                    proxyEngine_.get(), state, sendNormalized,
+                    logManager_->IsShowSensitive());
             }
 
             auto sendStreamingHeaders = [&](int code, const std::vector<std::pair<std::wstring, std::wstring>>& hdrs) {
@@ -1065,10 +1070,18 @@ static HWND ParseHwndQuery(const std::wstring& query);
 #endif
 
 HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body) {
-    // Log only the key: some bodies carry secrets (e.g. enableMasterPassword's
-    // new password), and this trail exists to explain unexplained setting flips.
-    LOGF(L"[EngineApp] Setting change: %ls", key.c_str());
+    // This trail exists to explain unexplained setting flips. Log the new
+    // value too when the body carries no secrets — enableMasterPassword's
+    // body carries the new password (or an empty string for Hello), so only
+    // the "value" field of the ordinary keys is ever logged.
     json j = json::parse(body);
+    std::wstring logLine = L"[EngineApp] Setting change: " + key;
+    if (j.contains("value")) {
+        const auto& v = j["value"];
+        if (v.is_boolean()) logLine += v.get<bool>() ? L" -> true" : L" -> false";
+        else if (v.is_string()) logLine += L" -> " + Utils::Utf8ToWide(v.get<std::string>());
+    }
+    LOGF(L"%ls", logLine.c_str());
     if (key == L"startOnBoot") {
         settings_->SetStartOnBoot(j.at("value").get<bool>());
     } else if (key == L"onnxProvider") {
@@ -1111,6 +1124,9 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstrin
 #endif
     } else if (key == L"lock") {
         settings_->Lock();
+        // Sensitive logging is session-only: a lock ends the session (both
+        // GUIs lock on quit when the engine survives), so disarm it here.
+        logManager_->SetShowSensitive(false);
     } else if (key == L"disableMasterPassword") {
         // Security: disabling strips ALL protection (after it, the api-key
         // endpoint serves the key without any verification), so it is gated
