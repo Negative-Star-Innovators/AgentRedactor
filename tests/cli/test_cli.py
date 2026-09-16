@@ -198,6 +198,35 @@ def test_remove_missing_entry(engine: CliEngine) -> None:
     assert "out of range" in r.stdout
 
 
+def test_extra_positional_arguments_rejected(engine: CliEngine) -> None:
+    """Commands take a fixed number of positional arguments. Extras used to be
+    silently ignored, which turned typos into wrong state (a missing space in
+    `profiles add alias--port 8080` swallowed the port; unquoted shell brace
+    expansion split a regex into two words and stored only the first). Extras
+    are now a usage error, checked before any gating or mutation."""
+    for args in (
+        ("status", "extra"),
+        ("languages", "extra"),
+        ("get", "logging", "extra"),
+        ("set", "logging", "true", "extra"),
+        ("profiles", "list", "extra"),
+        ("profiles", "add", "somedummy", "8080"),
+        ("profiles", "delete", "someid", "extra"),
+        ("regex", "list", "extra"),
+        ("regex", "add", "foo", "bar"),
+        ("regex", "remove", "1", "extra"),
+        ("keywords", "list", "extra"),
+        ("keywords", "add", "foo", "bar"),
+        ("keywords", "remove", "1", "extra"),
+        ("pii-types", "list", "extra"),
+        ("pii-types", "enable", "secret", "extra"),
+        ("password", "disable", "extra"),
+    ):
+        r = engine.run_cli(*args)
+        assert r.returncode == 2, (args, r.stdout)
+        assert "unexpected argument" in r.stdout, (args, r.stdout)
+
+
 def test_removed_cli_keys_are_unknown(engine: CliEngine) -> None:
     """onnx-provider, the profile `enabled` key, the old use-openai-model
     name, and pii-types (owned by the `pii-types` command) are not get/set
