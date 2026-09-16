@@ -86,7 +86,7 @@ agentredactor regex add <pattern> [--profile P]
 agentredactor regex remove <n|pattern> [--profile P]
 agentredactor keywords list [--profile P]
 agentredactor keywords add <text> [--ignore-case] [--profile P]
-agentredactor keywords remove <n|text> [--profile P]
+agentredactor keywords remove <n|text> [--ignore-case] [--profile P]
 agentredactor password enable | disable       Windows-Hello protection
 ```
 
@@ -120,7 +120,9 @@ enforces it, mirroring the GUI checkbox); `regex add` validates the pattern
 takes a fixed number of positional arguments — extra words are rejected as
 `unexpected argument` (usage, exit 2) instead of being silently ignored; on
 Linux shells, unquoted brace expansion (`{,20}`) otherwise splits a pattern
-into two arguments, so the help text tells Linux users to quote patterns. The CLI deals only in **single PII types** (e.g.
+into two arguments, so the help text tells Linux users to quote patterns. `--ignore-case` selects an
+ignore-case entry on `keywords remove <text>` (without it the first exact
+text match is removed, as before); `regex remove` matches text only. The CLI deals only in **single PII types** (e.g.
 `secret`, `private_email`) — there are no PII categories on the CLI, matching
 the GUI; a category name like `CONTACT` is rejected as an unknown type.
 

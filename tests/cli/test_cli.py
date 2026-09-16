@@ -192,6 +192,50 @@ def test_keywords_add_list_remove(engine: CliEngine) -> None:
         engine.run_cli("keywords", "remove", "TopSecret")
 
 
+def test_keywords_remove_honors_ignore_case_flag(engine: CliEngine) -> None:
+    """With --ignore-case, `keywords remove <text>` deletes the first
+    ignore-case entry with that text (previously the flag was ignored and the
+    first text match was deleted regardless). Without the flag the historical
+    behavior is unchanged: first exact text match wins."""
+
+    def dupe_lines() -> list[str]:
+        r = engine.run_cli("keywords", "list")
+        assert r.returncode == 0, r.stdout
+        return [line for line in r.stdout.splitlines() if "Dupe" in line]
+
+    try:
+        r = engine.run_cli("keywords", "add", "Dupe")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "Dupe", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+
+        # The flag selects the ignore-case entry even though the
+        # case-sensitive one comes first.
+        r = engine.run_cli("keywords", "remove", "Dupe", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        lines = dupe_lines()
+        assert len(lines) == 1 and "(case-sensitive)" in lines[0], lines
+
+        # Without the flag, first exact text match (the case-sensitive one).
+        r = engine.run_cli("keywords", "remove", "Dupe")
+        assert r.returncode == 0, r.stdout
+        assert dupe_lines() == []
+
+        # The flag with only a case-sensitive match fails with a hint.
+        r = engine.run_cli("keywords", "add", "Solo")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "remove", "Solo", "--ignore-case")
+        assert r.returncode == 2, r.stdout
+        assert "no ignore-case entry" in r.stdout, r.stdout
+        assert "omit --ignore-case" in r.stdout, r.stdout
+        r = engine.run_cli("keywords", "remove", "Solo")
+        assert r.returncode == 0, r.stdout
+    finally:
+        engine.run_cli("keywords", "remove", "Dupe")
+        engine.run_cli("keywords", "remove", "Dupe", "--ignore-case")
+        engine.run_cli("keywords", "remove", "Solo")
+
+
 def test_remove_missing_entry(engine: CliEngine) -> None:
     r = engine.run_cli("regex", "remove", "99")
     assert r.returncode == 2
