@@ -948,12 +948,21 @@ int MutateList(const Ctx& ctx, const char* field,
     return 0;
 }
 
+// How a text selector matches keyword entries by case-sensitivity.
+// Regex patterns carry no case-sensitivity and always use Any.
+enum class RemoveMatch {
+    Any,                 // first exact text match, list order
+    PreferCaseSensitive, // first case-sensitive match, else first ignore-case
+    IgnoreCaseOnly,      // --ignore-case: only ignore-case entries
+};
+
 // Resolves a remove selector (1-based list index or exact text match). For
-// keywords, --ignore-case restricts a text match to ignore-case entries
-// (caseSensitive=false); std::nullopt (regex, or no flag) keeps the plain
-// first-exact-text-match behavior.
+// keywords the user's --ignore-case choice is honored: with the flag only
+// ignore-case entries match; without it a case-sensitive entry wins regardless
+// of list order, falling back to an ignore-case entry when no case-sensitive
+// one exists (deterministic — plain list order used to decide).
 bool RemoveEntry(const Ctx& ctx, json& entries, const std::wstring& sel, const char* textField,
-                 std::optional<bool> caseSensitive = std::nullopt) {
+                 RemoveMatch match = RemoveMatch::Any) {
     size_t index = 0;
     if (IsInteger(sel)) {
         const size_t n = static_cast<size_t>(std::stoul(sel));
@@ -964,19 +973,20 @@ bool RemoveEntry(const Ctx& ctx, json& entries, const std::wstring& sel, const c
         index = n - 1;
     } else {
         bool found = false, wrongCaseFlag = false;
-        for (size_t k = 0; k < entries.size(); ++k) {
-            if (JStr(entries[k], textField) != sel) continue;
-            if (caseSensitive && entries[k].value("case_sensitive", true) != *caseSensitive) {
-                wrongCaseFlag = true;
-                continue;
+        for (int pass = 0; pass < 2 && !found; ++pass) {
+            for (size_t k = 0; k < entries.size(); ++k) {
+                if (JStr(entries[k], textField) != sel) continue;
+                const bool cs = entries[k].value("case_sensitive", true);
+                if (match == RemoveMatch::IgnoreCaseOnly && cs) { wrongCaseFlag = true; continue; }
+                if (match == RemoveMatch::PreferCaseSensitive && ((pass == 0) != cs)) continue;
+                index = k; found = true; break;
             }
-            index = k; found = true; break;
+            if (match != RemoveMatch::PreferCaseSensitive) break;
         }
         if (!found) {
             if (wrongCaseFlag) {
-                ctx.Error(std::wstring(L"no ") + (*caseSensitive ? L"case-sensitive" : L"ignore-case")
-                    + L" entry: " + sel + L" (one exists with the other case-sensitivity; "
-                    + (*caseSensitive ? L"pass --ignore-case" : L"omit --ignore-case") + L")");
+                ctx.Error(L"no ignore-case entry: " + sel
+                    + L" (a case-sensitive entry exists; omit --ignore-case)");
             } else {
                 ctx.Error(L"no such entry: " + sel);
             }
@@ -1088,7 +1098,8 @@ int CmdKeywords(const Ctx& ctx) {
         const std::wstring sel = ctx.opts.positional[2];
         return MutateList(ctx, "keywords", [&](json& entries) {
             return RemoveEntry(ctx, entries, sel, "text",
-                               ctx.opts.ignoreCase ? std::optional<bool>(false) : std::nullopt);
+                               ctx.opts.ignoreCase ? RemoveMatch::IgnoreCaseOnly
+                                                   : RemoveMatch::PreferCaseSensitive);
         });
     }
     ctx.Error(L"unknown keywords action: " + action + L" (list|add|remove)");

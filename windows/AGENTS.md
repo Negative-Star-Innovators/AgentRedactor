@@ -121,8 +121,10 @@ takes a fixed number of positional arguments — extra words are rejected as
 `unexpected argument` (usage, exit 2) instead of being silently ignored; on
 Linux shells, unquoted brace expansion (`{,20}`) otherwise splits a pattern
 into two arguments, so the help text tells Linux users to quote patterns. `--ignore-case` selects an
-ignore-case entry on `keywords remove <text>` (without it the first exact
-text match is removed, as before); `regex remove` matches text only. The CLI deals only in **single PII types** (e.g.
+ignore-case entry on `keywords remove <text>`; without it the first
+case-sensitive match is removed, falling back to an ignore-case entry when no
+case-sensitive one exists (deterministic — list order never decides);
+`regex remove` matches text only. The CLI deals only in **single PII types** (e.g.
 `secret`, `private_email`) — there are no PII categories on the CLI, matching
 the GUI; a category name like `CONTACT` is rejected as an unknown type.
 

@@ -193,15 +193,16 @@ def test_keywords_add_list_remove(engine: CliEngine) -> None:
 
 
 def test_keywords_remove_honors_ignore_case_flag(engine: CliEngine) -> None:
-    """With --ignore-case, `keywords remove <text>` deletes the first
-    ignore-case entry with that text (previously the flag was ignored and the
-    first text match was deleted regardless). Without the flag the historical
-    behavior is unchanged: first exact text match wins."""
+    """`keywords remove <text>` honors the user's case-sensitivity choice:
+    with --ignore-case it deletes the first ignore-case entry; without it the
+    first case-sensitive entry wins regardless of list order, falling back to
+    an ignore-case entry when no case-sensitive one exists. Previously the
+    flag was ignored and plain list order decided."""
 
-    def dupe_lines() -> list[str]:
+    def entry_lines(name: str) -> list[str]:
         r = engine.run_cli("keywords", "list")
         assert r.returncode == 0, r.stdout
-        return [line for line in r.stdout.splitlines() if "Dupe" in line]
+        return [line for line in r.stdout.splitlines() if name in line]
 
     try:
         r = engine.run_cli("keywords", "add", "Dupe")
@@ -213,13 +214,27 @@ def test_keywords_remove_honors_ignore_case_flag(engine: CliEngine) -> None:
         # case-sensitive one comes first.
         r = engine.run_cli("keywords", "remove", "Dupe", "--ignore-case")
         assert r.returncode == 0, r.stdout
-        lines = dupe_lines()
+        lines = entry_lines("Dupe")
         assert len(lines) == 1 and "(case-sensitive)" in lines[0], lines
 
-        # Without the flag, first exact text match (the case-sensitive one).
+        # Without the flag the case-sensitive entry is removed.
         r = engine.run_cli("keywords", "remove", "Dupe")
         assert r.returncode == 0, r.stdout
-        assert dupe_lines() == []
+        assert entry_lines("Dupe") == []
+
+        # Order-independence: with the ignore-case entry FIRST, a plain
+        # remove still takes the case-sensitive one.
+        r = engine.run_cli("keywords", "add", "Pear2", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "Pear2")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "remove", "Pear2")
+        assert r.returncode == 0, r.stdout
+        lines = entry_lines("Pear2")
+        assert len(lines) == 1 and "(ignore case)" in lines[0], lines
+        r = engine.run_cli("keywords", "remove", "Pear2", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        assert entry_lines("Pear2") == []
 
         # The flag with only a case-sensitive match fails with a hint.
         r = engine.run_cli("keywords", "add", "Solo")
@@ -233,6 +248,8 @@ def test_keywords_remove_honors_ignore_case_flag(engine: CliEngine) -> None:
     finally:
         engine.run_cli("keywords", "remove", "Dupe")
         engine.run_cli("keywords", "remove", "Dupe", "--ignore-case")
+        engine.run_cli("keywords", "remove", "Pear2")
+        engine.run_cli("keywords", "remove", "Pear2", "--ignore-case")
         engine.run_cli("keywords", "remove", "Solo")
 
 
