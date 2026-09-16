@@ -24,6 +24,13 @@ The AT-SPI GUI tests require a display and the AT-SPI bindings; they skip cleanl
 
 3. Push only after both steps pass. Do not rely on CI as the first compile or test check.
 
+   Note: CI builds on Ubuntu 24.04 with the distro Qt 6.4 (apt
+   `qt6-base-dev`), which is also what the AppImage ships. A newer local Qt
+   silently accepts post-6.4 APIs — guard anything newer (e.g.
+   `QStyleHints::colorScheme`, Qt 6.8) with `#if QT_VERSION >=
+   QT_VERSION_CHECK(...)` and a 6.4-compatible fallback, or the PR fails on
+   the Linux build leg.
+
 4. If your change touches the Linux codebase at all (GUI widgets/strings, engine,
    libraries Qt the release bundles), also check whether `linux/build-release.sh`
    (the Velopack AppImage packager) must change to stay consistent with it. Do not

@@ -11,13 +11,16 @@
 namespace {
 
 bool isDark() {
-    // The platform theme's explicit color scheme (Qt 6.5+) is the source of
-    // truth: on early-login autostart the settings portal can resolve seconds
-    // after the palette was constructed, so the palette alone can report
-    // light while the system is dark. Fall back to the palette only while
-    // the scheme is unknown.
+    // The platform theme's explicit color scheme is the source of truth where
+    // the Qt build provides it (6.8+; CI and the shipped AppImage use distro
+    // Qt 6.4): on early-login autostart the settings portal can resolve
+    // seconds after the palette was constructed, so the palette alone can
+    // report light while the system is dark. Fall back to the palette only
+    // while the scheme is unknown.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
     const auto scheme = QGuiApplication::styleHints()->colorScheme();
     if (scheme != Qt::ColorScheme::Unknown) return scheme == Qt::ColorScheme::Dark;
+#endif
     return QGuiApplication::palette().color(QPalette::Window).lightness() < 128;
 }
 
@@ -233,11 +236,13 @@ void Theme::Apply(QApplication& app) {
     // construction can still be Unknown/default even though the system is
     // dark — and early-login autostart stretches this further, the portal may
     // not answer for the first seconds of the session. Re-check on a short
-    // schedule and whenever the scheme changes; apply() only re-styles when
-    // the resolved darkness actually changed.
+    // schedule and, on Qt 6.8+, whenever the scheme changes; apply() only
+    // re-styles when the resolved darkness actually changed.
     for (const int delayMs : {0, 500, 2000, 5000})
         QTimer::singleShot(delayMs, &app, [&app] { apply(app); });
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
     QObject::connect(app.styleHints(), &QStyleHints::colorSchemeChanged,
         &app, [&app] { apply(app); });
+#endif
     app.installEventFilter(new PaletteChangeFilter(app));
 }
