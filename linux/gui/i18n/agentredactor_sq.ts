@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>Kjo hyrje tashmë ekziston.</translation>
+      <translation>Ky element ekziston tashmë.</translation>
     </message>
     <message>
       <source>Enable keyword</source>

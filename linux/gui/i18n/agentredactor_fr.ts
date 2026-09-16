@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>Cette occurrence existe déjà.</translation>
+      <translation>Cette entrée existe déjà.</translation>
     </message>
     <message>
       <source>Enable keyword</source>

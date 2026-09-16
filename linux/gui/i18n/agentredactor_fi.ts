@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>Tämä tietue on jo olemassa.</translation>
+      <translation>Tämä merkintä on jo olemassa.</translation>
     </message>
     <message>
       <source>Enable keyword</source>

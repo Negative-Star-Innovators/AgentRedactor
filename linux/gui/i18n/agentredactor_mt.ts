@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>Din id-dħula diġà teżisti.</translation>
+      <translation>Dan l-element diġà jeżisti.</translation>
     </message>
     <message>
       <source>Enable keyword</source>

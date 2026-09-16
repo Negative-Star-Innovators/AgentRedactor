@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>Girdi zaten var.</translation>
+      <translation>Bu girdi zaten var.</translation>
     </message>
     <message>
       <source>Enable keyword</source>

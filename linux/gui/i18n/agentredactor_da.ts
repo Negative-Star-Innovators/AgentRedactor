@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>Denne indgang findes allerede.</translation>
+      <translation>Denne post findes allerede.</translation>
     </message>
     <message>
       <source>Enable keyword</source>

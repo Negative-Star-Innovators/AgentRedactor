@@ -722,6 +722,6 @@
     <value>Dan se jikteb valuri sensittivi mhux redattati (ismijiet, emails, numri tat-telefon, eċċ.) u ċ-ċavetta API tiegħek fil-log file tiegħek fuq disk. Tippermettix dan jekk ħaddieħor ikollu aċċess għal dan il-kompjuter. L-issettjar mill-ġdid meta tagħlaq l-app.</value>
   </data>
   <data name="Validation_DuplicateEntry" xml:space="preserve">
-    <value>Din id-dħula diġà teżisti.</value>
+    <value>Dan l-element diġà jeżisti.</value>
   </data>
 </root>

@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>This entry already exists.</source>
-      <translation>यह प्रविष्टि पहले से ही अस्तित्व में है.</translation>
+      <translation>यह प्रविष्टि पहले से मौजूद है।</translation>
     </message>
     <message>
       <source>Enable keyword</source>
