@@ -83,6 +83,24 @@ uses the weaker `press_named` and **never verifies the state changed**.
 1. **Test-side (most likely, minimal):** make `set_checkbox` verify state after
    pressing and retry via the existing `press_until`, e.g. press until
    `_checked(self.checkbox(name)) == on`.
+
+### Resolution (2026-09-17, applied)
+Candidate #1 was implemented. `AtspiGui.set_checkbox` in
+`tests/linux/gui_atspi.py` now uses the same verify-and-retry mechanism as the
+proven row-button helpers: it re-finds the checkbox per attempt via `press_until`
+and re-presses until the observable `CHECKED` state equals the target, instead of
+issuing one blind `press_named`. If the box is already in the target state it
+skips the press (PII boxes autosave on toggle, so no extra PUT). Clean `py_compile`.
+This is a test-driver-only change; no product code touched.
+
+Local validation under an expanded sandbox: the AT-SPI a11y bus starts, the
+single-instance socket is bypassed (uid-shim creates `-4242` socket), and the
+GUI stays alive with `XDG_DATA_HOME` set. The GUI never registers on the a11y
+bus here because this sandbox's Debian Qt 6.10 lacks the
+**`libqt6_linuxaccessibility` / `accessiblebridge` plugin** (absent from apt; the
+CI runner's Ubuntu 24.04 / Qt 6.4 includes it). So the full test cannot be
+executed sandboxed; verification is delegated to CI run on the next push.
+
 2. If that doesn't hold: add temporary `qWarning` logging in
    `onSaveProfile`/`gatherProfileFromForm` dumping `enabled_pii_types`, rerun CI,
    and see what the phase-2 autosave PUT actually carried.

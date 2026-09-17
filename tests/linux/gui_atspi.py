@@ -487,10 +487,27 @@ class AtspiGui:
         return self.find("check box", name, within=within, timeout=timeout)
 
     def set_checkbox(self, name: str, on: bool, *, within: Any | None = None) -> None:
-        """Press a check box only if its state differs from the target."""
-        node = self.checkbox(name, within=within)
-        if _checked(node) != on:
-            self.press_named(name, within=within, role="check box")
+        """Set a check box to `on`, verifying the state actually changed.
+
+        The PII check boxes autosave on toggle, and the settings-poll reload
+        rebuilds the form widgets from the saved profile. A toggle that lands
+        while that reload is rebuilding the very button being clicked can be
+        swallowed (the toggled handler sees a rebuilt/no-op state), so — like
+        the row buttons — verify the observable CHECKED state after pressing
+        and re-press until it sticks instead of trusting one click. If the
+        box is already in the target state, no press is needed.
+        """
+        finder = lambda: self.checkbox(name, within=within)
+        try:
+            if _checked(finder()) == on:
+                return
+        except (GLib.GError, AssertionError):
+            pass  # box mid-rebuild; let press_until re-find and verify
+        self.press_until(
+            f"checkbox {name!r} -> {'checked' if on else 'unchecked'}",
+            finder,
+            lambda: _checked(finder()) is on,
+        )
 
     # -- dialogs (QMessageBox appears as an [alert] top-level) -----------------
 
