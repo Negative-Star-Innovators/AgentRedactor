@@ -1175,10 +1175,11 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"  --upstream-url U profiles add: upstream endpoint");
     ctx.Print(L"  --api-key K     profiles add: API key");
     ctx.Print(L"  --ignore-case   keywords add/remove: case-insensitive matching");
-#ifndef _WIN32
     ctx.Print(L"");
     ctx.Print(L"shell note: quote patterns containing { } [ ] etc. so the shell does not");
-    ctx.Print(L"  expand them, e.g. agentredactor regex add 'sk-[a-zA-Z0-9]{20,}'");
+    ctx.Print(L"  expand or misinterpret them, e.g. agentredactor regex add 'sk-[a-zA-Z0-9]{20,}'");
+    ctx.Print(L"  (PowerShell/cmd.exe: use double quotes: \"sk-[a-zA-Z0-9]{20,}\")");
+#ifndef _WIN32
     ctx.Print(L"");
     ctx.Print(L"maintenance (Linux only):");
     ctx.Print(L"  uninstall [--yes]                    remove Agent Redactor, settings,");

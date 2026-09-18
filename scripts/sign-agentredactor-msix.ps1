@@ -4,8 +4,8 @@
 
 .DESCRIPTION
     Creates (or reuses) a self-signed code-signing certificate whose subject
-    matches the Publisher in windows\Package.appxmanifest, then signs
-    build\AgentRedactor.msixbundle with signtool.exe from the Windows SDK
+    matches the Publisher in windows\Package.appxmanifest, then signs the
+    MSIX/MSIX bundle under windows\build with signtool.exe from the Windows SDK
     (signtool signs .msix and .msixbundle identically).
 
     Because the certificate is self-signed, it must also be installed into the
@@ -20,9 +20,10 @@
 #>
 [CmdletBinding()]
 param(
-    # Path to the package to sign. Defaults to the bundle produced by
-    # windows\build.ps1 (per arch) + buildbundle.ps1.
-    [string]$MsixPath = (Join-Path $PSScriptRoot '..\windows\build\AgentRedactor.msixbundle'),
+    # Path to the package to sign. Defaults to the first existing package in
+    # windows\build: the bundle (build.ps1 + buildbundle.ps1) if present,
+    # otherwise the per-arch .msix (build.ps1 only).
+    [string]$MsixPath,
 
     # Certificate subject. Defaults to the Publisher from Package.appxmanifest.
     [string]$CertSubject,
@@ -35,6 +36,18 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # --- Resolve MSIX -----------------------------------------------------------
+if (-not $MsixPath) {
+    $buildDir = Join-Path $PSScriptRoot '..\windows\build'
+    $candidates = @(
+        (Join-Path $buildDir 'AgentRedactor.msixbundle'),
+        (Join-Path $buildDir 'AgentRedactor-x64.msix'),
+        (Join-Path $buildDir 'AgentRedactor-arm64.msix')
+    )
+    $MsixPath = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+    if (-not $MsixPath) {
+        throw "No MSIX package found under $buildDir`nLooked for: $($candidates -join ', ')`nBuild one with windows\build.ps1 first, or pass -MsixPath."
+    }
+}
 $MsixPath = (Resolve-Path $MsixPath).Path
 Write-Host "MSIX: $MsixPath"
 
