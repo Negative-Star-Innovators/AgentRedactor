@@ -374,6 +374,7 @@ Key pieces of the self-release channel:
 | Settings / start-on-boot | `SettingsPage.xaml`, `SettingsPage.cpp`, `AppState.cpp` |
 | Proxy engine | `../core/src/proxy_engine.cpp`, `../core/src/http_server.cpp` |
 | Settings persistence | `../core/src/settings_manager.cpp`, `../core/src/migrations/settings_migrator.cpp` |
+| Per-user config dir | `%APPDATA%\AgentRedactor` — `settings.json` plus per-user state files such as `redaction_state.json` (placeholder label counters, no PII). Keep any new per-user state file in this dir so clean/uninstall flows and the GUI-test `%APPDATA%` backup cover it automatically. |
 
 ## Changing the settings schema
 

@@ -48,6 +48,7 @@ The AT-SPI GUI tests require a display and the AT-SPI bindings; they skip cleanl
 - `linux/build-release.sh` — release build that produces the Velopack AppImage
 - Desktop integration writes to `$XDG_DATA_HOME/applications`, `$XDG_DATA_HOME/icons`, and `$XDG_CONFIG_HOME/autostart`
 - The AppImage is the entire application; deleting it removes the program
+- Per-user runtime state beyond settings.json (currently `redaction_state.json` — placeholder label counters, no PII) lives in the config dir next to settings.json. Keep any new per-user state file there so the uninstaller (`RemoveAll(GetAppDataPath())`) and `scripts/linux-clean-slate.sh` pick it up automatically.
 
 ## General rules
 
