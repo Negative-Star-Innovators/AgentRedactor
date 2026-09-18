@@ -620,7 +620,8 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
 }
 
 std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std::string& method,
-    const std::wstring& path, const std::vector<std::pair<std::wstring, std::wstring>>& headers,
+    const std::wstring& path,
+    [[maybe_unused]] const std::vector<std::pair<std::wstring, std::wstring>>& headers,
     const std::string& body, RedactionState& state) {
 
     size_t configHash = ComputeConfigHash(profile);
@@ -953,7 +954,7 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
     return Utils::WideToUtf8(state.redactedText);
 }
 
-std::string ProxyEngine::ProcessResponse(const ApiKeyProfile& profile, const std::string& responseBody,
+std::string ProxyEngine::ProcessResponse([[maybe_unused]] const ApiKeyProfile& profile, const std::string& responseBody,
     const std::vector<std::pair<std::wstring, std::wstring>>& responseHeaders,
     const RedactionState& state) {
 
@@ -1494,7 +1495,9 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
 #endif
 }
 
-void ProxyEngine::UpdateStats(const ApiKeyProfile& profile, size_t piiCount, size_t regexCount, size_t keywordCount) {
+void ProxyEngine::UpdateStats([[maybe_unused]] const ApiKeyProfile& profile,
+    [[maybe_unused]] size_t piiCount, [[maybe_unused]] size_t regexCount,
+    [[maybe_unused]] size_t keywordCount) {
     // Stats are updated via the settings manager externally
     // This is a placeholder for future real-time stat updates
     if (onUpdate_) {

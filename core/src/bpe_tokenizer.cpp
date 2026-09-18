@@ -120,7 +120,8 @@ std::string BPETokenizer::MergeKey(const std::string& a, const std::string& b) {
     return a + "\x01" + b;
 }
 
-std::vector<TokenPiece> BPETokenizer::BpeEncodeWord(const std::string& word, size_t byteOffset, const std::vector<size_t>& byteToChar) {
+std::vector<TokenPiece> BPETokenizer::BpeEncodeWord(const std::string& word, size_t byteOffset,
+    [[maybe_unused]] const std::vector<size_t>& byteToChar) {
     std::vector<TokenPiece> pieces;
     if (word.empty()) return pieces;
     for (size_t i = 0; i < word.size(); ++i) {

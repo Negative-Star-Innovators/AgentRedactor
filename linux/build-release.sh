@@ -82,7 +82,9 @@ EXCLUDE='^(linux-vdso.*|ld-linux.*|libc|libm|libdl|librt|libpthread|libresolv|li
 for bin in "${STAGE}/agentredactor-gui.real" "${STAGE}/agentredactor"; do
     ldd "${bin}" | awk '/=> \// {print $1, $3}' | while read -r name path; do
         if [[ "${name}" =~ ${EXCLUDE} ]]; then continue; fi
-        cp -n "${path}" "${STAGE}/${name}" || true
+        # Skip existing files with a test instead of cp -n: -n is deprecated
+        # (GNU cp prints a portability warning per call — hundreds per build).
+        [ -e "${STAGE}/${name}" ] || cp "${path}" "${STAGE}/${name}" || true
     done
 done
 
@@ -99,7 +101,7 @@ done
 find "${STAGE}/plugins" -name '*.so' -print0 | while IFS= read -r -d '' so; do
     ldd "${so}" | awk '/=> \// {print $1, $3}' | while read -r name path; do
         if [[ "${name}" =~ ${EXCLUDE} ]]; then continue; fi
-        cp -n "${path}" "${STAGE}/${name}" || true
+        [ -e "${STAGE}/${name}" ] || cp "${path}" "${STAGE}/${name}" || true
     done
 done
 

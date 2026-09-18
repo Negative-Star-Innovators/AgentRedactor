@@ -1072,7 +1072,7 @@ HttpResponse EngineApp::ApiGetSettings() {
 static HWND ParseHwndQuery(const std::wstring& query);
 #endif
 
-HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body) {
+HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, [[maybe_unused]] const std::wstring& query, const std::string& body) {
     // This trail exists to explain unexplained setting flips. Log the new
     // value too when the body carries no secrets — enableMasterPassword's
     // body carries the new password (or an empty string for Hello), so only
