@@ -10,6 +10,8 @@
 
 #include <QMainWindow>
 
+#include <array>
+
 #include "engine_client.h"
 
 class AppState;
@@ -92,6 +94,15 @@ private:
     bool validateForm(QString& error, bool& httpWarning);
     QString selectedProfileId() const;
     json* selectedProfile();
+    // Pending-edit protection (Windows HomePage formDirty_ parity): the four
+    // profile text fields keep uncommitted edits until the user Saves. A row
+    // mutation that rebuilds the whole form (reloadProfiles) must preserve
+    // them, so snapshot the fields before the reload and restore them after:
+    // savePendingFormText returns false when the form is clean (nothing to
+    // restore, and the reload's values are authoritative).
+    std::array<QString, 4> savePendingFormText() const;
+    void restorePendingFormText(const std::array<QString, 4>& fields,
+        bool wasDirty);
 
     // Lock overlay
     void ensureLockState(bool allowPrompt);

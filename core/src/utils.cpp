@@ -427,6 +427,37 @@ std::filesystem::path GetCurrentLogFilePath() {
     return g_logFilePath;
 }
 
+std::filesystem::path GetHostVisiblePath(const std::filesystem::path& path) {
+#ifdef _WIN32
+    // Directories require FILE_FLAG_BACKUP_SEMANTICS to open; FILE_READ_ATTRIBUTES
+    // is enough to resolve the final path. OPEN_EXISTING keeps this a pure
+    // resolver: a path that does not exist (this or the translated view) fails
+    // here and returns empty, which callers treat as "nothing to open".
+    HANDLE h = CreateFileW(path.c_str(), FILE_READ_ATTRIBUTES,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+        OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+    if (h == INVALID_HANDLE_VALUE) return std::filesystem::path();
+    wchar_t resolved[32768];
+    DWORD n = GetFinalPathNameByHandleW(h, resolved, 32768, 0);
+    CloseHandle(h);
+    if (n == 0 || n >= 32768) return std::filesystem::path();
+    std::wstring finalPath(resolved, n);
+    // The API returns a \\?\ (or \\?\UNC\) prefixed form for long paths /
+    // volume-GUID queries; strip it so Notepad/Explorer accept the path.
+    if (finalPath.size() >= 4 && finalPath[0] == L'\\' && finalPath[1] == L'\\'
+        && finalPath[2] == L'?' && finalPath[3] == L'\\') {
+        finalPath = finalPath.substr(4);
+        if (finalPath.size() >= 4 && finalPath[0] == L'U' && finalPath[1] == L'N'
+            && finalPath[2] == L'C' && (finalPath.size() == 3 || finalPath[3] == L'\\')) {
+            finalPath = L"\\" + finalPath.substr(3); // \\?\UNC\host\share -> \\host\share
+        }
+    }
+    return std::filesystem::path(finalPath);
+#else
+    return path;
+#endif
+}
+
 std::filesystem::path GetExecutablePath() {
 #ifdef _WIN32
     wchar_t path[MAX_PATH];

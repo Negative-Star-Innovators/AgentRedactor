@@ -65,6 +65,15 @@ bool CreateDirectoryRecursive(const std::filesystem::path& path);
 std::filesystem::path GetAppDataPath();
 std::filesystem::path GetExecutablePath();
 std::filesystem::path GetCurrentLogFilePath();
+// MSIX/Store sandboxes virtualize %APPDATA%: the app's own file I/O is
+// translated to Local\Packages\<pkg>\LocalCache\Roaming\..., so the literal
+// path passed to a NON-sandboxed child process (Notepad/Explorer via
+// ShellExecuteW) does not exist there even though the app's own
+// exists()/file I/O passes. Opens the handle through the app's own
+// (translated) I/O and asks Windows for the final on-disk path, so host
+// tools can actually find it. Returns an empty path when it cannot be
+// opened/resolved. A no-op (path unchanged) on non-Windows builds.
+std::filesystem::path GetHostVisiblePath(const std::filesystem::path& path);
 void LogShutdown();
 
 std::wstring GetCurrentMonth();

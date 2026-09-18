@@ -863,6 +863,34 @@ void MainWindow::onConnectionLost() {
 // Profiles: load / select / save
 // ---------------------------------------------------------------------------
 
+// Snapshot the four profile text fields while the form has uncommitted edits
+// (dirty_). reloadProfiles() unconditionally rebuilds the whole form from the
+// engine snapshot, which would discard those edits; the row-mutation handlers
+// snapshot before their reload and restore afterwards (Windows HomePage
+// formDirty_ parity).
+std::array<QString, 4> MainWindow::savePendingFormText() const {
+    std::array<QString, 4> fields{};
+    if (dirty_) {
+        fields[0] = aliasBox_->text();
+        fields[1] = portBox_->text();
+        fields[2] = urlBox_->text();
+        fields[3] = apiKeyBox_->text();
+    }
+    return fields;
+}
+
+void MainWindow::restorePendingFormText(const std::array<QString, 4>& fields,
+    bool wasDirty) {
+    if (!wasDirty) return;
+    // Re-apply pending edits over the freshly reloaded values. Only set a
+    // field that actually differs, so the textChanged dirty-tracking does not
+    // re-mark the form dirty for fields that were never edited.
+    if (aliasBox_->text() != fields[0]) aliasBox_->setText(fields[0]);
+    if (portBox_->text() != fields[1]) portBox_->setText(fields[1]);
+    if (urlBox_->text() != fields[2]) urlBox_->setText(fields[2]);
+    if (apiKeyBox_->text() != fields[3]) apiKeyBox_->setText(fields[3]);
+}
+
 void MainWindow::reloadProfiles(bool keepSelection) {
     if (reloadingProfiles_) {
         // A reload is already on the stack (e.g. the poll fired inside a
@@ -1029,7 +1057,12 @@ void MainWindow::loadProfileIntoForm(int index) {
             } catch (const std::regex_error&) {
                 QMessageBox::warning(this, tr("Validation Error"),
                     tr("Invalid regex syntax."));
+                // The revert reloads the whole form; keep pending profile
+                // text edits across it (Windows formDirty_ parity).
+                const bool wasDirty = dirty_;
+                const std::array<QString, 4> fields = savePendingFormText();
                 reloadProfiles(true);
+                restorePendingFormText(fields, wasDirty);
                 return;
             }
             dirty_ = true;
@@ -1047,8 +1080,11 @@ void MainWindow::loadProfileIntoForm(int index) {
             arr.erase(std::remove_if(arr.begin(), arr.end(), [&](const json& r) {
                 return r.value("pattern", std::string()) == pat;
             }), arr.end());
+            const bool wasDirty = dirty_;
+            const std::array<QString, 4> fields = savePendingFormText();
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
                 reloadProfiles(true);
+                restorePendingFormText(fields, wasDirty);
             }
         });
     }
@@ -1124,8 +1160,11 @@ void MainWindow::loadProfileIntoForm(int index) {
             arr.erase(std::remove_if(arr.begin(), arr.end(), [&](const json& kw) {
                 return kw.value("text", std::string()) == t;
             }), arr.end());
+            const bool wasDirty = dirty_;
+            const std::array<QString, 4> fields = savePendingFormText();
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
                 reloadProfiles(true);
+                restorePendingFormText(fields, wasDirty);
             }
         });
     }
@@ -1416,9 +1455,12 @@ void MainWindow::onAddRegex() {
 
     (*p)["regex_patterns"].push_back(
         {{"pattern", pat8}, {"enabled", true}});
+    const bool wasDirty = dirty_;
+    const std::array<QString, 4> fields = savePendingFormText();
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
         newRegexBox_->clear();
         reloadProfiles(true);
+        restorePendingFormText(fields, wasDirty);
     }
 }
 
@@ -1440,9 +1482,12 @@ void MainWindow::onAddKeyword() {
 
     (*p)["keywords"].push_back({{"text", text8},
         {"case_sensitive", caseSensitive}, {"enabled", true}});
+    const bool wasDirty = dirty_;
+    const std::array<QString, 4> fields = savePendingFormText();
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
         newKeywordBox_->clear();
         reloadProfiles(true);
+        restorePendingFormText(fields, wasDirty);
     }
 }
 
@@ -1538,8 +1583,13 @@ void MainWindow::onClearStatistics() {
     (*p)["stats"] = {{"total_requests", 0}, {"total_pii_detected", 0},
         {"total_regex_matches", 0}, {"total_keyword_matches", 0},
         {"pii_type_breakdown", json::object()}};
+    // The stats reset reloads the whole form; keep pending profile text
+    // edits across it (Windows formDirty_ parity).
+    const bool wasDirty = dirty_;
+    const std::array<QString, 4> fields = savePendingFormText();
     appState_->client().PutProfile(w(selectedProfileId()), *p);
     reloadProfiles(true);
+    restorePendingFormText(fields, wasDirty);
 }
 
 void MainWindow::onClearMatches() {
