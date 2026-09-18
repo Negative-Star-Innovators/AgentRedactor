@@ -1006,11 +1006,17 @@ void MainWindow::loadProfileIntoForm(int index) {
             Utils::WideToUtf8(type)) != enabledTypes.end());
     }
 
-    // Rebuild regex rows (each row is a widget so takeAt/delete cleans up).
+    // Rebuild regex rows (each row is a widget so takeAt cleans up).
     const auto regexPatterns = p.value("regex_patterns", json::array());
     regexHeader_->setVisible(!regexPatterns.empty());
     while (QLayoutItem* item = regexRows_->takeAt(0)) {
-        delete item->widget();
+        // deleteLater, not delete: the row being rebuilt may contain the
+        // widget whose signal handler triggered this reload (e.g. the Delete
+        // button mid-mouse-release) — destroying it synchronously returns
+        // into Qt event code on a deleted object (general protection fault
+        // in libQt6Widgets). The deferred delete runs once the handler
+        // returns to the event loop.
+        if (QWidget* row = item->widget()) row->deleteLater();
         delete item;
     }
     for (const auto& r : regexPatterns) {
@@ -1089,11 +1095,12 @@ void MainWindow::loadProfileIntoForm(int index) {
         });
     }
 
-    // Rebuild keyword rows.
+    // Rebuild keyword rows. Deferred deletion for the same reason as the
+    // regex rows above: the triggering widget may be inside a row.
     const auto keywords = p.value("keywords", json::array());
     keywordHeader_->setVisible(!keywords.empty());
     while (QLayoutItem* item = keywordRows_->takeAt(0)) {
-        delete item->widget();
+        if (QWidget* row = item->widget()) row->deleteLater();
         delete item;
     }
     for (const auto& k : keywords) {
