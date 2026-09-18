@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <functional>
+#include <fstream>
 #include <sstream>
 #include <unordered_map>
 #include <unordered_set>
@@ -34,6 +35,55 @@ namespace AgentRedactor {
 
 ProxyEngine::ProxyEngine(PIIDetector* detector, LogManager* logManager, std::function<void()> onUpdate)
     : detector_(detector), logManager_(logManager), onUpdate_(std::move(onUpdate)) {
+}
+
+void ProxyEngine::SetStateFilePath(const std::filesystem::path& path) {
+    std::lock_guard<std::mutex> lock(stateFileMutex_);
+    stateFilePath_ = path;
+    stateLoaded_ = false;
+}
+
+void ProxyEngine::LoadPersistedCountersLocked() {
+    stateLoaded_ = true;
+    persistedCounters_.clear();
+    std::error_code ec;
+    if (stateFilePath_.empty() || !std::filesystem::exists(stateFilePath_, ec)) return;
+    try {
+        std::ifstream in(stateFilePath_);
+        auto j = json::parse(in);
+        if (j.value("version", 0) != 1) return;
+        for (const auto& [key, val] : j.at("profiles").items()) {
+            PersistedCounters c;
+            c.pii = val.value("pii", 0);
+            c.regex = val.value("regex", 0);
+            c.keyword = val.value("keyword", 0);
+            persistedCounters_[Utils::Utf8ToWide(key)] = c;
+        }
+    } catch (const json::exception&) {
+        LOG(L"[ProxyEngine] redaction_state.json unreadable; counters start fresh");
+    }
+}
+
+void ProxyEngine::SavePersistedCountersLocked() {
+    if (stateFilePath_.empty()) return;
+    try {
+        json profiles = json::object();
+        for (const auto& [id, c] : persistedCounters_) {
+            profiles[Utils::WideToUtf8(id)] = {
+                {"pii", c.pii}, {"regex", c.regex}, {"keyword", c.keyword},
+            };
+        }
+        json j;
+        j["version"] = 1;
+        j["profiles"] = std::move(profiles);
+        std::filesystem::create_directories(stateFilePath_.parent_path());
+        std::ofstream out(stateFilePath_, std::ios::trunc);
+        out << j.dump(2);
+        if (!out) LOG(L"[ProxyEngine] failed to write redaction_state.json");
+    } catch (const std::exception&) {
+        // Persistence is best-effort: a failed write must not break proxying.
+        LOG(L"[ProxyEngine] failed to save redaction_state.json");
+    }
 }
 
 size_t ProxyEngine::ComputeConfigHash(const ApiKeyProfile& profile) {
@@ -582,9 +632,18 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
         session.piiTypeMap.clear();
         session.regexLabelMap.clear();
         session.keywordLabelMap.clear();
-        session.piiCounter = 0;
-        session.regexCounter = 0;
-        session.keywordCounter = 0;
+    }
+    // Floor the counters at the persisted values: even on config change (or a
+    // fresh session after restart) label numbers must never go backwards, or
+    // a restarted engine could reissue a label still referenced by
+    // provider-side conversation state.
+    {
+        std::lock_guard<std::mutex> lock(stateFileMutex_);
+        if (!stateLoaded_) LoadPersistedCountersLocked();
+        auto& pc = persistedCounters_[profile.id];
+        session.piiCounter = std::max(session.piiCounter, pc.pii);
+        session.regexCounter = std::max(session.regexCounter, pc.regex);
+        session.keywordCounter = std::max(session.keywordCounter, pc.keyword);
     }
 
     state.originalText = Utils::Utf8ToWide(body);
@@ -876,6 +935,20 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
     details += L"=== REDACTED REQUEST BODY (to upstream) ===\n" + redactedPreview;
 
     logManager_->AddLog(profile.alias, LogDirection::UserToProxy, summary, details);
+
+    // Persist any counter growth before the redacted body is forwarded, so a
+    // crash after this point cannot lose label numbers that already went out.
+    {
+        std::lock_guard<std::mutex> lock(stateFileMutex_);
+        if (stateLoaded_) {
+            auto& pc = persistedCounters_[profile.id];
+            bool dirty = false;
+            if (session.piiCounter > pc.pii) { pc.pii = session.piiCounter; dirty = true; }
+            if (session.regexCounter > pc.regex) { pc.regex = session.regexCounter; dirty = true; }
+            if (session.keywordCounter > pc.keyword) { pc.keyword = session.keywordCounter; dirty = true; }
+            if (dirty) SavePersistedCountersLocked();
+        }
+    }
 
     return Utils::WideToUtf8(state.redactedText);
 }

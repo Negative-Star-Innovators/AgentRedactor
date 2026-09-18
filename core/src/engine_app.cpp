@@ -346,6 +346,9 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
         // Stats are persisted per-request into settings.json; the GUI polls
         // the control API for updates, so no push notification is needed.
     });
+    // Persist label counters (no PII) so engine restarts never reissue live
+    // placeholder labels.
+    proxyEngine_->SetStateFilePath(settings_->GetConfigDir() / "redaction_state.json");
 
     if (!controlServer_.Start(ControlServer::kDefaultPort, settings_->GetConfigDir(),
             [this](const HttpRequest& req) { return this->HandleControlRequest(req); })) {
