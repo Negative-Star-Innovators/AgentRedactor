@@ -15,6 +15,7 @@
 class QAction;
 class QActionGroup;
 class QMenu;
+class QTimer;
 
 class TrayIcon : public QObject {
     Q_OBJECT
@@ -39,6 +40,9 @@ signals:
     void quitRequested();
 
 private:
+    // Create tray_ + menu if a system tray is available. Returns success.
+    bool tryCreate();
+
     QSystemTrayIcon* tray_ = nullptr;
     QMenu* menu_ = nullptr;
     QAction* openAction_ = nullptr;
@@ -46,4 +50,6 @@ private:
     QMenu* languageMenu_ = nullptr;
     QActionGroup* languageGroup_ = nullptr;
     QAction* quitAction_ = nullptr;
+    QTimer* retryTimer_ = nullptr;
+    int retryAttempts_ = 0;
 };

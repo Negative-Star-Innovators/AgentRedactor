@@ -68,6 +68,10 @@ std::string DesktopFileContents() {
        << "Exec=" << QuoteExecArg(ResolveExecPath().string()) << " --tray-only\n"
        // Resolved from the hicolor set installed by DesktopIntegration.
        << "Icon=agentredactor\n"
+       // Start a few seconds after the session: GNOME shell's tray watcher is
+       // not always ready when raw autostart entries fire, and an app that
+       // registers its StatusNotifierItem too early never gets an icon.
+       << "X-GNOME-Autostart-Delay=5\n"
        << "X-GNOME-Autostart-enabled=true\n";
     // Desktop entries are user config, not secrets; 644 is conventional.
     return ss.str();
