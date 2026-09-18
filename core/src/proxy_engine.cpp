@@ -5,8 +5,10 @@
 #include "localization.h"
 #include <nlohmann/json.hpp>
 #include <algorithm>
+#include <functional>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <chrono>
 
 using json = nlohmann::json;
@@ -57,6 +59,44 @@ size_t ProxyEngine::ComputeConfigHash(const ApiKeyProfile& profile) {
 SessionState& ProxyEngine::GetSessionState(const std::wstring& profileId) {
     return profileSessions_[profileId];
 }
+
+namespace {
+
+// String-valued JSON keys whose values are machine-structural and must reach
+// the provider byte-exact: message/block/tool ids pair tool_use with
+// tool_result, model/role/type are enums, and stop sequences silently alter
+// generation if modified. Deliberately NOT excluded: "name", "content",
+// "thinking", "system", "reasoning_content" etc. — human-meaningful strings
+// that can carry PII. A key we don't recognize is scanned, never skipped.
+bool IsStructuralJsonKey(const std::string& key) {
+    static const std::unordered_set<std::string> kKeys = {
+        "id", "tool_call_id", "model", "role", "type", "stop", "stop_sequences",
+    };
+    return kKeys.find(key) != kKeys.end();
+}
+
+// Recursive deny-all walk: redact every string value in the tree except
+// structural keys. `key` carries the parent key through arrays so that
+// "stop": ["..."] is honored for its string elements.
+void RedactJsonStrings(json& node, const std::string& key,
+    const std::function<std::wstring(const std::wstring&)>& redact) {
+    if (node.is_string()) {
+        if (!key.empty() && IsStructuralJsonKey(key)) return;
+        std::string s = node.get<std::string>();
+        // Embedded binary (image data URIs) carries no PII but can be
+        // megabytes; scanning it is pure cost.
+        if (s.rfind("data:", 0) == 0 && s.size() > 256) return;
+        std::wstring ws = Utils::Utf8ToWide(s);
+        std::wstring redacted = redact(ws);
+        if (redacted != ws) node = Utils::WideToUtf8(redacted);
+    } else if (node.is_array()) {
+        for (auto& el : node) RedactJsonStrings(el, key, redact);
+    } else if (node.is_object()) {
+        for (auto& el : node.items()) RedactJsonStrings(el.value(), el.key(), redact);
+    }
+}
+
+} // namespace
 
 std::wstring ProxyEngine::ApplyForwardPropagation(const std::wstring& text, SessionState& session,
     std::map<std::wstring, std::wstring>& fragPii,
@@ -655,49 +695,19 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
         return result;
     };
 
-    // Try to parse as OpenAI chat completions JSON and redact message contents individually
+    // Deny-all tree walk: redact every string value in the request JSON,
+    // skipping only the machine-structural keys above. This covers fields the
+    // old messages-only allowlist missed — Anthropic "thinking" blocks,
+    // "tool_result"/"tool_use" content, OpenAI "reasoning_content", "system",
+    // and any field providers add in the future.
     bool parsedJson = false;
     try {
         auto jsonBody = json::parse(body);
-        if (jsonBody.contains("messages") && jsonBody["messages"].is_array()) {
-            parsedJson = true;
-            for (auto& message : jsonBody["messages"]) {
-                // Redact message content (string or array format)
-                if (message.contains("content")) {
-                    if (message["content"].is_string()) {
-                        std::wstring content = Utils::Utf8ToWide(message["content"].get<std::string>());
-                        message["content"] = Utils::WideToUtf8(redactTextFragment(content));
-                    } else if (message["content"].is_array()) {
-                        for (auto& item : message["content"]) {
-                            if (item.is_object() && item.contains("type") && item["type"] == "text" && item.contains("text") && item["text"].is_string()) {
-                                std::wstring text = Utils::Utf8ToWide(item["text"].get<std::string>());
-                                item["text"] = Utils::WideToUtf8(redactTextFragment(text));
-                            }
-                        }
-                    }
-                }
-                // Redact tool call arguments (assistant messages with tool_calls)
-                if (message.contains("tool_calls") && message["tool_calls"].is_array()) {
-                    for (auto& toolCall : message["tool_calls"]) {
-                        if (toolCall.contains("function") && toolCall["function"].is_object()) {
-                            auto& func = toolCall["function"];
-                            if (func.contains("arguments") && func["arguments"].is_string()) {
-                                std::wstring args = Utils::Utf8ToWide(func["arguments"].get<std::string>());
-                                func["arguments"] = Utils::WideToUtf8(redactTextFragment(args));
-                            }
-                            // Also redact function name if it looks like it contains PII
-                            if (func.contains("name") && func["name"].is_string()) {
-                                std::wstring name = Utils::Utf8ToWide(func["name"].get<std::string>());
-                                func["name"] = Utils::WideToUtf8(redactTextFragment(name));
-                            }
-                        }
-                    }
-                }
-            }
-            state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
-        }
+        parsedJson = true;
+        RedactJsonStrings(jsonBody, "", redactTextFragment);
+        state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
     } catch (const json::exception&) {
-        // Not valid JSON or not an OpenAI format — fall through to full-body redaction
+        // Not valid JSON — fall through to full-body redaction below.
     }
 
     // Fallback: redact the entire body as plain text
