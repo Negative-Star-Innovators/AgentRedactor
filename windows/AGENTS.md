@@ -88,7 +88,14 @@ agentredactor keywords list [--profile P]
 agentredactor keywords add <text> [--ignore-case] [--profile P]
 agentredactor keywords remove <n|text> [--ignore-case] [--profile P]
 agentredactor password enable | disable       Windows-Hello protection
+agentredactor download-model                  download the AI model weights (first run; shows progress)
 ```
+
+Linux-only maintenance commands: `agentredactor update` (swap the AppImage for
+the latest channel release; restart to apply) and `agentredactor uninstall`.
+`agentredactor status` additionally performs an on-demand update-feed check on
+Linux and prints an "update available" line when a newer release exists; on
+Windows the app self-updates through the GUI's Velopack flow instead.
 
 `engine run` / `engine stop` are **not CLI commands at all**: both are
 rejected as unknown. Engine lifecycle belongs to the GUI (spawn on startup,

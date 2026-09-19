@@ -61,6 +61,15 @@ trap - EXIT
 
 echo "Installed: $target"
 
+# Put the engine/CLI on PATH so headless machines (WSL, SSH, servers) can run
+# 'agentredactor status' etc. without extracting the AppImage.
+mkdir -p "$HOME/.local/bin"
+ln -sf "$target" "$HOME/.local/bin/agentredactor"
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) echo "Note: ~/.local/bin is not on PATH; reopen your shell or add it to use 'agentredactor' directly." ;;
+esac
+
 # Launch detached. AppImages mount via FUSE; when the mount is unavailable
 # (minimal containers, WSL without fuse) the runtime exits non-zero within a
 # second or two, and we relaunch with --appimage-extract-and-run, which
@@ -80,6 +89,17 @@ start_app() {
 }
 
 echo 'Starting AgentRedactor...'
+# Headless machines (WSL without WSLg, SSH, servers) cannot run the Qt GUI;
+# the AppImage entrypoint would abort inside Qt platform init. Leave the
+# engine/CLI on PATH with starting instructions instead.
+if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ]; then
+    echo 'No display detected - installed headless.'
+    echo "  Run the engine:   agentredactor --console"
+    echo "  (or install the systemd user unit from the repository's linux/systemd/)"
+    echo "  First run needs the AI model: agentredactor download-model"
+    echo "  CLI overview:     agentredactor help"
+    exit 0
+fi
 if start_app; then
     echo 'AgentRedactor is starting — you can also launch it from your desktop menu.'
 elif start_app --appimage-extract-and-run; then

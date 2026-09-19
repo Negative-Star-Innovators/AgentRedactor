@@ -3,10 +3,19 @@
 #include "utils.h"
 #include "constants.h"
 
+#include <chrono>
+#include <cstdlib>
 #include <cwctype>
+#include <filesystem>
 #include <regex>
 #include <sstream>
 #include <iomanip>
+#include <thread>
+
+#ifndef _WIN32
+#include <sys/stat.h>
+#include <sys/utsname.h>
+#endif
 
 using namespace AgentRedactor;
 
@@ -73,6 +82,75 @@ std::wstring ValidateUpstreamUrl(const std::wstring& raw, const std::wstring& la
     }
     return L"";
 }
+
+// ---------------------------------------------------------------------------
+// Version + update-feed helpers (used by `status` and `update`)
+// ---------------------------------------------------------------------------
+
+#ifndef _WIN32
+// "1.2.13" -> {1,2,13}; anything unparsable -> valid=false.
+struct SemVersion { int parts[3] = {0, 0, 0}; bool valid = false; };
+
+SemVersion ParseSemVersion(const std::wstring& text) {
+    SemVersion v;
+    std::wistringstream ss(text);
+    std::wstring part;
+    int i = 0;
+    while (i < 3 && std::getline(ss, part, L'.') && IsInteger(part)) {
+        v.parts[i++] = std::stoi(part);
+    }
+    v.valid = (i == 3);
+    return v;
+}
+
+std::wstring SemVersionStr(const SemVersion& v) {
+    return std::to_wstring(v.parts[0]) + L"." + std::to_wstring(v.parts[1]) + L"." + std::to_wstring(v.parts[2]);
+}
+
+int CompareSemVersion(const SemVersion& a, const SemVersion& b) {
+    for (int i = 0; i < 3; ++i) {
+        if (a.parts[i] != b.parts[i]) return a.parts[i] < b.parts[i] ? -1 : 1;
+    }
+    return 0;
+}
+
+// Latest version advertised by a Velopack channel feed; valid=false on any
+// failure (offline, unreadable feed, no parseable asset versions). One-shot
+// fetch, no caching — `status` calls this on demand.
+SemVersion FeedLatestVersion(const std::wstring& channel) {
+    SemVersion latest;
+    std::string body;
+    const std::wstring url = L"https://api.agentredactor.negativestarinnovators.com/updates/"
+        + channel + L"/releases." + channel + L".json";
+    if (!Utils::HttpGetString(url, body)) return latest;
+    try {
+        const json feed = json::parse(body);
+        for (const auto& asset : feed.at("Assets")) {
+            SemVersion v = ParseSemVersion(Utils::Utf8ToWide(asset.value("Version", std::string())));
+            if (v.valid && (!latest.valid || CompareSemVersion(v, latest) > 0)) latest = v;
+        }
+    } catch (...) {
+    }
+    return latest;
+}
+
+// Velopack channel + fixed AppImage file name for the running CPU; empty
+// channel = unsupported architecture.
+std::wstring AppImageChannel(std::wstring& fileNameOut) {
+    struct utsname uts {};
+    if (uname(&uts) != 0) return L"";
+    const std::string machine = uts.machine;
+    if (machine == "x86_64" || machine == "amd64") {
+        fileNameOut = L"AgentRedactor.AppImage";
+        return L"linux";
+    }
+    if (machine == "aarch64" || machine == "arm64") {
+        fileNameOut = L"AgentRedactor-linux-arm64.AppImage";
+        return L"linux-arm64";
+    }
+    return L"";
+}
+#endif // _WIN32
 
 // ---------------------------------------------------------------------------
 // Invocation context
@@ -313,6 +391,23 @@ int CmdStatus(const Ctx& ctx) {
             ctx.Print(line);
         }
     }
+#ifndef _WIN32
+    // On-demand update check (Linux): one feed fetch per `status` call, silent
+    // when offline or the feed is unreadable. Windows self-updates through the
+    // GUI's Velopack flow instead.
+    {
+        std::wstring fileName;
+        const std::wstring channel = AppImageChannel(fileName);
+        if (!channel.empty()) {
+            const SemVersion latest = FeedLatestVersion(channel);
+            const SemVersion current = ParseSemVersion(APP_VERSION);
+            if (latest.valid && current.valid && CompareSemVersion(latest, current) > 0) {
+                ctx.Print(L"update available: " + SemVersionStr(latest) + L" (current "
+                          + SemVersionStr(current) + L") - run 'agentredactor update'");
+            }
+        }
+    }
+#endif
     return 0;
 }
 
@@ -1125,6 +1220,124 @@ int CmdKeywords(const Ctx& ctx) {
 // usage
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// download-model / update
+// ---------------------------------------------------------------------------
+
+// Triggers the engine's first-run download of the model weights and follows
+// it to completion via /status polling. Ungated (like status): on a fresh
+// install the proxies are blocked until the weights land, and a headless
+// engine with a master password must still be able to bootstrap itself.
+int CmdDownloadModel(const Ctx& ctx) {
+    if (!ctx.NoExtraArgs(1)) return 2;
+    json status;
+    if (!ctx.EngineStatus(status)) return 1;
+    if (!status.value("modelDownloadRequired", false) && !status.value("modelDownloadInProgress", false)) {
+        ctx.Print(L"model weights already present");
+        return 0;
+    }
+    json out;
+    if (!ctx.t.post(L"/engine/download-model", json::object(), &out)) {
+        ctx.Error(L"failed to start the model download");
+        return 1;
+    }
+    ctx.Print(L"downloading model weights (~1.6 GB, resumable)...");
+    int lastPct = -1;
+    for (int waitedSec = 0; waitedSec < 60 * 60; ++waitedSec) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        json s;
+        if (!ctx.t.get(L"/status", s)) {
+            ctx.Error(L"engine became unreachable during the download");
+            return 1;
+        }
+        if (s.value("modelDownloadInProgress", false)) {
+            const int pct = s.value("modelDownloadPercent", -1);
+            if (pct >= 0 && pct != lastPct) {
+                lastPct = pct;
+                ctx.Print(std::to_wstring(pct) + L"%");
+            }
+            continue;
+        }
+        if (s.value("modelDownloadFailed", false)) {
+            ctx.Error(L"model download failed: "
+                      + Utils::Utf8ToWide(s.value("modelDownloadStatus", std::string())));
+            return 1;
+        }
+        if (s.value("modelDownloadRequired", false)) {
+            // Waiting between automatic retries — keep polling silently.
+            continue;
+        }
+        ctx.Print(L"model download complete");
+        return 0;
+    }
+    ctx.Error(L"model download did not finish within 60 minutes");
+    return 1;
+}
+
+#ifndef _WIN32
+// Self-update for AppImage installs: compare the running binary's version
+// against the Velopack channel feed and, when newer, download the fixed-name
+// AppImage and atomically replace $APPIMAGE (rename over a running AppImage
+// is allowed on Linux; the old process keeps the old inode until it exits).
+int CmdUpdate(const Ctx& ctx) {
+    if (!ctx.NoExtraArgs(1)) return 2;
+    std::wstring fileName;
+    const std::wstring channel = AppImageChannel(fileName);
+    if (channel.empty()) {
+        ctx.Error(L"unsupported CPU architecture for self-update");
+        return 1;
+    }
+    ctx.Print(L"checking for updates (channel " + channel + L")...");
+    const SemVersion latest = FeedLatestVersion(channel);
+    if (!latest.valid) {
+        ctx.Error(L"could not read the update feed (offline?)");
+        return 1;
+    }
+    const SemVersion current = ParseSemVersion(APP_VERSION);
+    if (current.valid && CompareSemVersion(latest, current) <= 0) {
+        ctx.Print(L"up to date (" + SemVersionStr(current) + L")");
+        return 0;
+    }
+    const char* appImageEnv = std::getenv("APPIMAGE");
+    if (!appImageEnv || !*appImageEnv) {
+        ctx.Error(L"version " + SemVersionStr(latest) + L" is available, but this engine is not running"
+                  L" from an AppImage ($APPIMAGE is unset); re-run the install script to update");
+        return 1;
+    }
+    const std::filesystem::path target(std::string(appImageEnv));
+    const std::filesystem::path tmp = std::filesystem::path(target.native() + ".download");
+    ctx.Print(L"downloading " + fileName + L" ...");
+    int lastPct = -1;
+    const bool ok = Utils::HttpDownloadFileSegmented(
+        L"https://api.agentredactor.negativestarinnovators.com/updates/" + channel + L"/" + fileName,
+        tmp,
+        [&](uint64_t downloaded, uint64_t total) {
+            if (!total) return;
+            const int pct = static_cast<int>(downloaded * 100 / total);
+            if (pct != lastPct && pct % 10 == 0) {
+                lastPct = pct;
+                ctx.Print(std::to_wstring(pct) + L"%");
+            }
+        });
+    if (!ok) {
+        std::error_code ec;
+        std::filesystem::remove(tmp, ec);
+        ctx.Error(L"download failed");
+        return 1;
+    }
+    ::chmod(tmp.c_str(), 0755);
+    std::error_code ec;
+    std::filesystem::rename(tmp, target, ec);
+    if (ec) {
+        std::filesystem::remove(tmp, ec);
+        ctx.Error(L"failed to replace the AppImage: " + Utils::Utf8ToWide(ec.message()));
+        return 1;
+    }
+    ctx.Print(L"updated to " + SemVersionStr(latest) + L" - restart the app or engine to run the new version");
+    return 0;
+}
+#endif // _WIN32
+
 void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"Agent Redactor CLI");
     ctx.Print(L"usage: agentredactor <command> [options]");
@@ -1132,6 +1345,8 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"overview:");
     ctx.Print(L"  status                               engine + profile overview");
     ctx.Print(L"  languages                            list supported language codes");
+    ctx.Print(L"  download-model                       download the AI model weights");
+    ctx.Print(L"                                       (first run; shows progress)");
     ctx.Print(L"");
     ctx.Print(L"settings:");
     ctx.Print(L"  get <key> [--profile P]              read a setting");
@@ -1182,6 +1397,8 @@ void PrintUsage(const Ctx& ctx) {
 #ifndef _WIN32
     ctx.Print(L"");
     ctx.Print(L"maintenance (Linux only):");
+    ctx.Print(L"  update                               check for and install AppImage");
+    ctx.Print(L"                                       updates (restart to apply)");
     ctx.Print(L"  uninstall [--yes]                    remove Agent Redactor, settings,");
     ctx.Print(L"                                       icons, and the AppImage");
 #endif
@@ -1223,6 +1440,10 @@ int AgentRedactor::RunCli(const std::vector<std::wstring>& args,
     if (cmd == L"regex") return CmdRegex(ctx);
     if (cmd == L"keywords") return CmdKeywords(ctx);
     if (cmd == L"pii-types") return CmdPiiTypes(ctx);
+    if (cmd == L"download-model") return CmdDownloadModel(ctx);
+#ifndef _WIN32
+    if (cmd == L"update") return CmdUpdate(ctx);
+#endif
     // `engine run` / `engine stop` were removed from the CLI surface entirely;
     // engine lifecycle belongs to the GUI (spawn on startup, stop/lock on quit).
 
