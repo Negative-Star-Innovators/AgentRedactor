@@ -150,6 +150,62 @@ LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS info)
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
+// Single-instance hand-off: find another AgentRedactorUI top-level window and
+// bring it to the foreground, so a duplicate launch (or an update-restart
+// racing a user relaunch) lands the user on the live app instead of exiting
+// silently — the pre-fix silent exit read as a crash. Matched by exe name
+// (not the window title, which is localized); EnumWindows also enumerates
+// hidden windows, so a close-to-tray instance is found and restored.
+bool TryActivateRunningInstance()
+{
+    struct EnumCtx { DWORD selfPid; HWND hwnd; };
+    EnumCtx ctx{ GetCurrentProcessId(), nullptr };
+    EnumWindows([](HWND hwnd, LPARAM lp) -> BOOL {
+        auto* c = reinterpret_cast<EnumCtx*>(lp);
+        DWORD pid = 0;
+        GetWindowThreadProcessId(hwnd, &pid);
+        if (pid == 0 || pid == c->selfPid) return TRUE;
+        HANDLE proc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+        if (!proc) return TRUE;
+        wchar_t path[MAX_PATH] = {};
+        DWORD len = MAX_PATH;
+        bool match = false;
+        if (QueryFullProcessImageNameW(proc, 0, path, &len)) {
+            match = ::AgentRedactor::Utils::ToLower(
+                std::filesystem::path(path).filename().wstring()) == L"agentredactorui.exe";
+        }
+        CloseHandle(proc);
+        if (match) { c->hwnd = hwnd; return FALSE; }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&ctx));
+    if (!ctx.hwnd) return false;
+
+    if (IsIconic(ctx.hwnd)) ShowWindow(ctx.hwnd, SW_RESTORE);
+    ShowWindow(ctx.hwnd, SW_SHOW);
+    // SetForegroundWindow fails for background processes; borrow the
+    // foreground thread's input queue to take focus politely.
+    HWND fg = GetForegroundWindow();
+    DWORD fgThread = 0;
+    if (fg) GetWindowThreadProcessId(fg, &fgThread);
+    const DWORD myThread = GetCurrentThreadId();
+    if (fgThread && fgThread != myThread) AttachThreadInput(myThread, fgThread, TRUE);
+    SetForegroundWindow(ctx.hwnd);
+    if (fgThread && fgThread != myThread) AttachThreadInput(myThread, fgThread, FALSE);
+    return true;
+}
+
+// Called on every "another instance holds the mutex" path. Prefers the
+// window hand-off; only when no window exists at all does it tell the user
+// (the previous behavior — a bare return 1 — left no trace in the UI).
+void HandOffOrNotify()
+{
+    if (TryActivateRunningInstance()) return;
+    MessageBoxW(nullptr,
+        L"Agent Redactor is already running, but its window could not be shown.\n"
+        L"Check the system tray notification area or Task Manager.",
+        L"Agent Redactor", MB_OK | MB_ICONINFORMATION);
+}
+
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
 {
     SetUnhandledExceptionFilter(MyExceptionFilter);
@@ -215,7 +271,10 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         if (isVelopackRestart && hMutex) {
             DbgLog(L"wWinMain: restart detected; waiting for previous instance to release mutex");
-            constexpr DWORD kRestartMutexTimeoutMs = 30000;
+            // The previous instance can legitimately take minutes to exit
+            // (engine teardown with the model loaded); 30 s gave up far too
+            // early and the silent timeout exit read as a post-update crash.
+            constexpr DWORD kRestartMutexTimeoutMs = 120000;
             DWORD wait = WaitForSingleObject(hMutex, kRestartMutexTimeoutMs);
             if (wait == WAIT_OBJECT_0 || wait == WAIT_ABANDONED_0) {
                 ReleaseMutex(hMutex);
@@ -226,19 +285,22 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
                 if (GetLastError() != ERROR_ALREADY_EXISTS) {
                     DbgLog(L"wWinMain: mutex acquired after restart wait");
                 } else {
-                    DbgLog(L"wWinMain: another instance appeared during restart wait; exiting");
+                    DbgLog(L"wWinMain: another instance appeared during restart wait; handing off");
                     if (hMutex) { ReleaseMutex(hMutex); CloseHandle(hMutex); }
+                    HandOffOrNotify();
                     return 1;
                 }
             } else {
-                DbgLog(L"wWinMain: timed out waiting for previous instance mutex; exiting");
+                DbgLog(L"wWinMain: timed out waiting for previous instance mutex; handing off");
                 ReleaseMutex(hMutex);
                 CloseHandle(hMutex);
+                HandOffOrNotify();
                 return 1;
             }
         } else {
-            DbgLog(L"wWinMain: already running");
+            DbgLog(L"wWinMain: already running; handing off");
             if (hMutex) { ReleaseMutex(hMutex); CloseHandle(hMutex); }
+            HandOffOrNotify();
             return 1;
         }
     }
