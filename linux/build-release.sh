@@ -158,6 +158,12 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 #  - without a display the Qt GUI cannot start at all (e.g. WSL/SSH/servers),
 #    so EVERYTHING dispatches to the engine/CLI, and a bare launch prints a
 #    headless hint instead of aborting inside Qt platform init.
+# "--cli <args...>" is the pre-existing pass-through the GUI binary also
+# honors (linux/gui/main.cpp): strip the marker and run the engine CLI.
+if [ "$#" -gt 0 ] && [ "$1" = "--cli" ]; then
+    shift
+    exec -a agentredactor "${HERE}/agentredactor" "$@"
+fi
 is_cli_arg() {
     case "$1" in
         status|languages|get|set|profiles|regex|keywords|password|pii-types|help|uninstall|download-model|update|--help|-h|--console|--selftest-migrate-settings)
