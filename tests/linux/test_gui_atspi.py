@@ -552,6 +552,11 @@ async def test_regex_toggle_and_delete(
     wait_until("regex re-enabled", gui.app.regexes,
                lambda rs: rs.get(pattern) is True)
     gui.app.delete_regex(pattern)
+    # The GUI row can disappear before the engine has applied the delete;
+    # wait for the engine-side list to drop the pattern before sending traffic.
+    wait_until("regex removed from engine",
+               lambda: gui.cli("regex", "list").stdout,
+               lambda out: pattern not in out)
     response = await _send_chat(gui, client, request_text)
     upstream = mock_llm.last_request
     assert upstream is not None
