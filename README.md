@@ -41,17 +41,6 @@ x64 build on ARM64 if no native package is published yet) and installs per-user
 under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
 Windows SmartScreen may warn on first run.
 
-**Self-release for Linux** (x64 and ARM64; updates itself via Velopack). Run:
-
-```bash
-curl -fsSL https://api.agentredactor.negativestarinnovators.com/install.sh | bash
-```
-
-The installer picks the AppImage for your architecture (`uname -m`), installs it
-to `~/Applications`, and starts the app — first launch adds the desktop-menu
-entry. If FUSE is unavailable the first launch falls back to
-`--appimage-extract-and-run`.
-
 ## Repository layout
 
 | Path | Contents |
