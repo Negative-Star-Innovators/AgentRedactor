@@ -92,7 +92,7 @@ echo 'Starting AgentRedactor...'
 # Headless machines (WSL without WSLg, SSH, servers) cannot run the Qt GUI;
 # the AppImage entrypoint would abort inside Qt platform init. Leave the
 # engine/CLI on PATH with starting instructions instead.
-if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ]; then
+if [ -z "\${DISPLAY:-}" ] && [ -z "\${WAYLAND_DISPLAY:-}" ]; then
     echo 'No display detected - installed headless.'
     echo "  Run the engine:   agentredactor --console"
     echo "  (or install the systemd user unit from the repository's linux/systemd/)"
