@@ -168,7 +168,10 @@ is_cli_arg() {
 if [ "$#" -gt 0 ] && is_cli_arg "$1"; then
     exec -a agentredactor "${HERE}/agentredactor" "$@"
 fi
-if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ]; then
+# Headless: no X/Wayland display -> the Qt GUI cannot start; point at the CLI.
+# An explicit QT_QPA_PLATFORM (e.g. offscreen in CI/tests) means the caller
+# asked for the GUI regardless of the display, so do not dispatch then.
+if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${QT_QPA_PLATFORM:-}" ]; then
     if [ "$#" -eq 0 ]; then
         echo "No display detected (set DISPLAY or WAYLAND_DISPLAY for the GUI)."
         echo "Headless usage: agentredactor <command>   (try 'agentredactor help')"
