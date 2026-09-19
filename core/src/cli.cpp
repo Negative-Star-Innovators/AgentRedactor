@@ -1304,8 +1304,8 @@ int CmdUpdate(const Ctx& ctx) {
                   L" from an AppImage ($APPIMAGE is unset); re-run the install script to update");
         return 1;
     }
-    const std::filesystem::path target(std::string(appImageEnv));
-    const std::filesystem::path tmp = std::filesystem::path(target.native() + ".download");
+    const std::filesystem::path target{std::string(appImageEnv)};
+    const std::filesystem::path tmp{target.native() + ".download"};
     ctx.Print(L"downloading " + fileName + L" ...");
     int lastPct = -1;
     const bool ok = Utils::HttpDownloadFileSegmented(
