@@ -120,18 +120,45 @@ namespace {
 // that can carry PII. A key we don't recognize is scanned, never skipped.
 bool IsStructuralJsonKey(const std::string& key) {
     static const std::unordered_set<std::string> kKeys = {
-        "id", "tool_call_id", "model", "role", "type", "stop", "stop_sequences",
+        "id", "tool_call_id", "tool_use_id", "call_id", "previous_response_id",
+        "model", "role", "type", "stop", "stop_sequences",
     };
     return kKeys.find(key) != kKeys.end();
+}
+
+// Walk context: which machine-structural exemption applies to this subtree.
+enum WalkFlags : unsigned {
+    kWalkNone = 0,
+    kWalkAtRoot = 1 << 0,       // direct members of the request body
+    kWalkInert = 1 << 1,        // tool declarations: vendor code, never redact
+    kWalkNameExempt = 1 << 2,   // object whose direct "name" member is a tool identifier
+};
+
+// True when the object's own members include a tool identifier "name":
+// a message with role "tool", or a tool_use / function_call block or
+// tool_calls element. Everything else on these objects (content, arguments,
+// input, output) is user data and stays scanned.
+bool HasToolNameMember(const json& node) {
+    auto roleIt = node.find("role");
+    if (roleIt != node.end() && roleIt->is_string() &&
+        roleIt->get<std::string>() == "tool") return true;
+    auto typeIt = node.find("type");
+    if (typeIt == node.end() || !typeIt->is_string()) return false;
+    const std::string t = typeIt->get<std::string>();
+    if (t == "tool_use" || t == "function_call") return true;
+    // OpenAI tool_calls element: {"type":"function","function":{...}}
+    return t == "function" && node.contains("function");
 }
 
 // Recursive deny-all walk: redact every string value in the tree except
 // structural keys. `key` carries the parent key through arrays so that
 // "stop": ["..."] is honored for its string elements.
-void RedactJsonStrings(json& node, const std::string& key,
+void RedactJsonStrings(json& node, const std::string& key, unsigned flags,
     const std::function<std::wstring(const std::wstring&)>& redact) {
     if (node.is_string()) {
+        if (flags & kWalkInert) return;
         if (!key.empty() && IsStructuralJsonKey(key)) return;
+        if ((flags & kWalkNameExempt) && key == "name") return;
         std::string s = node.get<std::string>();
         // Embedded binary (image data URIs) carries no PII but can be
         // megabytes; scanning it is pure cost.
@@ -140,9 +167,39 @@ void RedactJsonStrings(json& node, const std::string& key,
         std::wstring redacted = redact(ws);
         if (redacted != ws) node = Utils::WideToUtf8(redacted);
     } else if (node.is_array()) {
-        for (auto& el : node) RedactJsonStrings(el, key, redact);
+        for (auto& el : node) RedactJsonStrings(el, key, flags & kWalkInert, redact);
     } else if (node.is_object()) {
-        for (auto& el : node.items()) RedactJsonStrings(el.value(), el.key(), redact);
+        unsigned self = flags & kWalkInert;
+        if (!(flags & kWalkInert)) {
+            if (HasToolNameMember(node)) self |= kWalkNameExempt;
+            // An exemption flagged by the parent (root tool_choice /
+            // function_call, or the function object of a tool_calls element)
+            // applies to this object's own name member.
+            if (flags & kWalkNameExempt) self |= kWalkNameExempt;
+        }
+        for (auto& el : node.items()) {
+            const std::string& k = el.key();
+            // Tool identifier names are exempt at the object level so the
+            // exemption never leaks into sibling data fields.
+            if ((self & kWalkNameExempt) && k == "name") continue;
+            unsigned child = self & kWalkInert;
+            if (!child) {
+                if ((flags & kWalkAtRoot) && k == "tools") {
+                    // Tool declarations are vendor-authored and provider-
+                    // validated; a placeholder in a name/schema 400s. Never
+                    // redact inside the subtree (pre-deny-all behavior).
+                    child |= kWalkInert;
+                } else if ((flags & kWalkAtRoot) &&
+                           (k == "tool_choice" || k == "function_call")) {
+                    child |= kWalkNameExempt;
+                } else if ((self & kWalkNameExempt) && k == "function") {
+                    // tool_calls element / tool_choice: the nested function
+                    // object holds the tool name.
+                    child |= kWalkNameExempt;
+                }
+            }
+            RedactJsonStrings(el.value(), k, child, redact);
+        }
     }
 }
 
@@ -756,15 +813,18 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
     };
 
     // Deny-all tree walk: redact every string value in the request JSON,
-    // skipping only the machine-structural keys above. This covers fields the
-    // old messages-only allowlist missed — Anthropic "thinking" blocks,
-    // "tool_result"/"tool_use" content, OpenAI "reasoning_content", "system",
-    // and any field providers add in the future.
+    // skipping only the machine-structural keys and tool machinery above.
+    // This covers fields the old messages-only allowlist missed — Anthropic
+    // "thinking" blocks, "tool_result" content, OpenAI "reasoning_content",
+    // "system", and any field providers add in the future. Tool declarations
+    // and tool names are exempted because providers validate them — a
+    // placeholder there 400s the request; the data tools carry (content,
+    // arguments, input, output) stays scanned.
     bool parsedJson = false;
     try {
         auto jsonBody = json::parse(body);
         parsedJson = true;
-        RedactJsonStrings(jsonBody, "", redactTextFragment);
+        RedactJsonStrings(jsonBody, "", kWalkAtRoot, redactTextFragment);
         state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
     } catch (const json::exception&) {
         // Not valid JSON — fall through to full-body redaction below.
