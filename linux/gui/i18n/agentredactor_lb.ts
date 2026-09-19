@@ -35,20 +35,24 @@
       <translation>Et konnt net no Updates gesicht ginn. Probéiert et méi spéit nach eng Kéier.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp; Datei</translation>
+      <source>On</source>
+      <translation>Op</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Zoumaachen</translation>
+      <source>Off</source>
+      <translation>Off</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Wéi Dir Agent Redactor benotzt</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detektioun</translation>
+      <source>API Proxy</source>
+      <translation>API-Proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>KI-gestëtzten Erkennungsmodell</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Numm:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Lokal URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API-Schlëssel</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Benotzt AI Modell:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Vertrauensgrenz:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiller</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfiguréiert Äre Profil hei drënner (oder benotzt de Standard)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Richt Äre LLM-Client (Claude Code, OpenClaw, asw.) op déi lokal URL, déi hei drënner gewise gëtt</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Mir sëtze tëschent Ärem Client an der richteger API. Alles bleiwt op Ärem Computer. Sensibel Donnéeën ginn lokal geschwäerzt, ier eng Ufro Äre Computer verléisst, sou datt Är Donnéeën eisem Server ni erreechen</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>D'Adress, op déi Äre LLM-Client zielt</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Den echte API-Endpunkt, deen Är geschwäerzten Ufroen empfaangen</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>KI-gestëtzten Erkennung leeft lokal als zousätzlech Ofwiermechanismus. Donnéeën kënnen iwwersinn oder iwwerschwäerzt ginn. Benotzt d'Regex-Muster an Schlësselwierder hei drënner fir deterministesch Schwäerzung.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Erwart eng liicht méi lues Äntwaert wann aktivéiert. De Modell scannt all Message lokal.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Text, deen op dës Muster passt, gëtt geschwäerzt ier e un d'API geschéckt gëtt</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Message mat dëse Wierder gi fir Schwäerzung markéiert</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Tatsächlech Schwäerzungen an der aktueller Sitzung entdeckt.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Keng Schwäerzungen an der aktueller Sitzung.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Logbicher ginn op dësem PC gespäichert. Redaktéiert Logbicher kënnen nach ëmmer sensibel Donnéeën enthalen déi Detektioun verpasst huet.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>z. B., Aarbecht OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>z. B. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>z. B. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>z. B. Passwuert</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Show API Schlëssel</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proxy URL kopéieren</translation>
+      <source>Copy</source>
+      <translation>Kopéieren</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor ass gespaart</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profiller</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profil Numm</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Master Passwuert</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktivéiert</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-Muster</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Schreifweis</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Schlësselwuert</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Ongülteg Regex-Syntax.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Dësen Eintrag existéiert schonn.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Schlësselwuert aktivéieren</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Fall: Jo</translation>
+      <source>Yes</source>
+      <translation>Jo</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Fall: Nee</translation>
+      <source>No</source>
+      <translation>Neen</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy URL kopéiert op Clipboard</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 ass verfügbar</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 gëtt schonn benotzt</translation>
     </message>
     <message>
       <source>Wrong password.</source>

@@ -35,20 +35,24 @@
       <translation>Nepodarilo sa skontrolovať aktualizácie. Skúste to znova neskôr.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Súbor</translation>
+      <source>On</source>
+      <translation>Zapnuté</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Ukončiť</translation>
+      <source>Off</source>
+      <translation>Vypnuté</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Ako používať Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Detekcia</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Model detekcie poháňaný umelou inteligenciou</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>meno:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>Miestna URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API kľúč</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Použiť model AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Prah spoľahlivosti:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profily</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Nakonfigurujte svoj profil nižšie (alebo použite predvolený)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Nasmerujte svojho LLM klienta (Claude Code, OpenClaw atď.) na nižšie zobrazenú miestnu URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Sediame medzi vaším klientom a skutočným API. Všetko zostáva na vašom stroji. Citlivé údaje sa redigujú lokálne skôr, ako akákoľvek požiadavka opustí váš počítač, čo zaisťuje, že vaše údaje sa nikdy nedostanú na náš server</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adresa, na ktorú váš LLM klient ukazuje</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Skutočný koncový bod API, ktorý prijíma vaše redigované požiadavky</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Detekcia poháňaná umelou inteligenciou beží lokálne ako dodatočná vrstva obrany. Môže prehliadnuť údaje alebo príliš redigovať. Použite nižšie uvedené Regex vzory a Kľúčové slová pre deterministické redigovanie.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Po povolení očakávajte mierne pomalšie odpovede. Model lokálne skenuje každú správu.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Text zodpovedajúci týmto vzorom bude redigovaný pred odoslaním do API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Správy obsahujúce tieto slová budú označené na redigovanie</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Skutočné redigovania zistené v aktuálnej relácii.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>V aktuálnej relácii nie sú žiadne redigovania.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Protokoly sú uložené na tomto počítači. Redigované denníky môžu stále obsahovať citlivé údaje, ktoré sa nepodarilo zistiť.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>napr., Práca OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>napr. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>napr. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>napr. heslo</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Zobraziť kľúč API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Skopírujte adresu URL servera proxy</translation>
+      <source>Copy</source>
+      <translation>Kopírovať</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor je uzamknutý</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profily</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Názov profilu</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Hlavné heslo</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Povolené</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex vzor</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Veľkosť písmen</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kľúčové slovo</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Neplatná regex syntax.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Táto položka už existuje.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Povoliť kľúčové slovo</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Prípad: Áno</translation>
+      <source>Yes</source>
+      <translation>Áno</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Prípad: Nie</translation>
+      <source>No</source>
+      <translation>Nie</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Adresa URL proxy servera bola skopírovaná do schránky</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 je dostupný</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 sa už používa</translation>
     </message>
     <message>
       <source>Wrong password.</source>

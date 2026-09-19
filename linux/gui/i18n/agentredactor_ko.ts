@@ -35,20 +35,24 @@
       <translation>업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;파일</translation>
+      <source>On</source>
+      <translation>~에</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>종료</translation>
+      <source>Off</source>
+      <translation>끄다</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>윤곽</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor 사용 방법</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>발각</translation>
+      <source>API Proxy</source>
+      <translation>API 프록시</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI 기반 검출 모델</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>이름:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>포트:</translation>
+      <source>Local URL</source>
+      <translation>로컬 URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API 키</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>AI 모델 사용:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>신뢰도 임계값:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>프로필</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. 아래에서 프로필을 구성하세요(또는 기본값 사용)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. LLM 클라이언트(Claude Code, OpenClaw 등)를 아래에 표시된 로컬 URL로 지정하세요</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. 클라이언트와 실제 API 사이에 위치합니다. 모든 것은 사용자의 컴퓨터에 그대로 있습니다. 민감한 데이터는 요청이 컴퓨터를 떠나기 전에 로컬에서 삭제되어 데이터가 당사 서버에 닿지 않습니다</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>LLM 클라이언트가 가리키는 주소</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>삭제된 요청을 받는 실제 API 엔드포인트</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI 기반 검출은 추가 방어 계층으로 로컬에서 실행됩니다. 데이터를 놓치거나 과도하게 삭제할 수 있습니다. 결정론적 삭제를 위해 아래의 정규식 패턴과 키워드를 사용하세요.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>사용 시 응답이 약간 느려질 수 있습니다. 모델은 모든 메시지를 로컬에서 검사합니다.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>이러한 패턴과 일치하는 텍스트는 API로 전송되기 전에 삭제됩니다</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>이러한 단어가 포함된 메시지는 삭제 대상으로 표시됩니다</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>현재 세션에서 감지된 실제 삭제 항목입니다.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>현재 세션에 삭제 항목이 없습니다.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>로그는 이 PC에 저장됩니다. 수정된 로그에는 탐지에서 놓친 민감한 데이터가 여전히 포함될 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>예: 업무용 OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>예: https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>예: sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>예: password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API 키 표시</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>프록시 URL 복사</translation>
+      <source>Copy</source>
+      <translation>복사</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>에이전트 편집자가 잠겨 있습니다.</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>프로필</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>프로필 이름</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>마스터 비밀번호</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>사용</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>정규식 패턴</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>대소문자</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>키워드</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>정규식 구문이 잘못되었습니다.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>이미 존재하는 항목입니다.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>키워드 활성화</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>케이스: 예</translation>
+      <source>Yes</source>
+      <translation>예</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>케이스: 아니오</translation>
+      <source>No</source>
+      <translation>아니요</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>프록시 URL이 클립보드에 복사되었습니다.</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>포트 %1 사용 가능</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>포트 %1이(가) 이미 사용 중입니다</translation>
     </message>
     <message>
       <source>Wrong password.</source>

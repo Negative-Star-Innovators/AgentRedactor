@@ -35,20 +35,24 @@
       <translation>Не удалось проверить обновления. Повторите попытку позже.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Файл</translation>
+      <source>On</source>
+      <translation>На</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Выйти</translation>
+      <source>Off</source>
+      <translation>Выключенный</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Профиль</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Как использовать Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Обнаружение</translation>
+      <source>API Proxy</source>
+      <translation>API-прокси</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Модель обнаружения на основе ИИ</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Имя:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Порт:</translation>
+      <source>Local URL</source>
+      <translation>Локальный URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Ключ API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Использовать модель AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Порог уверенности:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Профили</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Настройте свой профиль ниже (или используйте профиль по умолчанию)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Направьте свой LLM-клиент (Claude Code, OpenClaw и т. д.) на локальный URL, указанный ниже</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Мы находимся между вашим клиентом и реальным API. Все остается на вашем компьютере. Конфиденциальные данные редактируются локально, прежде чем какой-либо запрос покинет ваш компьютер, гарантируя, что ваши данные никогда не попадут на наш сервер</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Адрес, на который указывает ваш LLM-клиент</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Реальная конечная точка API, которая получает ваши отредактированные запросы</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Обнаружение на основе ИИ работает локально как дополнительный уровень защиты. Может пропустить данные или отредактировать лишнее. Используйте шаблоны регулярных выражений и ключевые слова ниже для детерминированного редактирования.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Ожидайте небольшого замедления ответов при включении. Модель сканирует каждое сообщение локально.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Текст, соответствующий этим шаблонам, будет отредактирован перед отправкой в API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Сообщения, содержащие эти слова, будут помечены для редактирования</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Фактические редактирования, обнаруженные в текущем сеансе.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>В текущем сеансе редактирований нет.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Журналы хранятся на этом компьютере. Отредактированные журналы могут по-прежнему содержать конфиденциальные данные, которые не были обнаружены.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>например, Работа OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>например https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>например sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>например пароль</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Показать ключ API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Скопировать URL-адрес прокси-сервера</translation>
+      <source>Copy</source>
+      <translation>Копировать</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Редактор агента заблокирован</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Профили</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Имя профиля</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Мастер-пароль</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Включено</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Шаблон регулярного выражения</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Регистр</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ключевое слово</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Неверный синтаксис регулярного выражения.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Такая запись уже существует.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Включить ключевое слово</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Корпус: Да</translation>
+      <source>Yes</source>
+      <translation>Да</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Корпус: Нет</translation>
+      <source>No</source>
+      <translation>Нет</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL-адрес прокси-сервера скопирован в буфер обмена.</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Порт %1 доступен</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Порт %1 уже используется</translation>
     </message>
     <message>
       <source>Wrong password.</source>

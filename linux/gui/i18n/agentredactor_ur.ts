@@ -35,20 +35,24 @@
       <translation>اپڈیٹس چیک نہیں ہو سکیں۔ بعد میں دوبارہ کوشش کریں۔</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;فائل</translation>
+      <source>On</source>
+      <translation>پر</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>بند کریں</translation>
+      <source>Off</source>
+      <translation>آف</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>پروفائل</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor کا استعمال کیسے کریں</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>پتہ لگانا</translation>
+      <source>API Proxy</source>
+      <translation>API پراکسی</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI پر مبنی نشاندہی ماڈل</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>نام:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>پورٹ:</translation>
+      <source>Local URL</source>
+      <translation>مقامی URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API کلید</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>AI ماڈل استعمال کریں:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>اعتماد کی حد:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>پروفائلز</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. نیچے اپنی پروفائل کنفیگر کریں (یا طے شدہ استعمال کریں)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. اپنے LLM کلائنٹ (Claude Code، OpenClaw، وغیرہ) کو نیچے دکھائے گئے مقامی URL کی طرف رہنمائی کریں</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. ہم آپ کے کلائنٹ اور حقیقی API کے درمیان ہیں۔ سب کچھ آپ کی مشین پر ہی رہتا ہے۔ حساس ڈیٹا کو مقامی طور پر اس وقت سے پہلے ہی حذف کر دیا جاتا ہے کہ کوئی بھی درخواست آپ کے کمپیوٹر سے باہر جائے، جس سے یہ یقینی بنتا ہے کہ آپ کا ڈیٹا کبھی بھی ہمارے سرور تک نہیں پہنچتا</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>وہ پتہ جس کی طرف آپ کا LLM کلائنٹ اشارہ کرتا ہے</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>وہ حقیقی API نقطہِ اختتام جو آپ کی حذف شدہ درخواستیں وصول کرتا ہے</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI پر مبنی نشاندہی ایک اضافی دفاعی پرت کے طور پر مقامی طور پر چلتی ہے۔ یہ ڈیٹا چھوڑ سکتی ہے یا زیادہ حذف کر سکتی ہے۔ قطعی حذف کرنے کے لیے نیچے دیے گئے Regex پیٹرن اور مطلوبہ الفاظ استعمال کریں۔</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>فعال ہونے پر جوابات میں معمولی تاخیر متوقع ہے۔ ماڈل ہر پیغام کو مقامی طور پر اسکین کرتا ہے۔</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>ان پیٹرنز سے مماثل متن API بھیجنے سے پہلے حذف کر دیا جائے گا</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>ان الفاظ پر مشتمل پیغامات کو حذف کرنے کے لیے نشان زد کیا جائے گا</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>موجودہ سیشن میں دریافت شدہ حقیقی حذفیاں۔</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>موجودہ سیشن میں کوئی حذفیاں نہیں۔</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>نوشتہ جات اس پی سی پر محفوظ ہیں۔ ترمیم شدہ لاگز میں اب بھی حساس ڈیٹا ہو سکتا ہے جس کا پتہ لگانا چھوٹ گیا ہے۔</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>مثلاً، کام کے لیے OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>مثلاً https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>مثلاً sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>مثلاً password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API کلید دکھائیں۔</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>پراکسی یو آر ایل کاپی کریں۔</translation>
+      <source>Copy</source>
+      <translation>کاپی کریں</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>ایجنٹ ریڈیکٹر مقفل ہے۔</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>پروفائلز</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>پروفائل کا نام</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>ماسٹر پاس ورڈ</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>فعال</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex پیٹرن</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>کیس</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>مطلوبہ لفظ</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>غلط regex سنٹیکس۔</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>یہ اندراج پہلے سے موجود ہے۔</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>کلیدی لفظ کو فعال کریں۔</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>کیس: ہاں</translation>
+      <source>Yes</source>
+      <translation>ہاں</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>کیس: نہیں۔</translation>
+      <source>No</source>
+      <translation>نہیں</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>پراکسی یو آر ایل کلپ بورڈ پر کاپی ہو گیا۔</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>پورٹ %1 دستیاب ہے</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>پورٹ %1 پہلے سے استعمال میں ہے</translation>
     </message>
     <message>
       <source>Wrong password.</source>

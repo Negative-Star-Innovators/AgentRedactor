@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <deque>
 #include <mutex>
+#include <filesystem>
 #include "platform_compat.h"
 #include <functional>
 #include "api_key_profile.h"
@@ -96,6 +97,11 @@ public:
     void ClearSessionMatches(const std::wstring& profileId);
     std::vector<SessionMatch> GetSessionMatches(const std::wstring& profileId) const;
 
+    // Persist per-profile label counters to this file so an engine restart
+    // never reissues a live placeholder label. Counters only — no PII is
+    // written. Call once at startup; empty path = persistence disabled.
+    void SetStateFilePath(const std::filesystem::path& path);
+
     // Rebuild an SSE stream, unredacting labels that may be split across events.
     // Streaming handlers apply it incrementally to avoid buffering the entire
     // upstream response.
@@ -120,6 +126,22 @@ private:
     RegexEngine regexEngine_;
     KeywordEngine keywordEngine_;
     std::unordered_map<std::wstring, SessionState> profileSessions_;
+
+    // Persisted label-counter floors (see SetStateFilePath). The counters are
+    // monotonically increasing and never reset, so a restarted engine mints
+    // fresh label numbers instead of colliding with labels that may still be
+    // referenced by provider-side conversation state.
+    struct PersistedCounters {
+        int pii = 0;
+        int regex = 0;
+        int keyword = 0;
+    };
+    void LoadPersistedCountersLocked();
+    void SavePersistedCountersLocked();
+    std::filesystem::path stateFilePath_;
+    std::mutex stateFileMutex_;
+    std::map<std::wstring, PersistedCounters> persistedCounters_;
+    bool stateLoaded_ = false;
 
     struct MatchTracker {
         std::deque<SessionMatch> matches;

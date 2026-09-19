@@ -35,20 +35,24 @@
       <translation>புதுப்பிப்புகளைச் சரிபார்க்க முடியவில்லை. பின்னர் மீண்டும் முயற்சிக்கவும்.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;கோப்பு</translation>
+      <source>On</source>
+      <translation>அன்று</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>வெளியேறு</translation>
+      <source>Off</source>
+      <translation>ஆஃப்</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>சுயவிவரம்</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor ஐ எவ்வாறு பயன்படுத்துவது</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>கண்டறிதல்</translation>
+      <source>API Proxy</source>
+      <translation>API ப்ராக்ஸி</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI இயக்கிய கண்டறிதல் மாதிரி</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>பெயர்:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>துறைமுகம்:</translation>
+      <source>Local URL</source>
+      <translation>உள்ளூர் URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API விசை</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>AI மாதிரியைப் பயன்படுத்தவும்:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>நம்பிக்கை வரம்பு:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>சுயவிவரங்கள்</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. கீழே உங்கள் சுயவிவரத்தை உள்ளமைக்கவும் (அல்லது இயல்புநிலையைப் பயன்படுத்தவும்)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. உங்கள் LLM கிளையன்டை (Claude Code, OpenClaw போன்றவை) கீழே காட்டப்பட்டுள்ள உள்ளூர் URL க்கு நோக்கி வைக்கவும்</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. நாங்கள் உங்கள் கிளையன்டுக்கும் உண்மையான API க்கும் இடையில் இருக்கிறோம். அனைத்தும் உங்கள் கணினியிலேயே உள்ளது. உங்கள் கணினியை விட்டு எந்தக் கோரிக்கையும் வெளியேறுவதற்கு முன்பு முக்கியமான தரவுகள் உள்ளூரில் மறைக்கப்படுகின்றன, இதனால் உங்கள் தரவு எங்கள் சேவையகத்தை எட்டாது</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>உங்கள் LLM கிளையன்ட் சுட்டிக்காட்டும் முகவரி</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>உங்கள் மறைக்கப்பட்ட கோரிக்கைகளைப் பெறும் உண்மையான API முனையம்</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI இயக்கிய கண்டறிதல் கூடுதல் பாதுகாப்பு அடுக்காக உள்ளூரில் இயங்குகிறது. தரவுகளைத் தவறவிடலாம் அல்லது அதிகமாக மறைக்கலாம். தீர்மானிக்கும் மறைப்புக்கு கீழே உள்ள Regex முறைகளையும் முக்கியசொற்களையும் பயன்படுத்தவும்.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>இயக்கப்படும்போது சற்று மெதுவான பதில்களை எதிர்பார்க்கவும். மாதிரி ஒவ்வொரு செய்தியையும் உள்ளூரில் பரிசோதிக்கிறது.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>இந்த முறைகளுடன் பொருந்தும் உரை API க்கு அனுப்புவதற்கு முன் மறைக்கப்படும்</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>இந்த சொற்களைக் கொண்ட செய்திகள் மறைப்புக்காகக் குறிக்கப்படும்</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>தற்போதைய அமர்வில் கண்டறியப்பட்ட உண்மையான மறைப்புகள்.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>தற்போதைய அமர்வில் மறைப்புகள் இல்லை.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>இந்த கணினியில் பதிவுகள் சேமிக்கப்படுகின்றன. திருத்தப்பட்ட பதிவுகளில், கண்டறிதல் தவறவிட்ட முக்கியமான தரவு இன்னும் இருக்கலாம்.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>எ.கா., பணி OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>எ.கா. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>எ.கா. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>எ.கா. password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API விசையைக் காட்டு</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>ப்ராக்ஸி URL ஐ நகலெடுக்கவும்</translation>
+      <source>Copy</source>
+      <translation>நகலெடு</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>ஏஜென்ட் ரெடாக்டர் பூட்டப்பட்டுள்ளது</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>சுயவிவரங்கள்</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>சுயவிவரப் பெயர்</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>முதன்மை கடவுச்சொல்</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>இயக்கப்பட்டது</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex முறை</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>எழுத்துப்பிரிவு</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>முக்கியசொல்</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>தவறான regex தொடரமைப்பு.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>இந்த பதிவு ஏற்கனவே உள்ளது.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>முக்கிய சொல்லை இயக்கு</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>வழக்கு: ஆம்</translation>
+      <source>Yes</source>
+      <translation>ஆம்</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>வழக்கு: இல்லை</translation>
+      <source>No</source>
+      <translation>இல்லை</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>ப்ராக்ஸி URL கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>போர்ட் %1 கிடைக்கிறது</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>போர்ட் %1 ஏற்கனவே பயன்பாட்டில் உள்ளது</translation>
     </message>
     <message>
       <source>Wrong password.</source>

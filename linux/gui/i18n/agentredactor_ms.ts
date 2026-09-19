@@ -35,20 +35,24 @@
       <translation>Tidak dapat menyemak kemas kini. Cuba lagi kemudian.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fail</translation>
+      <source>On</source>
+      <translation>hidup</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Berhenti</translation>
+      <source>Off</source>
+      <translation>Mati</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Cara menggunakan Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Pengesanan</translation>
+      <source>API Proxy</source>
+      <translation>Proksi API</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Model Pengesanan Berkuasa AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>nama:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Pelabuhan:</translation>
+      <source>Local URL</source>
+      <translation>URL tempatan</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Kunci API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Gunakan model AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Ambang keyakinan:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profil</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurasikan profil anda di bawah (atau gunakan lalai)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Halakan klien LLM anda (Kod Claude, OpenClaw, dll.) pada URL Setempat yang ditunjukkan di bawah</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Kami duduk di antara pelanggan anda dan API sebenar. Semuanya kekal pada mesin anda. Data sensitif disunting secara tempatan sebelum sebarang permintaan meninggalkan komputer anda memastikan data anda tidak pernah menyentuh pelayan kami</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Alamat yang dituju oleh pelanggan LLM anda</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Titik akhir API sebenar yang menerima permintaan anda yang telah disunting</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Pengesanan berkuasa AI berjalan secara setempat sebagai lapisan pertahanan tambahan. Mungkin terlepas data atau redaksi berlebihan. Gunakan Corak Regex dan Kata Kunci di bawah untuk redaksi deterministik.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Jangkakan respons yang lebih perlahan apabila didayakan. Model mengimbas setiap mesej secara setempat.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Teks yang sepadan dengan corak ini akan disunting sebelum dihantar ke API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Mesej yang mengandungi perkataan ini akan dibenderakan untuk redaksi</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Penyuntingan sebenar dikesan dalam sesi semasa.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Tiada suntingan dalam sesi semasa.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Log disimpan pada PC ini. Log yang disunting mungkin masih mengandungi data sensitif yang terlepas pengesanan.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>cth., Work OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>cth. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>cth. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>cth. kata laluan</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Tunjukkan kunci API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Salin URL proksi</translation>
+      <source>Copy</source>
+      <translation>salin</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor dikunci</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profil</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Nama profil</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Kata laluan induk</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Didayakan</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Corak Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Kes</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kata kunci</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Sintaks regex tidak sah.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Entri ini sudah wujud.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Dayakan kata kunci</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Kes: Ya</translation>
+      <source>Yes</source>
+      <translation>ya</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Kes: Tidak</translation>
+      <source>No</source>
+      <translation>Tidak</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL proksi disalin ke papan keratan</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 tersedia</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 sudah digunakan</translation>
     </message>
     <message>
       <source>Wrong password.</source>

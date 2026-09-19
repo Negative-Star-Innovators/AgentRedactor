@@ -134,18 +134,24 @@ void HttpServer::RunListener() {
         SOCKET clientSocket = accept(listenSocket_, (sockaddr*)&clientAddr, &addrLen);
         if (clientSocket == INVALID_SOCKET) continue;
 
+        // Count the connection BEFORE spawning the client thread: Stop()
+        // drains on activeConnections_ == 0, and a thread that has not
+        // incremented yet would otherwise run HandleClient on a destroyed
+        // server.
+        activeConnections_.fetch_add(1);
         std::thread clientThread(&HttpServer::HandleClient, this, clientSocket);
         clientThread.detach();
     }
 }
 
 void HttpServer::HandleClient(SOCKET clientSocket) {
-    activeConnections_.fetch_add(1);
+    // activeConnections_ was already incremented by RunListener before this
+    // thread was spawned (see the accept loop).
     HttpRequest request;
     if (ParseRequest(clientSocket, request)) {
         bool showSensitive = logManager_ && logManager_->IsShowSensitive();
         if (!quiet_) {
-            LOGF(L"[HTTP] Parsed request: %s %s %s, headers=%zu, body=%zu",
+            LOGF(L"[HTTP] Parsed request: %ls %ls %ls, headers=%zu, body=%zu",
                 request.method.c_str(), request.path.c_str(), request.version.c_str(),
                 request.headers.size(), request.body.size());
         }
@@ -154,8 +160,8 @@ void HttpServer::HandleClient(SOCKET clientSocket) {
             for (const auto& [name, value] : request.headers) {
                 headerLog += name + L": " + value + L"\r\n";
             }
-            LOGF(L"[HTTP] Request headers from client:\n%s", headerLog.c_str());
-            LOGF(L"[HTTP] Request body from client (%zu bytes):\n%s", request.body.size(), Utils::Utf8ToWide(request.body).c_str());
+            LOGF(L"[HTTP] Request headers from client:\n%ls", headerLog.c_str());
+            LOGF(L"[HTTP] Request body from client (%zu bytes):\n%ls", request.body.size(), Utils::Utf8ToWide(request.body).c_str());
         }
         if (quiet_) {
             // Control API: no per-request traffic logging (see SetQuiet).
@@ -369,8 +375,8 @@ bool HttpServer::SendResponse(SOCKET clientSocket, const HttpResponse& response)
     if (showSensitive && !quiet_) {
         std::string headerSection = data.substr(0, data.find("\r\n\r\n") + 4);
         std::wstring wHeaderSection = Utils::Utf8ToWide(headerSection);
-        LOGF(L"[HTTP] Sending raw response headers:\n%s", wHeaderSection.c_str());
-        LOGF(L"[HTTP] Response body (%zu bytes):\n%s",
+        LOGF(L"[HTTP] Sending raw response headers:\n%ls", wHeaderSection.c_str());
+        LOGF(L"[HTTP] Response body (%zu bytes):\n%ls",
             response.body.size(),
             Utils::Utf8ToWide(response.body).c_str());
     }

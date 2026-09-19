@@ -35,20 +35,24 @@
       <translation>განახლებების შემოწმება ვერ მოხერხდა. სცადეთ მოგვიანებით.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;ფაილი</translation>
+      <source>On</source>
+      <translation>ჩართულია</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>გამოსვლა</translation>
+      <source>Off</source>
+      <translation>გამორთულია</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>პროფილი</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>როგორ გამოვიყენოთ Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>გამოვლენა</translation>
+      <source>API Proxy</source>
+      <translation>API პროქსი</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>ხელოვნური ინტელექტით მართული გამოვლენის მოდელი</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>სახელი:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>პორტი:</translation>
+      <source>Local URL</source>
+      <translation>ლოკალური URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API გასაღები</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>გამოიყენეთ AI მოდელი:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>ნდობის ზღვარი:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>პროფილები</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. დააკონფიგურირეთ თქვენი პროფილი ქვემოთ (ან გამოიყენეთ ნაგულისხმევი)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. მიმართეთ თქვენი LLM კლიენტი (Claude Code, OpenClaw და სხვა) ქვემოთ ნაჩვენებ ლოკალურ URL-ს</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. ჩვენ თქვენს კლიენტსა და ნამდვილ API-ს შორის ვართ. ყველაფერი თქვენს მოწყობილობაზე რჩება. მგრძნობიარე მონაცემები ლოკალურად წაიშლება, სანამ ნებისმიერი მოთხოვნა თქვენს კომპიუტერს დატოვებს, რაც უზრუნველყოფს, რომ თქვენი მონაცემები ჩვენს სერვერს არასდროს შეხება</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>მისამართი, რომელზეც თქვენი LLM კლიენტი მიუთითებს</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>ნამდვილი API ენდპოინტი, რომელიც იღებს თქვენს წაშლილ მოთხოვნებს</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>ხელოვნური ინტელექტით გამოვლენა მუშაობს ლოკალურად დამატებითი დაცვის ფენის სახით. შესაძლოა მონაცემები გამორჩეს ან ზედმეტად წაშალოს. დეტერმინისტული წაშლისთვის გამოიყენეთ ქვემოთ მოცემული Regex ნიმუშები და საკვანძო სიტყვები.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>ჩართვისას ოდნავ ნელი პასუხები ელოდეთ. მოდელი ყველა შეტყობინებას ლოკალურად სკანირებს.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>ამ ნიმუშებს შესაბამისი ტექსტი წაიშლება API-ში გაგზავნამდე</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>შეტყობინებები, რომლებიც შეიცავს ამ სიტყვებს, წაშლისთვის მოინიშნება</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>მიმდინარე სეანსში აღმოჩენილი რეალური წაშლები.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>მიმდინარე სეანსში წაშლები არ არის.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>ჟურნალები ინახება ამ კომპიუტერზე. რედაქტირებული ჟურნალები შეიძლება კვლავ შეიცავდეს სენსიტიურ მონაცემებს, რომლებიც გამოტოვებულია.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>მაგ., სამუშაო OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>მაგ. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>მაგ. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>მაგ. პაროლი</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API გასაღების ჩვენება</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>დააკოპირეთ პროქსის URL</translation>
+      <source>Copy</source>
+      <translation>კოპირება</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>აგენტი რედაქტორი ჩაკეტილია</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>პროფილები</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>პროფილის სახელი</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>ძირითადი პაროლი</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>ჩართულია</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex ნიმუში</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>რეგისტრი</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>საკვანძო სიტყვა</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>არასწორი regex სინტაქსი.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>ეს ჩანაწერი უკვე არსებობს.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>ჩართეთ საკვანძო სიტყვა</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>საქმე: დიახ</translation>
+      <source>Yes</source>
+      <translation>დიახ</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>საქმე: არა</translation>
+      <source>No</source>
+      <translation>არა</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>პროქსის URL კოპირებულია ბუფერში</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>პორტი %1 ხელმისაწვდომია</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>პორტი %1 უკვე გამოიყენება</translation>
     </message>
     <message>
       <source>Wrong password.</source>

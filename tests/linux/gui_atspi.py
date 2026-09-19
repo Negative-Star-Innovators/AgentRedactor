@@ -162,6 +162,14 @@ def _role_matches(actual: str, wanted: str) -> bool:
     return actual in _ROLE_ALIASES.get(wanted, frozenset())
 
 
+# English card titles (matched against the live GUI tree). The API Proxy and
+# AI-detection card names were aligned to the Windows HomePage resw titles, so
+# lookups use the verbatim English values; a title translation must be updated
+# here too when the corresponding Windows resw string changes.
+_API_PROXY_PANEL = "API Proxy"
+_DETECTION_PANEL = "AI Powered Detection Model"
+
+
 class AtspiGui:
     """Owns one agentredactor-gui process and exposes AT-SPI operations on it."""
 
@@ -253,8 +261,8 @@ class AtspiGui:
         raise RuntimeError("agentredactor application did not appear on the a11y bus")
 
     def wait_ready(self, timeout: float = 60.0) -> None:
-        """Wait until the main window content is up (Profile card showing)."""
-        self.panel("Profile", timeout=timeout)
+        """Wait until the main window content is up (API Proxy card showing)."""
+        self.panel(_API_PROXY_PANEL, timeout=timeout)
 
     def find_all(
         self,
@@ -479,10 +487,27 @@ class AtspiGui:
         return self.find("check box", name, within=within, timeout=timeout)
 
     def set_checkbox(self, name: str, on: bool, *, within: Any | None = None) -> None:
-        """Press a check box only if its state differs from the target."""
-        node = self.checkbox(name, within=within)
-        if _checked(node) != on:
-            self.press_named(name, within=within, role="check box")
+        """Set a check box to `on`, verifying the state actually changed.
+
+        The PII check boxes autosave on toggle, and the settings-poll reload
+        rebuilds the form widgets from the saved profile. A toggle that lands
+        while that reload is rebuilding the very button being clicked can be
+        swallowed (the toggled handler sees a rebuilt/no-op state), so — like
+        the row buttons — verify the observable CHECKED state after pressing
+        and re-press until it sticks instead of trusting one click. If the
+        box is already in the target state, no press is needed.
+        """
+        finder = lambda: self.checkbox(name, within=within)
+        try:
+            if _checked(finder()) == on:
+                return
+        except (GLib.GError, AssertionError):
+            pass  # box mid-rebuild; let press_until re-find and verify
+        self.press_until(
+            f"checkbox {name!r} -> {'checked' if on else 'unchecked'}",
+            finder,
+            lambda: _checked(finder()) is on,
+        )
 
     # -- dialogs (QMessageBox appears as an [alert] top-level) -----------------
 
@@ -547,7 +572,7 @@ class AtspiGui:
                    lambda names: len(names) == len(before) + 1, timeout=30.0)
         wait_until(
             "form settled on the new profile",
-            lambda: self.field_text("Profile name", within=self.panel("Profile")),
+            lambda: self.field_text("Profile name", within=self.panel(_API_PROXY_PANEL)),
             lambda alias: bool(alias) and alias not in before,
             timeout=30.0,
         )
@@ -586,8 +611,8 @@ class AtspiGui:
         )
 
     def save_profile(self) -> None:
-        """Press Save on the Profile card and wait for the reload to settle."""
-        card = self.panel("Profile")
+        """Press Save on the API Proxy card and wait for the reload to settle."""
+        card = self.panel(_API_PROXY_PANEL)
         self.press_named("Save", within=card)
         # The save round-trips through the engine and reloads the rows.
         time.sleep(1.0)
@@ -617,11 +642,11 @@ class AtspiGui:
                     continue
                 if role == "check box" and node.get_name() == "Enable keyword":
                     enabled_box = node
-                elif _role_matches(role, "button") and (node.get_name() or "").startswith("Case:"):
+                elif _role_matches(role, "button") and (node.get_name() or "") in ("Yes", "No"):
                     case_btn = node
             rows[value] = {
                 "enabled": _checked(enabled_box) if enabled_box is not None else None,
-                "case_sensitive": (case_btn.get_name() == "Case: Yes")
+                "case_sensitive": (case_btn.get_name() == "Yes")
                 if case_btn is not None
                 else None,
             }
@@ -664,7 +689,7 @@ class AtspiGui:
         for node in _walk(box.get_parent()):
             try:
                 if _role_matches(node.get_role_name(), "button") \
-                        and (node.get_name() or "").startswith("Case:"):
+                        and (node.get_name() or "") in ("Yes", "No"):
                     return node
             except Exception:
                 continue
@@ -759,15 +784,15 @@ class AtspiGui:
 
     def set_pii_type(self, pii_type: str, enabled: bool) -> None:
         label = self._PII_LABELS[pii_type]
-        card = self.panel("Detection")
+        card = self.panel(_DETECTION_PANEL)
         self.set_checkbox(label, enabled, within=card)
 
     def set_pii_master(self, enabled: bool) -> None:
-        card = self.panel("Detection")
+        card = self.panel(_DETECTION_PANEL)
         self.set_checkbox("Use AI model for PII detection", enabled, within=card)
 
     def pii_master_state(self) -> bool:
-        card = self.panel("Detection")
+        card = self.panel(_DETECTION_PANEL)
         return _checked(self.checkbox("Use AI model for PII detection", within=card))
 
     # -- statistics / session redactions ------------------------------------------
@@ -817,15 +842,15 @@ class AtspiGui:
 
     def api_key_role(self) -> str:
         """'password text' while masked, 'text' when Show API key is checked."""
-        card = self.panel("Profile")
+        card = self.panel(_API_PROXY_PANEL)
         return self.find(name="API key", within=card).get_role_name()
 
     def api_key_text(self) -> str | None:
-        card = self.panel("Profile")
+        card = self.panel(_API_PROXY_PANEL)
         return self.text_of(self.find(name="API key", within=card))
 
     def toggle_show_api_key(self) -> None:
-        card = self.panel("Profile")
+        card = self.panel(_API_PROXY_PANEL)
         self.press_named("Show API key", within=card, role="check box")
 
     # -- lock overlay ----------------------------------------------------------------
@@ -847,7 +872,7 @@ class AtspiGui:
 
     def set_form(self, *, alias: str | None = None, port: int | None = None,
                  url: str | None = None, api_key: str | None = None) -> None:
-        card = self.panel("Profile")
+        card = self.panel(_API_PROXY_PANEL)
         if url is not None:
             self.set_field("Forward To URL", url, within=card)
         if api_key is not None:
@@ -856,3 +881,17 @@ class AtspiGui:
             self.set_field("Proxy port", str(port), within=card)
         if alias is not None:
             self.set_field("Profile name", alias, within=card)
+
+    def port_status_text(self) -> str | None:
+        """Live port availability hint under the Proxy port box (or None if hidden).
+
+        The status is the only label in the API Proxy card whose accessible name
+        starts with 'Port ' (the field labels are 'Forward To URL', 'API key',
+        'Proxy port', 'Profile name').
+        """
+        card = self.panel(_API_PROXY_PANEL)
+        for node in self.find_all("label", within=card):
+            name = node.get_name() or ""
+            if name.startswith("Port "):
+                return name
+        return None

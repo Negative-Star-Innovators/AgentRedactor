@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Þetta mun skrifa óbreytt viðkvæm gildi (nöfn, tölvupóstur, símanúmer o.s.frv.) og API lykilinn þinn í notendaskrána þína á disknum. Ekki virkja þetta ef aðrir hafa aðgang að þessari tölvu. Stillingin endurstillast þegar þú lokar appinu.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Þessi færsla er þegar til.</value>
+  </data>
 </root>

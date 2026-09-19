@@ -158,22 +158,15 @@ inline bool LanguageMatches(const std::wstring& current, const std::wstring& sup
 } // namespace AgentRedactor
 
 #ifdef _WIN32
-inline void RegisterStartupTask() {
-    HKEY hKey;
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
-        wchar_t path[MAX_PATH];
-        GetModuleFileNameW(nullptr, path, MAX_PATH);
-        std::wstring command = std::wstring(L"\"") + path + L"\" --tray-only";
-        RegSetValueExW(hKey, AgentRedactor::APP_NAME, 0, REG_SZ, (BYTE*)command.c_str(), static_cast<DWORD>((command.size() + 1) * sizeof(wchar_t)));
-        RegCloseKey(hKey);
-    }
-}
-
-inline void UnregisterStartupTask() {
-    HKEY hKey;
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
-        RegDeleteValueW(hKey, AgentRedactor::APP_NAME);
-        RegCloseKey(hKey);
-    }
-}
+// Declared (Windows-only) and defined in windows/src/startup_task.cpp, which
+// is compiled into the GUI build only (the engine never calls these).
+// Enable/disable logon startup for the current build:
+//   - Packaged (MSIX identity): drives the manifest windows.startupTask
+//     "AgentRedactorStartup" (windows/Package.appxmanifest) via the
+//     StartupTask API — RequestEnableAsync shows no consent dialog for
+//     packaged desktop apps and cannot override a task the user disabled in
+//     Task Manager / Settings -> Startup.
+//   - Unpackaged (Velopack): writes/deletes the HKCU Run value.
+void RegisterStartupTask();
+void UnregisterStartupTask();
 #endif

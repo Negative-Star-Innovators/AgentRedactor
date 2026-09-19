@@ -35,20 +35,24 @@
       <translation>Ba a iya duba sabuntawa ba. Sake gwadawa daga baya.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fayil</translation>
+      <source>On</source>
+      <translation>Kunna</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Dakata</translation>
+      <source>Off</source>
+      <translation>Kashe</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Bayanan martaba</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Yadda ake amfani da Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Ganewa</translation>
+      <source>API Proxy</source>
+      <translation>API ɗin Wakili</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Samfurin Gano Mai ƙarfi AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Suna:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Port:</translation>
+      <source>Local URL</source>
+      <translation>URL na gida</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Maɓallin API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Yi amfani da samfurin AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Ƙofar amincewa:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Bayanan martaba</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Sanya bayanin martabarku a ƙasa (ko amfani da tsoho)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Nuna abokin ciniki na LLM (Lambar Claude, OpenClaw, da sauransu) a URL na gida da aka nuna a ƙasa</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Mun zauna tsakanin abokin ciniki da ainihin API. Komai yana kan injin ku. Ana sake gyara bayanai masu mahimmanci a cikin gida kafin kowace buƙata ta bar kwamfutarka don tabbatar da cewa bayananku ba su taɓa sabar mu ba</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adireshin abokin ciniki na LLM yana nunawa a</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Haƙiƙanin ƙarshen API wanda ke karɓar buƙatun ku da aka gyara</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Gano mai ƙarfin AI yana gudana a cikin gida azaman ƙarin tsarin tsaro. Maiyuwa rasa bayanai ko wuce gona da iri. Yi amfani da Tsarin Regex da Keywords da ke ƙasa don ƙayyadaddun gyarawa.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Yi tsammanin martani a hankali lokacin da aka kunna. Samfurin yana duba kowane saƙo a cikin gida.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Za a sake gyara rubutun da ya dace da waɗannan alamu kafin aikawa zuwa API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Saƙonnin da ke ɗauke da waɗannan kalmomi za a yi alama don sake gyarawa</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>An gano ainihin gyare-gyare a cikin zaman na yanzu.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Babu raguwa a cikin zaman na yanzu.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Ana adana rajistan ayyukan akan wannan PC. Rubutun da aka sake gyara na iya ƙunsar mahimman bayanai waɗanda aka rasa.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>misali, Aiki OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>misali https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>misali sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>misali kalmar sirri</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Nuna maɓallin API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kwafi URL na wakili</translation>
+      <source>Copy</source>
+      <translation>Kwafi</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor yana kulle</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Bayanan martaba</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Sunan bayanin martaba</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Babban kalmar sirri</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>An kunna</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Tsarin Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Harka</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Mabuɗin kalma</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Rubutun regex mara inganci.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Wannan shigarwa ta riga ta wanzu.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Kunna kalma mai mahimmanci</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Case: E</translation>
+      <source>Yes</source>
+      <translation>Ee</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Harka: A'a</translation>
+      <source>No</source>
+      <translation>A'a</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>An kwafi URL wakili zuwa allo</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 yana samuwa</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>An riga an fara amfani da tashar jiragen ruwa %1</translation>
     </message>
     <message>
       <source>Wrong password.</source>

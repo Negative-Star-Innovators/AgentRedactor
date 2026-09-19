@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>سيؤدي هذا إلى كتابة قيم حساسة غير منقحة (الأسماء ورسائل البريد الإلكتروني وأرقام الهواتف وما إلى ذلك) ومفتاح واجهة برمجة التطبيقات (API) الخاص بك إلى ملف السجل الخاص بك على القرص. لا تقم بتمكين هذا إذا كان لدى الآخرين حق الوصول إلى هذا الكمبيوتر. تتم إعادة ضبط الإعداد عند إغلاق التطبيق.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>هذه المدخلة موجودة مسبقًا.</value>
+  </data>
 </root>

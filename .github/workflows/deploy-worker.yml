@@ -67,6 +67,29 @@ jobs:
           }
           Write-Host 'install.ps1 parses and contains the arch-selection logic.'
 
+      # install.sh is a JS template literal executed via "curl | bash" on user
+      # machines; a bash syntax error in it only shows up at install time.
+      # Extract it the same way and parse it with bash -n here instead.
+      - name: Validate install.sh parses as bash
+        shell: bash
+        run: |
+          script=$(awk '/^export const INSTALL_SH = `/{flag=1;next}/^`;/{if(flag){flag=0}}flag' cloudflare/src/static/install.sh.js)
+          if [ -z "$script" ]; then
+            echo 'Could not extract install.sh template literal from install.sh.js' >&2
+            exit 1
+          fi
+          if ! bash -n <<<"$script"; then
+            echo 'install.sh does not parse as bash' >&2
+            exit 1
+          fi
+          for needle in 'uname -m' 'linux-arm64' 'appimage-extract-and-run' '/updates' '$HOME/Applications'; do
+            case "$script" in
+              *"$needle"*) ;;
+              *) echo "install.sh is missing expected content: $needle" >&2; exit 1 ;;
+            esac
+          done
+          echo 'install.sh parses and contains the arch-selection logic.'
+
       # Chicken-egg defeater for the deploy path: uploads the Worker as a new
       # INACTIVE version (production keeps serving the current one — nothing
       # goes live), proving the credentials and the bundle work end-to-end on
@@ -128,6 +151,9 @@ jobs:
           echo '== /install.ps1 =='
           curl -sf "$base/install.ps1" -o /tmp/install.ps1
           grep -q 'AgentRedactor' /tmp/install.ps1 && echo OK
+
+          echo '== /install.sh =='
+          curl -sf "$base/install.sh" | bash -n && echo OK
 
           echo '== /models range request (expect 206) =='
           code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Range: bytes=0-99' "$base/models/model_quantized.onnx_data")

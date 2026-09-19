@@ -81,8 +81,12 @@ agentredactor profiles list                   table incl. request/redaction stat
 agentredactor profiles add <alias> [--port N] [--upstream-url U] [--api-key K]
 agentredactor profiles delete <id>
 agentredactor pii-types list|enable|disable <type> [--profile P]
-agentredactor regex list|add <p>|remove <n|p>
-agentredactor keywords list|add <t>|remove <n|t> [--ignore-case]
+agentredactor regex list [--profile P]
+agentredactor regex add <pattern> [--profile P]
+agentredactor regex remove <n|pattern> [--profile P]
+agentredactor keywords list [--profile P]
+agentredactor keywords add <text> [--ignore-case] [--profile P]
+agentredactor keywords remove <n|text> [--ignore-case] [--profile P]
 agentredactor password enable | disable       Windows-Hello protection
 ```
 
@@ -112,7 +116,20 @@ in `core/include/constants.h`, listed by `agentredactor languages` — a partial
 tag like `zh` is rejected instead of silently selecting nothing) and `set
 show-sensitive true` is rejected while logging is disabled (the engine
 enforces it, mirroring the GUI checkbox); `regex add` validates the pattern
-(invalid regex is rejected) as well as rejecting an empty one. The CLI deals only in **single PII types** (e.g.
+(invalid regex is rejected) as well as rejecting an empty one. Every command
+takes a fixed number of positional arguments — extra words are rejected as
+`unexpected argument` (usage, exit 2) instead of being silently ignored; on
+Linux shells, unquoted brace expansion (`{,20}`) otherwise splits a pattern
+into two arguments, so the help text tells Linux users to quote patterns. `--ignore-case` selects an
+ignore-case entry on `keywords remove <text>`; without it the first
+case-sensitive match is removed, falling back to an ignore-case entry when no
+case-sensitive one exists (deterministic — list order never decides);
+`regex remove` matches text only. Duplicates are rejected on add
+everywhere (CLI and both GUIs, showing the shared `Validation_DuplicateEntry`
+/ "This entry already exists." string): a keyword is a duplicate when both
+text and case-sensitivity match (the same text with the other case-sensitivity
+is a distinct entry), and a regex is a duplicate when the normalized pattern
+matches (`{,N}` == `{0,N}`). The CLI deals only in **single PII types** (e.g.
 `secret`, `private_email`) — there are no PII categories on the CLI, matching
 the GUI; a category name like `CONTACT` is rejected as an unknown type.
 
@@ -357,6 +374,7 @@ Key pieces of the self-release channel:
 | Settings / start-on-boot | `SettingsPage.xaml`, `SettingsPage.cpp`, `AppState.cpp` |
 | Proxy engine | `../core/src/proxy_engine.cpp`, `../core/src/http_server.cpp` |
 | Settings persistence | `../core/src/settings_manager.cpp`, `../core/src/migrations/settings_migrator.cpp` |
+| Per-user config dir | `%APPDATA%\AgentRedactor` — `settings.json` plus per-user state files such as `redaction_state.json` (placeholder label counters, no PII). Keep any new per-user state file in this dir so clean/uninstall flows and the GUI-test `%APPDATA%` backup cover it automatically. |
 
 ## Changing the settings schema
 

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Це запише невідредаговані конфіденційні значення (імена, електронні адреси, номери телефонів тощо) і ваш ключ API до вашого журналу на диску. Не вмикайте це, якщо інші мають доступ до цього комп’ютера. Налаштування скидається, коли ви закриваєте програму.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Цей елемент вже існує.</value>
+  </data>
 </root>

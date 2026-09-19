@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Tämä kirjoittaa muokkaamattomia arkaluonteisia arvoja (nimet, sähköpostiosoitteet, puhelinnumerot jne.) ja API-avaimesi lokitiedostoosi levylle. Älä ota tätä käyttöön, jos muilla on pääsy tähän tietokoneeseen. Asetus nollautuu, kun suljet sovelluksen.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Tämä merkintä on jo olemassa.</value>
+  </data>
 </root>

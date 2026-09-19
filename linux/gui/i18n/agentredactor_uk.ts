@@ -35,20 +35,24 @@
       <translation>Не вдалося перевірити оновлення. Спробуйте пізніше.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Файл</translation>
+      <source>On</source>
+      <translation>Увімкнено</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Вийти</translation>
+      <source>Off</source>
+      <translation>Вимкнено</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Профіль</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Як використовувати Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>виявлення</translation>
+      <source>API Proxy</source>
+      <translation>API-проксі</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Модель виявлення на основі ШІ</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Ім'я:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Порт:</translation>
+      <source>Local URL</source>
+      <translation>Локальна URL-адреса</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Ключ API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Використовуйте модель ШІ:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Поріг впевненості:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Профілі</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Налаштуйте свій профіль нижче (або використовуйте профіль за замовчуванням)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Спрямуйте свій LLM-клієнт (Claude Code, OpenClaw тощо) на локальну URL-адресу, показану нижче</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Ми знаходимося між вашим клієнтом і справжнім API. Усе залишається на вашому комп'ютері. Конфіденційні дані редагуються локально, перш ніж будь-який запит залишить ваш комп'ютер, гарантуючи, що ваші дані ніколи не потраплять на наш сервер</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Адреса, на яку вказує ваш LLM-клієнт</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Справжня кінцева точка API, яка отримує ваші відредаговані запити</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Виявлення на основі ШІ працює локально як додатковий рівень захисту. Може пропустити дані або відредагувати зайве. Використовуйте шаблони регулярних виразів і ключові слова нижче для детермінованого редагування.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Очікуйте дещо повільніших відповідей увімкненого режиму. Модель сканує кожне повідомлення локально.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Текст, що відповідає цим шаблонам, буде відредаговано перед відправкою до API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Повідомлення, що містять ці слова, будуть позначені для редагування</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Фактичні редагування, виявлені в поточному сеансі.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>У поточному сеансі немає редагувань.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Журнали зберігаються на цьому ПК. Відредаговані журнали все ще можуть містити конфіденційні дані, які не були виявлені.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>напр., Робота OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>напр. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>напр. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>напр. пароль</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Показати ключ API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Копіювати URL проксі</translation>
+      <source>Copy</source>
+      <translation>Копіювати</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Редактор агента заблоковано</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Профілі</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Ім'я профілю</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Головний пароль</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Увімкнено</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Шаблон регулярного виразу</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Регістр</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ключове слово</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Неправильний синтаксис регулярного виразу.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Цей елемент вже існує.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Увімкнути ключове слово</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Справа: Так</translation>
+      <source>Yes</source>
+      <translation>Так</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Справа: немає</translation>
+      <source>No</source>
+      <translation>Ні</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL-адресу проксі-сервера скопійовано в буфер обміну</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Порт %1 доступний</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Порт %1 уже використовується</translation>
     </message>
     <message>
       <source>Wrong password.</source>

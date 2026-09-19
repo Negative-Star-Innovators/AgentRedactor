@@ -192,10 +192,133 @@ def test_keywords_add_list_remove(engine: CliEngine) -> None:
         engine.run_cli("keywords", "remove", "TopSecret")
 
 
+def test_keywords_remove_honors_ignore_case_flag(engine: CliEngine) -> None:
+    """`keywords remove <text>` honors the user's case-sensitivity choice:
+    with --ignore-case it deletes the first ignore-case entry; without it the
+    first case-sensitive entry wins regardless of list order, falling back to
+    an ignore-case entry when no case-sensitive one exists. Previously the
+    flag was ignored and plain list order decided."""
+
+    def entry_lines(name: str) -> list[str]:
+        r = engine.run_cli("keywords", "list")
+        assert r.returncode == 0, r.stdout
+        return [line for line in r.stdout.splitlines() if name in line]
+
+    try:
+        r = engine.run_cli("keywords", "add", "Dupe")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "Dupe", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+
+        # The flag selects the ignore-case entry even though the
+        # case-sensitive one comes first.
+        r = engine.run_cli("keywords", "remove", "Dupe", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        lines = entry_lines("Dupe")
+        assert len(lines) == 1 and "(case-sensitive)" in lines[0], lines
+
+        # Without the flag the case-sensitive entry is removed.
+        r = engine.run_cli("keywords", "remove", "Dupe")
+        assert r.returncode == 0, r.stdout
+        assert entry_lines("Dupe") == []
+
+        # Order-independence: with the ignore-case entry FIRST, a plain
+        # remove still takes the case-sensitive one.
+        r = engine.run_cli("keywords", "add", "Pear2", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "Pear2")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "remove", "Pear2")
+        assert r.returncode == 0, r.stdout
+        lines = entry_lines("Pear2")
+        assert len(lines) == 1 and "(ignore case)" in lines[0], lines
+        r = engine.run_cli("keywords", "remove", "Pear2", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        assert entry_lines("Pear2") == []
+
+        # The flag with only a case-sensitive match fails with a hint.
+        r = engine.run_cli("keywords", "add", "Solo")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "remove", "Solo", "--ignore-case")
+        assert r.returncode == 2, r.stdout
+        assert "no ignore-case entry" in r.stdout, r.stdout
+        assert "omit --ignore-case" in r.stdout, r.stdout
+        r = engine.run_cli("keywords", "remove", "Solo")
+        assert r.returncode == 0, r.stdout
+    finally:
+        engine.run_cli("keywords", "remove", "Dupe")
+        engine.run_cli("keywords", "remove", "Dupe", "--ignore-case")
+        engine.run_cli("keywords", "remove", "Pear2")
+        engine.run_cli("keywords", "remove", "Pear2", "--ignore-case")
+        engine.run_cli("keywords", "remove", "Solo")
+
+
+def test_duplicate_keyword_and_regex_rejected(engine: CliEngine) -> None:
+    """Adding the same keyword (same text AND same case-sensitivity) or the
+    same regex pattern twice is rejected. The same keyword text with the other
+    case-sensitivity is a distinct entry and is allowed."""
+    try:
+        r = engine.run_cli("keywords", "add", "DupKw")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "DupKw")
+        assert r.returncode == 2, r.stdout
+        assert "keyword already exists" in r.stdout
+        # Same text with the other case-sensitivity: allowed, once.
+        r = engine.run_cli("keywords", "add", "DupKw", "--ignore-case")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("keywords", "add", "DupKw", "--ignore-case")
+        assert r.returncode == 2, r.stdout
+
+        r = engine.run_cli("regex", "add", r"dup-\d{3}")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("regex", "add", r"dup-\d{3}")
+        assert r.returncode == 2, r.stdout
+        assert "regex pattern already exists" in r.stdout
+        # A normalization-equivalent pattern ({,N} == {0,N}) is also a duplicate.
+        r = engine.run_cli("regex", "add", r"dupx-\d{,3}")
+        assert r.returncode == 0, r.stdout
+        r = engine.run_cli("regex", "add", r"dupx-\d{0,3}")
+        assert r.returncode == 2, r.stdout
+    finally:
+        engine.run_cli("keywords", "remove", "DupKw")
+        engine.run_cli("keywords", "remove", "DupKw", "--ignore-case")
+        engine.run_cli("regex", "remove", r"dup-\d{3}")
+        engine.run_cli("regex", "remove", r"dupx-\d{0,3}")
+
+
 def test_remove_missing_entry(engine: CliEngine) -> None:
     r = engine.run_cli("regex", "remove", "99")
     assert r.returncode == 2
     assert "out of range" in r.stdout
+
+
+def test_extra_positional_arguments_rejected(engine: CliEngine) -> None:
+    """Commands take a fixed number of positional arguments. Extras used to be
+    silently ignored, which turned typos into wrong state (a missing space in
+    `profiles add alias--port 8080` swallowed the port; unquoted shell brace
+    expansion split a regex into two words and stored only the first). Extras
+    are now a usage error, checked before any gating or mutation."""
+    for args in (
+        ("status", "extra"),
+        ("languages", "extra"),
+        ("get", "logging", "extra"),
+        ("set", "logging", "true", "extra"),
+        ("profiles", "list", "extra"),
+        ("profiles", "add", "somedummy", "8080"),
+        ("profiles", "delete", "someid", "extra"),
+        ("regex", "list", "extra"),
+        ("regex", "add", "foo", "bar"),
+        ("regex", "remove", "1", "extra"),
+        ("keywords", "list", "extra"),
+        ("keywords", "add", "foo", "bar"),
+        ("keywords", "remove", "1", "extra"),
+        ("pii-types", "list", "extra"),
+        ("pii-types", "enable", "secret", "extra"),
+        ("password", "disable", "extra"),
+    ):
+        r = engine.run_cli(*args)
+        assert r.returncode == 2, (args, r.stdout)
+        assert "unexpected argument" in r.stdout, (args, r.stdout)
 
 
 def test_removed_cli_keys_are_unknown(engine: CliEngine) -> None:

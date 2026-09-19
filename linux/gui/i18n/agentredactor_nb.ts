@@ -35,20 +35,24 @@
       <translation>Kunne ikke se etter oppdateringer. Prøv igjen senere.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fil</translation>
+      <source>On</source>
+      <translation>På</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Avslutt</translation>
+      <source>Off</source>
+      <translation>Av</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Slik bruker du Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Oppdagelse</translation>
+      <source>API Proxy</source>
+      <translation>API-proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI-drevet deteksjonsmodell</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Navn:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Havn:</translation>
+      <source>Local URL</source>
+      <translation>Lokal URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API-nøkkel</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Bruk AI-modell:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Konfidensgrense:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiler</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurer profilen din nedenfor (eller bruk standardprofilen)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Peke LLM-klienten din (Claude Code, OpenClaw, etc.) mot den lokale URL-en som vises nedenfor</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Vi sitter mellom klienten din og den ekte API-en. Alt blir på maskinen din. Sensitive data redigeres lokalt før noen forespørsel forlater datamaskinen din, slik at dataene dine aldri når serveren vår</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adressen LLM-klienten din peker mot</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Det ekte API-endepunktet som mottar dine redigerte forespørsler</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI-drevet deteksjon kjører lokalt som et ekstra forsvarslag. Den kan overse data eller redigere for mye. Bruk Regex-mønstre og Nøkkelord nedenfor for deterministisk redigering.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Forvent litt tregere svar når aktivert. Modellen skanner hver melding lokalt.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Tekst som samsvarer med disse mønstrene, vil bli redigert før den sendes til API-en</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Meldinger som inneholder disse ordene, vil bli markert for redigering</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Faktiske redigeringer oppdaget i gjeldende økt.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ingen redigeringer i gjeldende økt.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Logger lagres på denne PC-en. Redakterte logger kan fortsatt inneholde sensitive data som gjenkjenning savnet.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>f.eks., Jobb OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>f.eks. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>f.eks. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>f.eks. passord</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Vis API-nøkkel</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopier proxy-URL</translation>
+      <source>Copy</source>
+      <translation>Kopier</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor er låst</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profiler</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profilnavn</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Hovedpassord</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktivert</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-mønster</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Store/små bokstaver</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Nøkkelord</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Ugyldig regex-syntaks.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Denne oppføringen finnes allerede.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktiver søkeord</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Sak: Ja</translation>
+      <source>Yes</source>
+      <translation>Ja</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Sak: Nei</translation>
+      <source>No</source>
+      <translation>Nei</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy URL kopiert til utklippstavlen</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 er tilgjengelig</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 er allerede i bruk</translation>
     </message>
     <message>
       <source>Wrong password.</source>

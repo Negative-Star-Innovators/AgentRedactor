@@ -37,9 +37,14 @@ public:
 
 private:
     // Proxy data plane (moved from the old in-process AppState).
+    // StartProxyServers/StopProxyServers/RestartProxyServers are called from
+    // control-API worker threads, the model-download thread, and the main
+    // thread; all take proxyServersMutex_ and delegate to the Locked variants.
     void StartProxyServers();
     void StopProxyServers();
     void RestartProxyServers();
+    void StartProxyServersLocked();
+    void StopProxyServersLocked();
     bool IsProxyRunning(int port) const;
 
     HttpResponse HandleProxyRequest(int port, const std::string& method, const std::wstring& path,
@@ -75,6 +80,10 @@ private:
     std::unique_ptr<ProxyEngine> proxyEngine_;
     std::vector<std::unique_ptr<HttpServer>> servers_;
     std::unordered_set<int> runningPorts_;
+    // Serializes every mutation/iteration of servers_ and runningPorts_.
+    // Without it, concurrent profile PUTs each restarting the proxies race on
+    // the vector and on HttpServer teardown (joinable-thread terminate).
+    mutable std::mutex proxyServersMutex_;
     ControlServer controlServer_;
 
     // Stop signal for Run() (a Win32 event handle was used before the core
@@ -90,6 +99,13 @@ private:
     bool modelDownloadRequired_ = false;
     bool modelDownloadInProgress_ = false;
     bool modelDownloadFailed_ = false;
+    bool modelDownloadWaitingToRetry_ = false;
+
+    // Retry signalling: StartModelDownloadIfNeeded() can wake a sleeping
+    // download thread so a manual retry happens immediately.
+    std::mutex retryMutex_;
+    std::condition_variable retryCv_;
+    bool retryNowRequested_ = false;
 
     // Monotonic counter bumped on every profile mutation; exposed via
     // /settings so the GUI poll can detect CLI-side profile changes

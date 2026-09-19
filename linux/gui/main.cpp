@@ -28,6 +28,7 @@
 #include "app_state.h"
 #include "desktop_integration.h"
 #include "main_window.h"
+#include "theme.h"
 #include "tray_icon.h"
 #include "translator_loader.h"
 #include "utils.h"
@@ -111,6 +112,12 @@ void EnsureCliShim() {
             fs::remove(link, ec);
         }
         if (!appImageEnv || !*appImageEnv) return; // extract-and-run: no stable path
+
+        // Never write a wrapper pointing at a non-existent AppImage. Tests and
+        // stale launchers can set APPIMAGE to a fake path; leaving the shim
+        // alone lets a previous valid install keep working.
+        std::error_code existsEc;
+        if (!fs::is_regular_file(fs::path(appImageEnv), existsEc)) return;
 
         std::error_code ec2;
         fs::create_directories(binDir, ec2);
@@ -199,6 +206,7 @@ int main(int argc, char* argv[]) {
     }
 
     QApplication app(argc, argv);
+    Theme::Apply(app);
     QApplication::setApplicationName(QStringLiteral("agentredactor"));
     QApplication::setOrganizationName(QStringLiteral("NegativeStarInnovators"));
     QApplication::setWindowIcon(QIcon(QStringLiteral(":/app.png")));

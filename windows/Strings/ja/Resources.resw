@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>これにより、編集されていない機密値 (名前、電子メール、電話番号など) と API キーがディスク上のログ ファイルに書き込まれます。他の人がこのコンピュータにアクセスできる場合は、これを有効にしないでください。アプリを閉じると設定がリセットされます。</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>このエントリは既に存在します。</value>
+  </data>
 </root>

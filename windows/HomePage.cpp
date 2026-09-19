@@ -50,6 +50,24 @@ namespace winrt::AgentRedactor::implementation
         AddRegexBtn().Click({ this, &HomePage::AddRegex_Click });
         AddKeywordBtn().Click({ this, &HomePage::AddKeyword_Click });
 
+        // Use-AI toggle autosaves immediately (Linux parity). ToggleSwitch
+        // fires Toggled on programmatic IsOn() too, so LoadProfileForm()
+        // gates it with loadingProfileForm_.
+        UseOpenAISwitch().Toggled([this](IInspectable const&, RoutedEventArgs const&) {
+            if (loadingProfileForm_) return;
+            if (!SaveProfileFromUi()) ReloadProfileUi();
+        });
+        // Confidence threshold commits on focus loss / Enter (Linux
+        // editingFinished parity), reverting the form on any invalid field.
+        ConfidenceThresholdBox().LostFocus([this](IInspectable const&, RoutedEventArgs const&) {
+            Confidence_Commit();
+        });
+        ConfidenceThresholdBox().KeyDown([this](IInspectable const&, KeyRoutedEventArgs const& e) {
+            if (e.Key() == Windows::System::VirtualKey::Enter) {
+                Confidence_Commit();
+            }
+        });
+
         CopyUrlBtn().Click([this](IInspectable const&, RoutedEventArgs const&) {
             auto port = PortBox().Text();
             std::wstring url = L"http://localhost:" + std::wstring(port.c_str()) + L"/";
@@ -85,7 +103,39 @@ namespace winrt::AgentRedactor::implementation
             }
         });
         PortBox().TextChanged([this](IInspectable const&, TextChangedEventArgs const&) {
+            if (!loadingProfileForm_) {
+                formDirty_ = true;
+            }
             UpdateProxyStatus();
+        });
+        // Pending-edit tracking for the poll guard: while any of the four
+        // profile text fields has uncommitted edits, engine-driven refreshes
+        // must not rebuild the form (Linux `dirty_` parity), so a regex/
+        // keyword row op that writes the engine can never wipe them.
+        ProfileNameBox().TextChanged([this](IInspectable const&, TextChangedEventArgs const&) {
+            if (!loadingProfileForm_) {
+                formDirty_ = true;
+            }
+        });
+        UrlBox().TextChanged([this](IInspectable const&, TextChangedEventArgs const&) {
+            if (!loadingProfileForm_) {
+                formDirty_ = true;
+            }
+        });
+        ApiKeyBox().PasswordChanged([this](IInspectable const&, RoutedEventArgs const&) {
+            // User-edit guard for the api-key box. WinUI 3 fires
+            // PasswordChanged for programmatic Password() sets AND for
+            // PasswordRevealMode changes (the Show Key toggle), and the
+            // event can arrive ASYNCHRONOUSLY after loadingProfileForm_ has
+            // been reset to false — so the load flag alone let a load/reveal
+            // event mark the form dirty with zero user input, permanently
+            // freezing the poll-driven refresh (its dirty_ early-return).
+            // Only a value that genuinely differs from the last programmatic
+            // or committed write (programmaticApiKey_) counts as a user edit.
+            if (!loadingProfileForm_
+                && std::wstring(ApiKeyBox().Password().c_str()) != programmaticApiKey_) {
+                formDirty_ = true;
+            }
         });
 
         Loaded({ this, &HomePage::OnLoaded });
@@ -377,7 +427,17 @@ namespace winrt::AgentRedactor::implementation
         if (fresh.empty() && profiles_.empty()) {
             // First run: bootstrap the default profile.
             LoadData();
-        } else if (!ProfilesMatch(fresh)) {
+        } else if (!ProfilesMatch(fresh) && !formDirty_) {
+            // Diff-aware refresh: rebuild the profile UI only when the
+            // engine's profiles actually changed on the fields the list/form
+            // display. A profilesRevision bump caused by the GUI's OWN
+            // Add/Save then becomes a no-op, so in-progress (unsaved) form
+            // edits are never stomped by the 1-second poll; genuinely
+            // external changes (e.g. a CLI `set alias` / `set port`) still
+            // reload. While the four profile text fields have uncommitted
+            // edits (formDirty_), defer the whole rebuild like Linux's
+            // `if (!dirty_) reloadProfiles(true)` so a row op that writes the
+            // engine (regex/keyword add/edit/delete) can never wipe them.
             std::wstring prevId = currentProfileId_;
             profiles_ = std::move(fresh);
             bool keep = false;
@@ -392,6 +452,12 @@ namespace winrt::AgentRedactor::implementation
             LoadRegexList();
             LoadKeywordList();
             UpdateStats();
+        } else {
+            // The api-key box holds the full secret while the profile list
+            // only serves a 3-char mask, so ProfilesMatch() above cannot see
+            // a CLI-side `set api-key` that keeps the same prefix (sk-...).
+            // Sync just the box; never a full rebuild while edits are dirty.
+            RefreshSelectedProfileApiKey();
         }
         bool loggingEnabled = app->Settings()->IsLoggingEnabled();
         EnableLoggingCheck().IsChecked(loggingEnabled);
@@ -602,8 +668,20 @@ namespace winrt::AgentRedactor::implementation
     {
         auto app = ::AgentRedactor::AppState::Instance();
         if (!app) return;
+        // A profilesRevision bump caused by the GUI's own row autosave is a
+        // no-op once the handler refreshed profiles_ (SaveProfileFromUi /
+        // Add/Delete row handlers all do). Defer the reload entirely while
+        // the four profile text fields have uncommitted edits, so a pending
+        // edit is never wiped by a poll tick (Linux `if (!dirty_)` parity).
+        if (formDirty_) return;
         auto fresh = app->Settings()->GetProfiles();
-        if (ProfilesMatch(fresh)) return;
+        if (ProfilesMatch(fresh)) {
+            // Visible fields are unchanged, but the diff compares the masked
+            // api key, so a CLI-side key change that shares the 3-char prefix
+            // reads as "no change". Re-fetch the real key for the box.
+            RefreshSelectedProfileApiKey();
+            return;
+        }
 
         std::wstring prevId = currentProfileId_;
         profiles_ = std::move(fresh);
@@ -618,12 +696,53 @@ namespace winrt::AgentRedactor::implementation
         LoadMatchesList();
     }
 
+    // The form shows the REAL api key (fetched via GetProfileApiKey) while
+    // the engine's /profiles list only serves a 3-char mask ("abc...****").
+    // ProfilesMatch() diffs the mask, so a key replaced with another sharing
+    // its first 3 characters (e.g. two "sk-..." keys) reads as "no change"
+    // and the diff-aware refresh never runs — leaving the box stale until a
+    // profile switch or window reopen calls LoadProfileForm(). This syncs
+    // just the box after such a diff.
+    void HomePage::RefreshSelectedProfileApiKey()
+    {
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app || loadingProfileForm_ || formDirty_ || currentProfileId_.empty()) {
+            return;
+        }
+        std::wstring apiKey = app->Settings()->GetProfileApiKey(currentProfileId_);
+        if (apiKey.empty()) {
+            // 403 while the session is Hello-locked (or a transport failure):
+            // fall back to the masked key exactly like LoadProfileForm does,
+            // so we never clobber the box with an empty value.
+            auto opt = app->Settings()->GetProfileById(currentProfileId_);
+            if (!opt) return;
+            apiKey = opt->apiKey;
+        }
+        if (apiKey == ApiKeyBox().Password().c_str()) return;
+        // Record the value as the reference "programmatic" write BEFORE the
+        // setter: PasswordChanged can fire asynchronously, after
+        // loadingProfileForm_ is reset, and must see an unchanged value.
+        // Preserve the user's reveal state (LoadProfileForm semantics)
+        // instead of flipping a visible key back to hidden.
+        programmaticApiKey_ = apiKey;
+        loadingProfileForm_ = true;
+        bool wasShown = ShowKeyCheck().IsChecked().GetBoolean();
+        ApiKeyBox().Password(apiKey);
+        ApiKeyBox().PasswordRevealMode(wasShown ? PasswordRevealMode::Visible : PasswordRevealMode::Hidden);
+        loadingProfileForm_ = false;
+    }
+
     void HomePage::LoadProfileForm()
     {
         auto app = ::AgentRedactor::AppState::Instance();
         if (!app) return;
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
         if (!opt) return;
+        // Guard the programmatic control updates below: ToggleSwitch.Toggled
+        // fires on IsOn() assignments, and the autosave handler must not
+        // echo a programmatic set back to the engine.
+        loadingProfileForm_ = true;
+        formDirty_ = false;
         auto& p = *opt;
         ProfileNameBox().Text(p.alias);
         PortBox().Text(std::to_wstring(p.port));
@@ -633,6 +752,10 @@ namespace winrt::AgentRedactor::implementation
         // keys set through the CLI) instead of a stale "abc...****" mask.
         std::wstring apiKey = app->Settings()->GetProfileApiKey(currentProfileId_);
         if (apiKey.empty()) apiKey = p.apiKey;
+        // Reference the value we are about to write so any (possibly
+        // asynchronous) PasswordChanged from this programmatic set reads as
+        // "unchanged" and cannot mark the form dirty.
+        programmaticApiKey_ = apiKey;
         ApiKeyBox().Password(apiKey);
         // Keep the reveal state across engine-driven reloads: a poll refresh
         // landing while the user has the key shown must not hide it again.
@@ -645,6 +768,7 @@ namespace winrt::AgentRedactor::implementation
         UseOpenAISwitch().IsOn(p.useOpenAIModel);
         ConfidenceThresholdBox().Text(::AgentRedactor::Utils::FormatLocalizedFloat(p.piiConfidenceThreshold, 2));
         UpdateProxyStatus();
+        loadingProfileForm_ = false;
     }
 
 
@@ -671,6 +795,12 @@ namespace winrt::AgentRedactor::implementation
             cb.Foreground(checkBrush);
             bool checked = std::find(enabledTypes.begin(), enabledTypes.end(), type) != enabledTypes.end();
             cb.IsChecked(checked);
+            // PII toggle autosaves immediately (Linux parity). CheckBox.Click
+            // is user-only (programmatic IsChecked never fires it), so no
+            // loading_ guard is needed here.
+            cb.Click([this](IInspectable const&, RoutedEventArgs const&) {
+                if (!SaveProfileFromUi()) ReloadProfileUi();
+            });
             Grid::SetColumn(cb, col);
             Grid::SetRow(cb, row);
             grid.Children().Append(cb);
@@ -723,6 +853,11 @@ namespace winrt::AgentRedactor::implementation
             cb.Padding(Thickness{ 0 });
             cb.Foreground(checkBrush);
             AutomationProperties::SetAutomationId(cb, winrt::hstring(L"RegexCheckBox_" + std::to_wstring(idx)));
+            // Enable toggle autosaves immediately (Linux priority), with
+            // revert-on-invalid when the committed form fails validation.
+            cb.Click([this](IInspectable const&, RoutedEventArgs const&) {
+                if (!SaveProfileFromUi()) ReloadProfileUi();
+            });
             Grid::SetColumn(cb, 0);
             row.Children().Append(cb);
             regexCheckBoxes_.push_back(cb);
@@ -764,6 +899,10 @@ namespace winrt::AgentRedactor::implementation
                 if (p.regexPatterns[idx].pattern == newPattern) return;
                 p.regexPatterns[idx].pattern = newPattern;
                 app->Settings()->UpdateProfile(p);
+                // Keep the cached snapshot in sync so the 1s poll does not
+                // treat the GUI's own row edit as an external change and
+                // reload the form, wiping pending profile-field text.
+                profiles_ = app->Settings()->GetProfiles();
                 LOG(L"RegexLostFocus idx=" + std::to_wstring(idx) + L" pattern='" + newPattern + L"'");
             });
 
@@ -790,6 +929,9 @@ namespace winrt::AgentRedactor::implementation
                 if (idx < p.regexPatterns.size()) {
                     p.regexPatterns.erase(p.regexPatterns.begin() + idx);
                     app->Settings()->UpdateProfile(p);
+                    // Keep the cached snapshot in sync so the 1s poll does
+                    // not reload the form and wipe pending profile-field text.
+                    profiles_ = app->Settings()->GetProfiles();
                     LoadRegexList();
                 }
             });
@@ -840,6 +982,11 @@ namespace winrt::AgentRedactor::implementation
             cb.Padding(Thickness{ 0 });
             cb.Foreground(checkBrush);
             AutomationProperties::SetAutomationId(cb, winrt::hstring(L"KeywordCheckBox_" + std::to_wstring(idx)));
+            // Enable toggle autosaves immediately (Linux parity), with
+            // revert-on-invalid when the committed form fails validation.
+            cb.Click([this](IInspectable const&, RoutedEventArgs const&) {
+                if (!SaveProfileFromUi()) ReloadProfileUi();
+            });
             Grid::SetColumn(cb, 0);
             row.Children().Append(cb);
             keywordCheckBoxes_.push_back(cb);
@@ -859,10 +1006,14 @@ namespace winrt::AgentRedactor::implementation
             row.Children().Append(caseBtn);
             keywordCaseButtons_.push_back(caseBtn);
 
-            caseBtn.Click([caseBtn](IInspectable const&, RoutedEventArgs const&) {
+            // Case toggle: flip the Yes/No label, then commit. A failed
+            // commit (any invalid form field) reverts the whole form,
+            // restoring the previous case setting.
+            caseBtn.Click([this, caseBtn](IInspectable const&, RoutedEventArgs const&) {
                 auto txt = unbox_value<hstring>(caseBtn.Content());
                 auto yes = ::AgentRedactor::LocString(L"Common_Yes");
                 caseBtn.Content(box_value(txt == yes ? ::AgentRedactor::LocString(L"Common_No") : yes));
+                if (!SaveProfileFromUi()) ReloadProfileUi();
             });
 
             auto kwBox = TextBox();
@@ -889,6 +1040,9 @@ namespace winrt::AgentRedactor::implementation
                     LOG(L"KeywordLostFocus idx=" + std::to_wstring(idx) + L" oldProfileText='" + p.keywords[idx].text + L"' textBoxText='" + newText + L"'");
                     p.keywords[idx].text = newText;
                     app->Settings()->UpdateProfile(p);
+                    // Keep the cached snapshot in sync so the 1s poll does
+                    // not reload the form and wipe pending profile-field text.
+                    profiles_ = app->Settings()->GetProfiles();
                 }
             });
             Grid::SetColumn(kwBox, 2);
@@ -919,6 +1073,9 @@ namespace winrt::AgentRedactor::implementation
                 if (idx < p.keywords.size()) {
                     p.keywords.erase(p.keywords.begin() + idx);
                     app->Settings()->UpdateProfile(p);
+                    // Keep the cached snapshot in sync so the 1s poll does
+                    // not reload the form and wipe pending profile-field text.
+                    profiles_ = app->Settings()->GetProfiles();
                     LoadKeywordList();
                 }
             });
@@ -1033,12 +1190,12 @@ namespace winrt::AgentRedactor::implementation
         ApiKeyBox().PasswordRevealMode(show ? PasswordRevealMode::Visible : PasswordRevealMode::Hidden);
     }
 
-    void HomePage::SaveProfile_Click(IInspectable const&, RoutedEventArgs const&)
+    bool HomePage::SaveProfileFromUi()
     {
         auto app = ::AgentRedactor::AppState::Instance();
-        if (!app) return;
+        if (!app) return false;
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
-        if (!opt) return;
+        if (!opt) return false;
         auto p = *opt;
         p.alias = ProfileNameBox().Text().c_str();
         p.port = _wtoi(PortBox().Text().c_str());
@@ -1046,12 +1203,12 @@ namespace winrt::AgentRedactor::implementation
         // Port validation
         if (p.port < 1024 || p.port > 65535) {
             ShowPortErrorAsync(::AgentRedactor::LocString(L"Validation_PortRange"));
-            return;
+            return false;
         }
         for (const auto& other : profiles_) {
             if (other.id != p.id && other.port == p.port) {
                 ShowPortErrorAsync(::AgentRedactor::LocFormat(L"Validation_PortUsed", { std::to_wstring(p.port), other.alias }));
-                return;
+                return false;
             }
         }
 
@@ -1059,11 +1216,11 @@ namespace winrt::AgentRedactor::implementation
         std::wstring lowerUrl = ::AgentRedactor::Utils::ToLower(url);
         if (url.empty()) {
             ShowPortErrorAsync(::AgentRedactor::LocString(L"Validation_UrlEmpty"));
-            return;
+            return false;
         }
         if (!::AgentRedactor::Utils::StartsWith(lowerUrl, L"http://") && !::AgentRedactor::Utils::StartsWith(lowerUrl, L"https://")) {
             ShowPortErrorAsync(::AgentRedactor::LocString(L"Validation_UrlProtocol"));
-            return;
+            return false;
         }
         std::wstring urlHost;
         {
@@ -1074,7 +1231,7 @@ namespace winrt::AgentRedactor::implementation
             urlComp.dwExtraInfoLength = (DWORD)-1;
             if (!WinHttpCrackUrl(url.c_str(), 0, 0, &urlComp)) {
                 ShowPortErrorAsync(::AgentRedactor::LocString(L"Validation_UrlInvalid"));
-                return;
+                return false;
             }
             if (urlComp.lpszHostName && urlComp.dwHostNameLength > 0) {
                 urlHost.assign(urlComp.lpszHostName, urlComp.dwHostNameLength);
@@ -1094,7 +1251,7 @@ namespace winrt::AgentRedactor::implementation
         float confThreshold = static_cast<float>(::AgentRedactor::Utils::ParseLocalizedFloat(ConfidenceThresholdBox().Text().c_str()));
         if (confThreshold < 0.0f || confThreshold > 1.0f) {
             ShowPortErrorAsync(::AgentRedactor::LocString(L"Validation_ConfidenceRange"));
-            return;
+            return false;
         }
         p.piiConfidenceThreshold = confThreshold;
 
@@ -1104,7 +1261,7 @@ namespace winrt::AgentRedactor::implementation
             auto err = ValidateRegex(pattern);
             if (!err.empty()) {
                 ShowErrorAsync(err);
-                return;
+                return false;
             }
             p.regexPatterns[i].enabled = regexCheckBoxes_[i].IsChecked().GetBoolean();
             p.regexPatterns[i].pattern = pattern;
@@ -1130,9 +1287,63 @@ namespace winrt::AgentRedactor::implementation
         app->Settings()->UpdateProfile(p);
         app->RestartProxyServers();
 
+        // Refresh the cached snapshot so the 1-second poll's diff check sees
+        // no change and never stomps the UI after an autosave.
         profiles_ = app->Settings()->GetProfiles();
         LoadProfileList();
         UpdateProxyStatus();
+        // The four profile text fields were just committed, so the pending-
+        // edit guard is cleared and the poll can reload normally again.
+        // The committed key becomes the reference for the api-key box too,
+        // so a later Show Key toggle (PasswordRevealMode -> PasswordChanged)
+        // on the unchanged value cannot re-mark the form dirty.
+        formDirty_ = false;
+        programmaticApiKey_ = p.apiKey;
+        return true;
+    }
+
+    void HomePage::ReloadProfileUi()
+    {
+        // Full revert from the engine snapshot (Linux reloadProfiles(true)
+        // parity) after a failed commit-style autosave. Profiles may have
+        // changed under us (e.g. an invalid port/alias aborted the save but
+        // the engine is authoritative), so re-fetch before rebuilding.
+        auto app = ::AgentRedactor::AppState::Instance();
+        if (!app) return;
+        std::wstring prevId = currentProfileId_;
+        auto fresh = app->Settings()->GetProfiles();
+        if (fresh.empty()) return;
+        bool keep = false;
+        for (const auto& p : fresh) {
+            if (p.id == prevId) { keep = true; break; }
+        }
+        profiles_ = std::move(fresh);
+        currentProfileId_ = keep ? prevId : profiles_[0].id;
+        LoadProfileList();
+        LoadProfileForm();
+        LoadPIIGrid();
+        LoadRegexList();
+        LoadKeywordList();
+        UpdateProxyStatus();
+    }
+
+    void HomePage::Confidence_Commit()
+    {
+        if (loadingProfileForm_) return;
+        // Commit-style autosave for the confidence field: try the full
+        // save path (which validates the range too); on any invalid field
+        // revert the whole form instead of leaving a half-saved profile.
+        if (!SaveProfileFromUi()) {
+            ReloadProfileUi();
+        }
+    }
+
+    void HomePage::SaveProfile_Click(IInspectable const&, RoutedEventArgs const&)
+    {
+        // Manual Save keeps the current behavior: on validation failure the
+        // user keeps every field as typed (the dialog already explained the
+        // problem), so they can fix it before the next save.
+        SaveProfileFromUi();
     }
 
     void HomePage::AddRegex_Click(IInspectable const&, RoutedEventArgs const&)
@@ -1149,8 +1360,19 @@ namespace winrt::AgentRedactor::implementation
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
         if (!opt) return;
         auto p = *opt;
+        const std::wstring want = ::AgentRedactor::Utils::NormalizeRegexBraces(txt.c_str());
+        for (const auto& r : p.regexPatterns) {
+            if (::AgentRedactor::Utils::NormalizeRegexBraces(r.pattern) == want) {
+                ShowErrorAsync(::AgentRedactor::LocString(L"Validation_DuplicateEntry"));
+                return;
+            }
+        }
         p.regexPatterns.push_back({ txt.c_str(), true });
         app->Settings()->UpdateProfile(p);
+        // Refresh the cached snapshot so the 1-second poll sees the GUI's own
+        // row add as a no-op instead of a change that reloads the form and
+        // wipes pending edits in the profile text fields.
+        profiles_ = app->Settings()->GetProfiles();
         LoadRegexList();
         NewRegexBox().Text(L"");
     }
@@ -1164,8 +1386,19 @@ namespace winrt::AgentRedactor::implementation
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
         if (!opt) return;
         auto p = *opt;
-        p.keywords.push_back({ txt.c_str(), CaseSensitiveCheck().IsChecked().GetBoolean(), true });
+        const bool caseSensitive = CaseSensitiveCheck().IsChecked().GetBoolean();
+        for (const auto& k : p.keywords) {
+            if (k.text == txt.c_str() && k.caseSensitive == caseSensitive) {
+                ShowErrorAsync(::AgentRedactor::LocString(L"Validation_DuplicateEntry"));
+                return;
+            }
+        }
+        p.keywords.push_back({ txt.c_str(), caseSensitive, true });
         app->Settings()->UpdateProfile(p);
+        // Refresh the cached snapshot so the 1-second poll sees the GUI's own
+        // row add as a no-op instead of a change that reloads the form and
+        // wipes pending edits in the profile text fields.
+        profiles_ = app->Settings()->GetProfiles();
         LoadKeywordList();
         NewKeywordBox().Text(L"");
     }
@@ -1418,17 +1651,25 @@ namespace winrt::AgentRedactor::implementation
     void HomePage::OpenLog_Click(IInspectable const&, RoutedEventArgs const&)
     {
         auto path = ::AgentRedactor::Utils::GetCurrentLogFilePath();
-        if (!path.empty() && ::AgentRedactor::Utils::FileExists(path)) {
-            ShellExecuteW(nullptr, L"open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
-        }
+        if (path.empty() || !::AgentRedactor::Utils::FileExists(path)) return;
+        // MSIX/Store sandbox: the app writes through a translated view of
+        // %APPDATA% (real data lives under Local\Packages\<pkg>\LocalCache\...),
+        // so the literal path does not exist for an outside process. Resolve
+        // the host-visible path before shelling out, or Notepad reports
+        // "The system cannot find the path specified".
+        auto hostPath = ::AgentRedactor::Utils::GetHostVisiblePath(path);
+        if (hostPath.empty()) return;
+        ShellExecuteW(nullptr, L"open", hostPath.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
     }
 
     void HomePage::OpenLogsFolder_Click(IInspectable const&, RoutedEventArgs const&)
     {
         auto path = ::AgentRedactor::Utils::GetAppDataPath();
-        if (!path.empty() && ::AgentRedactor::Utils::FileExists(path)) {
-            ShellExecuteW(nullptr, L"open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
-        }
+        if (path.empty() || !::AgentRedactor::Utils::FileExists(path)) return;
+        // Same sandbox path-translation note as OpenLog_Click.
+        auto hostPath = ::AgentRedactor::Utils::GetHostVisiblePath(path);
+        if (hostPath.empty()) return;
+        ShellExecuteW(nullptr, L"open", hostPath.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
     }
 
     std::wstring HomePage::ValidateRegex(const std::wstring& pattern)

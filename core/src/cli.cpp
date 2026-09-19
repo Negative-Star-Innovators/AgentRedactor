@@ -133,6 +133,18 @@ struct Ctx {
     void Print(const std::wstring& line) const { c.print(line); }
     void Error(const std::wstring& msg) const { c.print(L"error: " + msg); }
 
+    // Every command takes a fixed number of positional arguments. Extra words
+    // used to be silently ignored, which turned typos into wrong state (a
+    // missing space in `profiles add meow--port 8080` swallowed the port, and
+    // unquoted shell brace expansion split a regex into two arguments, storing
+    // only the first). Reject extras instead. Checked before Gate() so a usage
+    // error never triggers a password/Hello prompt.
+    bool NoExtraArgs(size_t expected) const {
+        if (opts.positional.size() <= expected) return true;
+        Error(L"unexpected argument: '" + opts.positional[expected] + L"'");
+        return false;
+    }
+
     // Fetches /status; false means the engine is unreachable.
     bool EngineStatus(json& status) const {
         if (t.get(L"/status", status)) return true;
@@ -252,6 +264,7 @@ struct Ctx {
 // ---------------------------------------------------------------------------
 
 int CmdStatus(const Ctx& ctx) {
+    if (!ctx.NoExtraArgs(1)) return 2;
     json status;
     if (!ctx.EngineStatus(status)) return 1;
 
@@ -304,6 +317,7 @@ int CmdStatus(const Ctx& ctx) {
 }
 
 int CmdLanguages(const Ctx& ctx) {
+    if (!ctx.NoExtraArgs(1)) return 2;
     // One code per line, nothing else: the same list the Settings page and
     // tray menu are built from (core/include/constants.h SUPPORTED_LANGUAGES).
     for (const auto& lang : ::AgentRedactor::SUPPORTED_LANGUAGES) {
@@ -318,6 +332,7 @@ int CmdPassword(const Ctx& ctx) {
         return 2;
     }
     const std::wstring action = WideLower(ctx.opts.positional[1]);
+    if ((action == L"enable" || action == L"disable") && !ctx.NoExtraArgs(2)) return 2;
     json status;
     if (!ctx.EngineStatus(status)) return 1;
 
@@ -446,6 +461,7 @@ int CmdGet(const Ctx& ctx) {
         ctx.Error(L"usage: agentredactor get <key> [--profile <n|id|alias>]");
         return 2;
     }
+    if (!ctx.NoExtraArgs(2)) return 2;
     const std::wstring key = WideLower(ctx.opts.positional[1]);
 
     // Every read is gated when a master password is set (the engine lock is
@@ -503,6 +519,7 @@ int CmdSet(const Ctx& ctx) {
         ctx.Error(L"usage: agentredactor set <key> <value> [--profile <n|id|alias>]");
         return 2;
     }
+    if (!ctx.NoExtraArgs(3)) return 2;
     const std::wstring key = WideLower(ctx.opts.positional[1]);
     const std::wstring& value = ctx.opts.positional[2];
 
@@ -643,6 +660,7 @@ int CmdProfiles(const Ctx& ctx) {
 }
 
 int CmdProfilesList(const Ctx& ctx) {
+    if (!ctx.NoExtraArgs(2)) return 2;
     json status;
     if (!ctx.Gate(status)) return 1;
     json profiles;
@@ -698,6 +716,7 @@ int CmdProfilesAdd(const Ctx& ctx) {
         ctx.Error(L"usage: agentredactor profiles add <alias> [--port N] [--upstream-url U] [--api-key K]");
         return 2;
     }
+    if (!ctx.NoExtraArgs(3)) return 2;
     const std::wstring alias = Trim(ctx.opts.positional[2]);
     if (alias.empty()) {
         ctx.Error(L"profile alias must not be empty");
@@ -768,6 +787,7 @@ int CmdProfilesDelete(const Ctx& ctx) {
         ctx.Error(L"usage: agentredactor profiles delete <id>");
         return 2;
     }
+    if (!ctx.NoExtraArgs(3)) return 2;
     json status;
     if (!ctx.Gate(status)) return 1;
     json profiles;
@@ -849,6 +869,7 @@ int CmdPiiTypes(const Ctx& ctx) {
         ctx.Error(L"unknown pii-types action: " + action + L" (list|enable|disable)");
         return 2;
     }
+    if (!ctx.NoExtraArgs(action == L"list" ? 2 : 3)) return 2;
 
     json status;
     if (!ctx.Gate(status)) return 1;
@@ -927,8 +948,21 @@ int MutateList(const Ctx& ctx, const char* field,
     return 0;
 }
 
-// Resolves a remove selector (1-based list index or exact text match).
-bool RemoveEntry(const Ctx& ctx, json& entries, const std::wstring& sel, const char* textField) {
+// How a text selector matches keyword entries by case-sensitivity.
+// Regex patterns carry no case-sensitivity and always use Any.
+enum class RemoveMatch {
+    Any,                 // first exact text match, list order
+    PreferCaseSensitive, // first case-sensitive match, else first ignore-case
+    IgnoreCaseOnly,      // --ignore-case: only ignore-case entries
+};
+
+// Resolves a remove selector (1-based list index or exact text match). For
+// keywords the user's --ignore-case choice is honored: with the flag only
+// ignore-case entries match; without it a case-sensitive entry wins regardless
+// of list order, falling back to an ignore-case entry when no case-sensitive
+// one exists (deterministic — plain list order used to decide).
+bool RemoveEntry(const Ctx& ctx, json& entries, const std::wstring& sel, const char* textField,
+                 RemoveMatch match = RemoveMatch::Any) {
     size_t index = 0;
     if (IsInteger(sel)) {
         const size_t n = static_cast<size_t>(std::stoul(sel));
@@ -938,12 +972,24 @@ bool RemoveEntry(const Ctx& ctx, json& entries, const std::wstring& sel, const c
         }
         index = n - 1;
     } else {
-        bool found = false;
-        for (size_t k = 0; k < entries.size(); ++k) {
-            if (JStr(entries[k], textField) == sel) { index = k; found = true; break; }
+        bool found = false, wrongCaseFlag = false;
+        for (int pass = 0; pass < 2 && !found; ++pass) {
+            for (size_t k = 0; k < entries.size(); ++k) {
+                if (JStr(entries[k], textField) != sel) continue;
+                const bool cs = entries[k].value("case_sensitive", true);
+                if (match == RemoveMatch::IgnoreCaseOnly && cs) { wrongCaseFlag = true; continue; }
+                if (match == RemoveMatch::PreferCaseSensitive && ((pass == 0) != cs)) continue;
+                index = k; found = true; break;
+            }
+            if (match != RemoveMatch::PreferCaseSensitive) break;
         }
         if (!found) {
-            ctx.Error(L"no such entry: " + sel);
+            if (wrongCaseFlag) {
+                ctx.Error(L"no ignore-case entry: " + sel
+                    + L" (a case-sensitive entry exists; omit --ignore-case)");
+            } else {
+                ctx.Error(L"no such entry: " + sel);
+            }
             return false;
         }
     }
@@ -975,6 +1021,7 @@ int CmdRegex(const Ctx& ctx) {
     const std::wstring action = WideLower(ctx.opts.positional[1]);
 
     if (action == L"list") {
+        if (!ctx.NoExtraArgs(2)) return 2;
         json status;
         if (!ctx.Gate(status)) return 1;
         json profile;
@@ -984,6 +1031,7 @@ int CmdRegex(const Ctx& ctx) {
     }
     if (action == L"add") {
         if (ctx.opts.positional.size() < 3) { ctx.Error(L"regex add requires a pattern"); return 2; }
+        if (!ctx.NoExtraArgs(3)) return 2;
         std::wstring pattern = ctx.opts.positional[2];
         if (Trim(pattern).empty()) { ctx.Error(L"regex pattern must not be empty"); return 2; }
         // Mirror the GUI's ValidateRegex: reject an unparseable pattern before
@@ -998,13 +1046,21 @@ int CmdRegex(const Ctx& ctx) {
             return 2;
         }
         return MutateList(ctx, "regex_patterns", [&](json& entries) {
-            entries.push_back({{"pattern", Utils::WideToUtf8(pattern)}, {"enabled", true}});
+            const std::string pat8 = Utils::WideToUtf8(pattern);
+            for (const auto& e : entries) {
+                if (e.value("pattern", std::string()) == pat8) {
+                    ctx.Error(L"regex pattern already exists");
+                    return false;
+                }
+            }
+            entries.push_back({{"pattern", pat8}, {"enabled", true}});
             ctx.Print(L"ok");
             return true;
         });
     }
     if (action == L"remove") {
         if (ctx.opts.positional.size() < 3) { ctx.Error(L"regex remove requires an index or pattern"); return 2; }
+        if (!ctx.NoExtraArgs(3)) return 2;
         const std::wstring sel = ctx.opts.positional[2];
         return MutateList(ctx, "regex_patterns", [&](json& entries) {
             return RemoveEntry(ctx, entries, sel, "pattern");
@@ -1022,6 +1078,7 @@ int CmdKeywords(const Ctx& ctx) {
     const std::wstring action = WideLower(ctx.opts.positional[1]);
 
     if (action == L"list") {
+        if (!ctx.NoExtraArgs(2)) return 2;
         json status;
         if (!ctx.Gate(status)) return 1;
         json profile;
@@ -1031,10 +1088,19 @@ int CmdKeywords(const Ctx& ctx) {
     }
     if (action == L"add") {
         if (ctx.opts.positional.size() < 3) { ctx.Error(L"keywords add requires the keyword text"); return 2; }
+        if (!ctx.NoExtraArgs(3)) return 2;
         const std::wstring text = ctx.opts.positional[2];
         const bool caseSensitive = !ctx.opts.ignoreCase;
         return MutateList(ctx, "keywords", [&](json& entries) {
-            entries.push_back({{"text", Utils::WideToUtf8(text)},
+            const std::string text8 = Utils::WideToUtf8(text);
+            for (const auto& e : entries) {
+                if (e.value("text", std::string()) == text8
+                    && e.value("case_sensitive", true) == caseSensitive) {
+                    ctx.Error(L"keyword already exists");
+                    return false;
+                }
+            }
+            entries.push_back({{"text", text8},
                                {"case_sensitive", caseSensitive},
                                {"enabled", true}});
             ctx.Print(L"ok");
@@ -1043,9 +1109,12 @@ int CmdKeywords(const Ctx& ctx) {
     }
     if (action == L"remove") {
         if (ctx.opts.positional.size() < 3) { ctx.Error(L"keywords remove requires an index or the keyword text"); return 2; }
+        if (!ctx.NoExtraArgs(3)) return 2;
         const std::wstring sel = ctx.opts.positional[2];
         return MutateList(ctx, "keywords", [&](json& entries) {
-            return RemoveEntry(ctx, entries, sel, "text");
+            return RemoveEntry(ctx, entries, sel, "text",
+                               ctx.opts.ignoreCase ? RemoveMatch::IgnoreCaseOnly
+                                                   : RemoveMatch::PreferCaseSensitive);
         });
     }
     ctx.Error(L"unknown keywords action: " + action + L" (list|add|remove)");
@@ -1074,8 +1143,12 @@ void PrintUsage(const Ctx& ctx) {
     PrintValidKeys(ctx);
     ctx.Print(L"");
     ctx.Print(L"redaction lists (profile-scoped):");
-    ctx.Print(L"  regex list | add <pattern> | remove <n|pattern>");
-    ctx.Print(L"  keywords list | add <text> | remove <n|text> [--ignore-case]");
+    ctx.Print(L"  regex list [--profile P]");
+    ctx.Print(L"  regex add <pattern> [--profile P]");
+    ctx.Print(L"  regex remove <n|pattern> [--profile P]");
+    ctx.Print(L"  keywords list [--profile P]");
+    ctx.Print(L"  keywords add <text> [--ignore-case] [--profile P]");
+    ctx.Print(L"  keywords remove <n|text> [--profile P]");
     ctx.Print(L"  pii-types list [--profile P]");
     ctx.Print(L"  pii-types enable | disable <type> [--profile P]");
     ctx.Print(L"              PII types (single type only): account_number,");
@@ -1101,7 +1174,11 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"  --port N        profiles add: explicit proxy port");
     ctx.Print(L"  --upstream-url U profiles add: upstream endpoint");
     ctx.Print(L"  --api-key K     profiles add: API key");
-    ctx.Print(L"  --ignore-case   keywords add: case-insensitive matching");
+    ctx.Print(L"  --ignore-case   keywords add/remove: case-insensitive matching");
+    ctx.Print(L"");
+    ctx.Print(L"shell note: quote patterns containing { } [ ] etc. so the shell does not");
+    ctx.Print(L"  expand or misinterpret them, e.g. agentredactor regex add 'sk-[a-zA-Z0-9]{20,}'");
+    ctx.Print(L"  (PowerShell/cmd.exe: use double quotes: \"sk-[a-zA-Z0-9]{20,}\")");
 #ifndef _WIN32
     ctx.Print(L"");
     ctx.Print(L"maintenance (Linux only):");

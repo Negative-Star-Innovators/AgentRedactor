@@ -97,11 +97,35 @@ void AppState::PollThreadMain() {
             Q_ARG(QString, statusDump), Q_ARG(QString, settingsDump),
             Q_ARG(bool, statusOk));
 
+        if (statusOk) {
+            consecutivePollFailures_ = 0;
+        } else if (++consecutivePollFailures_ >= 5 &&
+                   (consecutivePollFailures_ - 5) % 30 == 0 && !stopPolling_) {
+            // The engine died mid-session (e.g. crashed): without a respawn
+            // the UI would report "not running" forever. First attempt after
+            // ~5 s of failures, then roughly every 30 s until it is back.
+            RespawnEngine();
+        }
+
         // 1 s cadence in 100 ms slices so Shutdown() is not kept waiting.
         for (int i = 0; i < 10 && !stopPolling_; ++i) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
+}
+
+void AppState::RespawnEngine() {
+    if (client_.Connect(configDir_) && client_.Ping()) return; // already back
+    qWarning("[AppState] engine unreachable; respawning it");
+    const auto engine = FindEngineBinary();
+    engineSpawned_ = QProcess::startDetached(
+        QString::fromStdString(engine.string()), {}) || engineSpawned_;
+    // Model already downloaded here, so startup is fast; allow 30 s anyway.
+    for (int i = 0; i < 300 && !stopPolling_; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (client_.Connect(configDir_) && client_.Ping()) return;
+    }
+    qWarning("[AppState] engine respawn did not come up within 30 s");
 }
 
 void AppState::onPolled(QString statusDump, QString settingsDump, bool statusOk) {

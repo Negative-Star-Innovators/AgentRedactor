@@ -1,13 +1,16 @@
 #pragma once
 
 // Linux mirror of windows/MainWindow + HomePage: a single window with a
-// profile sidebar and the settings cards (profile, regex, keywords,
-// detection, password, statistics, session redactions, logs), plus the lock
-// overlay, the blocking model-download dialog, close-to-tray and the
-// inactivity re-lock. All strings go through tr(); retranslateUi() applies
-// language changes live (TranslatorLoader drives QEvent::LanguageChange).
+// profile sidebar and the settings cards (quick start, API Proxy, regex,
+// keywords, AI detection, password, statistics, session redactions, logs),
+// plus the lock overlay, the blocking model-download dialog, close-to-tray
+// and the inactivity re-lock. All strings go through tr(); retranslateUi()
+// applies language changes live (TranslatorLoader drives
+// QEvent::LanguageChange).
 
 #include <QMainWindow>
+
+#include <array>
 
 #include "engine_client.h"
 
@@ -15,6 +18,7 @@ class AppState;
 class AppUpdateManager;
 class TrayIcon;
 class TranslatorLoader;
+class AgentToggleSwitch;
 
 class QCheckBox;
 class QCloseEvent;
@@ -25,6 +29,8 @@ class QLineEdit;
 class QListWidget;
 class QProgressBar;
 class QPushButton;
+class QShowEvent;
+class QHideEvent;
 class QStackedLayout;
 class QTimer;
 class QVBoxLayout;
@@ -46,6 +52,8 @@ public slots:
 protected:
     void closeEvent(QCloseEvent* event) override;
     void changeEvent(QEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
@@ -86,6 +94,15 @@ private:
     bool validateForm(QString& error, bool& httpWarning);
     QString selectedProfileId() const;
     json* selectedProfile();
+    // Pending-edit protection (Windows HomePage formDirty_ parity): the four
+    // profile text fields keep uncommitted edits until the user Saves. A row
+    // mutation that rebuilds the whole form (reloadProfiles) must preserve
+    // them, so snapshot the fields before the reload and restore them after:
+    // savePendingFormText returns false when the form is clean (nothing to
+    // restore, and the reload's values are authoritative).
+    std::array<QString, 4> savePendingFormText() const;
+    void restorePendingFormText(const std::array<QString, 4>& fields,
+        bool wasDirty);
 
     // Lock overlay
     void ensureLockState(bool allowPrompt);
@@ -102,6 +119,20 @@ private:
     void retranslateUi();
     void setCardsEnabled(bool enabled);
 
+    // Colored "Port N is available / already in use" hint under the Port box
+    // (mirrors Windows HomePage::UpdateProxyStatus).
+    void updatePortStatus();
+
+    // Re-render the Statistics card label from the selected profile's cached
+    // stats (mirrors Windows HomePage::UpdateStats). Called by both the status
+    // poll and a language change so the localized text follows tr().
+    void refreshStats();
+
+    // Make both language selectors (Settings-combo + tray submenu) reflect the
+    // same effective tag, so a change from either source is echoed immediately
+    // without waiting for the settings-poll round-trip.
+    void syncLanguageSelectors(const QString& tag);
+
     // PII type display label (translated; English source matches the
     // PII_Type_<type> values in the Windows resw catalogs).
     static QString piiTypeLabel(const std::wstring& type);
@@ -114,15 +145,24 @@ private:
     QStackedLayout* centralStack_ = nullptr;
 
     // Sidebar
+    QLabel* profilesHeader_ = nullptr;
     QListWidget* profileList_ = nullptr;
     QPushButton* addProfileBtn_ = nullptr;
     QPushButton* removeProfileBtn_ = nullptr;
+
+    // Quick start card
+    QLabel* quickStep1Label_ = nullptr;
+    QLabel* quickStep2Label_ = nullptr;
+    QLabel* quickStep3Label_ = nullptr;
 
     // Profile card
     QLabel* aliasLabel_ = nullptr;
     QLabel* portLabel_ = nullptr;
     QLabel* urlLabel_ = nullptr;
     QLabel* apiKeyLabel_ = nullptr;
+    QLabel* localUrlHint_ = nullptr;
+    QLabel* forwardToHint_ = nullptr;
+    QLabel* portStatusLabel_ = nullptr;
     QLineEdit* aliasBox_ = nullptr;
     QLineEdit* portBox_ = nullptr;
     QLineEdit* urlBox_ = nullptr;
@@ -132,18 +172,30 @@ private:
     QPushButton* saveBtn_ = nullptr;
 
     // Detection card
-    QLabel* useAiLabel_ = nullptr;
     QLabel* confidenceLabel_ = nullptr;
-    QCheckBox* useAiCheck_ = nullptr;
+    QLabel* detectionDescLabel_ = nullptr;
+    QLabel* detectionSlowLabel_ = nullptr;
+    AgentToggleSwitch* useAiCheck_ = nullptr;
     QLineEdit* confidenceBox_ = nullptr;
     std::vector<std::pair<std::wstring, QCheckBox*>> piiChecks_;
 
     // Regex / keywords cards (rows owned by layout)
+    QLabel* regexDescLabel_ = nullptr;
+    QLabel* keywordsDescLabel_ = nullptr;
     QVBoxLayout* regexRows_ = nullptr;
     QVBoxLayout* keywordRows_ = nullptr;
     QLineEdit* newRegexBox_ = nullptr;
     QLineEdit* newKeywordBox_ = nullptr;
     QCheckBox* newKeywordCaseCheck_ = nullptr;
+
+    // Regex / keywords column headers (Windows RegexHeaderGrid / KeywordHeaderGrid).
+    QWidget* regexHeader_ = nullptr;
+    QLabel* regexEnabledHeader_ = nullptr;
+    QLabel* regexPatternHeader_ = nullptr;
+    QWidget* keywordHeader_ = nullptr;
+    QLabel* keywordEnabledHeader_ = nullptr;
+    QLabel* keywordCaseHeader_ = nullptr;
+    QLabel* keywordKeywordHeader_ = nullptr;
 
     // Password card
     QCheckBox* requirePasswordCheck_ = nullptr;
@@ -152,11 +204,14 @@ private:
     QLabel* statsLabel_ = nullptr;
 
     // Session redactions card
+    QLabel* matchesDescLabel_ = nullptr;
+    QLabel* matchesEmptyLabel_ = nullptr;
     QListWidget* matchesList_ = nullptr;
 
     // Logs card
     QCheckBox* loggingCheck_ = nullptr;
     QCheckBox* showSensitiveCheck_ = nullptr;
+    QLabel* logsDisclaimerLabel_ = nullptr;
 
     // Settings card
     QCheckBox* startOnBootCheck_ = nullptr;
@@ -184,9 +239,16 @@ private:
     uint64_t prevProfilesRevision_ = UINT64_MAX;
     bool loading_ = false;  // suppress dirty-tracking while populating
     bool dirty_ = false;    // form edited since last load/save
+    // reloadProfiles re-entry guard: the poll timer (and modal dialogs' nested
+    // event loops) can trigger a reload while one is already rebuilding the
+    // profile list and rows. Re-entry during that teardown is a use-after-free
+    // risk, so a nested call is deferred instead.
+    bool reloadingProfiles_ = false;
+    bool reloadPending_ = false;
     bool quitting_ = false; // real quit in progress (vs close-to-tray)
     bool lockEnforcedOnce_ = false;
 
     QTimer* inactivityTimer_ = nullptr;
     QTimer* lockRetryTimer_ = nullptr;
+    QTimer* portStatusTimer_ = nullptr;
 };

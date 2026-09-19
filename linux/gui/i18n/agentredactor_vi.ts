@@ -35,20 +35,24 @@
       <translation>Không thể kiểm tra cập nhật. Thử lại sau.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Tài liệu</translation>
+      <source>On</source>
+      <translation>TRÊN</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Thoát</translation>
+      <source>Off</source>
+      <translation>Tắt</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Hồ sơ</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Cách sử dụng Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Phát hiện</translation>
+      <source>API Proxy</source>
+      <translation>Proxy API</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Mô hình phát hiện do AI cung cấp</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Tên:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Cảng:</translation>
+      <source>Local URL</source>
+      <translation>URL cục bộ</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Khóa API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Sử dụng mô hình AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Ngưỡng tin cậy:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Hồ sơ</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Cấu hình hồ sơ của bạn bên dưới (hoặc sử dụng hồ sơ mặc định)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Hướng máy khách LLM của bạn (Claude Code, OpenClaw, v.v.) đến URL cục bộ được hiển thị bên dưới</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Chúng tôi đứng giữa máy khách của bạn và API thực. Mọi thứ đều ở trên máy của bạn. Dữ liệu nhạy cảm được xóa cục bộ trước khi bất kỳ yêu cầu nào rồi khỏi máy tính của bạn, đảm bảo dữ liệu của bạn không bao giờ chạm đến máy chủ của chúng tôi</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Địa chỉ mà máy khách LLM của bạn trỏ đến</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Điểm cuối API thực nhận các yêu cầu đã được xóa của bạn</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Phát hiện do AI cung cấp chạy cục bộ như một lớp phòng thủ bổ sung. Có thể bỏ sót dữ liệu hoặc xóa quá mức. Sử dụng các Mẫu Regex và Từ khóa bên dưới để xóa xác định.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Khi bật, phản hồi có thể chậm hơn một chút. Mô hình quét từng tin nhắn cục bộ.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Văn bản khớp với các mẫu này sẽ bị xóa trước khi gửi đến API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Tin nhắn chứa các từ này sẽ được đánh dấu để xóa</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Các lần xóa thực tế được phát hiện trong phiên hiện tại.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Không có lần xóa nào trong phiên hiện tại.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Nhật ký được lưu trữ trên PC này. Nhật ký được xử lý lại có thể vẫn chứa dữ liệu nhạy cảm mà việc phát hiện bị bỏ sót.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>ví dụ: OpenAI công việc</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>ví dụ: https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>ví dụ: sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>ví dụ: password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Hiển thị khóa API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Sao chép URL proxy</translation>
+      <source>Copy</source>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor bị khóa</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Hồ sơ</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Tên hồ sơ</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Mật khẩu chính</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Đã bật</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Mẫu Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Chữ hoa/chữ thường</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Từ khóa</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Cú pháp regex không hợp lệ.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Mục nhập này đã tồn tại.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Bật từ khóa</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Trường hợp: Có</translation>
+      <source>Yes</source>
+      <translation>Có</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Trường hợp: Không</translation>
+      <source>No</source>
+      <translation>Không</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Đã sao chép URL proxy vào bảng nhớ tạm</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Cổng %1 khả dụng</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Cổng %1 đã được sử dụng</translation>
     </message>
     <message>
       <source>Wrong password.</source>

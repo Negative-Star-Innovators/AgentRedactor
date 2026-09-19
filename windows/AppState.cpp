@@ -428,6 +428,12 @@ void AppState::SetLanguage(const std::wstring& language) {
     LOG(L"[AppState] SetLanguage called: " + language);
     ::AgentRedactor::SetLanguageOverride(language);
 
+    // Persist through the ENGINE, not just the registry override, so the
+    // control API (CLI `agentredactor get/set app-language`) agrees with the
+    // GUI/tray pick. The 1-second settings poll reconciles any external
+    // change in the reverse direction (MainWindow::RefreshFromEngineSettings).
+    settingsFacade_.SetAppLanguage(language);
+
     // Refresh the tray tooltip so it matches the new language.
     if (systemTray_) {
         systemTray_->UpdateTooltip(::AgentRedactor::LocString(L"AppDisplayName").c_str());

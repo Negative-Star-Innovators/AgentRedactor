@@ -56,7 +56,8 @@ namespace {
     struct StreamingSSEUnredactor {
         StreamingSSEUnredactor(AgentRedactor::ProxyEngine* engine,
             const AgentRedactor::RedactionState& state,
-            std::function<bool(const std::string&)> emitChunk)
+            std::function<bool(const std::string&)> emitChunk,
+            bool showSensitive)
             : engine_(engine), state_(state), emitChunk_(std::move(emitChunk)) {
             auto consider = [&](const std::map<std::wstring, std::wstring>& m) {
                 for (const auto& [label, _] : m) {
@@ -75,9 +76,12 @@ namespace {
                 [](const std::string& a, const std::string& b) { return a.size() > b.size(); });
             LOGF(L"[StreamingSSEUnredactor] created, maxLabelLen=%zu, prefixes=%zu, pii=%zu, regex=%zu, keyword=%zu",
                 maxLabelLen_, labelPrefixes_.size(), state.piiMap.size(), state.regexMap.size(), state.keywordMap.size());
-            for (const auto& [label, original] : state.keywordMap) {
-                LOGF(L"[StreamingSSEUnredactor] keyword map: [%s] -> [%s]",
-                    label.c_str(), original.c_str());
+            // Raw values only when show-sensitive is on.
+            if (showSensitive) {
+                for (const auto& [label, original] : state.keywordMap) {
+                    LOGF(L"[StreamingSSEUnredactor] keyword map: [%ls] -> [%ls]",
+                        label.c_str(), original.c_str());
+                }
             }
         }
 
@@ -313,7 +317,7 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
     if (modelDir == ModelDownloader::GetFallbackModelDir()) {
         ModelDownloader::RefreshCompanionFiles(modelDir);
     }
-    detector_ = std::make_unique<PIIDetector>(modelDir);
+    detector_ = std::make_unique<PIIDetector>(modelDir, logManager_.get());
     // Set the provider BEFORE initializing so the model loads with the user's
     // chosen execution provider (CPU, GPU/Auto/DirectML/CUDA).
     detector_->SetProvider(settings_->GetOnnxProvider());
@@ -342,6 +346,9 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
         // Stats are persisted per-request into settings.json; the GUI polls
         // the control API for updates, so no push notification is needed.
     });
+    // Persist label counters (no PII) so engine restarts never reissue live
+    // placeholder labels.
+    proxyEngine_->SetStateFilePath(settings_->GetConfigDir() / "redaction_state.json");
 
     if (!controlServer_.Start(ControlServer::kDefaultPort, settings_->GetConfigDir(),
             [this](const HttpRequest& req) { return this->HandleControlRequest(req); })) {
@@ -390,9 +397,17 @@ bool EngineApp::IsModelDownloadRequired() const {
 void EngineApp::StartModelDownloadIfNeeded() {
     {
         std::lock_guard lock(stateMutex_);
-        if (modelDownloadInProgress_) return;
+        if (modelDownloadInProgress_) {
+            // Already downloading or waiting between retries. Wake the sleeping
+            // thread immediately so a manual retry request takes effect now.
+            std::lock_guard retryLock(retryMutex_);
+            retryNowRequested_ = true;
+            retryCv_.notify_all();
+            return;
+        }
         modelDownloadInProgress_ = true;
         modelDownloadFailed_ = false;
+        modelDownloadWaitingToRetry_ = false;
         modelDownloadPercent_ = -1;
         modelDownloadStatus_.clear();
     }
@@ -408,10 +423,43 @@ void EngineApp::StartModelDownloadIfNeeded() {
         };
 
         bool ok = false;
-        try {
-            ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
-        } catch (...) {
-            ok = false;
+        int attempt = 0;
+        const int maxAttempts = 10;
+        int delayMs = 2000;
+        const int maxDelayMs = 60000;
+
+        while (!ok && attempt < maxAttempts) {
+            ++attempt;
+            LOGF_LIFECYCLE(L"[EngineApp] Model download attempt %d/%d", attempt, maxAttempts);
+            try {
+                ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
+            } catch (...) {
+                ok = false;
+            }
+
+            if (!ok && attempt < maxAttempts) {
+                std::unique_lock retryLock(retryMutex_);
+                retryNowRequested_ = false;
+                {
+                    std::lock_guard stateLock(stateMutex_);
+                    modelDownloadWaitingToRetry_ = true;
+                    modelDownloadStatus_ = Utils::FormatString(L"Retrying in %d s...", delayMs / 1000);
+                    modelDownloadPercent_ = -1;
+                }
+                bool woken = retryCv_.wait_for(retryLock, std::chrono::milliseconds(delayMs),
+                    [&] { return retryNowRequested_; });
+                {
+                    std::lock_guard stateLock(stateMutex_);
+                    modelDownloadWaitingToRetry_ = false;
+                }
+                if (woken && retryNowRequested_) {
+                    LOG_LIFECYCLE(L"[EngineApp] Manual retry requested; restarting immediately");
+                    attempt = 0;
+                    delayMs = 2000;
+                } else {
+                    delayMs = std::min(delayMs * 2, maxDelayMs);
+                }
+            }
         }
 
         if (ok) {
@@ -444,13 +492,14 @@ void EngineApp::StartModelDownloadIfNeeded() {
                 : L"[EngineApp] Model downloaded but detector initialization failed");
             ok = initOk;
         } else {
-            LOG_LIFECYCLE(L"[EngineApp] Model download failed");
+            LOGF_LIFECYCLE(L"[EngineApp] Model download failed after %d attempts", maxAttempts);
         }
 
         {
             std::lock_guard lock(stateMutex_);
             modelDownloadInProgress_ = false;
             modelDownloadFailed_ = !ok;
+            modelDownloadWaitingToRetry_ = false;
             modelDownloadPercent_ = ok ? 100 : -1;
             if (ok) modelDownloadRequired_ = false;
         }
@@ -458,7 +507,12 @@ void EngineApp::StartModelDownloadIfNeeded() {
 }
 
 void EngineApp::StartProxyServers() {
-    StopProxyServers();
+    std::lock_guard lock(proxyServersMutex_);
+    StopProxyServersLocked();
+    StartProxyServersLocked();
+}
+
+void EngineApp::StartProxyServersLocked() {
     auto profiles = settings_->GetProfiles();
     for (const auto& profile : profiles) {
         if (!profile.enabled) continue;
@@ -469,16 +523,21 @@ void EngineApp::StartProxyServers() {
             return this->HandleProxyRequest(port, Utils::WideToUtf8(req.method), req.path, req.headers, req.body);
         };
         if (server->Start(port, handler)) {
-            LOGF_LIFECYCLE(L"[EngineApp] Started proxy on port %d for profile '%s'", port, profile.alias.c_str());
+            LOGF_LIFECYCLE(L"[EngineApp] Started proxy on port %d for profile '%ls'", port, profile.alias.c_str());
             runningPorts_.insert(port);
             servers_.push_back(std::move(server));
         } else {
-            LOGF_LIFECYCLE(L"[EngineApp] FAILED to start proxy on port %d for profile '%s'", port, profile.alias.c_str());
+            LOGF_LIFECYCLE(L"[EngineApp] FAILED to start proxy on port %d for profile '%ls'", port, profile.alias.c_str());
         }
     }
 }
 
 void EngineApp::StopProxyServers() {
+    std::lock_guard lock(proxyServersMutex_);
+    StopProxyServersLocked();
+}
+
+void EngineApp::StopProxyServersLocked() {
     for (auto& server : servers_) {
         if (server) server->Stop();
     }
@@ -488,12 +547,14 @@ void EngineApp::StopProxyServers() {
 }
 
 bool EngineApp::IsProxyRunning(int port) const {
+    std::lock_guard lock(proxyServersMutex_);
     return runningPorts_.find(port) != runningPorts_.end();
 }
 
 void EngineApp::RestartProxyServers() {
-    StopProxyServers();
-    StartProxyServers();
+    std::lock_guard lock(proxyServersMutex_);
+    StopProxyServersLocked();
+    StartProxyServersLocked();
 }
 
 HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, const std::wstring& path,
@@ -539,7 +600,7 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
         stream = false;
     }
     bool canStream = (isChatCompletions || isAnthropicMessagesPath) && stream;
-    LOGF(L"[EngineApp] Stream eligibility: isChatCompletions=%s, isAnthropicMessages=%s, canStream=%s",
+    LOGF(L"[EngineApp] Stream eligibility: isChatCompletions=%ls, isAnthropicMessages=%ls, canStream=%ls",
         isChatCompletions ? L"true" : L"false",
         isAnthropicMessagesPath ? L"true" : L"false",
         canStream ? L"true" : L"false");
@@ -553,7 +614,7 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
     bool isSSE = false;
 
     if (canStream) {
-        LOGF(L"[EngineApp] Using chunked streaming proxy on port %d for %s", port, upstreamPath.c_str());
+        LOGF(L"[EngineApp] Using chunked streaming proxy on port %d for %ls", port, upstreamPath.c_str());
         clientResp.isStreaming = true;
         clientResp.streamWriterOwnsHeaders = true;
         clientResp.streamWriter = [this, profile, method, path, upstreamPath, headerVec, requestBody, state](SOCKET clientSocket) {
@@ -641,7 +702,8 @@ HttpResponse EngineApp::HandleProxyRequest(int port, const std::string& method, 
             std::unique_ptr<StreamingSSEUnredactor> unredactor;
             if (needsUnredaction) {
                 unredactor = std::make_unique<StreamingSSEUnredactor>(
-                    proxyEngine_.get(), state, sendNormalized);
+                    proxyEngine_.get(), state, sendNormalized,
+                    logManager_->IsShowSensitive());
             }
 
             auto sendStreamingHeaders = [&](int code, const std::vector<std::pair<std::wstring, std::wstring>>& hdrs) {
@@ -945,8 +1007,18 @@ HttpResponse EngineApp::ApiGetStatus() {
     j["modelDownloadRequired"] = modelDownloadRequired_;
     j["modelDownloadInProgress"] = modelDownloadInProgress_;
     j["modelDownloadFailed"] = modelDownloadFailed_;
+    j["modelDownloadWaitingToRetry"] = modelDownloadWaitingToRetry_;
     j["modelDownloadPercent"] = modelDownloadPercent_;
     j["modelDownloadStatus"] = Utils::WideToUtf8(modelDownloadStatus_);
+    {
+        // Diagnostics for the planned ONNX Runtime CPU-arena bounding:
+        // observed host memory plus the detector's chunk/arena suggestion.
+        const Utils::SystemMemory mem = Utils::GetSystemMemory();
+        j["systemMemoryTotal"] = mem.totalBytes;
+        j["systemMemoryAvailable"] = mem.availableBytes;
+        j["modelChunkTokens"] = detector_ ? detector_->GetModelChunkTokens() : size_t{0};
+        j["modelArenaSuggestionBytes"] = detector_ ? detector_->GetSuggestedArenaBytes() : size_t{0};
+    }
     json profiles = json::array();
     for (const auto& p : settings_->GetProfiles()) {
         json pj;
@@ -1000,8 +1072,19 @@ HttpResponse EngineApp::ApiGetSettings() {
 static HWND ParseHwndQuery(const std::wstring& query);
 #endif
 
-HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstring& query, const std::string& body) {
+HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, [[maybe_unused]] const std::wstring& query, const std::string& body) {
+    // This trail exists to explain unexplained setting flips. Log the new
+    // value too when the body carries no secrets — enableMasterPassword's
+    // body carries the new password (or an empty string for Hello), so only
+    // the "value" field of the ordinary keys is ever logged.
     json j = json::parse(body);
+    std::wstring logLine = L"[EngineApp] Setting change: " + key;
+    if (j.contains("value")) {
+        const auto& v = j["value"];
+        if (v.is_boolean()) logLine += v.get<bool>() ? L" -> true" : L" -> false";
+        else if (v.is_string()) logLine += L" -> " + Utils::Utf8ToWide(v.get<std::string>());
+    }
+    LOGF(L"%ls", logLine.c_str());
     if (key == L"startOnBoot") {
         settings_->SetStartOnBoot(j.at("value").get<bool>());
     } else if (key == L"onnxProvider") {
@@ -1044,6 +1127,9 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, const std::wstrin
 #endif
     } else if (key == L"lock") {
         settings_->Lock();
+        // Sensitive logging is session-only: a lock ends the session (both
+        // GUIs lock on quit when the engine survives), so disarm it here.
+        logManager_->SetShowSensitive(false);
     } else if (key == L"disableMasterPassword") {
         // Security: disabling strips ALL protection (after it, the api-key
         // endpoint serves the key without any verification), so it is gated

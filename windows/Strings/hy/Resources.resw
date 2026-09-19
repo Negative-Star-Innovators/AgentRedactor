@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Սա սկավառակի վրա ձեր գրանցամատյանի ֆայլում կգրի չգրանցված զգայուն արժեքներ (անուններ, էլ. նամակներ, հեռախոսահամարներ և այլն) և ձեր API բանալին: Մի միացրեք սա, եթե ուրիշներն ունեն մուտք դեպի այս համակարգիչ: Կարգավորումը վերականգնվում է, երբ փակում եք հավելվածը:</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Այս գրառումն արդեն գոյություն ունի։</value>
+  </data>
 </root>

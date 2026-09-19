@@ -35,20 +35,24 @@
       <translation>Nuk u kontrolluan dot përditësimet. Provoni sërish më vonë.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Skedar</translation>
+      <source>On</source>
+      <translation>Aktiv</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Dil</translation>
+      <source>Off</source>
+      <translation>Joaktiv</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profili</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Si të përdorni Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Zbulimi</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Model zbulimi i fuqizuar nga AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Emri:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Porti:</translation>
+      <source>Local URL</source>
+      <translation>URL lokale</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Çelësi API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Përdorni modelin e AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Pragu i besimit:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profilet</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfiguroni profilin tuaj më poshtë (ose përdorni atë parazgjedhur)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Drejtoni klientin tuaj LLM (Claude Code, OpenClaw, etj.) në URL-në lokale të shfaqur më poshtë</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Ne gjendemi midis klientit tuaj dhe API-së së vërtetë. Gjithçka qëndron në makinën tuaj. Të dhënat e ndjeshme redaktohen lokalisht përpara se çdo kërkesë të largohet nga kompjuteri juaj, duke siguruar që të dhënat tuaja nuk prekin kurrë serverin tonë</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adresa në të cilën tregon klienti juaj LLM</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Pika e vërtetë e fundit e API që merr kërkesat tuaja të redaktuara</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Zbulimi i fuqizuar nga AI ekzekutohet lokalisht si një shtresë shtesë mbrojtjeje. Mund të humbasë të dhëna ose të redaktojë tepër. Përdorni Modelet Regex dhe Fjalët kyçe më poshtë për redaktim deterministik.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Pritni përgjigje pak më të ngadalta kur aktivizohet. Modeli skanon çdo mesazh lokalisht.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Teksti që përputhet me këto modele do të redaktohet përpara se të dërgohet në API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Mesazhet që përmbajnë këto fjalë do të shënohen për redaktim</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Redaktimet aktuale të zbuluara në seancën aktuale.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Asnjë redaktim në seancën aktuale.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Regjistrat ruhen në këtë kompjuter. Regjistrimet e redaktuara mund të përmbajnë ende të dhëna të ndjeshme që zbulimi ka humbur.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>p.sh., Pune OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>p.sh. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>p.sh. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>p.sh. fjalëkalim</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Shfaq çelësin API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopjo URL-në e përfaqësuesit</translation>
+      <source>Copy</source>
+      <translation>Kopjo</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agjenti Redaktori është i kyçur</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profilet</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Emri i profilit</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Fjalëkalimi kryesor</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktivizuar</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Model Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Madhësia e shkronjave</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Fjalë kyçe</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Sintaksë regex e pavlefshme.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ky element ekziston tashmë.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktivizo fjalën kyçe</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Rasti: Po</translation>
+      <source>Yes</source>
+      <translation>Po</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Rasti: Jo</translation>
+      <source>No</source>
+      <translation>Jo</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL-ja e përfaqësuesit u kopjua në kujtesën e fragmenteve</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Porti %1 është i disponueshëm</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Porti %1 është tashmë në përdorim</translation>
     </message>
     <message>
       <source>Wrong password.</source>

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Spowoduje to zapisanie niezredagowanych poufnych wartości (imion i nazwisk, adresów e-mail, numerów telefonów itp.) oraz klucza API w pliku dziennika na dysku. Nie włączaj tej opcji, jeśli inni mają dostęp do tego komputera. Ustawienie zostanie zresetowane po zamknięciu aplikacji.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Ta pozycja już istnieje.</value>
+  </data>
 </root>

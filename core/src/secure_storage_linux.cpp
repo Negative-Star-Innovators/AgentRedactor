@@ -43,7 +43,9 @@ const SecretSchema* MachineKeySchema() {
         {
             { "app", SECRET_SCHEMA_ATTRIBUTE_STRING },
             { nullptr, SECRET_SCHEMA_ATTRIBUTE_STRING },
-        }
+        },
+        // libsecret reserves these trailing fields; they must be zero.
+        0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
     };
     return &schema;
 }

@@ -35,20 +35,24 @@
       <translation>Haikuweza kuangalia sasisho. Jaribu tena baadaye.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Faili</translation>
+      <source>On</source>
+      <translation>Washa</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Toka</translation>
+      <source>Off</source>
+      <translation>Imezimwa</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Wasifu</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Jinsi ya kutumia Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Ugunduzi</translation>
+      <source>API Proxy</source>
+      <translation>Proxy ya API</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Mfano wa Utambuzi unaotumia AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Jina:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Bandari:</translation>
+      <source>Local URL</source>
+      <translation>URL ya Mitaa</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Ufunguo wa API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Tumia muundo wa AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Kiwango cha Kujiamini:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Wasifu</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Sanidi wasifu wako hapa chini (au tumia chaguo-msingi)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Elekeza mteja wako wa LLM (Claude Code, OpenClaw, n.k.) kwenye URL ya Mitaa inayoonekana hapa chini</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Tuko kati ya mteja wako na API halisi. Kila kitu hubaki kwenye mashine yako. Data nyeti hufutwa kwa ndani kabla ya ombi lolote kuondoka kwenye kompyuta yako, ikihakikisha data yako haiwahi kugusa seva yetu</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Anwani ambayo mteja wako wa LLM unaelekeza</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Mwisho wa API halisi unapokea maombi yako yaliyofutwa</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Utambuzi unaotumia AI unakimbia kwa ndani kama safu ya ziada ya ulinzi. Unaweza kukosa data au kufuta zaidi ya inavyohitajika. Tumia Mistarifa ya Regex na Maneno Muhimu hapa chini kwa ajili ya kufuta kwa uhakika.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Tarajia majibu kidogo ya polepole wakati ukiwashwa. Mfano unachunguza kila ujumbe kwa ndani.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Maandishi yanayolingana na mistarifa hii yatafutwa kabla ya kutumwa kwenye API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Ujumbe unaao maneno haya utawekwa alama kwa ajili ya kufutwa</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Kufutwa halisi kiliyogunduliwa katika kipindi cha sasa.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Hakuna kufutwa katika kipindi cha sasa.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Kumbukumbu zimehifadhiwa kwenye Kompyuta hii. Kumbukumbu zilizorekebishwa bado zinaweza kuwa na data nyeti ambayo utambuzi ulikosa.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>mfano, OpenAI ya Kazi</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>mfano https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>mfano sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>mfano password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Onyesha ufunguo wa API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Nakili URL ya seva mbadala</translation>
+      <source>Copy</source>
+      <translation>Nakili</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Wakala Redactor imefungwa</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Wasifu</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Jina la wasifu</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Nenosiri kuu</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Imewashwa</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Mistarifa ya Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Herufi kubwa/ndogo</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Neno Muhimu</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Mtiririko wa regex usiosahihi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Kiingilio hiki tayari kipo.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Washa nenomsingi</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Kesi: Ndiyo</translation>
+      <source>Yes</source>
+      <translation>Ndiyo</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Kesi: Hapana</translation>
+      <source>No</source>
+      <translation>Hapana</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>URL ya seva mbadala imenakiliwa kwenye ubao wa kunakili</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Bandari %1 inapatikana</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Bandari %1 tayari inatumika</translation>
     </message>
     <message>
       <source>Wrong password.</source>

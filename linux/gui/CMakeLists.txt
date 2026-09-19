@@ -47,7 +47,12 @@ if (AR_TS_FILES)
         set_source_files_properties(${AR_I18N_QRC} PROPERTIES
             OBJECT_DEPENDS "${AR_QM_FILES}")
     else()
-        message(WARNING "lrelease not found — building without translations (English only)")
+        if (AR_SELFRELEASE)
+            message(FATAL_ERROR "lrelease not found — release builds must embed translations "
+                "(install qt6-l10n-tools or make lrelease available)")
+        else()
+            message(WARNING "lrelease not found — building without translations (English only)")
+        endif()
     endif()
 endif()
 
@@ -56,11 +61,13 @@ set(CMAKE_AUTORCC ON)
 
 add_executable(agentredactor-gui
     main.cpp
+    agent_toggle_switch.cpp
     app_state.cpp
     autostart.cpp
     desktop_integration.cpp
     main_window.cpp
     password_dialog.cpp
+    theme.cpp
     translator_loader.cpp
     tray_icon.cpp
     update_manager.cpp

@@ -35,20 +35,24 @@
       <translation>Δεν ήταν δυνατός ο έλεγχος για ενημερώσεις. Δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Αρχείο</translation>
+      <source>On</source>
+      <translation>Επί</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Έξοδος</translation>
+      <source>Off</source>
+      <translation>Μακριά από</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Προφίλ</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Πώς να χρησιμοποιήσετε το Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Ανίχνευση</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Μοντέλο ανίχνευσης με τεχνητή νοημοσύνη</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Ονομα:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Λιμάνι:</translation>
+      <source>Local URL</source>
+      <translation>Τοπική URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>Κλειδί API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Χρησιμοποιήστε το μοντέλο AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Όριο εμπιστοσύνης:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Προφίλ</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Ρυθμίστε το προφίλ σας παρακάτω (ή χρησιμοποιήστε το προεπιλεγμένο)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Κατευθύνετε τον LLM πελάτη σας (Claude Code, OpenClaw, κλπ.) στην Τοπική URL που εμφανίζεται παρακάτω</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Βρισκόμαστε μεταξύ του πελάτη σας και του πραγματικού API. Όλα παραμένουν στον υπολογιστή σας. Ευαίσθητα δεδομένα αποκρύπτονται τοπικά πριν από οποιοδήποτε αίτημα εγκαταλείψει τον υπολογιστή σας, διασφαλίζοντας ότι τα δεδομένα σας δεν αγγίζουν ποτέ τον διακομιστή μας</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Η διεύθυνση στην οποία δείχνει ο LLM πελάτης σας</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Το πραγματικό τελικό σημείο API που λαμβάνει τα αποκρυμμένα αιτήματά σας</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Η ανίχνευση με τεχνητή νοημοσύνη εκτελείται τοπικά ως επιπλέον επίπεδο άμυνας. Μπορεί να χάσει δεδομένα ή να αποκρύψει υπερβολικά. Χρησιμοποιήστε τα Μοτίβα Regex και τις Λέξεις-κλειδιά παρακάτω για ντετερμινιστική απόκρυψη.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Αναμένετε κάπως πιο αργές απαντήσεις όταν είναι ενεργοποιημένο. Το μοντέλο σαρώνει κάθε μήνυμα τοπικά.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Το κείμενο που ταιριάζει με αυτά τα μοτίβα θα αποκρύπτεται πριν σταλεί στο API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Μηνύματα που περιέχουν αυτές τις λέξεις θα σημανθούν για απόκρυψη</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Πραγματικές αποκρύψεις που εντοπίστηκαν στην τρέχουσα συνεδρία.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Καμία απόκρυψη στην τρέχουσα συνεδρία.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Τα αρχεία καταγραφής αποθηκεύονται σε αυτόν τον υπολογιστή. Τα αρχεία καταγραφής που έχουν διορθωθεί ενδέχεται να εξακολουθούν να περιέχουν ευαίσθητα δεδομένα που δεν εντοπίστηκαν.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>π.χ., Εργασία OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>π.χ. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>π.χ. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>π.χ. κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Εμφάνιση κλειδιού API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Αντιγραφή διεύθυνσης URL διακομιστή μεσολάβησης</translation>
+      <source>Copy</source>
+      <translation>Αντιγραφή</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Το Agent Redactor είναι κλειδωμένο</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Προφίλ</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Όνομα προφίλ</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Κύριος κωδικός πρόσβασης</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Ενεργοποιημένο</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Μοτίβο Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Κεφαλαία/μικρά</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Λέξη-κλειδί</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Μη έγκυρη σύνταξη regex.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Αυτή η καταχώρηση υπάρχει ήδη.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Ενεργοποίηση λέξης-κλειδιού</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Υπόθεση: Ναι</translation>
+      <source>Yes</source>
+      <translation>Ναι</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Υπόθεση: Όχι</translation>
+      <source>No</source>
+      <translation>Όχι</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Η διεύθυνση URL του διακομιστή μεσολάβησης αντιγράφηκε στο πρόχειρο</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Η θύρα %1 είναι διαθέσιμη</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Η θύρα %1 χρησιμοποιείται ήδη</translation>
     </message>
     <message>
       <source>Wrong password.</source>

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Kjo do të shkruajë vlera të ndjeshme të pa redaktuara (emra, email, numra telefoni, etj.) dhe çelësin tuaj API në skedarin tuaj të regjistrit në disk. Mos e aktivizoni këtë nëse të tjerët kanë qasje në këtë kompjuter. Cilësimi rivendoset kur mbyllni aplikacionin.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Ky element ekziston tashmë.</value>
+  </data>
 </root>

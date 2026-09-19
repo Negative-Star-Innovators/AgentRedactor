@@ -35,20 +35,24 @@
       <translation>Yeniləmələri yoxlamaq mümkün olmadı. Daha sonra yenidən cəhd edin.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fayl</translation>
+      <source>On</source>
+      <translation>Aktiv</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Çıxın</translation>
+      <source>Off</source>
+      <translation>Söndür</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor necə istifadə olunur</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Aşkarlama</translation>
+      <source>API Proxy</source>
+      <translation>API Proksi</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI Güclü Aşkarlama Modeli</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Adı:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Liman:</translation>
+      <source>Local URL</source>
+      <translation>Yerli URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API Açarı</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>AI modelindən istifadə edin:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Etibar həddi:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profillər</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Aşağıda profilinizi konfiqurasiya edin (və ya standartdan istifadə edin)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. LLM müştərinizi (Claude Code, OpenClaw və s.) aşağıda göstərilən Yerli URL-ə yönəldin.</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Biz sizin müştərinizlə real API arasında otururuq. Hər şey maşınınızda qalır. Həssas məlumatlar hər hansı sorğu kompüterinizi tərk etməzdən əvvəl yerli olaraq redaktə edilir və məlumatlarınızın heç vaxt serverimizə toxunmamasını təmin edir</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>LLM müştərinizin göstərdiyi ünvan</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Redaktə edilmiş sorğularınızı qəbul edən real API son nöqtəsi</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Süni intellektlə işləyən aşkarlama əlavə müdafiə təbəqəsi kimi yerli olaraq işləyir. Məlumatı qaçıra və ya həddindən artıq redaktə edə bilər. Deterministik redaksiya üçün aşağıdakı Regex Pattern və Açar sözlərdən istifadə edin.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Aktivləşdirildikdə bir qədər yavaş cavablar gözləyin. Model hər mesajı yerli olaraq skan edir.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Bu nümunələrə uyğun gələn mətn API-yə göndərilməzdən əvvəl redaktə ediləcək</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Bu sözləri ehtiva edən mesajlar redaktə üçün işarələnəcək</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Cari sessiyada faktiki redaktələr aşkar edildi.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Cari sessiyada redaktə yoxdur.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Qeydlər bu kompüterdə saxlanılır. Redaktə edilmiş jurnallar hələ də aşkarlamanın buraxılmış həssas datasını ehtiva edə bilər.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>məsələn, OpenAI ilə işləyin</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>məs. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>məs. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>məs. parol</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API açarını göstərin</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proksi URL-ni kopyalayın</translation>
+      <source>Copy</source>
+      <translation>Kopyalayın</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redaktor kilidlənib</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profillər</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profil adı</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Master parol</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktivdir</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex nümunəsi</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Case</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Açar söz</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Yanlış regex sintaksisi.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Bu giriş artıq mövcuddur.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Açar sözü aktivləşdirin</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Dava: Bəli</translation>
+      <source>Yes</source>
+      <translation>Bəli</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Dava: Xeyr</translation>
+      <source>No</source>
+      <translation>yox</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proksi URL mübadilə buferinə kopyalandı</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>%1 portu əlçatandır</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>%1 port artıq istifadə olunur</translation>
     </message>
     <message>
       <source>Wrong password.</source>

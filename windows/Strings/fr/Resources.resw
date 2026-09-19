@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Cela écrira les valeurs sensibles non expurgées (noms, e-mails, numéros de téléphone, etc.) et votre clé API dans votre fichier journal sur le disque. Ne l&apos;activez pas si d&apos;autres personnes ont accès à cet ordinateur. Le paramètre est réinitialisé lorsque vous fermez l&apos;application.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Cette entrée existe déjà.</value>
+  </data>
 </root>

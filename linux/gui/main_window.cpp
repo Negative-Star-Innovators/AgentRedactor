@@ -8,6 +8,7 @@
 #include <QDesktopServices>
 #include <QDialog>
 #include <QFile>
+#include <QFontDatabase>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -21,10 +22,13 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QScreen>
+#include <QHideEvent>
 #include <QScrollArea>
+#include <QShowEvent>
 #include <QSplitter>
 #include <QStackedLayout>
 #include <QStatusBar>
+#include <QStyle>
 #include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -36,6 +40,7 @@
 
 #include "app_state.h"
 #include "autostart.h"
+#include "agent_toggle_switch.h"
 #include "constants.h"
 #include "http_server.h"
 #include "password_dialog.h"
@@ -51,23 +56,52 @@ namespace {
 QString q(const std::wstring& ws) { return QString::fromStdWString(ws); }
 std::wstring w(const QString& s) { return s.toStdWString(); }
 
-// Card container helper: titled group box with a vertical layout.
+// Card container helper: titled group box with a vertical layout. Inner
+// spacing/margins come from the app stylesheet (theme.cpp).
 QGroupBox* makeCard(const QString& title, QVBoxLayout*& layoutOut, QWidget* parent) {
     auto* box = new QGroupBox(title, parent);
     layoutOut = new QVBoxLayout(box);
+    layoutOut->setContentsMargins(0, 0, 0, 0);
+    layoutOut->setSpacing(8);
     return box;
 }
 
-// Modal dialog that cannot be closed by the user. Used for the first-run
-// model download: the app cannot proxy traffic until the weights exist, so
-// the dialog must stay open (mirrors the Windows ContentDialog behavior).
+// Dimmed wrapping help text (styled via the hint property in theme.cpp).
+QLabel* makeHint(QWidget* parent) {
+    auto* label = new QLabel(parent);
+    label->setWordWrap(true);
+    label->setProperty("hint", true);
+    return label;
+}
+
+// Fixed-pitch font for regex/keyword text (Windows uses Consolas 13).
+QFont rowFont() {
+    QFont f = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    f.setPointSize(13);
+    return f;
+}
+
+// Row column widths shared by the regex/keyword rows and their headers so the
+// header labels sit exactly over their columns (Windows: 70px Enabled column,
+// 100px Case column — the case toggle button is 90px here).
+constexpr int kEnabledColumnWidth = 70;
+constexpr int kCaseColumnWidth = 90;
+
+// Dimmed semi-bold column header label (styled via the colHeader property).
+QLabel* makeColHeader(QWidget* parent) {
+    auto* label = new QLabel(parent);
+    label->setProperty("colHeader", true);
+    return label;
+}
+
+// Modal dialog that cannot be dismissed by the user via Escape, but can be
+// hidden programmatically while the main window is closed/minimized to tray.
 class NonDismissibleDialog : public QDialog {
 public:
     using QDialog::QDialog;
 
 protected:
-    void closeEvent(QCloseEvent* event) override { event->ignore(); }
-    void reject() override { /* ignore Escape */ }
+    void reject() override { /* ignore Escape and any external dismiss request */ }
 };
 
 } // namespace
@@ -97,6 +131,7 @@ MainWindow::MainWindow(AppState* appState, TrayIcon* tray, TranslatorLoader* tra
         // settings-poll round-trip; the poll later reconciles the persisted
         // tag (no restart, unlike Windows).
         translator_->applyLanguage(tag);
+        syncLanguageSelectors(tag);
         appState_->client().PutSetting(L"appLanguage", tag.toStdString());
     });
 
@@ -199,7 +234,11 @@ void MainWindow::buildUi() {
 
     // Sidebar: profile list + add/remove
     auto* sidebar = new QWidget(splitter);
+    sidebar->setObjectName(QStringLiteral("sidebar"));
     auto* sidebarLayout = new QVBoxLayout(sidebar);
+    profilesHeader_ = new QLabel(sidebar);
+    profilesHeader_->setObjectName(QStringLiteral("profilesHeader"));
+    sidebarLayout->addWidget(profilesHeader_);
     profileList_ = new QListWidget(sidebar);
     connect(profileList_, &QListWidget::currentRowChanged,
         this, &MainWindow::onProfileSelectionChanged);
@@ -219,18 +258,50 @@ void MainWindow::buildUi() {
     // Cards in a scroll area
     auto* scroll = new QScrollArea;
     scroll->setWidgetResizable(true);
+    // Qt's AT-SPI bridge answers GetChildAtIndex without bounds checks while
+    // QAccessibleAbstractScrollArea exposes scrollbar containers only when the
+    // scrollbar is visible — a client holding a stale child count (e.g. an
+    // AT-SPI test walking the tree during a language switch) crashes the app.
+    // Pin scrollbar visibility so the accessible child set never changes.
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     auto* cards = new QWidget(scroll);
     auto* cardsLayout = new QVBoxLayout(cards);
+    cardsLayout->setContentsMargins(24, 24, 24, 24);
+    cardsLayout->setSpacing(16);
 
     auto markDirty = [this] { if (!loading_) dirty_ = true; };
+    // Controls with immediate effect: persist through the normal save path
+    // (validation included) instead of waiting for the Save button. Matches
+    // the keyword/regex row toggles, which already PUT on change.
+    auto autosave = [this] {
+        if (loading_) return;
+        dirty_ = true;
+        onSaveProfile();
+    };
 
-    // -- Profile card --
+    // -- Quick start card --
+    QVBoxLayout* quickStartLayout;
+    auto* quickStartCard = makeCard(QString(), quickStartLayout, cards); // title set in retranslateUi
+    quickStartCard->setObjectName(QStringLiteral("quickStartCard"));
+    quickStep1Label_ = new QLabel(quickStartCard);
+    quickStep1Label_->setWordWrap(true);
+    quickStep2Label_ = new QLabel(quickStartCard);
+    quickStep2Label_->setWordWrap(true);
+    quickStep3Label_ = new QLabel(quickStartCard);
+    quickStep3Label_->setWordWrap(true);
+    quickStartLayout->addWidget(quickStep1Label_);
+    quickStartLayout->addWidget(quickStep2Label_);
+    quickStartLayout->addWidget(quickStep3Label_);
+    cardsLayout->addWidget(quickStartCard);
+
+    // -- API Proxy card (Windows: HomePage_ApiProxy) --
     QVBoxLayout* profileLayout;
     auto* profileCard = makeCard(QString(), profileLayout, cards); // title set in retranslateUi
     profileCard->setObjectName(QStringLiteral("profileCard"));
     auto* profileForm = new QFormLayout;
     aliasLabel_ = new QLabel(profileCard);
-    portLabel_ = new QLabel(profileCard);
+    portLabel_ = new QLabel(profileCard); // "Local URL" (labels the port box row)
     urlLabel_ = new QLabel(profileCard);
     apiKeyLabel_ = new QLabel(profileCard);
     aliasBox_ = new QLineEdit(profileCard);
@@ -239,9 +310,31 @@ void MainWindow::buildUi() {
     apiKeyBox_ = new QLineEdit(profileCard);
     apiKeyBox_->setEchoMode(QLineEdit::Password);
     profileForm->addRow(aliasLabel_, aliasBox_);
-    profileForm->addRow(portLabel_, portBox_);
+    // Local URL row (windows/HomePage.xaml): literal prefix, editable port,
+    // literal suffix, Copy button on the same line; hint underneath.
+    auto* localUrlRow = new QWidget(profileCard);
+    auto* localUrlLayout = new QHBoxLayout(localUrlRow);
+    localUrlLayout->setContentsMargins(0, 0, 0, 0);
+    localUrlLayout->addWidget(new QLabel(QStringLiteral("http://localhost:"), localUrlRow));
+    portBox_->setFixedWidth(72);
+    localUrlLayout->addWidget(portBox_);
+    localUrlLayout->addWidget(new QLabel(QStringLiteral("/"), localUrlRow));
+    copyUrlBtn_ = new QPushButton(localUrlRow);
+    connect(copyUrlBtn_, &QPushButton::clicked, this, &MainWindow::onCopyUrl);
+    localUrlLayout->addWidget(copyUrlBtn_);
+    localUrlLayout->addStretch();
+    profileForm->addRow(portLabel_, localUrlRow);
+    localUrlHint_ = makeHint(profileCard);
+    profileForm->addRow(localUrlHint_);
     profileForm->addRow(urlLabel_, urlBox_);
+    forwardToHint_ = makeHint(profileCard);
+    profileForm->addRow(forwardToHint_);
     profileForm->addRow(apiKeyLabel_, apiKeyBox_);
+    // Windows shows the reveal toggle under the password box, not in the
+    // button row.
+    showKeyCheck_ = new QCheckBox(profileCard);
+    connect(showKeyCheck_, &QCheckBox::toggled, this, &MainWindow::onToggleApiKeyVisible);
+    profileForm->addRow(QString(), showKeyCheck_);
     profileLayout->addLayout(profileForm);
     // textChanged (not textEdited): programmatic edits — assistive tech like
     // AT-SPI setTextContents, which never emits textEdited — must also mark
@@ -253,50 +346,45 @@ void MainWindow::buildUi() {
     connect(urlBox_, &QLineEdit::textChanged, this, markDirty);
     connect(apiKeyBox_, &QLineEdit::textChanged, this, markDirty);
 
+    // Bottom row (Windows Grid.Row=4): port availability status on the left,
+    // Save on the right.
     auto* profileBtns = new QHBoxLayout;
-    showKeyCheck_ = new QCheckBox(profileCard);
-    connect(showKeyCheck_, &QCheckBox::toggled, this, &MainWindow::onToggleApiKeyVisible);
-    copyUrlBtn_ = new QPushButton(profileCard);
-    connect(copyUrlBtn_, &QPushButton::clicked, this, &MainWindow::onCopyUrl);
+    portStatusLabel_ = new QLabel(profileCard);
+    portStatusLabel_->setVisible(false);
     saveBtn_ = new QPushButton(profileCard);
+    saveBtn_->setProperty("accent", true);
     connect(saveBtn_, &QPushButton::clicked, this, &MainWindow::onSaveProfile);
-    profileBtns->addWidget(showKeyCheck_);
+    profileBtns->addWidget(portStatusLabel_);
     profileBtns->addStretch();
-    profileBtns->addWidget(copyUrlBtn_);
     profileBtns->addWidget(saveBtn_);
     profileLayout->addLayout(profileBtns);
     cardsLayout->addWidget(profileCard);
 
-    // -- Detection card --
-    QVBoxLayout* detectionLayout;
-    auto* detectionCard = makeCard(QString(), detectionLayout, cards);
-    detectionCard->setObjectName(QStringLiteral("detectionCard"));
-    auto* detectionForm = new QFormLayout;
-    useAiLabel_ = new QLabel(detectionCard);
-    confidenceLabel_ = new QLabel(detectionCard);
-    useAiCheck_ = new QCheckBox(detectionCard);
-    confidenceBox_ = new QLineEdit(detectionCard);
-    detectionForm->addRow(useAiLabel_, useAiCheck_);
-    detectionForm->addRow(confidenceLabel_, confidenceBox_);
-    detectionLayout->addLayout(detectionForm);
-    connect(useAiCheck_, &QCheckBox::toggled, this, markDirty);
-    connect(confidenceBox_, &QLineEdit::textEdited, this, markDirty);
-    auto* piiGrid = new QGridLayout;
-    int row = 0, col = 0;
-    for (const auto& type : DEFAULT_PII_TYPES) {
-        auto* check = new QCheckBox(piiTypeLabel(type), detectionCard);
-        connect(check, &QCheckBox::toggled, this, markDirty);
-        piiChecks_.emplace_back(type, check);
-        piiGrid->addWidget(check, row, col);
-        if (++col == 4) { col = 0; ++row; }
-    }
-    detectionLayout->addLayout(piiGrid);
-    cardsLayout->addWidget(detectionCard);
+    // Debounced port availability check (mirrors Windows UpdateProxyStatus).
+    portStatusTimer_ = new QTimer(this);
+    portStatusTimer_->setSingleShot(true);
+    portStatusTimer_->setInterval(300);
+    connect(portStatusTimer_, &QTimer::timeout, this, &MainWindow::updatePortStatus);
+    connect(portBox_, &QLineEdit::textChanged, this, [this] { portStatusTimer_->start(); });
 
     // -- Regex card --
     QVBoxLayout* regexLayout;
     auto* regexCard = makeCard(QString(), regexLayout, cards);
     regexCard->setObjectName(QStringLiteral("regexCard"));
+    regexDescLabel_ = makeHint(regexCard);
+    regexLayout->addWidget(regexDescLabel_);
+    // Column headers aligned over the row columns (Windows RegexHeaderGrid);
+    // hidden while the list is empty (HomePage::LoadRegexList).
+    regexHeader_ = new QWidget(regexCard);
+    auto* regexHeaderLayout = new QHBoxLayout(regexHeader_);
+    regexHeaderLayout->setContentsMargins(0, 0, 0, 0);
+    regexEnabledHeader_ = makeColHeader(regexHeader_);
+    regexEnabledHeader_->setFixedWidth(kEnabledColumnWidth);
+    regexPatternHeader_ = makeColHeader(regexHeader_);
+    regexHeaderLayout->addWidget(regexEnabledHeader_);
+    regexHeaderLayout->addWidget(regexPatternHeader_, 1);
+    regexHeader_->setVisible(false);
+    regexLayout->addWidget(regexHeader_);
     regexRows_ = new QVBoxLayout;
     regexLayout->addLayout(regexRows_);
     auto* newRegexRow = new QHBoxLayout;
@@ -314,6 +402,23 @@ void MainWindow::buildUi() {
     QVBoxLayout* keywordsLayout;
     auto* keywordsCard = makeCard(QString(), keywordsLayout, cards);
     keywordsCard->setObjectName(QStringLiteral("keywordsCard"));
+    keywordsDescLabel_ = makeHint(keywordsCard);
+    keywordsLayout->addWidget(keywordsDescLabel_);
+    // Column headers aligned over the row columns (Windows KeywordHeaderGrid);
+    // hidden while the list is empty (HomePage::LoadKeywordList).
+    keywordHeader_ = new QWidget(keywordsCard);
+    auto* keywordHeaderLayout = new QHBoxLayout(keywordHeader_);
+    keywordHeaderLayout->setContentsMargins(0, 0, 0, 0);
+    keywordEnabledHeader_ = makeColHeader(keywordHeader_);
+    keywordEnabledHeader_->setFixedWidth(kEnabledColumnWidth);
+    keywordCaseHeader_ = makeColHeader(keywordHeader_);
+    keywordCaseHeader_->setFixedWidth(kCaseColumnWidth);
+    keywordKeywordHeader_ = makeColHeader(keywordHeader_);
+    keywordHeaderLayout->addWidget(keywordEnabledHeader_);
+    keywordHeaderLayout->addWidget(keywordCaseHeader_);
+    keywordHeaderLayout->addWidget(keywordKeywordHeader_, 1);
+    keywordHeader_->setVisible(false);
+    keywordsLayout->addWidget(keywordHeader_);
     keywordRows_ = new QVBoxLayout;
     keywordsLayout->addLayout(keywordRows_);
     auto* newKeywordRow = new QHBoxLayout;
@@ -329,6 +434,46 @@ void MainWindow::buildUi() {
     newKeywordRow->addWidget(addKeywordBtn);
     keywordsLayout->addLayout(newKeywordRow);
     cardsLayout->addWidget(keywordsCard);
+
+    // -- AI Powered Detection Model card (Windows: SecurityCardBorder) --
+    QVBoxLayout* detectionLayout;
+    auto* detectionCard = makeCard(QString(), detectionLayout, cards);
+    detectionCard->setObjectName(QStringLiteral("detectionCard"));
+    detectionDescLabel_ = makeHint(detectionCard);
+    detectionLayout->addWidget(detectionDescLabel_);
+    // Windows ToggleSwitch: a self-drawn sliding switch (AgentToggleSwitch,
+    // based on QCheckBox so its accessible role/checked/name contract is
+    // unchanged). The visible text is the On/Off state; the accessible name
+    // stays fixed so assistive tech can find the control regardless of state.
+    useAiCheck_ = new AgentToggleSwitch(detectionCard);
+    useAiCheck_->setObjectName(QStringLiteral("useAiSwitch"));
+    connect(useAiCheck_, &QCheckBox::toggled, this, autosave);
+    connect(useAiCheck_, &QCheckBox::toggled, this, [this](bool on) {
+        useAiCheck_->setText(on ? tr("On") : tr("Off"));
+    });
+    detectionLayout->addWidget(useAiCheck_, 0, Qt::AlignLeft);
+    detectionSlowLabel_ = makeHint(detectionCard);
+    detectionLayout->addWidget(detectionSlowLabel_);
+    auto* detectionForm = new QFormLayout;
+    confidenceLabel_ = new QLabel(detectionCard);
+    confidenceBox_ = new QLineEdit(detectionCard);
+    detectionForm->addRow(confidenceLabel_, confidenceBox_);
+    detectionLayout->addLayout(detectionForm);
+    connect(confidenceBox_, &QLineEdit::textEdited, this, markDirty);
+    // Autosave on commit (focus-out / Enter), not per keystroke: partial
+    // input like "0." would fail validation if saved mid-typing.
+    connect(confidenceBox_, &QLineEdit::editingFinished, this, autosave);
+    auto* piiGrid = new QGridLayout;
+    int row = 0, col = 0;
+    for (const auto& type : DEFAULT_PII_TYPES) {
+        auto* check = new QCheckBox(piiTypeLabel(type), detectionCard);
+        connect(check, &QCheckBox::toggled, this, autosave);
+        piiChecks_.emplace_back(type, check);
+        piiGrid->addWidget(check, row, col);
+        if (++col == 4) { col = 0; ++row; }
+    }
+    detectionLayout->addLayout(piiGrid);
+    cardsLayout->addWidget(detectionCard);
 
     // -- Password card --
     QVBoxLayout* passwordLayout;
@@ -355,6 +500,10 @@ void MainWindow::buildUi() {
     QVBoxLayout* matchesLayout2;
     auto* matchesCard = makeCard(QString(), matchesLayout2, cards);
     matchesCard->setObjectName(QStringLiteral("matchesCard"));
+    matchesDescLabel_ = makeHint(matchesCard);
+    matchesLayout2->addWidget(matchesDescLabel_);
+    matchesEmptyLabel_ = makeHint(matchesCard);
+    matchesLayout2->addWidget(matchesEmptyLabel_);
     matchesList_ = new QListWidget(matchesCard);
     matchesList_->setMinimumHeight(120);
     matchesLayout2->addWidget(matchesList_);
@@ -389,6 +538,8 @@ void MainWindow::buildUi() {
     logBtns->addWidget(clearLogsBtn);
     logBtns->addStretch();
     logsLayout->addLayout(logBtns);
+    logsDisclaimerLabel_ = makeHint(logsCard);
+    logsLayout->addWidget(logsDisclaimerLabel_);
     cardsLayout->addWidget(logsCard);
 
     // -- Settings card --
@@ -438,6 +589,7 @@ void MainWindow::buildUi() {
     auto* overlayOuter = new QVBoxLayout(lockOverlay_);
     overlayOuter->addStretch();
     auto* overlayBox = new QVBoxLayout;
+    overlayBox->setSpacing(12);
     auto* lockTitle = new QLabel(lockOverlay_);
     lockTitle->setObjectName(QStringLiteral("lockTitle"));
     lockTitle->setAlignment(Qt::AlignCenter);
@@ -473,8 +625,9 @@ void MainWindow::buildUi() {
 
 void MainWindow::retranslateUi() {
     setWindowTitle(tr("Agent Redactor"));
-    findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("Profile"));
-    findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("Detection"));
+    findChild<QGroupBox*>(QStringLiteral("quickStartCard"))->setTitle(tr("How to use Agent Redactor"));
+    findChild<QGroupBox*>(QStringLiteral("profileCard"))->setTitle(tr("API Proxy"));
+    findChild<QGroupBox*>(QStringLiteral("detectionCard"))->setTitle(tr("AI Powered Detection Model"));
     findChild<QGroupBox*>(QStringLiteral("regexCard"))->setTitle(tr("Regex Patterns"));
     findChild<QGroupBox*>(QStringLiteral("keywordsCard"))->setTitle(tr("Keywords"));
     findChild<QGroupBox*>(QStringLiteral("passwordCard"))->setTitle(tr("Password"));
@@ -484,18 +637,43 @@ void MainWindow::retranslateUi() {
     findChild<QGroupBox*>(QStringLiteral("settingsCard"))->setTitle(tr("Settings"));
 
     aliasLabel_->setText(tr("Name:"));
-    portLabel_->setText(tr("Port:"));
+    portLabel_->setText(tr("Local URL"));
     urlLabel_->setText(tr("Forward To"));
     apiKeyLabel_->setText(tr("API Key"));
-    useAiLabel_->setText(tr("Use AI model:"));
     confidenceLabel_->setText(tr("Confidence threshold:"));
+
+    // Help text reused verbatim from the Windows HomePage resw strings so the
+    // existing per-language catalogs translate them for free.
+    profilesHeader_->setText(tr("Profiles"));
+    quickStep1Label_->setText(tr("1. Configure your profile below (or use the default)"));
+    quickStep2Label_->setText(tr("2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below"));
+    quickStep3Label_->setText(tr("3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server"));
+    localUrlHint_->setText(tr("The address your LLM client points at"));
+    forwardToHint_->setText(tr("The real API endpoint that receives your redacted requests"));
+    detectionDescLabel_->setText(tr("AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction."));
+    detectionSlowLabel_->setText(tr("Expect slightly slower responses when enabled. The model scans every message locally."));
+    regexDescLabel_->setText(tr("Text matching these patterns will be redacted before sending to the API"));
+    keywordsDescLabel_->setText(tr("Messages containing these words will be flagged for redaction"));
+    matchesDescLabel_->setText(tr("Actual redactions detected in the current session."));
+    matchesEmptyLabel_->setText(tr("No redactions in current session."));
+    logsDisclaimerLabel_->setText(tr("Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed."));
+
+    // Hint text reused from the Windows HomePage placeholders so the existing
+    // per-language catalogs translate them for free.
+    aliasBox_->setPlaceholderText(tr("e.g., Work OpenAI"));
+    urlBox_->setPlaceholderText(tr("e.g. https://openrouter.ai/api/v1"));
+    newRegexBox_->setPlaceholderText(tr("e.g. sk-[a-zA-Z0-9]{20,}"));
+    newKeywordBox_->setPlaceholderText(tr("e.g. password"));
 
     addProfileBtn_->setText(tr("Add"));
     removeProfileBtn_->setText(tr("Remove"));
     showKeyCheck_->setText(tr("Show API key"));
-    copyUrlBtn_->setText(tr("Copy proxy URL"));
+    copyUrlBtn_->setText(tr("Copy"));
     saveBtn_->setText(tr("Save"));
-    useAiCheck_->setText(tr("Use AI model for PII detection"));
+    // The master detection toggle is a switch: its visible text is the On/Off
+    // state, its accessible name identifies the control.
+    useAiCheck_->setText(useAiCheck_->isChecked() ? tr("On") : tr("Off"));
+    useAiCheck_->setAccessibleName(tr("Use AI model for PII detection"));
     newKeywordCaseCheck_->setText(tr("Case sensitive"));
     findChild<QPushButton*>(QStringLiteral("addRegexBtn"))->setText(tr("Add"));
     findChild<QPushButton*>(QStringLiteral("addKeywordBtn"))->setText(tr("Add"));
@@ -532,6 +710,21 @@ void MainWindow::retranslateUi() {
 
     // PII grid labels are translated too (Windows PII_Type_* strings).
     for (auto& [type, check] : piiChecks_) check->setText(piiTypeLabel(type));
+
+    // Regex/keyword column headers (the rows themselves are rebuilt by
+    // reloadProfiles on language change).
+    regexEnabledHeader_->setText(tr("Enabled"));
+    regexPatternHeader_->setText(tr("Regex Pattern"));
+    keywordEnabledHeader_->setText(tr("Enabled"));
+    keywordCaseHeader_->setText(tr("Case"));
+    keywordKeywordHeader_->setText(tr("Keyword"));
+
+    // Re-render the port status in the new language.
+    updatePortStatus();
+
+    // The Statistics card content holds localized "Requests: ..." text; render
+    // it again so it follows tr() without waiting for the next status tick.
+    refreshStats();
 }
 
 QString MainWindow::piiTypeLabel(const std::wstring& type) {
@@ -587,12 +780,7 @@ void MainWindow::onStatusUpdated() {
                 }
             }
         }
-        const json& stats = (*p)["stats"];
-        statsLabel_->setText(tr("Requests: %1   PII: %2   Regex: %3   Keywords: %4")
-            .arg(stats.value("total_requests", 0))
-            .arg(stats.value("total_pii_detected", 0))
-            .arg(stats.value("total_regex_matches", 0))
-            .arg(stats.value("total_keyword_matches", 0)));
+        refreshStats();
 
         const std::wstring id = w(QString::fromStdString((*p)["id"].get<std::string>()));
         json matches;
@@ -607,7 +795,14 @@ void MainWindow::onStatusUpdated() {
                 matchesList_->addItem(line);
             }
         }
+        matchesEmptyLabel_->setVisible(matchesList_->count() == 0);
     }
+
+    // The port verdict depends on the profiles snapshot (cross-profile
+    // conflicts) and on proxyRunning, both of which change under the feet of
+    // a debounced textChanged evaluation; recompute every poll so the label
+    // never stays stale (Windows: UpdateProxyStatus on the same cadence).
+    updatePortStatus();
 }
 
 void MainWindow::onSettingsChanged() {
@@ -668,7 +863,47 @@ void MainWindow::onConnectionLost() {
 // Profiles: load / select / save
 // ---------------------------------------------------------------------------
 
+// Snapshot the four profile text fields while the form has uncommitted edits
+// (dirty_). reloadProfiles() unconditionally rebuilds the whole form from the
+// engine snapshot, which would discard those edits; the row-mutation handlers
+// snapshot before their reload and restore afterwards (Windows HomePage
+// formDirty_ parity).
+std::array<QString, 4> MainWindow::savePendingFormText() const {
+    std::array<QString, 4> fields{};
+    if (dirty_) {
+        fields[0] = aliasBox_->text();
+        fields[1] = portBox_->text();
+        fields[2] = urlBox_->text();
+        fields[3] = apiKeyBox_->text();
+    }
+    return fields;
+}
+
+void MainWindow::restorePendingFormText(const std::array<QString, 4>& fields,
+    bool wasDirty) {
+    if (!wasDirty) return;
+    // Re-apply pending edits over the freshly reloaded values. Only set a
+    // field that actually differs, so the textChanged dirty-tracking does not
+    // re-mark the form dirty for fields that were never edited.
+    if (aliasBox_->text() != fields[0]) aliasBox_->setText(fields[0]);
+    if (portBox_->text() != fields[1]) portBox_->setText(fields[1]);
+    if (urlBox_->text() != fields[2]) urlBox_->setText(fields[2]);
+    if (apiKeyBox_->text() != fields[3]) apiKeyBox_->setText(fields[3]);
+}
+
 void MainWindow::reloadProfiles(bool keepSelection) {
+    if (reloadingProfiles_) {
+        // A reload is already on the stack (e.g. the poll fired inside a
+        // nested event loop); run one more pass when it finishes.
+        reloadPending_ = true;
+        return;
+    }
+    reloadingProfiles_ = true;
+    struct ReloadGuard {
+        bool& flag;
+        ~ReloadGuard() { flag = false; }
+    } guard{reloadingProfiles_};
+
     json profiles;
     if (!appState_->client().GetProfiles(profiles) || !profiles.is_array()) {
         qWarning("[MainWindow] reloadProfiles: GetProfiles failed");
@@ -699,33 +934,41 @@ void MainWindow::reloadProfiles(bool keepSelection) {
             profile["enabled_pii_types"].push_back(Utils::WideToUtf8(t));
         std::wstring id;
         if (appState_->client().PostProfile(profile, id)) {
-            appState_->client().RestartListeners();
+            // POST /profiles already restarts the listeners engine-side.
+            // The re-entry guard defers this to a follow-up pass below.
             reloadProfiles(keepSelection);
         }
-        return;
-    }
+    } else {
+        const QString previousId = keepSelection ? selectedProfileId() : QString();
+        profiles_ = profiles;
 
-    const QString previousId = keepSelection ? selectedProfileId() : QString();
-    profiles_ = profiles;
-
-    loading_ = true;
-    profileList_->clear();
-    int selectRow = 0;
-    for (size_t i = 0; i < profiles_.size(); ++i) {
-        const auto& p = profiles_[i];
-        profileList_->addItem(QString::fromStdString(p.value("alias", std::string())));
-        if (!previousId.isEmpty() &&
-            previousId == QString::fromStdString(p.value("id", std::string()))) {
-            selectRow = static_cast<int>(i);
+        loading_ = true;
+        profileList_->clear();
+        int selectRow = 0;
+        for (size_t i = 0; i < profiles_.size(); ++i) {
+            const auto& p = profiles_[i];
+            profileList_->addItem(QString::fromStdString(p.value("alias", std::string())));
+            if (!previousId.isEmpty() &&
+                previousId == QString::fromStdString(p.value("id", std::string()))) {
+                selectRow = static_cast<int>(i);
+            }
         }
+        if (!profiles_.empty()) {
+            profileList_->setCurrentRow(selectRow);
+            loadProfileIntoForm(selectRow);
+        }
+        removeProfileBtn_->setEnabled(profiles_.size() > 1);
+        loading_ = false;
+        dirty_ = false;
     }
-    if (!profiles_.empty()) {
-        profileList_->setCurrentRow(selectRow);
-        loadProfileIntoForm(selectRow);
+
+    // A nested reload request arrived while this pass was running; do one
+    // follow-up pass with fresh data once the guard releases the flag.
+    if (reloadPending_) {
+        reloadPending_ = false;
+        reloadingProfiles_ = false;
+        reloadProfiles(keepSelection);
     }
-    removeProfileBtn_->setEnabled(profiles_.size() > 1);
-    loading_ = false;
-    dirty_ = false;
 }
 
 void MainWindow::loadProfileIntoForm(int index) {
@@ -763,22 +1006,39 @@ void MainWindow::loadProfileIntoForm(int index) {
             Utils::WideToUtf8(type)) != enabledTypes.end());
     }
 
-    // Rebuild regex rows (each row is a widget so takeAt/delete cleans up).
+    // Rebuild regex rows (each row is a widget so takeAt cleans up).
+    const auto regexPatterns = p.value("regex_patterns", json::array());
+    regexHeader_->setVisible(!regexPatterns.empty());
     while (QLayoutItem* item = regexRows_->takeAt(0)) {
-        delete item->widget();
+        // deleteLater, not delete: the row being rebuilt may contain the
+        // widget whose signal handler triggered this reload (e.g. the Delete
+        // button mid-mouse-release) — destroying it synchronously returns
+        // into Qt event code on a deleted object (general protection fault
+        // in libQt6Widgets). The deferred delete runs once the handler
+        // returns to the event loop.
+        if (QWidget* row = item->widget()) row->deleteLater();
         delete item;
     }
-    for (const auto& r : p.value("regex_patterns", json::array())) {
+    for (const auto& r : regexPatterns) {
         auto* rowWidget = new QWidget;
         auto* rowLayout = new QHBoxLayout(rowWidget);
         rowLayout->setContentsMargins(0, 0, 0, 0);
         auto* enabled = new QCheckBox;
         enabled->setChecked(r.value("enabled", true));
         enabled->setAccessibleName(tr("Enable pattern"));
+        // Fixed-width column so the rows line up under the header labels.
+        auto* enabledCol = new QWidget(rowWidget);
+        auto* enabledColLayout = new QHBoxLayout(enabledCol);
+        enabledColLayout->setContentsMargins(0, 0, 0, 0);
+        enabledColLayout->addWidget(enabled);
+        enabledCol->setFixedWidth(kEnabledColumnWidth);
         auto* pattern = new QLineEdit(QString::fromStdString(r.value("pattern", std::string())));
         pattern->setAccessibleName(tr("Regex pattern"));
-        auto* del = new QPushButton(tr("Delete"));
-        rowLayout->addWidget(enabled);
+        pattern->setFont(rowFont());
+        auto* del = new QPushButton(QString::fromUtf8("✕"));
+        del->setProperty("danger", true);
+        del->setAccessibleName(tr("Delete"));
+        rowLayout->addWidget(enabledCol);
         rowLayout->addWidget(pattern, 1);
         rowLayout->addWidget(del);
         regexRows_->addWidget(rowWidget);
@@ -803,7 +1063,12 @@ void MainWindow::loadProfileIntoForm(int index) {
             } catch (const std::regex_error&) {
                 QMessageBox::warning(this, tr("Validation Error"),
                     tr("Invalid regex syntax."));
+                // The revert reloads the whole form; keep pending profile
+                // text edits across it (Windows formDirty_ parity).
+                const bool wasDirty = dirty_;
+                const std::array<QString, 4> fields = savePendingFormText();
                 reloadProfiles(true);
+                restorePendingFormText(fields, wasDirty);
                 return;
             }
             dirty_ = true;
@@ -821,32 +1086,47 @@ void MainWindow::loadProfileIntoForm(int index) {
             arr.erase(std::remove_if(arr.begin(), arr.end(), [&](const json& r) {
                 return r.value("pattern", std::string()) == pat;
             }), arr.end());
+            const bool wasDirty = dirty_;
+            const std::array<QString, 4> fields = savePendingFormText();
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-                appState_->client().RestartListeners();
                 reloadProfiles(true);
+                restorePendingFormText(fields, wasDirty);
             }
         });
     }
 
-    // Rebuild keyword rows.
+    // Rebuild keyword rows. Deferred deletion for the same reason as the
+    // regex rows above: the triggering widget may be inside a row.
+    const auto keywords = p.value("keywords", json::array());
+    keywordHeader_->setVisible(!keywords.empty());
     while (QLayoutItem* item = keywordRows_->takeAt(0)) {
-        delete item->widget();
+        if (QWidget* row = item->widget()) row->deleteLater();
         delete item;
     }
-    for (const auto& k : p.value("keywords", json::array())) {
+    for (const auto& k : keywords) {
         auto* rowWidget = new QWidget;
         auto* rowLayout = new QHBoxLayout(rowWidget);
         rowLayout->setContentsMargins(0, 0, 0, 0);
         auto* enabled = new QCheckBox;
         enabled->setChecked(k.value("enabled", true));
         enabled->setAccessibleName(tr("Enable keyword"));
+        // Fixed-width columns so the rows line up under the header labels.
+        auto* enabledCol = new QWidget(rowWidget);
+        auto* enabledColLayout = new QHBoxLayout(enabledCol);
+        enabledColLayout->setContentsMargins(0, 0, 0, 0);
+        enabledColLayout->addWidget(enabled);
+        enabledCol->setFixedWidth(kEnabledColumnWidth);
+        // Windows uses a borderless Yes/No toggle button in the Case column.
         auto* caseBtn = new QPushButton(k.value("case_sensitive", true)
-            ? tr("Case: Yes") : tr("Case: No"));
-        caseBtn->setFixedWidth(90);
+            ? tr("Yes") : tr("No"));
+        caseBtn->setFixedWidth(kCaseColumnWidth);
         auto* text = new QLineEdit(QString::fromStdString(k.value("text", std::string())));
         text->setAccessibleName(tr("Keyword text"));
-        auto* del = new QPushButton(tr("Delete"));
-        rowLayout->addWidget(enabled);
+        text->setFont(rowFont());
+        auto* del = new QPushButton(QString::fromUtf8("✕"));
+        del->setProperty("danger", true);
+        del->setAccessibleName(tr("Delete"));
+        rowLayout->addWidget(enabledCol);
         rowLayout->addWidget(caseBtn);
         rowLayout->addWidget(text, 1);
         rowLayout->addWidget(del);
@@ -864,10 +1144,12 @@ void MainWindow::loadProfileIntoForm(int index) {
         connect(enabled, &QCheckBox::toggled, this, [this, mutateKeyword](bool on) {
             mutateKeyword([on](json& kw) { kw["enabled"] = on; });
         });
+        // The Case column is a Yes/No toggle with the real value in the label
+        // (Windows: keywordCaseButtons_ content = Common_Yes / Common_No).
         connect(caseBtn, &QPushButton::clicked, this, [this, caseBtn, mutateKeyword] {
-            const bool newValue = caseBtn->text() == tr("Case: No");
+            const bool newValue = caseBtn->text() != tr("Yes"); // was No -> now Yes
             mutateKeyword([newValue](json& kw) { kw["case_sensitive"] = newValue; });
-            caseBtn->setText(newValue ? tr("Case: Yes") : tr("Case: No"));
+            caseBtn->setText(newValue ? tr("Yes") : tr("No"));
         });
         connect(text, &QLineEdit::editingFinished, this, [this] {
             dirty_ = true;
@@ -885,15 +1167,18 @@ void MainWindow::loadProfileIntoForm(int index) {
             arr.erase(std::remove_if(arr.begin(), arr.end(), [&](const json& kw) {
                 return kw.value("text", std::string()) == t;
             }), arr.end());
+            const bool wasDirty = dirty_;
+            const std::array<QString, 4> fields = savePendingFormText();
             if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-                appState_->client().RestartListeners();
                 reloadProfiles(true);
+                restorePendingFormText(fields, wasDirty);
             }
         });
     }
 
     loading_ = false;
     dirty_ = false;
+    updatePortStatus();
 }
 
 QString MainWindow::selectedProfileId() const {
@@ -956,7 +1241,7 @@ json MainWindow::gatherProfileFromForm() {
         auto* text = rowWidget->findChild<QLineEdit*>();
         if (!enabled || !caseBtn || !text) continue;
         keywords.push_back({{"text", text->text().toStdString()},
-            {"case_sensitive", caseBtn->text() == tr("Case: Yes")},
+            {"case_sensitive", caseBtn->text() == tr("Yes")},
             {"enabled", enabled->isChecked()}});
     }
     p["keywords"] = keywords;
@@ -1032,7 +1317,7 @@ void MainWindow::onSaveProfile() {
             tr("The engine rejected the profile. Check the engine log for details."));
         return;
     }
-    appState_->client().RestartListeners();
+    // PUT /profiles already restarts the listeners engine-side.
     dirty_ = false;
     reloadProfiles(true);
 }
@@ -1067,7 +1352,7 @@ void MainWindow::onAddProfile() {
             tr("The engine rejected the new profile."));
         return;
     }
-    appState_->client().RestartListeners();
+    // POST /profiles already restarts the listeners engine-side.
     dirty_ = false;
     reloadProfiles(false);
     // Select the new profile.
@@ -1086,7 +1371,6 @@ void MainWindow::onRemoveProfile() {
     if (answer != QMessageBox::Yes) return;
 
     if (appState_->client().DeleteProfile(w(selectedProfileId()))) {
-        appState_->client().RestartListeners();
         dirty_ = false;
         reloadProfiles(false);
     }
@@ -1100,6 +1384,53 @@ void MainWindow::onCopyUrl() {
 
 void MainWindow::onToggleApiKeyVisible(bool visible) {
     apiKeyBox_->setEchoMode(visible ? QLineEdit::Normal : QLineEdit::Password);
+}
+
+void MainWindow::updatePortStatus() {
+    bool ok = false;
+    const int port = portBox_->text().toInt(&ok);
+    if (!ok || port < 1024 || port > 65535) {
+        portStatusLabel_->setVisible(false);
+        return;
+    }
+    // A port owned by another saved profile is always shown as taken,
+    // mirroring Windows HomePage::UpdateProxyStatus. This must be checked
+    // before the running/availability branch (an external listener would not
+    // be caught by the profile loop, and another profile's running proxy would
+    // otherwise be reported as "available").
+    const int currentRow = profileList_->currentRow();
+    for (int i = 0; i < static_cast<int>(profiles_.size()); ++i) {
+        if (i == currentRow) continue;
+        if (profiles_[i].value("port", 0) == port) {
+            portStatusLabel_->setText(tr("Port %1 is already used by profile '%2'.")
+                .arg(port)
+                .arg(QString::fromStdString(profiles_[i].value("alias", std::string()))));
+            portStatusLabel_->setProperty("statusOk", false);
+            portStatusLabel_->setProperty("statusErr", true);
+            portStatusLabel_->style()->unpolish(portStatusLabel_);
+            portStatusLabel_->style()->polish(portStatusLabel_);
+            portStatusLabel_->setVisible(true);
+            return;
+        }
+    }
+    // A port the engine already listens on (this profile's running proxy)
+    // counts as available, mirroring Windows HomePage::UpdateProxyStatus.
+    bool running = false;
+    for (const auto& sp : appState_->lastStatus().value("profiles", json::array())) {
+        if (sp.value("port", 0) == port && sp.value("proxyRunning", false)) {
+            running = true;
+            break;
+        }
+    }
+    const bool available = running || IsPortAvailable(port);
+    portStatusLabel_->setText(available
+        ? tr("Port %1 is available").arg(port)
+        : tr("Port %1 is already in use").arg(port));
+    portStatusLabel_->setProperty("statusOk", available);
+    portStatusLabel_->setProperty("statusErr", !available);
+    portStatusLabel_->style()->unpolish(portStatusLabel_);
+    portStatusLabel_->style()->polish(portStatusLabel_);
+    portStatusLabel_->setVisible(true);
 }
 
 // ---------------------------------------------------------------------------
@@ -1120,12 +1451,23 @@ void MainWindow::onAddRegex() {
         return;
     }
 
+    const std::string pat8 = Utils::WideToUtf8(normalized);
+    for (const auto& r : (*p)["regex_patterns"]) {
+        if (r.value("pattern", std::string()) == pat8) {
+            QMessageBox::warning(this, tr("Validation Error"),
+                tr("This entry already exists."));
+            return;
+        }
+    }
+
     (*p)["regex_patterns"].push_back(
-        {{"pattern", Utils::WideToUtf8(normalized)}, {"enabled", true}});
+        {{"pattern", pat8}, {"enabled", true}});
+    const bool wasDirty = dirty_;
+    const std::array<QString, 4> fields = savePendingFormText();
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-        appState_->client().RestartListeners();
         newRegexBox_->clear();
         reloadProfiles(true);
+        restorePendingFormText(fields, wasDirty);
     }
 }
 
@@ -1134,12 +1476,25 @@ void MainWindow::onAddKeyword() {
     const QString text = newKeywordBox_->text().trimmed();
     if (!p || text.isEmpty()) return;
 
-    (*p)["keywords"].push_back({{"text", text.toStdString()},
-        {"case_sensitive", newKeywordCaseCheck_->isChecked()}, {"enabled", true}});
+    const std::string text8 = text.toStdString();
+    const bool caseSensitive = newKeywordCaseCheck_->isChecked();
+    for (const auto& k : (*p)["keywords"]) {
+        if (k.value("text", std::string()) == text8
+            && k.value("case_sensitive", true) == caseSensitive) {
+            QMessageBox::warning(this, tr("Validation Error"),
+                tr("This entry already exists."));
+            return;
+        }
+    }
+
+    (*p)["keywords"].push_back({{"text", text8},
+        {"case_sensitive", caseSensitive}, {"enabled", true}});
+    const bool wasDirty = dirty_;
+    const std::array<QString, 4> fields = savePendingFormText();
     if (appState_->client().PutProfile(w(selectedProfileId()), *p)) {
-        appState_->client().RestartListeners();
         newKeywordBox_->clear();
         reloadProfiles(true);
+        restorePendingFormText(fields, wasDirty);
     }
 }
 
@@ -1171,15 +1526,17 @@ void MainWindow::onRequirePasswordToggled(bool checked) {
         // Disabling strips all protection: unlock first (the engine's disable
         // endpoint requires an unlocked session), then disable.
         PasswordUnlockDialog dlg(this);
+        bool unlocked = false;
         for (;;) {
             if (dlg.exec() != QDialog::Accepted) break;
             if (!appState_->client().Unlock(dlg.password().toStdWString())) {
                 dlg.setError(tr("Wrong password."));
                 continue;
             }
+            unlocked = true;
             break;
         }
-        if (!appState_->client().DisableMasterPassword()) {
+        if (!unlocked || !appState_->client().DisableMasterPassword()) {
             QSignalBlocker b(requirePasswordCheck_);
             requirePasswordCheck_->setChecked(true);
             return;
@@ -1233,8 +1590,13 @@ void MainWindow::onClearStatistics() {
     (*p)["stats"] = {{"total_requests", 0}, {"total_pii_detected", 0},
         {"total_regex_matches", 0}, {"total_keyword_matches", 0},
         {"pii_type_breakdown", json::object()}};
+    // The stats reset reloads the whole form; keep pending profile text
+    // edits across it (Windows formDirty_ parity).
+    const bool wasDirty = dirty_;
+    const std::array<QString, 4> fields = savePendingFormText();
     appState_->client().PutProfile(w(selectedProfileId()), *p);
     reloadProfiles(true);
+    restorePendingFormText(fields, wasDirty);
 }
 
 void MainWindow::onClearMatches() {
@@ -1242,6 +1604,7 @@ void MainWindow::onClearMatches() {
     if (!p) return;
     if (appState_->client().DeleteMatches(w(selectedProfileId()))) {
         matchesList_->clear();
+        matchesEmptyLabel_->setVisible(true);
     }
 }
 
@@ -1323,7 +1686,36 @@ void MainWindow::onLanguageSelected(int index) {
     // settings-poll round-trip; the poll later re-applies the persisted tag.
     const QString tag = languageCombo_->itemData(index).toString();
     translator_->applyLanguage(tag);
+    syncLanguageSelectors(tag);
     appState_->client().PutSetting(L"appLanguage", tag.toStdString());
+}
+
+void MainWindow::refreshStats() {
+    // Mirrors Windows HomePage::UpdateStats: localize "Requests: ..." with
+    // the selected profile's stats. The status poll refreshes (*p)["stats"]
+    // just before calling this; a language change re-renders the cached
+    // numbers so the format string follows tr() even if no new tick arrives.
+    json* p = selectedProfile();
+    if (!p) return;
+    const json& st = (*p)["stats"];
+    statsLabel_->setText(tr("Requests: %1   PII: %2   Regex: %3   Keywords: %4")
+        .arg(st.value("total_requests", 0))
+        .arg(st.value("total_pii_detected", 0))
+        .arg(st.value("total_regex_matches", 0))
+        .arg(st.value("total_keyword_matches", 0)));
+}
+
+void MainWindow::syncLanguageSelectors(const QString& tag) {
+    // Keep the Settings-combo and the tray submenu agreed on the effective
+    // tag. The combo entry index 0 carries an empty data tag for "System
+    // default" (the engine resolves the OS locale); anything unrecognized
+    // maps back to index 0, mirroring onSettingsChanged.
+    {
+        QSignalBlocker b(languageCombo_);
+        const int idx = languageCombo_->findData(tag);
+        languageCombo_->setCurrentIndex(idx < 0 ? 0 : idx);
+    }
+    tray_->setCurrentLanguage(tag);
 }
 
 // ---------------------------------------------------------------------------
@@ -1346,7 +1738,7 @@ void MainWindow::updateModelDownloadDialog() {
             modelProgress_ = nullptr;
             modelRetryBtn_ = nullptr;
             if (auto* cw = centralWidget()) cw->setEnabled(true);
-            d->accept();
+            d->hide();
             d->deleteLater();
         }
         return;
@@ -1354,11 +1746,10 @@ void MainWindow::updateModelDownloadDialog() {
 
     if (!modelDialog_) {
         modelDialog_ = new NonDismissibleDialog(this);
-        modelDialog_->setModal(true);
-        // Frameless: no title bar, no min/max/close buttons, no OS decorations.
-        // We draw the title ourselves so the dialog matches Windows' ContentDialog
-        // and cannot be dismissed until the model is ready.
-        modelDialog_->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        // Non-modal: the window manager must still allow minimizing/closing the
+        // main window. We disable the central widget below to block interaction
+        // with the rest of the UI while the model downloads.
+        modelDialog_->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
         auto* layout = new QVBoxLayout(modelDialog_);
         auto* titleLabel = new QLabel(tr("Downloading AI model"), modelDialog_);
         QFont titleFont = titleLabel->font();
@@ -1385,7 +1776,7 @@ void MainWindow::updateModelDownloadDialog() {
     const int percent = status.value("modelDownloadPercent", 0);
     modelProgress_->setValue(percent);
     modelStatusLabel_->setText(tr("The PII detection model is downloading (%1%).").arg(percent));
-    modelRetryBtn_->setEnabled(failed);
+    modelRetryBtn_->setEnabled(failed || status.value("modelDownloadWaitingToRetry", false));
     if (failed) {
         modelStatusLabel_->setText(tr("The model download failed. Check your internet "
             "connection, then retry. PII detection is unavailable until the download completes."));
@@ -1394,18 +1785,22 @@ void MainWindow::updateModelDownloadDialog() {
         appState_->client().DownloadModel();
     }
 
-    if (!modelDialog_->isVisible()) {
+    if (!modelDialog_->isVisible() && isVisible() && !isMinimized()) {
         // Block interaction with the main window (like Windows' ContentDialog)
-        // until the weights are present. The local event loop still processes
-        // status updates, so the progress bar updates live.
+        // until the weights are present. Using show() instead of exec() lets the
+        // user minimize or close-to-tray the main window while downloading.
+        // Do not show the dialog while minimized: Qt still reports isVisible()
+        // for minimized windows, and showing the child dialog can restore the
+        // parent. showEvent re-runs this once the window is restored.
         modelDialog_->setMinimumWidth(360);
         modelDialog_->adjustSize();
         if (auto* parent = qobject_cast<QWidget*>(modelDialog_->parent())) {
             modelDialog_->move(parent->frameGeometry().center() - modelDialog_->rect().center());
         }
         if (auto* cw = centralWidget()) cw->setEnabled(false);
-        modelDialog_->exec();
-        if (auto* cw = centralWidget()) cw->setEnabled(true);
+        modelDialog_->show();
+        modelDialog_->raise();
+        modelDialog_->activateWindow();
     }
 }
 
@@ -1427,11 +1822,10 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event) {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-    if (modelDialog_ && modelDialog_->isVisible()) {
-        // The model download blocks the UI; don't allow close-to-tray while it
-        // is open (mirrors the Windows ContentDialog behavior).
-        event->ignore();
-        return;
+    // Hide the modal download dialog while the main window is closed/minimized
+    // to tray; it will be re-shown when the window is reopened.
+    if (modelDialog_) {
+        modelDialog_->hide();
     }
     if (quitting_ || !tray_->available()) {
         // Real quit (control-panel mode: closing the window exits the GUI;
@@ -1449,7 +1843,22 @@ void MainWindow::openWindow() {
     showNormal();
     raise();
     activateWindow();
+    updateModelDownloadDialog();
     ensureLockState(true);
+}
+
+void MainWindow::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+    if (modelDialog_) {
+        updateModelDownloadDialog();
+    }
+}
+
+void MainWindow::hideEvent(QHideEvent* event) {
+    if (modelDialog_) {
+        modelDialog_->hide();
+    }
+    QMainWindow::hideEvent(event);
 }
 
 void MainWindow::onQuitRequested() {

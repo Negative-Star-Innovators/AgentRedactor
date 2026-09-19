@@ -35,20 +35,24 @@
       <translation>अपडेट जांचे नहीं जा सके। बाद में पुनः प्रयास करें।</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;फ़ाइल</translation>
+      <source>On</source>
+      <translation>पर</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>बाहर निकलें</translation>
+      <source>Off</source>
+      <translation>बंद</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>प्रोफ़ाइल</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Agent Redactor का उपयोग कैसे करें</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>खोज</translation>
+      <source>API Proxy</source>
+      <translation>API प्रॉक्सी</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI-संचालित पहचान मॉडल</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>नाम:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>पत्तन:</translation>
+      <source>Local URL</source>
+      <translation>लोकल URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API कुंजी</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>एआई मॉडल का प्रयोग करें:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>आत्मविश्वास की सीमा:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>प्रोफ़ाइल</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. नीचे अपनी प्रोफ़ाइल कॉन्फ़िगर करें (या डिफ़ॉल्ट का उपयोग करें)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. अपने LLM क्लाइंट (Claude Code, OpenClaw आदि) को नीचे दिखाए गए लोकल URL पर निर्देशित करें</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. हम आपके क्लाइंट और असली API के बीच में हैं। सब कुछ आपकी मशीन पर ही रहता है। संवेदनशील डेटा को किसी भी अनुरोध के आपके कंप्यूटर से बाहर जाने से पहले स्थानीय रूप से रिडैक्ट किया जाता है, जिससे यह सुनिश्चित होता है कि आपका डेटा कभी भी हमारे सर्वर तक नहीं पहुँचता</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>वह पता जिस पर आपका LLM क्लाइंट इंगित करता है</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>वह असली API एंडपॉइंट जो आपके रिडैक्ट किए गए अनुरोधों को प्राप्त करता है</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI-संचालित पहचान एक अतिरिक्त सुरक्षा परत के रूप में स्थानीय रूप से चलती है। यह डेटा छोड़ सकता है या अधिक रिडैक्ट कर सकता है। निर्धारात्मक रिडैक्शन के लिए नीचे दिए गए Regex पैटर्न और कीवर्ड का उपयोग करें।</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>सक्षम होने पर प्रतिक्रियाएँ थोड़ी धीमी हो सकती हैं। मॉडल प्रत्येक संदेश को स्थानीय रूप से स्कैन करता है।</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>इन पैटर्न से मेल खाने वाला टेक्स्ट API पर भेजने से पहले रिडैक्ट किया जाएगा</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>इन शब्दों को शामिल करने वाले संदेशों को रिडैक्शन के लिए चिह्नित किया जाएगा</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>वर्तमान सत्र में पाए गए वास्तविक रिडैक्शन।</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>वर्तमान सत्र में कोई रिडैक्शन नहीं।</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>लॉग इस पीसी पर संग्रहीत हैं. संशोधित लॉग में अभी भी संवेदनशील डेटा हो सकता है जिसका पता नहीं चल पाया है।</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>उदा., कार्य OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>उदा. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>उदा. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>उदा. password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>एपीआई कुंजी दिखाएँ</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>प्रॉक्सी यूआरएल कॉपी करें</translation>
+      <source>Copy</source>
+      <translation>कॉपी करें</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>एजेंट रेडैक्टर लॉक है</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>प्रोफ़ाइल</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>प्रोफ़ाइल नाम</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>मास्टर पासवर्ड</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>सक्षम</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex पैटर्न</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>केस</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>कीवर्ड</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>अमान्य regex सिंटैक्स।</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>यह प्रविष्टि पहले से मौजूद है।</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>कीवर्ड सक्षम करें</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>केस: हाँ</translation>
+      <source>Yes</source>
+      <translation>हाँ</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>केस: नहीं</translation>
+      <source>No</source>
+      <translation>नहीं</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>प्रॉक्सी यूआरएल क्लिपबोर्ड पर कॉपी किया गया</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>पोर्ट %1 उपलब्ध है</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>पोर्ट %1 पहले से ही उपयोग में है</translation>
     </message>
     <message>
       <source>Wrong password.</source>

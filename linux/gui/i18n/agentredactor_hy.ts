@@ -35,20 +35,24 @@
       <translation>Չհաջողվեց ստուգել թարմացումները։ Փորձեք ավելի ուշ։</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Ֆայլ</translation>
+      <source>On</source>
+      <translation>Միացված է</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Դուրս գալ</translation>
+      <source>Off</source>
+      <translation>Անջատված</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Անձնագիր</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Ինչպես օգտագործել Agent Redactor-ը</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Հայտնաբերում</translation>
+      <source>API Proxy</source>
+      <translation>API Proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Արհեստական բանականությամբ աշխատող հայտնաբերման մոդել</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Անունը:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Նավահանգիստ:</translation>
+      <source>Local URL</source>
+      <translation>Տեղական URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API բանալի</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Օգտագործեք AI մոդելը.</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Վստահության շեմ.</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Պրոֆիլներ</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Կազմաձևեք ձեր պրոֆիլը ստորև (կամ օգտագործեք լռելյայնը)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Ուղղորդեք ձեր LLM հաճախորդը (Claude Code, OpenClaw և այլն) ստորև ցուցադրված տեղական URL-ին</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Մենք գտնվում ենք ձեր հաճախորդի և իրական API-ի միջև: Ամեն ինչ մնում է ձեր սարքում: Զգայուն տվյալները ջնջվում են տեղում՝ յուրաքանչյուր հարցում ձեր համակարգիչը լքելուց առաջ, երաշխավորելով, որ ձեր տվյալները երբևէ չեն հասնի մեր սերվերին</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Հասցեն, որն ուղղորդում է ձեր LLM հաճախորդը</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Իրական API կետը, որը ստանում է ձեր ջնջված հարցումները</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Արհեստական բանականությամբ հայտնաբերումը աշխատում է տեղում որպես պաշտպանության լրացուցիչ շերտ: Այն կարող է բաց թողնել տվյալներ կամ ավելորդ ջնջել: Օգտագործեք ստորև Regex նմուշները և բանալի բառերը դետերմինիստական ջնջման համար:</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Միացված ժամանակ ակնկալեք մի փոքր ավելի դանդաղ պատասխաններ: Մոդելը տեղում սկանավորում է յուրաքանչյուր հաղորդագրություն:</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Այս նմուշներին համապատասխանող տեքստը կջնջվի API-ին ուղարկելուց առաջ</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Այս բառերը պարունակող հաղորդագրությունները կնշվեն ջնջման համար</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Ընթացիկ նստաշրջանում հայտնաբերված իրական ջնջումներ:</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Ընթացիկ նստաշրջանում ջնջումներ չկան:</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Տեղեկամատյանները պահվում են այս համակարգչի վրա: Ռեակտիվացված մատյանները դեռ կարող են պարունակել զգայուն տվյալներ, որոնք հայտնաբերումը բաց է թողել:</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>օր., Աշխատանք OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>օր. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>օր. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>օր. գաղտնաբառ</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Ցույց տալ API ստեղնը</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Պատճենել վստահված անձի URL-ը</translation>
+      <source>Copy</source>
+      <translation>Պատճենել</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor-ը կողպված է</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Պրոֆիլներ</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Պրոֆիլի անունը</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Հիմնական գաղտնաբառը</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Միացված է</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex նմուշ</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Տառատեսակի ռեգիստր</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Բանալի բառ</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Անվավեր regex շարահյուսություն:</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Այս գրառումն արդեն գոյություն ունի։</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Միացնել հիմնաբառը</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Դեպք: Այո</translation>
+      <source>Yes</source>
+      <translation>Այո</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Դեպք՝ ոչ</translation>
+      <source>No</source>
+      <translation>Ոչ</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Վստահված անձի URL-ը պատճենվեց սեղմատախտակին</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Պորտ %1-ը հասանելի է</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Պորտ %1-ն արդեն օգտագործվում է</translation>
     </message>
     <message>
       <source>Wrong password.</source>

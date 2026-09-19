@@ -678,4 +678,7 @@
     <value>Keywords: {0}</value>
   </data>
 
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>This entry already exists.</value>
+  </data>
 </root>

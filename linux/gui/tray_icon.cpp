@@ -4,11 +4,35 @@
 #include <QActionGroup>
 #include <QIcon>
 #include <QMenu>
+#include <QTimer>
 
 #include "constants.h" // SUPPORTED_LANGUAGES
 
+namespace {
+// How long the startup race with GNOME shell's StatusNotifierWatcher can be:
+// 15 tries, 2 s apart (~30 s), before giving up on having a tray icon.
+constexpr int kMaxTrayRetries = 15;
+} // namespace
+
 TrayIcon::TrayIcon(QObject* parent) : QObject(parent) {
-    if (!QSystemTrayIcon::isSystemTrayAvailable()) return;
+    if (tryCreate()) return;
+
+    // No tray at startup: at session login GNOME shell's StatusNotifierWatcher
+    // is often not up yet, and Qt does not retry on its own — the icon would
+    // silently never appear (the app itself is healthy). Retry instead.
+    retryTimer_ = new QTimer(this);
+    retryTimer_->setInterval(2000);
+    connect(retryTimer_, &QTimer::timeout, this, [this] {
+        if (tryCreate() || ++retryAttempts_ >= kMaxTrayRetries) {
+            if (!tray_) qWarning("[TrayIcon] No system tray became available; running without a tray icon");
+            retryTimer_->stop();
+        }
+    });
+    retryTimer_->start();
+}
+
+bool TrayIcon::tryCreate() {
+    if (tray_ || !QSystemTrayIcon::isSystemTrayAvailable()) return tray_ != nullptr;
 
     tray_ = new QSystemTrayIcon(QIcon(QStringLiteral(":/app.png")), this);
 
@@ -48,6 +72,10 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent) {
         });
 
     retranslate();
+    // When created by the startup retry timer, showIcon() was already called
+    // (and no-op'd) before the tray existed — show it ourselves.
+    tray_->show();
+    return true;
 }
 
 bool TrayIcon::available() const { return tray_ != nullptr; }

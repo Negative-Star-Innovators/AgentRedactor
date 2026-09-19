@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Bu, hassas değerleri (isimler, e-postalar, telefon numaraları vb.) ve API anahtarınızı diskteki günlük dosyanıza düzenlenmemiş olarak yazacaktır. Başkalarının bu bilgisayara erişimi varsa bunu etkinleştirmeyin. Uygulamayı kapattığınızda ayar sıfırlanır.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Bu girdi zaten var.</value>
+  </data>
 </root>

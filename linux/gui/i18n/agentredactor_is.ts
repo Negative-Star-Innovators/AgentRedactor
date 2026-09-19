@@ -35,20 +35,24 @@
       <translation>Ekki tókst að athuga uppfærslur. Reyndu aftur síðar.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Skrá</translation>
+      <source>On</source>
+      <translation>Á</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Hætta</translation>
+      <source>Off</source>
+      <translation>Slökkt</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Prófíll</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Hvernig á að nota Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Uppgötvun</translation>
+      <source>API Proxy</source>
+      <translation>API milliþjónn</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Gervigreindardrifinn greiningarlíkan</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Nafn:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Höfn:</translation>
+      <source>Local URL</source>
+      <translation>Staðbundið URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API lykill</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Notaðu gervigreind líkan:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Sjálfstraustsþröskuldur:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Prófílar</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Stilla prófílinn þinn hér að neðan (eða nota sjálfgefna)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Beinir LLM biðlaranum þínum (Claude Code, OpenClaw o.s.frv.) að staðbundnu URL-inu sem sýnt er hér að neðan</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Við sitjum milli biðlarans þíns og raunverulegs API. Allt er á vélinni þinni. Viðkvæm gögn eru afskráð staðbundið áður en nokkurn beiðni yfirgefur tölvuna þína, sem tryggir að gögnin þín snerta aldrei netþjóninn okkar</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Heimilisfangið sem LLM biðlarinn þinn bendir á</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Raunverulegur API endapunktur sem tekur við afskráðum beiðnum þínum</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Gervigreindargreining keyrir staðbundið sem viðbótarvörn. Hún getur misst af gögnum eða afskráð of mikið. Notaðu Regex mynstur og Lykilorð hér að neðan fyrir ákveðna afskráningu.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Gerðu ráð fyrir aðeins hægari svörum þegar virkt. Líkanið skannar hver skilaboð staðbundið.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Texti sem passar við þessi mynstur verður afskráður áður en hann er sendur API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Skilaboð sem innihalda þessi orð verða merkt fyrir afskráningu</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Raunverulegar afskráningar sem fundust í núverandi lotu.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Engar afskráningar í núverandi lotu.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Dagskrár eru geymdar á þessari tölvu. Ritfærðar annálar gætu enn innihaldið viðkvæm gögn sem ekki var hægt að finna.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>t.d., Vinnu OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>t.d. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>t.d. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>t.d. lykilorð</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Sýna API lykil</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Afritaðu proxy-slóð</translation>
+      <source>Copy</source>
+      <translation>Afrita</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor er læstur</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Prófílar</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Nafn prófíls</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Aðal lykilorð</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Virkt</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex mynstur</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Hástafir/lágstafir</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Lykilorð</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Ógild regex setningafræði.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Þessi færsla er þegar til.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Virkja leitarorð</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Mál: Já</translation>
+      <source>Yes</source>
+      <translation>Já</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Mál: Nei</translation>
+      <source>No</source>
+      <translation>Nei</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Umboðsslóð afrituð á klemmuspjald</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 er laus</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 er þegar í notkun</translation>
     </message>
     <message>
       <source>Wrong password.</source>

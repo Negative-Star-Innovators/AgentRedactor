@@ -5,8 +5,11 @@
 #include "localization.h"
 #include <nlohmann/json.hpp>
 #include <algorithm>
+#include <functional>
+#include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <chrono>
 
 using json = nlohmann::json;
@@ -34,6 +37,55 @@ ProxyEngine::ProxyEngine(PIIDetector* detector, LogManager* logManager, std::fun
     : detector_(detector), logManager_(logManager), onUpdate_(std::move(onUpdate)) {
 }
 
+void ProxyEngine::SetStateFilePath(const std::filesystem::path& path) {
+    std::lock_guard<std::mutex> lock(stateFileMutex_);
+    stateFilePath_ = path;
+    stateLoaded_ = false;
+}
+
+void ProxyEngine::LoadPersistedCountersLocked() {
+    stateLoaded_ = true;
+    persistedCounters_.clear();
+    std::error_code ec;
+    if (stateFilePath_.empty() || !std::filesystem::exists(stateFilePath_, ec)) return;
+    try {
+        std::ifstream in(stateFilePath_);
+        auto j = json::parse(in);
+        if (j.value("version", 0) != 1) return;
+        for (const auto& [key, val] : j.at("profiles").items()) {
+            PersistedCounters c;
+            c.pii = val.value("pii", 0);
+            c.regex = val.value("regex", 0);
+            c.keyword = val.value("keyword", 0);
+            persistedCounters_[Utils::Utf8ToWide(key)] = c;
+        }
+    } catch (const json::exception&) {
+        LOG(L"[ProxyEngine] redaction_state.json unreadable; counters start fresh");
+    }
+}
+
+void ProxyEngine::SavePersistedCountersLocked() {
+    if (stateFilePath_.empty()) return;
+    try {
+        json profiles = json::object();
+        for (const auto& [id, c] : persistedCounters_) {
+            profiles[Utils::WideToUtf8(id)] = {
+                {"pii", c.pii}, {"regex", c.regex}, {"keyword", c.keyword},
+            };
+        }
+        json j;
+        j["version"] = 1;
+        j["profiles"] = std::move(profiles);
+        std::filesystem::create_directories(stateFilePath_.parent_path());
+        std::ofstream out(stateFilePath_, std::ios::trunc);
+        out << j.dump(2);
+        if (!out) LOG(L"[ProxyEngine] failed to write redaction_state.json");
+    } catch (const std::exception&) {
+        // Persistence is best-effort: a failed write must not break proxying.
+        LOG(L"[ProxyEngine] failed to save redaction_state.json");
+    }
+}
+
 size_t ProxyEngine::ComputeConfigHash(const ApiKeyProfile& profile) {
     size_t hash = 0;
     hash = Utils::HashCombine(hash, static_cast<size_t>(profile.useOpenAIModel));
@@ -57,6 +109,101 @@ size_t ProxyEngine::ComputeConfigHash(const ApiKeyProfile& profile) {
 SessionState& ProxyEngine::GetSessionState(const std::wstring& profileId) {
     return profileSessions_[profileId];
 }
+
+namespace {
+
+// String-valued JSON keys whose values are machine-structural and must reach
+// the provider byte-exact: message/block/tool ids pair tool_use with
+// tool_result, model/role/type are enums, and stop sequences silently alter
+// generation if modified. Deliberately NOT excluded: "name", "content",
+// "thinking", "system", "reasoning_content" etc. — human-meaningful strings
+// that can carry PII. A key we don't recognize is scanned, never skipped.
+bool IsStructuralJsonKey(const std::string& key) {
+    static const std::unordered_set<std::string> kKeys = {
+        "id", "tool_call_id", "tool_use_id", "call_id", "previous_response_id",
+        "model", "role", "type", "stop", "stop_sequences",
+    };
+    return kKeys.find(key) != kKeys.end();
+}
+
+// Walk context: which machine-structural exemption applies to this subtree.
+enum WalkFlags : unsigned {
+    kWalkNone = 0,
+    kWalkAtRoot = 1 << 0,       // direct members of the request body
+    kWalkInert = 1 << 1,        // tool declarations: vendor code, never redact
+    kWalkNameExempt = 1 << 2,   // object whose direct "name" member is a tool identifier
+};
+
+// True when the object's own members include a tool identifier "name":
+// a message with role "tool", or a tool_use / function_call block or
+// tool_calls element. Everything else on these objects (content, arguments,
+// input, output) is user data and stays scanned.
+bool HasToolNameMember(const json& node) {
+    auto roleIt = node.find("role");
+    if (roleIt != node.end() && roleIt->is_string() &&
+        roleIt->get<std::string>() == "tool") return true;
+    auto typeIt = node.find("type");
+    if (typeIt == node.end() || !typeIt->is_string()) return false;
+    const std::string t = typeIt->get<std::string>();
+    if (t == "tool_use" || t == "function_call") return true;
+    // OpenAI tool_calls element: {"type":"function","function":{...}}
+    return t == "function" && node.contains("function");
+}
+
+// Recursive deny-all walk: redact every string value in the tree except
+// structural keys. `key` carries the parent key through arrays so that
+// "stop": ["..."] is honored for its string elements.
+void RedactJsonStrings(json& node, const std::string& key, unsigned flags,
+    const std::function<std::wstring(const std::wstring&)>& redact) {
+    if (node.is_string()) {
+        if (flags & kWalkInert) return;
+        if (!key.empty() && IsStructuralJsonKey(key)) return;
+        if ((flags & kWalkNameExempt) && key == "name") return;
+        std::string s = node.get<std::string>();
+        // Embedded binary (image data URIs) carries no PII but can be
+        // megabytes; scanning it is pure cost.
+        if (s.rfind("data:", 0) == 0 && s.size() > 256) return;
+        std::wstring ws = Utils::Utf8ToWide(s);
+        std::wstring redacted = redact(ws);
+        if (redacted != ws) node = Utils::WideToUtf8(redacted);
+    } else if (node.is_array()) {
+        for (auto& el : node) RedactJsonStrings(el, key, flags & kWalkInert, redact);
+    } else if (node.is_object()) {
+        unsigned self = flags & kWalkInert;
+        if (!(flags & kWalkInert)) {
+            if (HasToolNameMember(node)) self |= kWalkNameExempt;
+            // An exemption flagged by the parent (root tool_choice /
+            // function_call, or the function object of a tool_calls element)
+            // applies to this object's own name member.
+            if (flags & kWalkNameExempt) self |= kWalkNameExempt;
+        }
+        for (auto& el : node.items()) {
+            const std::string& k = el.key();
+            // Tool identifier names are exempt at the object level so the
+            // exemption never leaks into sibling data fields.
+            if ((self & kWalkNameExempt) && k == "name") continue;
+            unsigned child = self & kWalkInert;
+            if (!child) {
+                if ((flags & kWalkAtRoot) && k == "tools") {
+                    // Tool declarations are vendor-authored and provider-
+                    // validated; a placeholder in a name/schema 400s. Never
+                    // redact inside the subtree (pre-deny-all behavior).
+                    child |= kWalkInert;
+                } else if ((flags & kWalkAtRoot) &&
+                           (k == "tool_choice" || k == "function_call")) {
+                    child |= kWalkNameExempt;
+                } else if ((self & kWalkNameExempt) && k == "function") {
+                    // tool_calls element / tool_choice: the nested function
+                    // object holds the tool name.
+                    child |= kWalkNameExempt;
+                }
+            }
+            RedactJsonStrings(el.value(), k, child, redact);
+        }
+    }
+}
+
+} // namespace
 
 std::wstring ProxyEngine::ApplyForwardPropagation(const std::wstring& text, SessionState& session,
     std::map<std::wstring, std::wstring>& fragPii,
@@ -307,9 +454,14 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
             }
         }
         if (!reasoningEventIdx.empty()) {
-            LOGF(L"[RebuildSSE] reasoning events=%zu, fullReasoning=[%s]", reasoningEventIdx.size(), fullReasoning.c_str());
+            LOGF(L"[RebuildSSE] reasoning events=%zu", reasoningEventIdx.size());
             std::wstring unredacted = UnredactAll(fullReasoning, state);
-            LOGF(L"[RebuildSSE] unredacted reasoning=[%s]", unredacted.c_str());
+            // Content (and especially the unredacted form with raw values) is
+            // logged only when show-sensitive is on.
+            if (logManager_->IsShowSensitive()) {
+                LOGF(L"[RebuildSSE] fullReasoning=[%ls]", fullReasoning.c_str());
+                LOGF(L"[RebuildSSE] unredacted reasoning=[%ls]", unredacted.c_str());
+            }
             std::vector<std::wstring> chunks;
             redistribute(unredacted, reasoningOriginals, chunks);
             for (size_t i = 0; i < reasoningEventIdx.size(); ++i) {
@@ -414,9 +566,14 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
             }
         }
         if (!anthropicFields.empty()) {
-            LOGF(L"[RebuildSSE] anthropic fields=%zu, fullText=[%s]", anthropicFields.size(), anthropicFull.c_str());
+            LOGF(L"[RebuildSSE] anthropic fields=%zu", anthropicFields.size());
             std::wstring unredacted = UnredactAll(anthropicFull, state);
-            LOGF(L"[RebuildSSE] unredacted anthropic text=[%s]", unredacted.c_str());
+            // Content (and especially the unredacted form with raw values) is
+            // logged only when show-sensitive is on.
+            if (logManager_->IsShowSensitive()) {
+                LOGF(L"[RebuildSSE] fullText=[%ls]", anthropicFull.c_str());
+                LOGF(L"[RebuildSSE] unredacted anthropic text=[%ls]", unredacted.c_str());
+            }
             std::vector<std::string> originals;
             originals.reserve(anthropicFields.size());
             for (const auto& f : anthropicFields) originals.push_back(f.original);
@@ -520,7 +677,8 @@ std::string ProxyEngine::RebuildSSE(const std::string& sseBody, const RedactionS
 }
 
 std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std::string& method,
-    const std::wstring& path, const std::vector<std::pair<std::wstring, std::wstring>>& headers,
+    const std::wstring& path,
+    [[maybe_unused]] const std::vector<std::pair<std::wstring, std::wstring>>& headers,
     const std::string& body, RedactionState& state) {
 
     size_t configHash = ComputeConfigHash(profile);
@@ -532,9 +690,18 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
         session.piiTypeMap.clear();
         session.regexLabelMap.clear();
         session.keywordLabelMap.clear();
-        session.piiCounter = 0;
-        session.regexCounter = 0;
-        session.keywordCounter = 0;
+    }
+    // Floor the counters at the persisted values: even on config change (or a
+    // fresh session after restart) label numbers must never go backwards, or
+    // a restarted engine could reissue a label still referenced by
+    // provider-side conversation state.
+    {
+        std::lock_guard<std::mutex> lock(stateFileMutex_);
+        if (!stateLoaded_) LoadPersistedCountersLocked();
+        auto& pc = persistedCounters_[profile.id];
+        session.piiCounter = std::max(session.piiCounter, pc.pii);
+        session.regexCounter = std::max(session.regexCounter, pc.regex);
+        session.keywordCounter = std::max(session.keywordCounter, pc.keyword);
     }
 
     state.originalText = Utils::Utf8ToWide(body);
@@ -645,49 +812,22 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
         return result;
     };
 
-    // Try to parse as OpenAI chat completions JSON and redact message contents individually
+    // Deny-all tree walk: redact every string value in the request JSON,
+    // skipping only the machine-structural keys and tool machinery above.
+    // This covers fields the old messages-only allowlist missed — Anthropic
+    // "thinking" blocks, "tool_result" content, OpenAI "reasoning_content",
+    // "system", and any field providers add in the future. Tool declarations
+    // and tool names are exempted because providers validate them — a
+    // placeholder there 400s the request; the data tools carry (content,
+    // arguments, input, output) stays scanned.
     bool parsedJson = false;
     try {
         auto jsonBody = json::parse(body);
-        if (jsonBody.contains("messages") && jsonBody["messages"].is_array()) {
-            parsedJson = true;
-            for (auto& message : jsonBody["messages"]) {
-                // Redact message content (string or array format)
-                if (message.contains("content")) {
-                    if (message["content"].is_string()) {
-                        std::wstring content = Utils::Utf8ToWide(message["content"].get<std::string>());
-                        message["content"] = Utils::WideToUtf8(redactTextFragment(content));
-                    } else if (message["content"].is_array()) {
-                        for (auto& item : message["content"]) {
-                            if (item.is_object() && item.contains("type") && item["type"] == "text" && item.contains("text") && item["text"].is_string()) {
-                                std::wstring text = Utils::Utf8ToWide(item["text"].get<std::string>());
-                                item["text"] = Utils::WideToUtf8(redactTextFragment(text));
-                            }
-                        }
-                    }
-                }
-                // Redact tool call arguments (assistant messages with tool_calls)
-                if (message.contains("tool_calls") && message["tool_calls"].is_array()) {
-                    for (auto& toolCall : message["tool_calls"]) {
-                        if (toolCall.contains("function") && toolCall["function"].is_object()) {
-                            auto& func = toolCall["function"];
-                            if (func.contains("arguments") && func["arguments"].is_string()) {
-                                std::wstring args = Utils::Utf8ToWide(func["arguments"].get<std::string>());
-                                func["arguments"] = Utils::WideToUtf8(redactTextFragment(args));
-                            }
-                            // Also redact function name if it looks like it contains PII
-                            if (func.contains("name") && func["name"].is_string()) {
-                                std::wstring name = Utils::Utf8ToWide(func["name"].get<std::string>());
-                                func["name"] = Utils::WideToUtf8(redactTextFragment(name));
-                            }
-                        }
-                    }
-                }
-            }
-            state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
-        }
+        parsedJson = true;
+        RedactJsonStrings(jsonBody, "", kWalkAtRoot, redactTextFragment);
+        state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
     } catch (const json::exception&) {
-        // Not valid JSON or not an OpenAI format — fall through to full-body redaction
+        // Not valid JSON — fall through to full-body redaction below.
     }
 
     // Fallback: redact the entire body as plain text
@@ -857,10 +997,24 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
 
     logManager_->AddLog(profile.alias, LogDirection::UserToProxy, summary, details);
 
+    // Persist any counter growth before the redacted body is forwarded, so a
+    // crash after this point cannot lose label numbers that already went out.
+    {
+        std::lock_guard<std::mutex> lock(stateFileMutex_);
+        if (stateLoaded_) {
+            auto& pc = persistedCounters_[profile.id];
+            bool dirty = false;
+            if (session.piiCounter > pc.pii) { pc.pii = session.piiCounter; dirty = true; }
+            if (session.regexCounter > pc.regex) { pc.regex = session.regexCounter; dirty = true; }
+            if (session.keywordCounter > pc.keyword) { pc.keyword = session.keywordCounter; dirty = true; }
+            if (dirty) SavePersistedCountersLocked();
+        }
+    }
+
     return Utils::WideToUtf8(state.redactedText);
 }
 
-std::string ProxyEngine::ProcessResponse(const ApiKeyProfile& profile, const std::string& responseBody,
+std::string ProxyEngine::ProcessResponse([[maybe_unused]] const ApiKeyProfile& profile, const std::string& responseBody,
     const std::vector<std::pair<std::wstring, std::wstring>>& responseHeaders,
     const RedactionState& state) {
 
@@ -1401,7 +1555,9 @@ bool ProxyEngine::ForwardToUpstreamStreaming(const std::wstring& upstreamUrl, co
 #endif
 }
 
-void ProxyEngine::UpdateStats(const ApiKeyProfile& profile, size_t piiCount, size_t regexCount, size_t keywordCount) {
+void ProxyEngine::UpdateStats([[maybe_unused]] const ApiKeyProfile& profile,
+    [[maybe_unused]] size_t piiCount, [[maybe_unused]] size_t regexCount,
+    [[maybe_unused]] size_t keywordCount) {
     // Stats are updated via the settings manager externally
     // This is a placeholder for future real-time stat updates
     if (onUpdate_) {

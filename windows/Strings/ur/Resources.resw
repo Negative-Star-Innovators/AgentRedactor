@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>یہ غیر ترمیم شدہ حساس اقدار (نام، ای میلز، فون نمبر وغیرہ) اور آپ کی API کلید کو ڈسک پر موجود آپ کی لاگ فائل میں لکھے گا۔ اگر دوسروں کو اس کمپیوٹر تک رسائی حاصل ہے تو اسے فعال نہ کریں۔ جب آپ ایپ کو بند کرتے ہیں تو ترتیب دوبارہ سیٹ ہوجاتی ہے۔</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>یہ اندراج پہلے سے موجود ہے۔</value>
+  </data>
 </root>

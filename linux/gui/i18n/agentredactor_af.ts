@@ -35,20 +35,24 @@
       <translation>Kon nie vir opdaterings soek nie. Probeer later weer.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Lêer</translation>
+      <source>On</source>
+      <translation>Aan</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Maak toe</translation>
+      <source>Off</source>
+      <translation>Af</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profiel</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Hoe om Agent Redactor te gebruik</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Opsporing</translation>
+      <source>API Proxy</source>
+      <translation>API-prossie</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI-aangedrewe opsporingsmodel</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Naam:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Poort:</translation>
+      <source>Local URL</source>
+      <translation>Plaaslike URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API-sleutel</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Gebruik AI-model:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Vertrouensdrempel:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profiele</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Stel jou profiel hieronder op (of gebruik die verstek)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Rig jou LLM-kliënt (Claude Code, OpenClaw, ens.) na die Plaaslike URL wat hieronder gewys word</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Ons sit tussen jou kliënt en die werklike API. Alles bly op jou masjien. Sensitive data word plaaslik geredigeer voordat enige versoek jou rekenaar verlaat, wat verseker dat jou data nooit ons bediener raak nie</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Die adres waarop jou LLM-kliënt wys</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Die werklike API-eindpunt wat jou geredigeerde versoeke ontvang</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI-aangedrewe opsporing loop plaaslik as 'n bykomende verdedigingslaag. Dit kan data mis of oor-redigeer. Gebruik die Regex-patrone en Sleutelwoorde hieronder vir deterministiese redigering.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Verwag effens stadiger reaksietye wanneer geaktiveer. Die model skandeer elke boodskap plaaslik.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Teks wat met hierdie patrone ooreenstem, sal geredigeer word voordat dit na die API gestuur word</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Boodskappe wat hierdie woorde bevat, sal gemerk word vir redigering</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Werklike redigerings wat in die huidige sessie opgespoor is.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Geen redigerings in die huidige sessie nie.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Logs word op hierdie rekenaar gestoor. Geredigeerde logs kan steeds sensitiewe data bevat wat opsporing gemis het.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>bv., Werk OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>bv. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>bv. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>bv. wagwoord</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Wys API-sleutel</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopieer proxy-URL</translation>
+      <source>Copy</source>
+      <translation>Kopieer</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor is gesluit</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profiele</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profielnaam</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Hoofwagwoord</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Geaktiveer</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-patroon</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Hooflettergebruik</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Sleutelwoord</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Ongeldige regex-sintaksis.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Hierdie inskrywing bestaan reeds.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Aktiveer sleutelwoord</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Geval: Ja</translation>
+      <source>Yes</source>
+      <translation>Ja</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Geval: Nee</translation>
+      <source>No</source>
+      <translation>Nee</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy-URL is na knipbord gekopieer</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Poort %1 is beskikbaar</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Poort %1 is reeds in gebruik</translation>
     </message>
     <message>
       <source>Wrong password.</source>

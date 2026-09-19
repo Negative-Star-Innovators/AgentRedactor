@@ -35,20 +35,24 @@
       <translation>تعذّر التحقق من التحديثات. حاول مرة أخرى لاحقًا.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;ملف</translation>
+      <source>On</source>
+      <translation>على</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>يترك</translation>
+      <source>Off</source>
+      <translation>عن</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>حساب تعريفي</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>كيفية استخدام وكيل Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>كشف</translation>
+      <source>API Proxy</source>
+      <translation>وكيل واجهة برمجة التطبيقات</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>نموذج الكشف المدعوم بالذكاء الاصطناعي</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>اسم:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>ميناء:</translation>
+      <source>Local URL</source>
+      <translation>عنوان URL المحلي</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>مفتاح واجهة برمجة التطبيقات</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>استخدم نموذج الذكاء الاصطناعي:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>عتبة الثقة:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>الملفات الشخصية</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. قم بتكوين ملف التعريف الخاص بك أدناه (أو استخدم الإعداد الافتراضي)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. قم بتوجيه عميل LLM الخاص بك (Claude Code، OpenClaw، وما إلى ذلك) إلى عنوان URL المحلي الموضح أدناه</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. نحن نجلس بين عميلك وواجهة برمجة التطبيقات الحقيقية. كل شيء يبقى على جهازك. يتم تنقيح البيانات الحساسة محليًا قبل أن يغادر أي طلب جهاز الكمبيوتر الخاص بك لضمان عدم ملامسة بياناتك لخادمنا أبدًا</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>العنوان الذي يشير إليه عميل LLM الخاص بك</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>نقطة نهاية واجهة برمجة التطبيقات الحقيقية التي تتلقى طلباتك المنقحة</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>يعمل الكشف المدعوم بالذكاء الاصطناعي محليًا كطبقة إضافية من الدفاع. قد تفوت البيانات أو تبالغ في تنقيحها. استخدم أنماط Regex والكلمات الرئيسية أدناه للتنقيح الحتمي.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>توقع استجابات أبطأ قليلاً عند التمكين. يقوم النموذج بمسح كل رسالة محليًا.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>سيتم تنقيح النص المطابق لهذه الأنماط قبل إرساله إلى واجهة برمجة التطبيقات</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>سيتم وضع علامة على الرسائل التي تحتوي على هذه الكلمات لتنقيحها</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>تم الكشف عن التنقيحات الفعلية في الجلسة الحالية.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>لا توجد تنقيحات في الجلسة الحالية.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>يتم تخزين السجلات على هذا الكمبيوتر. ربما لا تزال السجلات المنقحة تحتوي على بيانات حساسة لم يتم الكشف عنها.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>على سبيل المثال، العمل OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>على سبيل المثال https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>على سبيل المثال س-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>على سبيل المثال كلمة المرور</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>إظهار مفتاح API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>انسخ عنوان URL للوكيل</translation>
+      <source>Copy</source>
+      <translation>ينسخ</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>تم تأمين وكيل Redactor</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>الملفات الشخصية</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>اسم الملف الشخصي</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>كلمة المرور الرئيسية</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>ممكّن</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>نمط ريكس</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>قضية</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>الكلمة الرئيسية</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>بناء جملة التعبير العادي غير صالح.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>هذه المدخلة موجودة مسبقًا.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>تمكين الكلمة الرئيسية</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>الحالة: نعم</translation>
+      <source>Yes</source>
+      <translation>نعم</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>الحالة: لا</translation>
+      <source>No</source>
+      <translation>لا</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>تم نسخ عنوان URL للوكيل إلى الحافظة</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>المنفذ %1 متاح</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>المنفذ %1 قيد الاستخدام بالفعل</translation>
     </message>
     <message>
       <source>Wrong password.</source>

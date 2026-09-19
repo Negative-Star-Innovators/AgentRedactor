@@ -35,20 +35,24 @@
       <translation>לא ניתן היה לבדוק עדכונים. נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;קוֹבֶץ</translation>
+      <source>On</source>
+      <translation>עַל</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>צא</translation>
+      <source>Off</source>
+      <translation>כבוי</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>פּרוֹפִיל</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>איך להשתמש ב-Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>איתור</translation>
+      <source>API Proxy</source>
+      <translation>פרוקסי API</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>מודל זיהוי מונע AI</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>שֵׁם:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>נָמָל:</translation>
+      <source>Local URL</source>
+      <translation>URL מקומי</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>מפתח API</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>השתמש במודל AI:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>סף ביטחון:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>פרופילים</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. הגדר את הפרופיל שלך למטה (או השתמש בברירת המחדל)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. הפנה את לקוח ה-LLM שלך (Claude Code, OpenClaw וכו') אל כתובת ה-URL המקומית המוצגת למטה</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. אנחנו יושבים בין הלקוח שלך לבין ה-API האמיתי. הכל נשאר על המחשב שלך. נתונים רגישים מוסרים מקומית לפני שבקשה כלשהי יוצאת מהמחשב שלך, כך שהנתונים שלך לעולם לא יגיעו לשרתים שלנו</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>הכתובת שאליה לקוח ה-LLM שלך מצביע</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>נקודת הקצה האמיתית של ה-API שמקבלת את הבקשות המעודכנות שלך</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>זיהוי מונע AI פועל מקומית כשכבת הגנה נוספת. ייתכן שיפספס נתונים או יסיר יתר על המידה. השתמש בתבניות ה-Regex ובמילות המפתח שלמטה להסרה דטרמיניסטית.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>צפה לתגובות מעט אטיות יותר כאשר מופעל. המודל סורק כל הודעה מקומית.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>טקסט התואם לתבניות אלה יוסר לפני השליחה ל-API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>הודעות המכילות מילים אלה יסומנו להסרה</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>הסרות בפועל שזוהו בהפעלה הנוכחית.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>אין הסרות בהפעלה הנוכחית.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>יומנים שעברו עריכה עשויים עדיין להכיל נתונים רגישים שפספס הזיהוי. היומנים נשמרים על מחשב זה.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>למשל, OpenAI עבודה</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>למשל https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>למשל sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>למשל password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>הצג מפתח API</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>העתק את כתובת ה-proxy</translation>
+      <source>Copy</source>
+      <translation>העתק</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>הסוכן Redactor נעול</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>פרופילים</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>שם פרופיל</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>סיסמת מאסטר</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>מופעל</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>תבנית Regex</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>רישיות</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>מילת מפתח</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>תחביר regex לא חוקי.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>רשומה זו כבר קיימת.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>אפשר מילת מפתח</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>מקרה: כן</translation>
+      <source>Yes</source>
+      <translation>כן</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>מקרה: לא</translation>
+      <source>No</source>
+      <translation>לא</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>כתובת ה-proxy הועתקה ללוח</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>פורט %1 זמין</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>פורט %1 כבר בשימוש</translation>
     </message>
     <message>
       <source>Wrong password.</source>

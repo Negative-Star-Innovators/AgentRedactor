@@ -9,6 +9,8 @@
 #include <atomic>
 #include <condition_variable>
 
+#include "constants.h"
+
 namespace Ort {
     class Session;
     class Env;
@@ -19,6 +21,7 @@ namespace Ort {
 namespace AgentRedactor {
 
 class BPETokenizer;
+class LogManager;
 
 struct PIIEntity {
     std::wstring type;
@@ -41,7 +44,8 @@ struct DetectionResult {
 
 class PIIDetector {
 public:
-    explicit PIIDetector(const std::filesystem::path& modelPath = L"models");
+    explicit PIIDetector(const std::filesystem::path& modelPath = L"models",
+                         LogManager* logManager = nullptr);
     ~PIIDetector();
     PIIDetector(const PIIDetector&) = delete;
     PIIDetector& operator=(const PIIDetector&) = delete;
@@ -53,6 +57,15 @@ public:
     std::wstring GetCurrentProvider() const { return currentProvider_; }
     void SetConfidenceThreshold(float threshold) { confidenceThreshold_ = threshold; }
     float GetConfidenceThreshold() const { return confidenceThreshold_; }
+
+    // Effective single-chunk token budget this build feeds the model
+    // (MAX_TOKENS_PER_CHUNK). Left constant today; reported so diagnostics can
+    // reason about the largest activation workspace a Run() can request.
+    size_t GetModelChunkTokens() const { return MAX_TOKENS_PER_CHUNK; }
+    // Suggested ONNX Runtime CPU memory-arena cap (bytes) computed from the
+    // host's available RAM, for observability only — NOT applied yet. Returning
+    // 0 means no suggestion (memory unknown).
+    size_t GetSuggestedArenaBytes() const { return suggestedArenaBytes_; }
 
     std::vector<PIIEntity> DetectPII(
         const std::wstring& text,
@@ -89,10 +102,12 @@ private:
     std::unique_ptr<Ort::Session> session_;
     std::unique_ptr<BPETokenizer> tokenizer_;
     std::vector<std::wstring> supportedTypes_;
+    LogManager* logManager_ = nullptr;
     bool initialized_ = false;
     bool useONNX = false;
     std::wstring preferredProvider_ = L"auto";
     std::wstring currentProvider_ = L"cpu";
+    size_t suggestedArenaBytes_ = 0;
     std::unordered_map<std::string, float> viterbiBiases_;
     float confidenceThreshold_ = 0.9f;
     std::unordered_map<int, std::wstring> id2label_;

@@ -62,6 +62,12 @@ the engine (`agentredactor`, found next to it or in the sibling `engine/`
 build dir) when none is running, and stops it on quit only when it spawned
 it.
 
+The Qt floor is the distro Qt in Ubuntu 24.04 (Qt 6.4, from apt
+`qt6-base-dev`): CI and the AppImage build against it, so APIs newer than
+6.4 (e.g. `QStyleHints::colorScheme`, Qt 6.8) must be guarded with
+`QT_VERSION` checks. A newer locally installed Qt compiles them fine but CI
+does not.
+
 - Tray: `QSystemTrayIcon` (StatusNotifierItem). On desktops without a tray
   (plain Wayland GNOME without the AppIndicator extension) the app runs as a
   control panel: closing the window exits the GUI but leaves the engine

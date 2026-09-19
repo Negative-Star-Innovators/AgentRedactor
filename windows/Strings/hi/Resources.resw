@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>यह डिस्क पर आपकी लॉग फ़ाइल में असंपादित संवेदनशील मान (नाम, ईमेल, फ़ोन नंबर, आदि) और आपकी एपीआई कुंजी लिखेगा। यदि दूसरों के पास इस कंप्यूटर तक पहुंच है तो इसे सक्षम न करें। जब आप ऐप बंद करते हैं तो सेटिंग रीसेट हो जाती है।</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>यह प्रविष्टि पहले से मौजूद है।</value>
+  </data>
 </root>

@@ -35,20 +35,24 @@
       <translation>Es konnte nicht nach Updates gesucht werden. Versuchen Sie es später erneut.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Datei</translation>
+      <source>On</source>
+      <translation>An</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Beenden</translation>
+      <source>Off</source>
+      <translation>Aus</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Wie Sie Agent Redactor verwenden</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Erkennung</translation>
+      <source>API Proxy</source>
+      <translation>API-Proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>KI-gestütztes Erkennungsmodell</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Name:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Hafen:</translation>
+      <source>Local URL</source>
+      <translation>Lokale URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API-Schlüssel</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>KI-Modell verwenden:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Vertrauensschwelle:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profile</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurieren Sie unten Ihr Profil (oder verwenden Sie das Standardprofil)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Richten Sie Ihren LLM-Client (Claude Code, OpenClaw usw.) auf die unten angezeigte lokale URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Wir sitzen zwischen Ihrem Client und der echten API. Alles bleibt auf Ihrem Rechner. Sensible Daten werden lokal geschwärzt, bevor eine Anfrage Ihren Computer verlässt, sodass Ihre Daten nie unseren Server erreichen</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Die Adresse, auf die Ihr LLM-Client zeigt</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Der echte API-Endpunkt, der Ihre geschwärzten Anfragen erhält</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Die KI-gestützte Erkennung läuft lokal als zusätzliche Verteidigungslinie. Möglicherweise werden Daten übersehen oder übermäßig geschwärzt. Verwenden Sie unten Regex-Muster und Schlüsselwörter für deterministische Schwärzung.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Erwarten Sie bei Aktivierung etwas langsamere Antworten. Das Modell scannt jede Nachricht lokal.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Text, auf den diese Muster zutreffen, wird vor dem Senden an die API geschwärzt</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Nachrichten, die diese Wörter enthalten, werden zur Schwärzung markiert</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Tatsächliche Schwärzungen in der aktuellen Sitzung.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Keine Schwärzungen in der aktuellen Sitzung.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Auf diesem PC werden Protokolle gespeichert. Geschwärzte Protokolle enthalten möglicherweise immer noch vertrauliche Daten, die bei der Erkennung übersehen wurden.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>z. B. Arbeit OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>z. B. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>z. B. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>z. B. Passwort</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API-Schlüssel anzeigen</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proxy-URL kopieren</translation>
+      <source>Copy</source>
+      <translation>Kopieren</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor ist gesperrt</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profile</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profilname</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Master-Passwort</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktiviert</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex-Muster</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Groß-/Kleinschreibung</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Schlüsselwort</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Ungültige Regex-Syntax.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Dieser Eintrag existiert bereits.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Schlüsselwort aktivieren</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Fall: Ja</translation>
+      <source>Yes</source>
+      <translation>Ja</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Fall: Nein</translation>
+      <source>No</source>
+      <translation>Nein</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy-URL in die Zwischenablage kopiert</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 ist verfügbar</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 wird bereits verwendet</translation>
     </message>
     <message>
       <source>Wrong password.</source>

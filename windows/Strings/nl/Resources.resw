@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>Hierdoor worden niet-geredigeerde gevoelige waarden (namen, e-mails, telefoonnummers, enz.) en uw API-sleutel naar uw logbestand op schijf geschreven. Schakel dit niet in als anderen toegang hebben tot deze computer. De instelling wordt gereset wanneer u de app sluit.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Dit item bestaat reeds.</value>
+  </data>
 </root>

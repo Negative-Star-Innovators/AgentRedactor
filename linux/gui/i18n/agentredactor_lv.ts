@@ -35,20 +35,24 @@
       <translation>Neizdevās pārbaudīt atjauninājumus. Mēģiniet vēlāk vēlreiz.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fails</translation>
+      <source>On</source>
+      <translation>Ieslēgts</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Iziet</translation>
+      <source>Off</source>
+      <translation>Izslēgts</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profils</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Kā izmantot Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Atklāšana</translation>
+      <source>API Proxy</source>
+      <translation>API starpniekserveris</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Mākslīgā intelekta pamatots atklāšanas modelis</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Vārds:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Ports:</translation>
+      <source>Local URL</source>
+      <translation>Vietējais URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API atslēga</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Izmantojiet AI modeli:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Pārliecības slieksnis:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profili</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurējiet savu profilu zemāk (vai izmantojiet noklusējuma profilu)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Vērsiet savu LLM klientu (Claude Code, OpenClaw utt.) uz zemāk redzamo vietējo URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Mēs atrodamies starp jūsu klientu un īsto API. Viss paliek uz jūsu ierīces. Jutīgie dati tiek rediģēti lokāli, pirms jebkurš pieprasījums pamet jūsu datoru, nodrošinot, ka jūsu dati nekad nesasniedz mūsu serveri</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adrese, uz kuru norāda jūsu LLM klients</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Īstais API galapunkts, kas saņem jūsu rediģētos pieprasījumus</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Mākslīgā intelekta atklāšana darbojas lokāli kā papildu aizsardzības slānis. Tā var palaist garām datus vai pārlieku rediģēt. Izmantojiet Regex paraugus un Atslēgvārdus zemāk determinētai rediģēšanai.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Gaidiet nedaudz lēnākas atbildes, kad iespējots. Modelis skenē katru ziņu lokāli.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Teksts, kas atbilst šiem paraugiem, tiks rediģēts pirms nosūtīšanas uz API</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Ziņojumi, kas satur šos vārdus, tiks atzīmēti rediģēšanai</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Faktiskie rediģējumi, kas atklāti pašreizējā sesijā.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Pašreizējā sesijā nav rediģējumu.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Žurnāli tiek glabāti šajā datorā. Rediģētajos žurnālos joprojām var būt ietverti sensitīvi dati, kas netika atklāti.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>piem., Darbs OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>piem. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>piem. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>piem. parole</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Rādīt API atslēgu</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopēt starpniekservera URL</translation>
+      <source>Copy</source>
+      <translation>Kopēt</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Aģenta redaktors ir bloķēts</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profili</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profila nosaukums</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Galvenā parole</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Iespējots</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex paraugs</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Reģistrs</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Atslēgvārds</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Nederīga regex sintakse.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Šis ieraksts jau eksistē.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Iespējot atslēgvārdu</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Lieta: Jā</translation>
+      <source>Yes</source>
+      <translation>Jā</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Lieta: Nē</translation>
+      <source>No</source>
+      <translation>Nē</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Starpniekservera URL ir kopēts starpliktuvē</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Ports %1 ir pieejams</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Ports %1 jau tiek izmantots</translation>
     </message>
     <message>
       <source>Wrong password.</source>

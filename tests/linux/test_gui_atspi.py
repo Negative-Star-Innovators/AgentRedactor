@@ -9,8 +9,11 @@ against the mock upstream LLM (tests/mock_llm.py).
 
 Coverage notes vs. the Windows suite:
 - The Windows "port status indicator" (green/red text next to the Port box)
-  has no Linux counterpart; port validation is covered here through the
-  Save-time conflict dialog instead (test_port_conflict_rejected_with_dialog).
+  has a Linux counterpart under the same name. A port owned by another saved
+  profile shows the red "already used by profile" text live
+  (test_port_status_used_by_another_profile_shows_red_text); port validation
+  is also covered through the Save-time conflict dialog
+  (test_port_conflict_rejected_with_dialog).
 - Language switching is driven through the real CLI (`set app-language`), as
   allowed for this port, and asserted on the retranslated a11y strings.
 - Row text edits (keyword/regex) must be persisted with the profile card's
@@ -310,7 +313,7 @@ async def test_port_conflict_rejected_with_dialog(
 
     app.select_profile("second-profile")
     app.set_form(port=gui.proxy_port)
-    card = app.panel("Profile")
+    card = app.panel("API Proxy")
     app.press_named("Save", within=card)
 
     lines = app.dialog_text("Validation Error")
@@ -322,6 +325,39 @@ async def test_port_conflict_rejected_with_dialog(
         "form reverted to original port",
         lambda: app.field_text("Proxy port"),
         lambda text: text == str(second_port),
+    )
+
+
+@pytest.mark.asyncio
+async def test_port_status_used_by_another_profile_shows_red_text(
+    gui: GuiContext, client: aiohttp.ClientSession, mock_llm: MockLLM
+) -> None:
+    """Linux mirror of Windows test_gui_port_status_used_by_another_profile_shows_red_text.
+
+    With a second profile already owning a port, typing that port into the
+    current profile shows the live status as taken by that profile — without
+    saving, the same check the Save-time validation enforces.
+    """
+    app = gui.app
+    second_port = _find_free_port()
+
+    app.add_profile()
+    app.set_form(url=mock_llm.base_url, api_key="test-api-key-second",
+                 port=second_port, alias="second-profile")
+    app.save_profile()
+    assert _wait_for_port(second_port, timeout=30.0)
+
+    # The newly saved second profile stays selected (AT-SPI list-item
+    # activation does not switch QListWidget selection, so no existing test
+    # relies on clicking the sidebar). Type the seeded profile's port into the
+    # current profile's box instead: same cross-profile check the Save-time
+    # validation enforces, evaluated live without saving.
+    app.set_field("Proxy port", str(gui.proxy_port))
+
+    wait_until(
+        "port status reports the other profile",
+        app.port_status_text,
+        lambda text: text is not None and "already used by profile 'test-profile'" in text,
     )
 
 
@@ -712,7 +748,7 @@ async def test_master_password_lock_overlay_and_unlock(gui: GuiContext) -> None:
 
     wait_until("lock overlay shown", app.locked, lambda locked: locked, timeout=60)
     # The content page is hidden while locked (nothing leaks behind it).
-    assert not app.find_all("panel", "Profile")
+    assert not app.find_all("panel", "API Proxy")
     assert not app.find_all("list", "Profiles")
 
     # Wrong password: inline error, overlay stays.
@@ -762,17 +798,19 @@ async def test_language_switch_retranslates_ui(gui: GuiContext) -> None:
 
     r = gui.cli("set", "app-language", "de")
     assert r.returncode == 0, r.stdout + r.stderr
-    wait_until("German UI", lambda: app.find_all("panel", "Profil"),
+    wait_until("German UI", lambda: app.find_all("panel", "API-Proxy"),
                lambda nodes: len(nodes) > 0, timeout=20)
     assert app.find_all("panel", "Schlüsselwörter")
+    assert app.find_all("panel", "KI-gestütztes Erkennungsmodell")
 
     r = gui.cli("set", "app-language", "ar")
     assert r.returncode == 0, r.stdout + r.stderr
-    wait_until("Arabic UI", lambda: app.find_all("panel", "حساب تعريفي"),
+    wait_until("Arabic UI", lambda: app.find_all("panel", "وكيل واجهة برمجة التطبيقات"),
                lambda nodes: len(nodes) > 0, timeout=20)
+    assert app.find_all("panel", "نموذج الكشف المدعوم بالذكاء الاصطناعي")
 
     r = gui.cli("set", "app-language", "en")
     assert r.returncode == 0, r.stdout + r.stderr
-    wait_until("English UI restored", lambda: app.find_all("panel", "Profile"),
+    wait_until("English UI restored", lambda: app.find_all("panel", "API Proxy"),
                lambda nodes: len(nodes) > 0, timeout=20)
     assert "test-profile" in app.profiles()

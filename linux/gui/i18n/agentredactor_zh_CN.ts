@@ -35,20 +35,24 @@
       <translation>无法检查更新。请稍后重试。</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>＆文件</translation>
+      <source>On</source>
+      <translation>在</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>退出</translation>
+      <source>Off</source>
+      <translation>离开</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>轮廓</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>如何使用 Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>检测</translation>
+      <source>API Proxy</source>
+      <translation>API 代理</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>AI 驱动检测模型</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>姓名：</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>港口：</translation>
+      <source>Local URL</source>
+      <translation>本地 URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API 密钥</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>使用AI模型：</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>置信阈值：</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>配置文件</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. 在下方配置您的配置文件（或使用默认配置）</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. 将您的 LLM 客户端（Claude Code、OpenClaw 等）指向下方显示的本地 URL</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. 我们位于您的客户端与真实 API 之间。所有内容都保留在您的设备上。敏感数据会在任何请求离开您的计算机之前本地脱敏，确保您的数据绝不会到达我们的服务器</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>您的 LLM 客户端指向的地址</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>接收您脱敏后请求的真实 API 端点</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>AI 驱动检测在本地运行，作为额外防御层。可能会遗漏数据或过度脱敏。请使用下方的正则表达式模式和关键词进行确定性脱敏。</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>启用后响应速度可能会稍慢。模型会在本地扫描每条消息。</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>与这些模式匹配的文本将在发送至 API 之前脱敏</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>包含这些词的消息将被标记为脱敏</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>当前会话中检测到的实际脱敏。</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>当前会话中无脱敏。</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>日志存储在此 PC 上。编辑后的日志可能仍包含检测遗漏的敏感数据。</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>例如，工作 OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>例如 https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>例如 sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>例如 password</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>显示 API 密钥</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>复制代理网址</translation>
+      <source>Copy</source>
+      <translation>复制</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>代理编辑器已锁定</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>配置文件</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>个人资料名称</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>主密码</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>已启用</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>正则表达式模式</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>大小写</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>关键词</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>正则表达式语法无效。</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>此条目已存在。</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>启用关键字</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>案例：是</translation>
+      <source>Yes</source>
+      <translation>是</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>案例：无</translation>
+      <source>No</source>
+      <translation>否</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>代理 URL 已复制到剪贴板</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>端口 %1 可用</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>端口 %1 已被占用</translation>
     </message>
     <message>
       <source>Wrong password.</source>

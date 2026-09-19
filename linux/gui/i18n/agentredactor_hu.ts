@@ -35,20 +35,24 @@
       <translation>Nem sikerült frissítéseket keresni. Próbálja újra később.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Fájl</translation>
+      <source>On</source>
+      <translation>On</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Kilépés</translation>
+      <source>Off</source>
+      <translation>Le</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Hogyan használja az Agent Redactor-t</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Érzékelés</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Mesterséges intelligenciával működő észlelési modell</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Név:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Kikötő:</translation>
+      <source>Local URL</source>
+      <translation>Helyi URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API kulcs</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>AI modell használata:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Bizalmi küszöb:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profilok</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurálja alább a profilját (vagy használja az alapértelmezettet)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Irányítsa az LLM kliensét (Claude Code, OpenClaw stb.) az alább megjelenített helyi URL-re</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Mi az Ön kliense és a valódi API között helyezkedünk el. Minden az Ön gépén marad. Az érzékeny adatok helyben anonimizálásra kerülnek, mielőtt bármely kérés elhagyná a számítógépét, így az Ön adatai soha nem érik el a mi szerverünket</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Az az cím, amelyre az LLM kliense mutat</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>A valódi API végpont, amely fogadja az Ön anonimizált kéréseit</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>A mesterséges intelligenciával működő észlelés helyben fut további védelmi rétegként. Előfordulhat, hogy adatokat mulaszt el, vagy túl sokat anonimizál. A determinisztikus anonimizáláshoz használja az alábbi Regex mintákat és Kulcsszavakat.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Bekapcsolás esetén kissé lassabb válaszokra számítson. A modell minden üzenetet helyben szkennel.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Az ezeknek a mintáknak megfelelő szöveget anonimizáljuk az API-nak való elküldés előtt</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Az ezeket a szavakat tartalmazó üzeneteket anonimizálásra jelöljük</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>A jelenlegi munkamenetben észlelt tényleges anonimizálások.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Nincs anonimizálás a jelenlegi munkamenetben.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>A naplók ezen a számítógépen tárolódnak. A módosított naplók továbbra is tartalmazhatnak olyan bizalmas adatokat, amelyek észlelése elmaradt.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>pl., Munka OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>pl. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>pl. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>pl. jelszó</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>API-kulcs megjelenítése</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Proxy URL másolása</translation>
+      <source>Copy</source>
+      <translation>Másolás</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Az Agent Redactor zárolva van</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profilok</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Profil neve</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Mester jelszó</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Engedélyezve</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex minta</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Kis- és nagybetű</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Kulcsszó</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Érvénytelen regex szintaxis.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ilyen bejegyzés már létezik.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Kulcsszó engedélyezése</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Eset: Igen</translation>
+      <source>Yes</source>
+      <translation>Igen</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Eset: Nem</translation>
+      <source>No</source>
+      <translation>Nem</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy URL a vágólapra másolva</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>A(z) %1 port elérhető</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>A(z) %1 port már használatban van</translation>
     </message>
     <message>
       <source>Wrong password.</source>

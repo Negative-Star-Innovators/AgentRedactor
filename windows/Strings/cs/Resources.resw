@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>To zapíše neredigované citlivé hodnoty (jména, e-maily, telefonní čísla atd.) a váš klíč API do souboru protokolu na disk. Toto nepovolujte, pokud k tomuto počítači mají přístup ostatní. Po zavření aplikace se nastavení resetuje.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>Tato položka již existuje.</value>
+  </data>
 </root>

@@ -316,7 +316,7 @@ void SettingsManager::SaveSettings() {
             file << settings_.dump(2);
         }
     } catch (const std::exception& e) {
-        LOGF_LIFECYCLE(L"[SettingsManager] Save error: %s", Utils::Utf8ToWide(e.what()).c_str());
+        LOGF_LIFECYCLE(L"[SettingsManager] Save error: %ls", Utils::Utf8ToWide(e.what()).c_str());
     }
 }
 
@@ -346,7 +346,7 @@ void SettingsManager::LoadSettings() {
         // If protection is enabled, decryption is deferred until
         // UnlockWithHello is called (Windows Hello only).
     } catch (const std::exception& e) {
-        LOGF_LIFECYCLE(L"[SettingsManager] Load error: %s", Utils::Utf8ToWide(e.what()).c_str());
+        LOGF_LIFECYCLE(L"[SettingsManager] Load error: %ls", Utils::Utf8ToWide(e.what()).c_str());
         BackupCorruptSettingsFile();
         settings_ = json::object();
         secureStorage_.Initialize(json::object());
@@ -372,10 +372,10 @@ void SettingsManager::BackupCorruptSettingsFile() {
         std::error_code ec;
         std::filesystem::copy_file(settingsFile_, backup, ec);
         if (ec) {
-            LOGF_LIFECYCLE(L"[SettingsManager] FAILED to back up corrupt settings file to %s: %s",
+            LOGF_LIFECYCLE(L"[SettingsManager] FAILED to back up corrupt settings file to %ls: %ls",
                 backup.c_str(), Utils::Utf8ToWide(ec.message()).c_str());
         } else {
-            LOGF_LIFECYCLE(L"[SettingsManager] Corrupt settings file backed up to %s before reset",
+            LOGF_LIFECYCLE(L"[SettingsManager] Corrupt settings file backed up to %ls before reset",
                 backup.c_str());
         }
     } catch (...) {

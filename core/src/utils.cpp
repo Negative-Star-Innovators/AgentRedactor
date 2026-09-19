@@ -104,12 +104,15 @@ void LogTrafficMessage(const std::wstring& direction, const std::wstring& messag
     if (g_debugTrafficLogFilePath.empty()) InitializeDebugTrafficLogging();
     std::lock_guard<std::mutex> lock(g_debugTrafficLogMutex);
     try {
-        std::wofstream logFile(g_debugTrafficLogFilePath, std::ios::app);
+        // Narrow stream + explicit UTF-8: wofstream in the default C locale
+        // silently drops any line containing non-ASCII (BPE markers, accented
+        // PII text) — the whole insertion fails, nothing is written.
+        std::ofstream logFile(g_debugTrafficLogFilePath, std::ios::app);
         if (logFile) {
             auto now = std::chrono::system_clock::now();
             auto time = std::chrono::system_clock::to_time_t(now);
             std::wstring timeStr = FormatLocalizedDateTime(time);
-            logFile << L"[" << timeStr << L"] [" << direction << L"] " << message << std::endl;
+            logFile << WideToUtf8(L"[" + timeStr + L"] [" + direction + L"] " + message + L"\n");
             logFile.flush();
         }
     } catch (...) {}
@@ -143,9 +146,11 @@ static void WriteLogLine(const std::wstring& message) {
             CloseHandle(h);
         }
 #else
-        std::wofstream logFile(g_logFilePath, std::ios::app);
+        // See LogTrafficMessage: narrow stream + explicit UTF-8 so non-ASCII
+        // content is not silently dropped in the C locale.
+        std::ofstream logFile(g_logFilePath, std::ios::app);
         if (logFile) {
-            logFile << L"[" << timeStr << L"] " << message << std::endl;
+            logFile << WideToUtf8(L"[" + timeStr + L"] " + message + L"\n");
             logFile.flush();
         }
 #endif
@@ -302,6 +307,58 @@ size_t HashWString(const std::wstring& str) {
     return std::hash<std::wstring>{}(str);
 }
 
+SystemMemory GetSystemMemory() {
+    SystemMemory mem;
+#ifdef _WIN32
+    MEMORYSTATUSEX m = {};
+    m.dwLength = sizeof(m);
+    if (GlobalMemoryStatusEx(&m)) {
+        mem.totalBytes = static_cast<size_t>(m.ullTotalPhys);
+        mem.availableBytes = static_cast<size_t>(m.ullAvailPhys);
+    }
+#else
+    // /proc/meminfo: "MemTotal: <n> kB", "MemAvailable: <n> kB", ... The
+    // trailing unit token must be consumed so the key/value pairs stay aligned
+    // (each line is key + value + "kB").
+    std::ifstream f(std::filesystem::path(L"/proc/meminfo"));
+    if (f) {
+        std::string key, unit;
+        unsigned long long kb = 0;
+        while (f >> key >> kb >> unit) {
+            if (key == "MemTotal:") mem.totalBytes = static_cast<size_t>(kb) * 1024;
+            else if (key == "MemAvailable:") mem.availableBytes = static_cast<size_t>(kb) * 1024;
+        }
+    }
+#endif
+    return mem;
+}
+
+size_t GetProcessRssBytes() {
+#ifdef _WIN32
+    MEMORYSTATUSEX m = {};
+    m.dwLength = sizeof(m);
+    if (GlobalMemoryStatusEx(&m)) {
+        // Not per-process, but a rough diagnostic on Windows.
+        return static_cast<size_t>(m.ullTotalPhys - m.ullAvailPhys);
+    }
+    return 0;
+#else
+    std::ifstream f(std::filesystem::path(L"/proc/self/status"));
+    if (f) {
+        std::string line;
+        while (std::getline(f, line)) {
+            if (line.rfind("VmRSS:", 0) == 0) {
+                unsigned long long kb = 0;
+                if (std::sscanf(line.c_str() + 6, " %llu", &kb) >= 1) {
+                    return static_cast<size_t>(kb) * 1024;
+                }
+            }
+        }
+    }
+    return 0;
+#endif
+}
+
 std::optional<std::wstring> ReadFileAsString(const std::filesystem::path& path) {
     try {
         std::ifstream file(path, std::ios::binary);
@@ -368,6 +425,37 @@ std::filesystem::path GetCurrentLogFilePath() {
         return GetAppDataPath() / L"agent_redactor.log";
     }
     return g_logFilePath;
+}
+
+std::filesystem::path GetHostVisiblePath(const std::filesystem::path& path) {
+#ifdef _WIN32
+    // Directories require FILE_FLAG_BACKUP_SEMANTICS to open; FILE_READ_ATTRIBUTES
+    // is enough to resolve the final path. OPEN_EXISTING keeps this a pure
+    // resolver: a path that does not exist (this or the translated view) fails
+    // here and returns empty, which callers treat as "nothing to open".
+    HANDLE h = CreateFileW(path.c_str(), FILE_READ_ATTRIBUTES,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+        OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+    if (h == INVALID_HANDLE_VALUE) return std::filesystem::path();
+    wchar_t resolved[32768];
+    DWORD n = GetFinalPathNameByHandleW(h, resolved, 32768, 0);
+    CloseHandle(h);
+    if (n == 0 || n >= 32768) return std::filesystem::path();
+    std::wstring finalPath(resolved, n);
+    // The API returns a \\?\ (or \\?\UNC\) prefixed form for long paths /
+    // volume-GUID queries; strip it so Notepad/Explorer accept the path.
+    if (finalPath.size() >= 4 && finalPath[0] == L'\\' && finalPath[1] == L'\\'
+        && finalPath[2] == L'?' && finalPath[3] == L'\\') {
+        finalPath = finalPath.substr(4);
+        if (finalPath.size() >= 4 && finalPath[0] == L'U' && finalPath[1] == L'N'
+            && finalPath[2] == L'C' && (finalPath.size() == 3 || finalPath[3] == L'\\')) {
+            finalPath = L"\\" + finalPath.substr(3); // \\?\UNC\host\share -> \\host\share
+        }
+    }
+    return std::filesystem::path(finalPath);
+#else
+    return path;
+#endif
 }
 
 std::filesystem::path GetExecutablePath() {
@@ -692,13 +780,13 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
 
     size_t segmentCount = static_cast<size_t>(std::min<uint64_t>(maxSegments, totalSize / kMinSegmentedBytes));
     if (!rangesSupported || segmentCount < 2) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %s (ranges %s, size %llu)",
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %ls (ranges %ls, size %llu)",
             url.c_str(), rangesSupported ? L"supported" : L"unsupported",
             static_cast<unsigned long long>(totalSize));
         return HttpDownloadFile(url, destPath, progress);
     }
 
-    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %s",
+    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %ls",
         static_cast<unsigned long long>(totalSize), segmentCount, url.c_str());
 
     const uint64_t segmentSize = totalSize / segmentCount;
@@ -788,7 +876,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     for (size_t i = 0; i < segmentCount; ++i) {
         if (!results[i]) {
             // Part files are kept so the next retry resumes each segment.
-            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %s", i, url.c_str());
+            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %ls", i, url.c_str());
             return false;
         }
     }
@@ -814,7 +902,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     std::error_code ec;
     auto finalSize = std::filesystem::file_size(destPath, ec);
     if (ec || finalSize != totalSize) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %s", url.c_str());
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %ls", url.c_str());
         std::filesystem::remove(destPath, ec);
         return false;
     }
@@ -1018,13 +1106,13 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
 
     size_t segmentCount = static_cast<size_t>(std::min<uint64_t>(maxSegments, totalSize / kMinSegmentedBytes));
     if (!rangesSupported || segmentCount < 2) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %s (ranges %s, size %llu)",
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: single-stream fallback for %ls (ranges %ls, size %llu)",
             url.c_str(), rangesSupported ? L"supported" : L"unsupported",
             static_cast<unsigned long long>(totalSize));
         return HttpDownloadFile(url, destPath, progress);
     }
 
-    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %s",
+    LOGF_LIFECYCLE(L"[Utils] Segmented download: %llu bytes in %zu segments from %ls",
         static_cast<unsigned long long>(totalSize), segmentCount, url.c_str());
 
     const uint64_t segmentSize = totalSize / segmentCount;
@@ -1111,7 +1199,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     for (size_t i = 0; i < segmentCount; ++i) {
         if (!results[i]) {
             // Part files are kept so the next retry resumes each segment.
-            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %s", i, url.c_str());
+            LOGF_LIFECYCLE(L"[Utils] Segmented download: segment %zu failed for %ls", i, url.c_str());
             return false;
         }
     }
@@ -1137,7 +1225,7 @@ bool HttpDownloadFileSegmented(const std::wstring& url, const std::filesystem::p
     std::error_code ec;
     auto finalSize = std::filesystem::file_size(destPath, ec);
     if (ec || finalSize != totalSize) {
-        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %s", url.c_str());
+        LOGF_LIFECYCLE(L"[Utils] Segmented download: size mismatch after concat for %ls", url.c_str());
         std::filesystem::remove(destPath, ec);
         return false;
     }

@@ -721,4 +721,7 @@
   <data name="Dialog_EnableSensitiveInfo_Message" xml:space="preserve">
     <value>See kirjutab redigeerimata tundlikud väärtused (nimed, meilid, telefoninumbrid jne) ja teie API-võtme teie kettale logifaili. Ärge lubage seda, kui teistel on sellele arvutile juurdepääs. Seade lähtestatakse rakenduse sulgemisel.</value>
   </data>
+  <data name="Validation_DuplicateEntry" xml:space="preserve">
+    <value>See kirje on juba olemas.</value>
+  </data>
 </root>

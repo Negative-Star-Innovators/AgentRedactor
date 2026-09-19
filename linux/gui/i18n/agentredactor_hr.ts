@@ -35,20 +35,24 @@
       <translation>Nije moguće provjeriti ažuriranja. Pokušajte ponovno kasnije.</translation>
     </message>
     <message>
-      <source>&amp;File</source>
-      <translation>&amp;Datoteka</translation>
+      <source>On</source>
+      <translation>Na</translation>
     </message>
     <message>
-      <source>&amp;Quit</source>
-      <translation>Izađi</translation>
+      <source>Off</source>
+      <translation>Isključeno</translation>
     </message>
     <message>
-      <source>Profile</source>
-      <translation>Profil</translation>
+      <source>How to use Agent Redactor</source>
+      <translation>Kako koristiti Agent Redactor</translation>
     </message>
     <message>
-      <source>Detection</source>
-      <translation>Otkrivanje</translation>
+      <source>API Proxy</source>
+      <translation>API proxy</translation>
+    </message>
+    <message>
+      <source>AI Powered Detection Model</source>
+      <translation>Model detekcije pokretan umjetnom inteligencijom</translation>
     </message>
     <message>
       <source>Regex Patterns</source>
@@ -83,8 +87,8 @@
       <translation>Ime:</translation>
     </message>
     <message>
-      <source>Port:</source>
-      <translation>Luka:</translation>
+      <source>Local URL</source>
+      <translation>Lokalni URL</translation>
     </message>
     <message>
       <source>Forward To</source>
@@ -95,12 +99,76 @@
       <translation>API ključ</translation>
     </message>
     <message>
-      <source>Use AI model:</source>
-      <translation>Koristi AI model:</translation>
-    </message>
-    <message>
       <source>Confidence threshold:</source>
       <translation>Prag pouzdanosti:</translation>
+    </message>
+    <message>
+      <source>Profiles</source>
+      <translation>Profili</translation>
+    </message>
+    <message>
+      <source>1. Configure your profile below (or use the default)</source>
+      <translation>1. Konfigurirajte svoj profil ispod (ili koristite zadani)</translation>
+    </message>
+    <message>
+      <source>2. Point your LLM client (Claude Code, OpenClaw, etc.) at the Local URL shown below</source>
+      <translation>2. Usmjerite svoj LLM klijent (Claude Code, OpenClaw, itd.) na lokalni URL prikazan ispod</translation>
+    </message>
+    <message>
+      <source>3. We sit between your client and real API. Everything stays on your machine. Sensitive data is redacted locally before any request leaves your computer ensuring your data never touches our server</source>
+      <translation>3. Mi smo između vašeg klijenta i pravog API-ja. Sve ostaje na vašem računalu. Osjetljivi podaci se lokalno maskiraju prije nego što bilo koji zahtjev napusti vaše računalo, osiguravajući da vaši podaci nikada ne dosegnu naš poslužitelj</translation>
+    </message>
+    <message>
+      <source>The address your LLM client points at</source>
+      <translation>Adresa na koju upućuje vaš LLM klijent</translation>
+    </message>
+    <message>
+      <source>The real API endpoint that receives your redacted requests</source>
+      <translation>Pravi API endpoint koji prima vaše maskirane zahtjeve</translation>
+    </message>
+    <message>
+      <source>AI-powered detection runs locally as an additional layer of defense. May miss data or over-redact. Use Regex Patterns and Keywords below for deterministic redaction.</source>
+      <translation>Detekcija pokretana umjetnom inteligencijom radi lokalno kao dodatni sloj obrane. Može propustiti podatke ili previše maskirati. Koristite Regex uzorke i Ključne riječi ispod za determinističko maskiranje.</translation>
+    </message>
+    <message>
+      <source>Expect slightly slower responses when enabled. The model scans every message locally.</source>
+      <translation>Očekujte nešto sporije odgovore kada je omogućeno. Model skenira svaku poruku lokalno.</translation>
+    </message>
+    <message>
+      <source>Text matching these patterns will be redacted before sending to the API</source>
+      <translation>Tekst koji odgovara ovim uzorcima bit će maskiran prije slanja API-ju</translation>
+    </message>
+    <message>
+      <source>Messages containing these words will be flagged for redaction</source>
+      <translation>Poruke koje sadrže ove riječi bit će označene za maskiranje</translation>
+    </message>
+    <message>
+      <source>Actual redactions detected in the current session.</source>
+      <translation>Stvarna maskiranja otkrivena u trenutnoj sesiji.</translation>
+    </message>
+    <message>
+      <source>No redactions in current session.</source>
+      <translation>Nema maskiranja u trenutnoj sesiji.</translation>
+    </message>
+    <message>
+      <source>Logs are stored on this PC. Redacted logs may still contain sensitive data that detection missed.</source>
+      <translation>Dnevnici su pohranjeni na ovom računalu. Redigirani zapisnici mogu i dalje sadržavati osjetljive podatke koji nisu otkriveni.</translation>
+    </message>
+    <message>
+      <source>e.g., Work OpenAI</source>
+      <translation>npr., Posao OpenAI</translation>
+    </message>
+    <message>
+      <source>e.g. https://openrouter.ai/api/v1</source>
+      <translation>npr. https://openrouter.ai/api/v1</translation>
+    </message>
+    <message>
+      <source>e.g. sk-[a-zA-Z0-9]{20,}</source>
+      <translation>npr. sk-[a-zA-Z0-9]{20,}</translation>
+    </message>
+    <message>
+      <source>e.g. password</source>
+      <translation>npr. lozinka</translation>
     </message>
     <message>
       <source>Add</source>
@@ -115,8 +183,8 @@
       <translation>Prikaži API ključ</translation>
     </message>
     <message>
-      <source>Copy proxy URL</source>
-      <translation>Kopiraj proxy URL</translation>
+      <source>Copy</source>
+      <translation>Kopiraj</translation>
     </message>
     <message>
       <source>Save</source>
@@ -187,10 +255,6 @@
       <translation>Agent Redactor je zaključan</translation>
     </message>
     <message>
-      <source>Profiles</source>
-      <translation>Profili</translation>
-    </message>
-    <message>
       <source>Profile name</source>
       <translation>Naziv profila</translation>
     </message>
@@ -225,6 +289,22 @@
     <message>
       <source>Master password</source>
       <translation>Glavna lozinka</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Omogućeno</translation>
+    </message>
+    <message>
+      <source>Regex Pattern</source>
+      <translation>Regex uzorak</translation>
+    </message>
+    <message>
+      <source>Case</source>
+      <translation>Velika/mala slova</translation>
+    </message>
+    <message>
+      <source>Keyword</source>
+      <translation>Ključna riječ</translation>
     </message>
     <message>
       <source>Account number</source>
@@ -291,16 +371,20 @@
       <translation>Nevažeća regex sintaksa.</translation>
     </message>
     <message>
+      <source>This entry already exists.</source>
+      <translation>Ovaj unos već postoji.</translation>
+    </message>
+    <message>
       <source>Enable keyword</source>
       <translation>Omogući ključnu riječ</translation>
     </message>
     <message>
-      <source>Case: Yes</source>
-      <translation>Slučaj: Da</translation>
+      <source>Yes</source>
+      <translation>Da</translation>
     </message>
     <message>
-      <source>Case: No</source>
-      <translation>Slučaj: br</translation>
+      <source>No</source>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Keyword text</source>
@@ -357,6 +441,14 @@
     <message>
       <source>Proxy URL copied to clipboard</source>
       <translation>Proxy URL kopiran u međuspremnik</translation>
+    </message>
+    <message>
+      <source>Port %1 is available</source>
+      <translation>Port %1 je dostupan</translation>
+    </message>
+    <message>
+      <source>Port %1 is already in use</source>
+      <translation>Port %1 je već u uporabi</translation>
     </message>
     <message>
       <source>Wrong password.</source>
