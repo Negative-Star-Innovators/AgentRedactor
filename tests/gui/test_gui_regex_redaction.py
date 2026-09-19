@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import aiohttp
 import pytest
+import re
 
 from mock_llm import MockLLM
 
@@ -57,7 +58,10 @@ def _find_regex(regexes: list[dict[str, str | bool]], pattern: str) -> dict[str,
 def _assert_redacted_regex(upstream_body: dict, matched_text: str) -> None:
     upstream_content = _extract_last_user_message(upstream_body)
     assert matched_text not in upstream_content
-    assert "<<REDACTED_REGEX_0>>" in upstream_content
+    # Label counters are monotonic across settings changes (persisted across
+    # engine restarts), so any <<REDACTED_REGEX_n>> is a valid hit — do not
+    # assume the first label of a test is _0.
+    assert re.search(r"<<REDACTED_REGEX_\d+>>", upstream_content)
 
 
 def _assert_not_redacted_regex(upstream_body: dict, expected_text: str) -> None:
