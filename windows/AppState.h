@@ -83,6 +83,13 @@ public:
     // Tray actions
     void ShowTrayMenu();
     void OpenWindow();
+    // Re-adds the tray icon after an Explorer restart (TaskbarCreated). No-op
+    // when the tray was never created.
+    void NotifyTaskbarCreated();
+    // False when the tray icon could not be created (no shell tray area):
+    // close-to-tray would hide the window with no way back, so callers must
+    // exit instead.
+    bool TrayAvailable() const { return trayAvailable_; }
     void SetLanguage(const std::wstring& language);
     void ToggleStartOnBoot();
     void Quit();
@@ -107,6 +114,7 @@ private:
     LogsFacade logsFacade_{ &engineClient_, &logManager_ };
     ProxyFacade proxyFacade_{ &engineClient_ };
     std::unique_ptr<SystemTray> systemTray_;
+    bool trayAvailable_ = false;  // result of SystemTray::Create
 
     HWND messageHwnd_ = nullptr;
     HWND mainHwnd_ = nullptr;

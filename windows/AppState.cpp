@@ -57,7 +57,8 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
     systemTray_ = std::make_unique<SystemTray>(messageHwnd_);
     HICON trayIcon = SystemTray::LoadIconFromFile(L"app.ico", 32);
     if (!trayIcon) trayIcon = SystemTray::CreateGradientIcon(32);
-    systemTray_->Create(trayIcon, ::AgentRedactor::LocString(L"AppDisplayName").c_str());
+    trayAvailable_ = systemTray_->Create(trayIcon, ::AgentRedactor::LocString(L"AppDisplayName").c_str());
+    if (!trayAvailable_) LOG(L"[AppState] WARNING: system tray icon could not be created; close will exit instead of hiding to tray");
     systemTray_->SetOnLeftClick([this]() { OpenWindow(); });
     systemTray_->SetOnRightClick([this]() { ShowTrayMenu(); });
 
@@ -476,6 +477,10 @@ void AppState::OpenWindow() {
         SetWindowPos(mainHwnd_, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
         SetForegroundWindow(mainHwnd_);
     }
+}
+
+void AppState::NotifyTaskbarCreated() {
+    if (systemTray_) systemTray_->Recreate();
 }
 
 void AppState::ToggleStartOnBoot() {

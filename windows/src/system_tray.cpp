@@ -83,6 +83,13 @@ void SystemTray::Destroy() {
     }
 }
 
+void SystemTray::Recreate() {
+    // created_ tracks our intent (Create succeeded); the icon itself is gone
+    // after the Explorer restart, so re-add with the last icon/tooltip.
+    if (!created_ || !notifyIconData_.hIcon) return;
+    Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
+}
+
 void SystemTray::ShowMenu(const std::vector<MenuItem>& items) {
     if (!hwnd_ || showingMenu_) return;
     struct ScopeGuard {

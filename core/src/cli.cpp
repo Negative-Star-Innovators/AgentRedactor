@@ -1398,7 +1398,8 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"");
     ctx.Print(L"maintenance (Linux only):");
     ctx.Print(L"  update                               check for and install AppImage");
-    ctx.Print(L"                                       updates (restart to apply)");
+    ctx.Print(L"                                       updates (restart to apply; 'status'");
+    ctx.Print(L"                                       shows when one is available)");
     ctx.Print(L"  uninstall [--yes]                    remove Agent Redactor, settings,");
     ctx.Print(L"                                       icons, and the AppImage");
 #endif

@@ -61,14 +61,31 @@ namespace winrt::AgentRedactor::implementation
 
     LRESULT CALLBACK MainWindow::SubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
+        // Explorer broadcasts this to every top-level window when it (re)starts.
+        // Function-local static: thread-safe one-time registration on first
+        // message. The message-only AppState window never sees broadcasts, so
+        // the handler lives here on the real top-level window.
+        static const UINT wmTaskbarCreated = RegisterWindowMessageW(L"TaskbarCreated");
         auto* self = reinterpret_cast<MainWindow*>(dwRefData);
-        if (uMsg == WM_CLOSE && self && !self->allowClose_) {
-            // Close-to-tray: hide the window and lock the session so the next
-            // appearance (tray -> Open) demands Windows Hello again.
-            self->hiddenToTray_ = true;
-            self->OnWindowHidden();
-            ShowWindow(hWnd, SW_HIDE);
+        if (wmTaskbarCreated != 0 && uMsg == wmTaskbarCreated) {
+            // Explorer restarted and wiped every tray icon - re-add ours so
+            // the app does not silently vanish from the tray area.
+            if (auto app = ::AgentRedactor::AppState::Instance()) app->NotifyTaskbarCreated();
             return 0;
+        }
+        if (uMsg == WM_CLOSE && self && !self->allowClose_) {
+            // Close-to-tray requires a tray: when the icon could not be
+            // created (no shell tray area), hiding would leave the app
+            // running with no window and no way back - exit instead.
+            auto app = ::AgentRedactor::AppState::Instance();
+            if (app && !app->TrayAvailable()) {
+                self->allowClose_ = true;  // fall through to a real close
+            } else {
+                self->hiddenToTray_ = true;
+                self->OnWindowHidden();
+                ShowWindow(hWnd, SW_HIDE);
+                return 0;
+            }
         }
         if (uMsg == WM_SHOWWINDOW && wParam && self) {
             self->OnWindowShown();
