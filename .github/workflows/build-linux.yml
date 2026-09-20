@@ -170,6 +170,23 @@ jobs:
           ls "$dir"/*.AppImage >/dev/null || { echo "no AppImage"; exit 1; }
           echo "Velopack output OK:" && ls "$dir"
 
+      # The xcb platform plugin must resolve every dependency from the AppDir
+      # or the host. A missing libxcb-* extension lib means the GUI core-dumps
+      # on slim distros (WSLg sets DISPLAY but lacks the libs) - catch that at
+      # build time. The staged AppDir is the packed content, so checking it
+      # covers the shipped AppImage.
+      - name: Verify xcb platform plugin dependencies
+        run: |
+          plugin=linux/build-release/appdir/plugins/platforms/libqxcb.so
+          test -f "$plugin" || { echo "xcb plugin missing from AppDir"; exit 1; }
+          missing="$(ldd "$plugin" | awk '/not found/{print $1}')"
+          if [ -n "$missing" ]; then
+            echo "Unresolved xcb plugin dependencies (would break the GUI on slim distros):"
+            echo "$missing"
+            exit 1
+          fi
+          echo "xcb plugin dependencies OK"
+
       - name: Upload Velopack output artifact
         if: always()
         uses: actions/upload-artifact@v4

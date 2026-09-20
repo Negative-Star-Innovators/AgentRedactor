@@ -358,7 +358,12 @@ Key pieces of the self-release channel:
   `ModelDownloader::ResolveModelDir()` (exe-dir first, fallback second), and
   deletes fallback-dir weights (never MSIX exe-dir weights) when the detector
   fails to initialize right after a successful download.
-- To cut a self-release: bump `version.txt`, tag `v<version>`, push — the
+- To cut a self-release: carry the version bump IN the release PR (a second
+  commit on the feature branch, `chore: release version X.Y.Z`), merge once,
+  then tag `v<version>` on the merge commit and push the tag. One PR, one
+  merge, one tag — main blocks direct pushes, so the bump cannot be pushed
+  outside a PR, and a separate bump-only PR just burns a CI cycle. The tag's
+  pipeline is the full validation (see below), so nothing is gated twice. The
   `release-selfrelease.yml` workflow builds and packs both arches, then gates
   the R2 publish on the settings-migration tests, the fresh-install E2E
   (incl. a first-run model-download smoke test), the previous-live-release

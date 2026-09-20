@@ -90,14 +90,89 @@ start_app() {
 
 echo 'Starting AgentRedactor...'
 # Headless machines (WSL without WSLg, SSH, servers) cannot run the Qt GUI;
-# the AppImage entrypoint would abort inside Qt platform init. Leave the
-# engine/CLI on PATH with starting instructions instead.
+# the AppImage entrypoint would abort inside Qt platform init. Instead of
+# printing instructions, leave a WORKING proxy behind: engine running, model
+# downloaded, and - when systemd is available - a user service + linger so
+# it comes back after logout/reboot. Opt out with AGENTREDACTOR_NO_SERVICE=1
+# (engine is not started either; manual instructions are printed instead).
 if [ -z "\${DISPLAY:-}" ] && [ -z "\${WAYLAND_DISPLAY:-}" ]; then
-    echo 'No display detected - installed headless.'
-    echo "  Run the engine:   agentredactor --console"
-    echo "  (or install the systemd user unit from the repository's linux/systemd/)"
-    echo "  First run needs the AI model: agentredactor download-model"
-    echo "  CLI overview:     agentredactor help"
+    echo 'No display detected - installing headless.'
+    if [ -n "\${AGENTREDACTOR_NO_SERVICE:-}" ]; then
+        echo 'AGENTREDACTOR_NO_SERVICE is set; not starting the engine.'
+        echo "  Run it manually:  \$HOME/.local/bin/agentredactor --console"
+        echo "  First run needs the AI model: agentredactor download-model"
+        echo '  CLI overview:     agentredactor help'
+        exit 0
+    fi
+
+    started=0
+    if command -v systemctl >/dev/null 2>&1 && systemctl --user daemon-reload >/dev/null 2>&1; then
+        mkdir -p "\$HOME/.config/systemd/user"
+        cat > "\$HOME/.config/systemd/user/agentredactor.service" <<'UNIT'
+[Unit]
+Description=Agent Redactor engine
+After=default.target
+
+[Service]
+ExecStart=%h/.local/bin/agentredactor --console
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
+UNIT
+        systemctl --user daemon-reload
+        if systemctl --user enable --now agentredactor.service >/dev/null 2>&1; then
+            started=1
+            echo 'Installed systemd user service: agentredactor.service (starts on boot, survives logout).'
+            if loginctl enable-linger "\$USER" >/dev/null 2>&1; then
+                echo 'Enabled linger: the engine starts at boot without anyone logging in.'
+            else
+                echo "NOTE: could not enable linger - the engine stops when your last session closes."
+                echo "      Fix with: loginctl enable-linger \$USER"
+            fi
+        else
+            echo 'systemd user service could not be started; starting the engine directly.'
+        fi
+    else
+        echo 'No systemd user session detected; starting the engine directly (will NOT survive logout/reboot).'
+    fi
+
+    if [ "\$started" -eq 0 ]; then
+        state_dir="\${XDG_STATE_HOME:-\$HOME/.local/state}/agentredactor"
+        mkdir -p "\$state_dir"
+        nohup "\$HOME/.local/bin/agentredactor" --console >>"\$state_dir/engine-stdout.log" 2>&1 &
+        echo "Engine started directly (log: \$state_dir/engine-stdout.log)."
+    fi
+
+    echo 'Waiting for the engine...'
+    engine_up=0
+    for _ in $(seq 1 60); do
+        if "\$HOME/.local/bin/agentredactor" status >/dev/null 2>&1; then engine_up=1; break; fi
+        sleep 1
+    done
+    if [ "\$engine_up" -eq 0 ]; then
+        echo 'ERROR: the engine did not come up within 60 s. Log:' >&2
+        echo "  journalctl --user -u agentredactor   (or ~/.local/state/agentredactor/engine-stdout.log)" >&2
+        exit 1
+    fi
+
+    echo 'Downloading the AI model (first run only, resumable)...'
+    "\$HOME/.local/bin/agentredactor" download-model || \
+        echo 'Model download failed - retry anytime with: agentredactor download-model' >&2
+
+    echo ''
+    echo 'Agent Redactor is running headless.'
+    "\$HOME/.local/bin/agentredactor" status || true
+    echo ''
+    echo 'Useful commands:'
+    echo '  agentredactor help      CLI overview'
+    echo '  agentredactor update    check for / install updates'
+    if [ "\$started" -eq 1 ]; then
+        echo '  systemctl --user status agentredactor     service status'
+        echo '  systemctl --user stop agentredactor       stop the engine'
+        echo '  systemctl --user disable agentredactor    undo boot start'
+    fi
     exit 0
 fi
 if start_app; then
@@ -108,6 +183,9 @@ elif start_app --appimage-extract-and-run; then
 else
     echo 'AgentRedactor failed to start. Try running it manually:' >&2
     echo "  $target" >&2
+    echo 'If the output mentions missing X libraries (libxcb-*), install them (the' >&2
+    echo 'exact apt line is printed by the AppImage) or run the install script in a' >&2
+    echo 'session without DISPLAY to install headless instead.' >&2
     exit 1
 fi
 `;

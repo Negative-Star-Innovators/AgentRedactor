@@ -138,8 +138,21 @@ std::string Md5OfUri(const std::string& uri) {
     return {};
 }
 
-void RemoveThumbnails(const fs::path& appImage) {
-    std::string uri = "file://" + appImage.string();
+void RemoveSystemdUnit() {
+    // install.sh (headless) registers the engine as a systemd user service;
+    // tear it down too - otherwise a unit pointing at the deleted AppImage
+    // would restart a missing binary on every boot. Best-effort throughout:
+    // systems without systemd simply no-op here.
+    std::error_code ec;
+    const fs::path unit = HomeDir() / ".config" / "systemd" / "user" / "agentredactor.service";
+    if (!fs::exists(unit, ec)) return;
+    std::fprintf(stderr, "Removing systemd user service...\n");
+    std::system("systemctl --user disable --now agentredactor.service >/dev/null 2>&1");
+    RemoveFile(unit);
+    std::system("systemctl --user daemon-reload >/dev/null 2>&1");
+}
+
+void RemoveThumbnails(const fs::path& appImage) {    std::string uri = "file://" + appImage.string();
     std::string md5 = Md5OfUri(uri);
     if (md5.empty()) return;
     const fs::path cache = HomeDir() / ".cache" / "thumbnails";
@@ -196,6 +209,7 @@ int RunUninstaller(const std::vector<std::wstring>& args) {
     }
 
     StopOtherInstances();
+    RemoveSystemdUnit();
 
     const fs::path home = HomeDir();
     const auto appImage = AppImagePath();
@@ -204,6 +218,10 @@ int RunUninstaller(const std::vector<std::wstring>& args) {
     RemoveFile(home / ".local" / "share" / "applications" / "agentredactor.desktop");
     RemoveFile(home / ".config" / "autostart" / "agentredactor.desktop");
     RemoveFile(home / ".local" / "bin" / "agentredactor");
+
+    // Engine stdout log from installs that started the engine directly
+    // (no systemd user session).
+    RemoveAll(home / ".local" / "state" / "agentredactor");
 
     // Icons.
     for (int size : kIconSizes) {

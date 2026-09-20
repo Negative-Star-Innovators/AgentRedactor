@@ -77,8 +77,15 @@ cp "${MODELS_SRC}/config.json" "${MODELS_SRC}/tokenizer.json" \
 cp "${MODELS_SRC}/onnx/model_quantized.onnx" "${STAGE}/models/onnx/"
 
 # Bundle the shared libraries the two binaries resolve to, minus the
-# AppImage-standard system set that must come from the host.
-EXCLUDE='^(linux-vdso.*|ld-linux.*|libc|libm|libdl|librt|libpthread|libresolv|libnsl|libutil|libz|libGL.*|libEGL.*|libX11(-.*)?|libxcb(-.*)?|libXau|libXdmcp|libdrm(-.*)?|libgbm|libwayland(-.*)?|libxkbcommon(-.*)?|libfontconfig|libfreetype|libexpat|libdbus-1|libsystemd|libglib-2\.0|libgobject-2\.0|libgio-2\.0)\.so'
+# AppImage-standard system set that must come from the host. Core libxcb /
+# libX11 / libxkbcommon stay host-side (bundling them conflicts with the
+# host's X stack), but the libxcb-* EXTENSION libraries (icccm, image,
+# keysyms, randr, render-util, xinerama, cursor) and libxkbcommon-x11 are
+# leaf libraries with a stable ABI against the host core - slim distros
+# (WSL images, minimal cloud images) often lack them, and without them Qt's
+# xcb platform plugin cannot load at all (WSLg sets DISPLAY but the GUI
+# core-dumps). Bundling them is what makes the GUI work out of the box there.
+EXCLUDE='^(linux-vdso.*|ld-linux.*|libc|libm|libdl|librt|libpthread|libresolv|libnsl|libutil|libz|libGL.*|libEGL.*|libX11(-.*)?|libxcb\.so|libXau|libXdmcp|libdrm(-.*)?|libgbm|libwayland(-.*)?|libxkbcommon\.so|libfontconfig|libfreetype|libexpat|libdbus-1|libsystemd|libglib-2\.0|libgobject-2\.0|libgio-2\.0)\.so'
 for bin in "${STAGE}/agentredactor-gui.real" "${STAGE}/agentredactor"; do
     ldd "${bin}" | awk '/=> \// {print $1, $3}' | while read -r name path; do
         if [[ "${name}" =~ ${EXCLUDE} ]]; then continue; fi
@@ -185,6 +192,34 @@ if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${QT_QPA_PLAT
         exit 0
     fi
     exec -a agentredactor "${HERE}/agentredactor" "$@"
+fi
+
+# GUI path. The xcb platform plugin needs host libxcb extension libraries
+# that slim distros (WSL images, minimal cloud images) often lack - a missing
+# one aborts Qt deep inside platform init with a useless core dump. Check
+# the plugin's resolvable dependencies first (ldd honors the plugin's
+# RUNPATH, so bundled leaf libs count); when something is unresolvable,
+# explain and fall back to headless instead of crashing. An explicit
+# QT_QPA_PLATFORM above (e.g. wayland, offscreen) means the caller chose the
+# platform themselves - respect it and skip the check.
+missing=""
+if command -v ldd >/dev/null 2>&1; then
+    missing="$(ldd "${HERE}/plugins/platforms/libqxcb.so" 2>/dev/null | awk '/not found/{print $1}' | sort -u | tr '\n' ' ')"
+fi
+if [ -n "$missing" ]; then
+    echo "Cannot start the GUI: missing X libraries on this system: ${missing}" >&2
+    echo "Debian/Ubuntu: sudo apt install libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0" >&2
+    echo "(or try Wayland: QT_QPA_PLATFORM=wayland $0)" >&2
+    echo "Falling back to headless mode - the engine/CLI works without a display." >&2
+    if [ "$#" -eq 0 ]; then
+        exit 0
+    fi
+    if is_cli_arg "$1"; then
+        exec -a agentredactor "${HERE}/agentredactor" "$@"
+    fi
+    # Unknown args are Velopack lifecycle markers (--veloapp-*): swallow them
+    # successfully rather than feeding them to the CLI parser.
+    exit 0
 fi
 
 # GNOME/Wayland does not provide server-side window decorations, and the

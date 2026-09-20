@@ -150,18 +150,26 @@ LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS info)
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-// Single-instance hand-off: find another AgentRedactorUI top-level window and
-// bring it to the foreground, so a duplicate launch (or an update-restart
-// racing a user relaunch) lands the user on the live app instead of exiting
-// silently — the pre-fix silent exit read as a crash. Matched by exe name
-// (not the window title, which is localized); EnumWindows also enumerates
-// hidden windows, so a close-to-tray instance is found and restored.
+// Single-instance hand-off: find the best other AgentRedactorUI top-level
+// window and bring it to the foreground, so a duplicate launch (or an
+// update-restart racing a user relaunch) lands the user on the live app
+// instead of exiting silently — the pre-fix silent exit read as a crash.
+// Matched by exe name (not the window title, which is localized). A WinUI 3
+// process owns several top-level windows (the main window plus hidden helper
+// windows), so candidates are scored: tool windows are ignored, visible
+// windows beat hidden ones, and the largest window wins — a bare first-match
+// can activate a zero-size helper and look like a no-op.
 bool TryActivateRunningInstance()
 {
-    struct EnumCtx { DWORD selfPid; HWND hwnd; };
-    EnumCtx ctx{ GetCurrentProcessId(), nullptr };
+    struct Candidate { HWND hwnd; bool visible; long long area; };
+    std::vector<Candidate> candidates;
+    struct EnumCtx { DWORD selfPid; std::vector<Candidate>* out; };
+    EnumCtx ctx{ GetCurrentProcessId(), &candidates };
     EnumWindows([](HWND hwnd, LPARAM lp) -> BOOL {
         auto* c = reinterpret_cast<EnumCtx*>(lp);
+        if (GetWindowLongW(hwnd, GWL_STYLE) & WS_CHILD) return TRUE;
+        // Helper/tool windows (XAML input, composition) are never the target.
+        if (GetWindowLongW(hwnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW) return TRUE;
         DWORD pid = 0;
         GetWindowThreadProcessId(hwnd, &pid);
         if (pid == 0 || pid == c->selfPid) return TRUE;
@@ -175,13 +183,29 @@ bool TryActivateRunningInstance()
                 std::filesystem::path(path).filename().wstring()) == L"agentredactorui.exe";
         }
         CloseHandle(proc);
-        if (match) { c->hwnd = hwnd; return FALSE; }
+        if (match) {
+            RECT rc = {};
+            GetWindowRect(hwnd, &rc);
+            const long long area = static_cast<long long>(rc.right - rc.left)
+                * static_cast<long long>(rc.bottom - rc.top);
+            c->out->push_back({ hwnd, IsWindowVisible(hwnd) != FALSE, area });
+        }
         return TRUE;
     }, reinterpret_cast<LPARAM>(&ctx));
-    if (!ctx.hwnd) return false;
+    if (candidates.empty()) return false;
 
-    if (IsIconic(ctx.hwnd)) ShowWindow(ctx.hwnd, SW_RESTORE);
-    ShowWindow(ctx.hwnd, SW_SHOW);
+    // Prefer visible over hidden; then largest area.
+    size_t bestIdx = 0;
+    for (size_t i = 1; i < candidates.size(); ++i) {
+        const auto& cand = candidates[i];
+        const auto& best = candidates[bestIdx];
+        if (cand.visible != best.visible ? cand.visible : cand.area > best.area) bestIdx = i;
+    }
+    HWND best = candidates[bestIdx].hwnd;
+    if (!best) return false;
+
+    if (IsIconic(best)) ShowWindow(best, SW_RESTORE);
+    ShowWindow(best, SW_SHOW);
     // SetForegroundWindow fails for background processes; borrow the
     // foreground thread's input queue to take focus politely.
     HWND fg = GetForegroundWindow();
@@ -189,7 +213,7 @@ bool TryActivateRunningInstance()
     if (fg) GetWindowThreadProcessId(fg, &fgThread);
     const DWORD myThread = GetCurrentThreadId();
     if (fgThread && fgThread != myThread) AttachThreadInput(myThread, fgThread, TRUE);
-    SetForegroundWindow(ctx.hwnd);
+    SetForegroundWindow(best);
     if (fgThread && fgThread != myThread) AttachThreadInput(myThread, fgThread, FALSE);
     return true;
 }
