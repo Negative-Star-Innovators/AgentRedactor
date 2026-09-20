@@ -147,7 +147,7 @@ UNIT
 
     echo 'Waiting for the engine...'
     engine_up=0
-    for _ in \$(seq 1 60); do
+    for _ in $(seq 1 60); do
         if "\$HOME/.local/bin/agentredactor" status >/dev/null 2>&1; then engine_up=1; break; fi
         sleep 1
     done
