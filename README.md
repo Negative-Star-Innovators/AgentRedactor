@@ -41,6 +41,23 @@ x64 build on ARM64 if no native package is published yet) and installs per-user
 under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
 Windows SmartScreen may warn on first run.
 
+**Linux** (x64 and ARM64; per-user AppImage install). Run in a terminal:
+
+```bash
+curl -fsSL https://api.agentredactor.negativestarinnovators.com/install.sh | bash
+```
+
+The installer detects your architecture, places the AppImage in
+`~/Applications`, and symlinks the `agentredactor` CLI into `~/.local/bin`.
+With a display it starts the GUI; on a headless machine it instead installs a
+systemd user service (starts at boot), downloads the AI model, and confirms
+with `agentredactor status`. Works under WSL as well (GUI via WSLg, headless
+otherwise). Remove with `agentredactor uninstall`.
+
+Linux has no automatic update prompt: `agentredactor status` reports when a
+newer release exists, then run `agentredactor update` and restart to apply
+(`systemctl --user restart agentredactor` on headless installs).
+
 ## Repository layout
 
 | Path | Contents |
