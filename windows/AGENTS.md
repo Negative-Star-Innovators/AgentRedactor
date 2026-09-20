@@ -375,6 +375,12 @@ Key pieces of the self-release channel:
   (no publish, no GUI suite — the build is stamped live+1 patch so the
   upgrade E2E still runs). Local loop: `.\build-selfrelease.ps1` then install
   `build\velopack\*-Setup.exe`.
+- Docs-only changes (root `README.md`, `AGENTS.md` files) need no version bump
+  and no release: the README ships in no release artifact (MSIX, AppImage, and
+  the Cloudflare worker are all built from `windows/`, `linux/`, and
+  `cloudflare/` only), so a docs PR is just a normal merge to main. The
+  user-facing website under `website/` deploys separately (wrangler) and is
+  likewise independent of the release tagging.
 
 ## Common Files to Know
 
