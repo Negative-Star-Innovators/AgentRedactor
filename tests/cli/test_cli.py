@@ -729,3 +729,17 @@ def test_profiles_delete_guards(engine: CliEngine) -> None:
     r = engine.run_cli("profiles", "list")
     assert r.returncode == 0
     assert "test-profile" in r.stdout
+
+
+def test_help_lists_download_model(engine: CliEngine) -> None:
+    r = engine.run_cli("help")
+    assert r.returncode == 0
+    assert "download-model" in r.stdout
+
+
+def test_download_model_rejects_extra_args(engine: CliEngine) -> None:
+    # NoExtraArgs runs before any engine contact, so this is safe even in
+    # build trees without model weights (it must never start a real download).
+    r = engine.run_cli("download-model", "unexpected")
+    assert r.returncode == 2
+    assert "unexpected argument" in r.stdout

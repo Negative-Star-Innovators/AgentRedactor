@@ -49,6 +49,8 @@ The AT-SPI GUI tests require a display and the AT-SPI bindings; they skip cleanl
 - Desktop integration writes to `$XDG_DATA_HOME/applications`, `$XDG_DATA_HOME/icons`, and `$XDG_CONFIG_HOME/autostart`
 - The AppImage is the entire application; deleting it removes the program
 - Per-user runtime state beyond settings.json (currently `redaction_state.json` — placeholder label counters, no PII) lives in the config dir next to settings.json. Keep any new per-user state file there so the uninstaller (`RemoveAll(GetAppDataPath())`) and `scripts/linux-clean-slate.sh` pick it up automatically.
+- AppImage entrypoint dispatch: the packed `agentredactor-gui` is a bash wrapper (generated in `build-release.sh`), not the ELF. Known CLI subcommands (`status`, `get`, `set`, `keywords`, `download-model`, `update`, …) always dispatch to the engine/CLI binary, and when no `DISPLAY`/`WAYLAND_DISPLAY` exists EVERYTHING dispatches to it (headless/WSL/SSH); a bare headless launch prints a hint instead of starting Qt. Keep the dispatch list in the wrapper in sync with the CLI commands in `core/src/cli.cpp`.
+- Headless operation needs no GUI: `agentredactor --console` runs the engine, the model download is driven by `agentredactor download-model` (ungated so a fresh install can bootstrap), and `agentredactor update` swaps the AppImage for the latest channel release (uses `$APPIMAGE`; a running process keeps the old inode until restarted). The install script symlinks `agentredactor` into `~/.local/bin`.
 
 ## General rules
 

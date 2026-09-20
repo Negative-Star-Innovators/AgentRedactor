@@ -667,12 +667,56 @@ class AtspiGui:
                 continue
         raise AssertionError(f"no {role} {name!r} in keyword row {text!r}")
 
+    # -- engine-side state (the source of truth) -----------------------------
+    #
+    # The AT-SPI tree reflects the GUI model, which applies clicks
+    # optimistically and can revert them when the next settings poll sees the
+    # engine never got the change (a click swallowed by the row rebuild).
+    # Predicates for press_until/wait_until therefore read the ENGINE's lists
+    # via the CLI, never the tree — a swallowed click keeps being re-pressed
+    # until the engine confirms, and a transient tree flip can never satisfy
+    # the wait early.
+
+    def cli(self, *args: str) -> subprocess.CompletedProcess:
+        """Run the engine CLI against this GUI's engine/config dir."""
+        return subprocess.run(
+            [str(ENGINE_BIN), *args], env=self.env,
+            capture_output=True, text=True, timeout=60,
+        )
+
+    def keyword_enabled_engine(self, text: str) -> bool | None:
+        """Engine-side keyword enabled flag; None when the keyword is absent.
+
+        PrintEntries lines look like: '1  [x]  Project Chimera  (ignore case)'.
+        """
+        out = self.cli("keywords", "list").stdout
+        for line in out.splitlines():
+            if text in line:
+                return "[x]" in line
+        return None
+
+    def keyword_case_engine(self, text: str) -> bool | None:
+        """Engine-side keyword case-sensitivity flag; None when absent."""
+        out = self.cli("keywords", "list").stdout
+        for line in out.splitlines():
+            if text in line:
+                return "(case-sensitive)" in line
+        return None
+
+    def regex_enabled_engine(self, pattern: str) -> bool | None:
+        """Engine-side regex enabled flag; None when the pattern is absent."""
+        out = self.cli("regex", "list").stdout
+        for line in out.splitlines():
+            if pattern in line:
+                return "[x]" in line
+        return None
+
     def toggle_keyword(self, text: str) -> None:
         target = not self.keywords()[text]["enabled"]
         self.press_until(
             f"keyword {text!r} enabled -> {target}",
             lambda: self._keyword_row_child(text, "check box", "Enable keyword"),
-            lambda: self.keywords().get(text, {}).get("enabled") is target,
+            lambda: self.keyword_enabled_engine(text) is target,
         )
 
     def toggle_keyword_case(self, text: str) -> None:
@@ -680,7 +724,7 @@ class AtspiGui:
         self.press_until(
             f"keyword {text!r} case_sensitive -> {target}",
             lambda: self._keyword_case_button(text),
-            lambda: self.keywords().get(text, {}).get("case_sensitive") is target,
+            lambda: self.keyword_case_engine(text) is target,
         )
 
     def _keyword_case_button(self, text: str) -> Any:
@@ -754,7 +798,7 @@ class AtspiGui:
         self.press_until(
             f"regex {pattern!r} enabled -> {target}",
             lambda: self._regex_row_child(pattern, "check box", "Enable pattern"),
-            lambda: self.regexes().get(pattern) is target,
+            lambda: self.regex_enabled_engine(pattern) is target,
         )
 
     def delete_regex(self, pattern: str) -> None:

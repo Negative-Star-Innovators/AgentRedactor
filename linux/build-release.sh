@@ -151,6 +151,42 @@ cat > "${STAGE}/agentredactor-gui" <<'EOF'
 # In the packed AppImage this script is at $APPDIR/usr/bin/; the real GUI
 # binary is right next to it and has RUNPATH=$ORIGIN for bundled libraries.
 HERE="$(cd "$(dirname "$0")" && pwd)"
+
+# Dual entry point, mirroring the Windows agentredactor.exe split:
+#  - known CLI subcommands always run the engine/CLI binary, even on a
+#    desktop (e.g. ./AgentRedactor.AppImage status must not pop the GUI);
+#  - without a display the Qt GUI cannot start at all (e.g. WSL/SSH/servers),
+#    so EVERYTHING dispatches to the engine/CLI, and a bare launch prints a
+#    headless hint instead of aborting inside Qt platform init.
+# "--cli <args...>" is the pre-existing pass-through the GUI binary also
+# honors (linux/gui/main.cpp): strip the marker and run the engine CLI.
+if [ "$#" -gt 0 ] && [ "$1" = "--cli" ]; then
+    shift
+    exec -a agentredactor "${HERE}/agentredactor" "$@"
+fi
+is_cli_arg() {
+    case "$1" in
+        status|languages|get|set|profiles|regex|keywords|password|pii-types|help|uninstall|download-model|update|--help|-h|--console|--selftest-migrate-settings)
+            return 0 ;;
+    esac
+    return 1
+}
+if [ "$#" -gt 0 ] && is_cli_arg "$1"; then
+    exec -a agentredactor "${HERE}/agentredactor" "$@"
+fi
+# Headless: no X/Wayland display -> the Qt GUI cannot start; point at the CLI.
+# An explicit QT_QPA_PLATFORM (e.g. offscreen in CI/tests) means the caller
+# asked for the GUI regardless of the display, so do not dispatch then.
+if [ -z "${DISPLAY:-}" ] && [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${QT_QPA_PLATFORM:-}" ]; then
+    if [ "$#" -eq 0 ]; then
+        echo "No display detected (set DISPLAY or WAYLAND_DISPLAY for the GUI)."
+        echo "Headless usage: agentredactor <command>   (try 'agentredactor help')"
+        echo "Run the engine in the foreground with: agentredactor --console"
+        exit 0
+    fi
+    exec -a agentredactor "${HERE}/agentredactor" "$@"
+fi
+
 # GNOME/Wayland does not provide server-side window decorations, and the
 # bundled Qt Wayland client-side decoration plugin leaves the main window
 # without a title bar (no min/max/close buttons). Force the XCB/XWayland

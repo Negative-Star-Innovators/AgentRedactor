@@ -4,6 +4,7 @@
 #include "localization.h"
 #include "constants.h"
 #include "logging.h"
+#include "update_manager.h"
 #include <chrono>
 #include <fstream>
 #include <thread>
@@ -68,6 +69,26 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
 
     pollStop_ = false;
     pollThread_ = std::thread(&AppState::StatusPollLoop, this);
+
+    // Update apply: stop the engine and wait for its exit BEFORE Update.exe
+    // starts swapping files. Update.exe's --waitPid only covers this process;
+    // a still-running engine has the old binaries mapped (the swap fails on
+    // locked files) and its teardown holds the single-instance mutex past the
+    // post-apply relaunch's wait — the combination surfaced as a silent
+    // "crash" right after an update. Best-effort: never block the update on
+    // an engine that is already gone.
+    UpdateManager::SetPreApplyHook([this]() {
+        if (!engineSpawned_) return;
+        LOG(L"[AppState] Update apply: stopping engine before Update.exe");
+        engineClient_.Post(L"/engine/stop", json::object());
+        engineSpawned_ = false;
+        for (int i = 0; i < 360; ++i) {  // up to 90 s
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            json status;
+            if (!engineClient_.Get(L"/status", status)) return;  // engine exited
+        }
+        LOG(L"[AppState] Update apply: engine did not exit within 90 s; proceeding anyway");
+    });
     return true;
 }
 

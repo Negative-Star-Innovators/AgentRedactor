@@ -71,6 +71,7 @@ bool AutoApplyEnabled() {
 }
 
 UiDispatch g_uiDispatch;
+std::function<void()> g_preApplyHook;
 std::atomic<bool> g_checkRunning{ false };
 std::wstring g_availableVersion;      // version of the downloaded package
 std::filesystem::path g_downloadedPackage;
@@ -226,6 +227,12 @@ void ApplyDownloadedUpdateAndExit() {
     auto updateExe = FindUpdateExe();
     if (updateExe.empty() || g_downloadedPackage.empty()) return;
 
+    // Stop the engine (and wait for its exit) BEFORE Update.exe starts
+    // swapping files: the swap fails on the mapped binaries of a running
+    // engine, and a slow engine teardown otherwise holds the single-instance
+    // mutex past the post-apply relaunch's wait.
+    if (g_preApplyHook) g_preApplyHook();
+
     std::wstring command = BuildApplyCommand(updateExe, g_downloadedPackage, GetCurrentProcessId());
     LOGF_LIFECYCLE(L"[UpdateManager] Applying update: %s", command.c_str());
 
@@ -319,6 +326,10 @@ void SetUiDispatch(UiDispatch dispatch) {
     g_uiDispatch = std::move(dispatch);
 }
 
+void SetPreApplyHook(std::function<void()> hook) {
+    g_preApplyHook = std::move(hook);
+}
+
 void CheckAndDownloadInBackground() {
     LOGF_LIFECYCLE(L"[UpdateManager] Starting background update check (feed %s)", GetUpdateFeedUrl().c_str());
     RunPipeline(nullptr);
@@ -337,6 +348,7 @@ namespace AgentRedactor {
 namespace UpdateManager {
 
 void SetUiDispatch(UiDispatch) {}
+void SetPreApplyHook(std::function<void()>) {}
 void CheckAndDownloadInBackground() {}
 void CheckNowInteractive(std::function<void(CheckResult)>) {}
 

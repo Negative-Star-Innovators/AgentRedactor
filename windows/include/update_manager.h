@@ -37,5 +37,14 @@ void CheckAndDownloadInBackground();
 // When an update was downloaded the restart prompt is shown as usual.
 void CheckNowInteractive(std::function<void(CheckResult)> completion);
 
+// Registers a hook run on the UI thread at the start of
+// ApplyDownloadedUpdateAndExit, before Update.exe is launched. The GUI uses it
+// to stop the engine and wait for its exit: Update.exe's --waitPid only covers
+// this process, but the file swap fails while the engine still has the old
+// binaries mapped, and a lingering engine teardown delays the mutex release
+// that the post-apply relaunch waits on. Optional; never invoked in the Store
+// build (which never applies updates this way).
+void SetPreApplyHook(std::function<void()> hook);
+
 } // namespace UpdateManager
 } // namespace AgentRedactor

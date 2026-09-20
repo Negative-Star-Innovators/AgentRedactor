@@ -396,8 +396,8 @@ async def test_keyword_toggle_enable_disable(
     gui.app.add_keyword(secret)
 
     gui.app.toggle_keyword(secret)
-    wait_until("keyword disabled", gui.app.keywords,
-               lambda ks: ks.get(secret, {}).get("enabled") is False)
+    wait_until("keyword disabled", lambda: gui.app.keyword_enabled_engine(secret),
+               lambda v: v is False)
 
     response = await _send_chat(gui, client, f"The plan is {secret} once.")
     upstream = mock_llm.last_request
@@ -406,8 +406,8 @@ async def test_keyword_toggle_enable_disable(
     assert _extract_assistant_content(response) == f"The plan is {secret} once."
 
     gui.app.toggle_keyword(secret)
-    wait_until("keyword re-enabled", gui.app.keywords,
-               lambda ks: ks.get(secret, {}).get("enabled") is True)
+    wait_until("keyword re-enabled", lambda: gui.app.keyword_enabled_engine(secret),
+               lambda v: v is True)
 
     response = await _send_chat(gui, client, f"The plan is {secret} twice.")
     upstream = mock_llm.last_request
@@ -539,8 +539,8 @@ async def test_regex_toggle_and_delete(
 
     # Disable via the row checkbox: the secret passes through again.
     gui.app.toggle_regex(pattern)
-    wait_until("regex disabled", gui.app.regexes,
-               lambda rs: rs.get(pattern) is False)
+    wait_until("regex disabled", lambda: gui.app.regex_enabled_engine(pattern),
+               lambda v: v is False)
     response = await _send_chat(gui, client, request_text)
     upstream = mock_llm.last_request
     assert upstream is not None
@@ -549,8 +549,8 @@ async def test_regex_toggle_and_delete(
 
     # Re-enable, then delete via the row Delete button.
     gui.app.toggle_regex(pattern)
-    wait_until("regex re-enabled", gui.app.regexes,
-               lambda rs: rs.get(pattern) is True)
+    wait_until("regex re-enabled", lambda: gui.app.regex_enabled_engine(pattern),
+               lambda v: v is True)
     gui.app.delete_regex(pattern)
     # The GUI row can disappear before the engine has applied the delete;
     # wait for the engine-side list to drop the pattern before sending traffic.
