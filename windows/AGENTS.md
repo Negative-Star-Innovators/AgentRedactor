@@ -67,6 +67,11 @@ Key sources:
 
 ## CLI
 
+The user-facing CLI reference lives in `../docs/cli.md` — update it when
+`../core/src/cli.cpp` changes. The notes below are maintainer detail (password
+model, transport quirks, test hooks) that intentionally stays out of the user
+docs.
+
 `agentredactor.exe` doubles as the CLI; every subcommand talks to the running
 engine over the control API (so CLI and GUI always agree). Output goes to the
 inherited console, or UTF-8 to stdout when piped (script/AI-agent friendly);
