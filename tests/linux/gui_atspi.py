@@ -711,8 +711,15 @@ class AtspiGui:
                 return "[x]" in line
         return None
 
+    def _keyword_state(self, text: str) -> dict[str, Any]:
+        """Row state for `text`, waiting out the settings-poll reload that can
+        briefly drop a just-added row from the panel between reads (a bare
+        keywords()[text] then raises KeyError)."""
+        return wait_until(f"keyword {text!r} row present", self.keywords,
+                          lambda ks: text in ks)[text]
+
     def toggle_keyword(self, text: str) -> None:
-        target = not self.keywords()[text]["enabled"]
+        target = not self._keyword_state(text)["enabled"]
         self.press_until(
             f"keyword {text!r} enabled -> {target}",
             lambda: self._keyword_row_child(text, "check box", "Enable keyword"),
@@ -720,7 +727,7 @@ class AtspiGui:
         )
 
     def toggle_keyword_case(self, text: str) -> None:
-        target = not self.keywords()[text]["case_sensitive"]
+        target = not self._keyword_state(text)["case_sensitive"]
         self.press_until(
             f"keyword {text!r} case_sensitive -> {target}",
             lambda: self._keyword_case_button(text),
@@ -793,8 +800,15 @@ class AtspiGui:
                 continue
         raise AssertionError(f"no {role} {name!r} in regex row {pattern!r}")
 
+    def _regex_state(self, pattern: str) -> bool:
+        """Row state for `pattern`, waiting out the settings-poll reload that
+        can briefly drop a just-added row from the panel between reads (a
+        bare regexes()[pattern] then raises KeyError)."""
+        return wait_until(f"regex {pattern!r} row present", self.regexes,
+                          lambda rs: pattern in rs)[pattern]
+
     def toggle_regex(self, pattern: str) -> None:
-        target = not self.regexes()[pattern]
+        target = not self._regex_state(pattern)
         self.press_until(
             f"regex {pattern!r} enabled -> {target}",
             lambda: self._regex_row_child(pattern, "check box", "Enable pattern"),
