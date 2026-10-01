@@ -7,6 +7,15 @@ name: Build Linux
 # release-selfrelease.yml: only tag pushes (v*) or manual dispatches with
 # publish checked upload to R2 (channels "linux" / "linux-arm64"); PRs get a
 # pack dry-run with the packages as artifacts.
+#
+# Docs-only changes (markdown, website/, docs/) skip the expensive
+# build/test/pack steps via the `changes` gate job below (see RUN_BUILD in the
+# build job) — the same pattern as build-msix.yml and release-selfrelease.yml.
+# The gate is deliberately on the STEPS, not the job: a skipped matrix job
+# reports a single "build" check, which does not satisfy the required per-arch
+# checks ("build (x64)"/"build (arm64)") — a job whose steps all skip reports
+# success under the real leg names. (Trigger-level paths-ignore is worse
+# still: no check runs at all, so required checks block merging.)
 on:
   push:
     tags: ['v*']
@@ -28,7 +37,36 @@ permissions:
   contents: read
 
 jobs:
+  # Gate job: decides whether the diff contains anything but docs. Cheap
+  # (ubuntu, seconds); the build job below keys off its output.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          elif [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            BASE="${{ github.event.before }}"
+          else
+            # No parent to diff against (e.g. manual dispatch or first push) — build.
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only "$BASE" HEAD | grep -qvE '\.md$|^website/|^docs/'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: changes
     strategy:
       # One arch failing must not cancel the other; publish only runs when
       # both succeed anyway (same pattern as release-selfrelease.yml).
@@ -39,17 +77,24 @@ jobs:
     runs-on: ${{ matrix.arch == 'x64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     env:
       ONNXRUNTIME_DIR: ${{ github.workspace }}/onnxruntime
+      # Manual dispatches and code diffs always build; docs-only PRs skip the
+      # steps below (the job still reports success under the per-arch check
+      # names, keeping the branch ruleset satisfied).
+      RUN_BUILD: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.code == 'true' }}
     steps:
       - name: Checkout
+        if: env.RUN_BUILD == 'true'
         uses: actions/checkout@v4
 
       - name: Resolve version from version.txt
+        if: env.RUN_BUILD == 'true'
         run: |
           version=$(tr -d '[:space:]' < windows/version.txt)
           echo "VERSION_FROM_VERSION_TXT=$version" >> "$GITHUB_ENV"
           echo "Building version $version"
 
       - name: Install build + test dependencies
+        if: env.RUN_BUILD == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake ninja-build pkg-config \
@@ -60,6 +105,7 @@ jobs:
       # onnxruntime has no apt package; official tarball per arch, same as
       # linux/README.md documents for local builds.
       - name: Download onnxruntime
+        if: env.RUN_BUILD == 'true'
         run: |
           mkdir -p "$ONNXRUNTIME_DIR"
           rid="${{ matrix.arch == 'x64' && 'x64' || 'aarch64' }}"
@@ -67,11 +113,13 @@ jobs:
             | tar xz -C "$ONNXRUNTIME_DIR" --strip-components=1
 
       - name: Set up Python
+        if: env.RUN_BUILD == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install test dependencies
+        if: env.RUN_BUILD == 'true'
         run: pip install -r tests/requirements.txt
 
       # The engine refuses to serve (proxy ports stay closed) until the NER
@@ -81,6 +129,7 @@ jobs:
       # the gitignored weights are downloaded, from the same R2 models
       # endpoint the app itself uses. Cached across runs.
       - name: Cache ONNX model weights
+        if: env.RUN_BUILD == 'true'
         id: model-cache
         uses: actions/cache@v4
         with:
@@ -88,7 +137,7 @@ jobs:
           key: onnx-model-ner-${{ runner.arch }}-v1
 
       - name: Stage model files (cache miss only)
-        if: steps.model-cache.outputs.cache-hit != 'true'
+        if: env.RUN_BUILD == 'true' && steps.model-cache.outputs.cache-hit != 'true'
         run: |
           dest=~/.local/share/agentredactor/models
           mkdir -p "$dest/onnx"
@@ -99,6 +148,7 @@ jobs:
             https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
 
       - name: Build (dev config, updater off)
+        if: env.RUN_BUILD == 'true'
         run: |
           cmake -S linux -B linux/build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
@@ -110,12 +160,15 @@ jobs:
       # and tests/migration both ship a top-level conftest.py and a shared
       # module name breaks a combined run.
       - name: Run CLI tests
+        if: env.RUN_BUILD == 'true'
         run: python -m pytest tests/cli -q
 
       - name: Run migration tests
+        if: env.RUN_BUILD == 'true'
         run: python -m pytest tests/migration -q
 
       - name: Run Linux tests (offscreen GUI smoke)
+        if: env.RUN_BUILD == 'true'
         run: python -m pytest tests/linux -q -m "not atspi"
 
       # The AT-SPI suite (tests/linux/test_gui_atspi.py) drives the real GUI
@@ -124,6 +177,7 @@ jobs:
       # for the a11y bus. The gi/Atspi bindings come from the distro packages
       # above; PYTHONPATH exposes them to the setup-python interpreter.
       - name: Run Linux GUI tests (AT-SPI, Xvfb)
+        if: env.RUN_BUILD == 'true'
         run: |
           PYTHONPATH=/usr/lib/python3/dist-packages \
             dbus-run-session -- xvfb-run -a -s "-screen 0 1280x800x24" \
@@ -132,7 +186,7 @@ jobs:
       # On AT-SPI failures upload the per-test GUI logs and the accessibility
       # tree dumps the driver writes on lookup timeouts.
       - name: Upload AT-SPI failure diagnostics
-        if: failure()
+        if: env.RUN_BUILD == 'true' && failure()
         uses: actions/upload-artifact@v4
         with:
           name: atspi-diagnostics-${{ matrix.arch }}
@@ -144,6 +198,7 @@ jobs:
           retention-days: 14
 
       - name: Set up .NET (for vpk)
+        if: env.RUN_BUILD == 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -151,17 +206,20 @@ jobs:
       # Pinned to the Velopack library version vendored by
       # linux/fetch-velopack.sh — keep the two in sync.
       - name: Install vpk 1.2.0 (Velopack CLI)
+        if: env.RUN_BUILD == 'true'
         run: dotnet tool install -g vpk --version 1.2.0
 
       # build-release.sh derives the vpk runtime/channel from the host arch
       # (linux-x64/'linux', linux-arm64/'linux-arm64').
       - name: Build and pack AppImage (build-release.sh)
+        if: env.RUN_BUILD == 'true'
         env:
           ONNXRUNTIME_INCLUDE_DIR: ${{ github.workspace }}/onnxruntime/include
           ONNXRUNTIME_LIB: ${{ github.workspace }}/onnxruntime/lib/libonnxruntime.so
         run: linux/build-release.sh
 
       - name: Verify Velopack output
+        if: env.RUN_BUILD == 'true'
         run: |
           dir=linux/build-release/velopack
           channel="${{ matrix.arch == 'x64' && 'linux' || 'linux-arm64' }}"
@@ -176,6 +234,7 @@ jobs:
       # build time. The staged AppDir is the packed content, so checking it
       # covers the shipped AppImage.
       - name: Verify xcb platform plugin dependencies
+        if: env.RUN_BUILD == 'true'
         run: |
           plugin=linux/build-release/appdir/plugins/platforms/libqxcb.so
           test -f "$plugin" || { echo "xcb plugin missing from AppDir"; exit 1; }
@@ -188,7 +247,7 @@ jobs:
           echo "xcb plugin dependencies OK"
 
       - name: Upload Velopack output artifact
-        if: always()
+        if: always() && env.RUN_BUILD == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: AgentRedactor-velopack-linux-${{ matrix.arch }}
@@ -200,6 +259,7 @@ jobs:
       # Runs after packing since it consumes the pack output; skips locally
       # when vpk or the pack output is missing.
       - name: Run update E2E (AppImage self-update)
+        if: env.RUN_BUILD == 'true'
         run: python -m pytest tests/linux/test_update_feed.py -q
 
       # Grab the previous LIVE release's AppImage from R2 for the upgrade E2E.
@@ -207,6 +267,7 @@ jobs:
       # build. Skipped gracefully when the channel has no live release yet, or
       # when the live version is not older than this build's version.
       - name: Download previous live AppImage from R2
+        if: env.RUN_BUILD == 'true'
         id: prevappimage
         run: |
           channel="${{ matrix.arch == 'x64' && 'linux' || 'linux-arm64' }}"
@@ -269,7 +330,7 @@ jobs:
           echo "appimage_path=$(pwd)/prev-appimage/$appimage" >> "$GITHUB_OUTPUT"
 
       - name: Upgrade E2E (previous live release -> this build)
-        if: steps.prevappimage.outputs.found == 'true'
+        if: env.RUN_BUILD == 'true' && steps.prevappimage.outputs.found == 'true'
         env:
           AGENTREDACTOR_UPGRADE_TEST: "1"
           AGENTREDACTOR_CHANNEL: ${{ matrix.arch == 'x64' && 'linux' || 'linux-arm64' }}

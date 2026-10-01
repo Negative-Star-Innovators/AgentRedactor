@@ -1,5 +1,9 @@
 # Agent Redactor — Linux build
 
+For installing and *using* Agent Redactor (end users), see the
+[root README](../README.md) — this document covers building and developing
+on Linux.
+
 Build the engine/CLI (`agentredactor`) and the Qt GUI (`agentredactor-gui`)
 on Linux:
 
@@ -24,8 +28,8 @@ cmake --build build
 The engine also needs the NER model files. `config.json`, `tokenizer.json`,
 `viterbi_calibration.json` and `onnx/model_quantized.onnx` live in
 `windows/models/`; the ~1.6 GB `onnx/model_quantized.onnx_data` weights are
-downloaded automatically on first run (or grab them from the models endpoint
-used by the Windows CI).
+downloaded automatically on first run (or grab them directly from
+<https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data>).
 
 Run the tests from the repo root (one pytest process per suite — the suites
 share the `conftest` module name and cannot be collected together):
@@ -199,3 +203,7 @@ Test hooks (self-release builds only, same contract as Windows):
 - `tests/linux/test_update_from_live.py` — downloads the previous live AppImage
   from R2 and asserts it upgrades to the just-built release. Wired into the
   `build-linux.yml` workflow.
+
+## License
+
+MIT — see [LICENSE](../LICENSE).

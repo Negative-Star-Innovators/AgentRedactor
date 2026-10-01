@@ -22,6 +22,7 @@ A native Windows C++ desktop application that acts as an intelligent HTTP proxy 
 - **System Tray**: Runs minimized in the system tray; auto-start with Windows.
 - **Native Win32 GUI**: No WebView2 — pure native C++ with RichEdit colored logs.
 - **Stats & Logs**: Per-profile statistics and colored logs (blue = user→proxy, green = proxy→LLM, orange = LLM→proxy, purple = proxy→user).
+- **Localized UI**: The app is translated into 53 languages (the shared list lives in `../core/include/constants.h`).
 - **Two distribution channels**: Microsoft Store MSIX, and a self-updating Velopack self-release channel (`version.txt` is the version source of truth).
 
 ## Project Structure
@@ -31,7 +32,7 @@ windows/
 ├── src/              # C++ source files
 ├── include/          # C++ headers
 ├── resources/        # Icons, manifest, RC file
-├── models/           # OpenAI Privacy Filter ONNX model (copied from parent project)
+├── models/           # ONNX NER model files (the ~1.6 GB weights are downloaded separately — see Build Instructions)
 ├── CMakeLists.txt    # CMake build config
 ├── vcpkg.json        # vcpkg dependencies
 ├── Package.appxmanifest  # MSIX manifest
@@ -46,10 +47,11 @@ windows/
   ONNX weights inside the package and contains no self-update code.
 - **Self-release (Velopack)** — built with `.\build-selfrelease.ps1` (x64).
   The installer is produced by `vpk pack` into `build\velopack\`; the large
-  model weights are downloaded on first run from the `models-v1` GitHub
-  release into `%LOCALAPPDATA%\windows\models`, and app updates are
-  delivered from `api.agentredactor.negativestarinnovators.com` via the
-  bundled Velopack `Update.exe`. The version comes from `version.txt`.
+  model weights are downloaded on first run from
+  `api.agentredactor.negativestarinnovators.com/models` into
+  `%LOCALAPPDATA%\AgentRedactor\models`, and app updates are
+  delivered from the same host via the bundled Velopack `Update.exe`. The
+  version comes from `version.txt`.
 
 ## Build Requirements
 
@@ -57,7 +59,7 @@ windows/
 - Visual Studio 2022 with C++ workload
 - CMake 3.20+
 - vcpkg (integrated with CMake)
-- ONNX Runtime model files (from `windows-app-openai/models`)
+- The ONNX model weights in `models\onnx\` (~1.6 GB — downloaded in step 1)
 
 ## Dependencies (vcpkg)
 
@@ -72,11 +74,11 @@ windows/
 
 ### 1. Ensure model files are present
 
-Copy or symlink the ONNX model from the existing project:
-
-```powershell
-Copy-Item -Recurse ..\windows-app-openai\models .\windows\models
-```
+The repo ships everything under `models\` except the ~1.6 GB
+`models\onnx\model_quantized.onnx_data` weights. Download them from the
+[Releases](https://github.com/Negative-Star-Innovators/AgentRedactor/releases)
+page (or `https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data`)
+and place the file in `models\onnx\`.
 
 ### 2. Configure with CMake
 
@@ -92,7 +94,12 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake
 cmake --build . --config Release
 ```
 
-### 4. Package (MSI + MSIX)
+For a quick local development build (EXE only, no packaging), run
+`.\buildquick.ps1` from the `windows` folder.
+
+### 4. Package (MSIX)
+
+From the `windows` folder:
 
 ```powershell
 .\build.ps1
@@ -150,4 +157,4 @@ For each incoming response:
 
 ## License
 
-Proprietary — Agent Redactor Project.
+MIT — see [LICENSE](../LICENSE).

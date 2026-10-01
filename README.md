@@ -1,18 +1,61 @@
 # Agent Redactor
 
-A desktop app for Windows and Linux that sits between AI coding agents and
-their LLM endpoints as a local proxy, redacting PII (names, emails, phone
-numbers, secrets, and more) from outbound requests before they leave your
-machine — and un-redacting the responses coming back.
+A local privacy proxy for AI coding agents, with a desktop app on Windows and
+Linux. It sits between your agents and their LLM endpoints, redacting PII
+(names, emails, phone numbers, secrets, and more) from outbound requests
+before they leave your machine — and un-redacting the responses coming back.
 
-- Windows: WinUI 3 (C++/WinRT) desktop app, self-contained Windows App SDK
-- Local HTTP proxy with on-device ONNX NER model — no cloud calls for detection
+- Local HTTP proxy with an on-device ONNX NER model — no cloud calls for detection
 - Custom keyword and regex redaction rules on top of model-based PII detection
+- Works with any agent that can point at a local proxy — Claude Code, Codex, OpenClaw, OpenCode, Hermes (guides below)
 - Localized UI in 53 languages
-- Distributed via the Microsoft Store (Windows MSIX) and a self-release channel
-  (Velopack, with built-in auto-updates) for Windows and Linux
+- Per-user install — no admin or root required; on headless Linux the installer sets up a systemd user service
+- Auto-updates via the Microsoft Store or the built-in Velopack updater
 
 **Website:** <https://agentredactor.negativestarinnovators.com/>
+
+## Install
+
+### Windows
+
+**Microsoft Store** (x64 and ARM64; updates via the Store):
+<https://apps.microsoft.com/detail/9pn44k2tm2g3>
+
+**Self-release** (x64 and ARM64; updates itself via Velopack). Run in PowerShell:
+
+```powershell
+iex "& { $(irm https://api.agentredactor.negativestarinnovators.com/install.ps1) }"
+```
+
+The installer picks the native build for your architecture (falling back to
+the x64 build on ARM64 if no native package is published yet) and installs
+per-user under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are
+unsigned for now — Windows SmartScreen may warn on first run.
+
+### Linux
+
+(x64 and ARM64; per-user AppImage install). Run in a terminal:
+
+```bash
+curl -fsSL https://api.agentredactor.negativestarinnovators.com/install.sh | bash
+```
+
+The installer detects your architecture and:
+
+- places the AppImage in `~/Applications` and symlinks the `agentredactor` CLI into `~/.local/bin`
+- with a display, starts the GUI; on a headless machine it instead installs a
+  systemd user service (starts at boot, survives logout), downloads the AI
+  model, and confirms with `agentredactor status`
+- works under WSL as well (GUI via WSLg, headless otherwise)
+
+Remove with `agentredactor uninstall`.
+
+**Updates.** Linux GUI installs self-update in-app, like Windows: the app
+checks at startup and offers "Restart now / later" once an update is
+downloaded (Settings also has a "Check for updates" button). Headless installs
+have no GUI prompt — `agentredactor status` reports when a newer release
+exists, then run `agentredactor update` and
+`systemctl --user restart agentredactor` to apply.
 
 ## Documentation
 
@@ -25,52 +68,26 @@ website:
 - [OpenCode](https://agentredactor.negativestarinnovators.com/opencode.html)
 - [Hermes](https://agentredactor.negativestarinnovators.com/hermes.html)
 
-## Install
-
-**Microsoft Store** (x64 and ARM64; updates via the Store):
-<https://apps.microsoft.com/detail/9pn44k2tm2g3>
-
-**Self-release** (x64 and ARM64; updates itself via Velopack). Run in PowerShell:
-
-```powershell
-iex "& { $(irm https://api.agentredactor.negativestarinnovators.com/install.ps1) }"
-```
-
-The installer picks the native build for your architecture (falling back to the
-x64 build on ARM64 if no native package is published yet) and installs per-user
-under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are unsigned for now —
-Windows SmartScreen may warn on first run.
-
-**Linux** (x64 and ARM64; per-user AppImage install). Run in a terminal:
-
-```bash
-curl -fsSL https://api.agentredactor.negativestarinnovators.com/install.sh | bash
-```
-
-The installer detects your architecture, places the AppImage in
-`~/Applications`, and symlinks the `agentredactor` CLI into `~/.local/bin`.
-With a display it starts the GUI; on a headless machine it instead installs a
-systemd user service (starts at boot), downloads the AI model, and confirms
-with `agentredactor status`. Works under WSL as well (GUI via WSLg, headless
-otherwise). Remove with `agentredactor uninstall`.
-
-Linux has no automatic update prompt: `agentredactor status` reports when a
-newer release exists, then run `agentredactor update` and restart to apply
-(`systemctl --user restart agentredactor` on headless installs).
-
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| `windows/` | The WinUI 3 app (C++), build scripts, models, resources |
-| `core/` | OS-agnostic C++ core (HTTP proxy, ONNX NER, regex/redaction engines) shared by all platform frontends; CMake scaffolding, currently built via the Windows project |
-| `cloudflare/` | The Cloudflare worker + R2 behind the self-release channel (`/install.ps1`, `/updates`, `/models`) |
-| `tests/` | GUI end-to-end tests (FlaUI + pytest + mock LLM) and self-release install/upgrade E2E |
+| `windows/` | The Windows app (WinUI 3, C++/WinRT), build scripts, models, resources, MSIX packaging |
+| `linux/` | The Linux app (Qt 6 GUI plus engine/CLI build), AppImage packaging, systemd user unit |
+| `core/` | OS-agnostic C++ core (HTTP proxy, ONNX NER, regex/redaction engines, CLI) shared by the platform frontends; built by both the Windows and Linux projects |
+| `cloudflare/` | The Cloudflare worker + R2 behind the self-release channel (`/install.ps1`, `/install.sh`, `/updates`, `/models`) |
+| `website/` | The website with the agent integration guides, translated into every supported language |
+| `docs/` | Design and spec documents (Linux implementation spec, port plan) |
+| `tests/` | pytest suites: cross-platform `cli/` and `migration/`, Linux GUI tests in `linux/` (AT-SPI), Windows GUI end-to-end tests in `gui/` (FlaUI + mock LLM), self-release install/upgrade E2E |
 | `third_party_tests/` | Integration tests driving real third-party agent CLIs through the proxy |
-| `scripts/` | PowerShell helpers that configure third-party clients for the integration tests |
-| `.github/workflows/` | CI: MSIX build + package tests, self-release (Velopack) build/test/publish, worker deploy |
+| `scripts/` | Build/release helpers and scripts that configure third-party clients for the integration tests |
+| `.github/workflows/` | CI: MSIX build + package tests, self-release (Velopack) build/test/publish for Windows and Linux, worker deploy |
 
-## Prerequisites
+## Building
+
+### Windows
+
+Prerequisites:
 
 - Windows 10/11, x64 or ARM64
 - Visual Studio 2022 (or Build Tools) with the *Desktop development with C++* workload
@@ -86,8 +103,6 @@ newer release exists, then run `agentredactor update` and restart to apply
   repo**; download it from the
   [Releases](https://github.com/Negative-Star-Innovators/AgentRedactor/releases) page and
   place it in `windows\models\onnx\`.
-
-## Building
 
 Quick build for local development (EXE only, no packaging):
 
@@ -121,23 +136,67 @@ cd windows
 ```
 
 Releases are published by pushing a `v*` tag — the Self-Release workflow builds,
-tests and uploads both channels to R2 (see `cloudflare/README.md`).
+tests and uploads both Windows channels to R2 (see `cloudflare/README.md`).
+
+### Linux
+
+Prerequisites (Ubuntu 24.04):
+
+```bash
+sudo apt install -y build-essential cmake ninja-build pkg-config \
+  libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
+  qt6-base-dev qt6-l10n-tools libgl1-mesa-dev patchelf
+
+# onnxruntime is not packaged in apt; use the official x64 tarball
+# (developed/tested against 1.29.0; on ARM64 use the aarch64 tarball):
+mkdir -p ~/onnxruntime
+curl -sL https://github.com/microsoft/onnxruntime/releases/download/v1.29.0/onnxruntime-linux-x64-1.29.0.tgz \
+  | tar xz -C ~/onnxruntime --strip-components=1
+```
+
+The engine also needs the NER model files: `config.json`, `tokenizer.json`,
+`viterbi_calibration.json` and `onnx/model_quantized.onnx` live in
+`windows/models/`; the ~1.6 GB `onnx/model_quantized.onnx_data` weights are
+downloaded automatically on first run.
+
+Build the GUI and engine/CLI:
+
+```bash
+cd linux
+cmake -B build -G Ninja \
+  -DONNXRUNTIME_INCLUDE_DIR=~/onnxruntime/include \
+  -DONNXRUNTIME_LIB=~/onnxruntime/lib/libonnxruntime.so
+cmake --build build
+```
+
+Release packaging (Velopack AppImage, produced under
+`linux/build-release/velopack/`) is `linux/build-release.sh` — it needs the
+.NET SDK and the pinned `vpk` tool. See `linux/README.md` for packaging,
+publishing and running the AppImage. Linux releases publish the same way as
+Windows: push a `v*` tag and the Build Linux workflow builds, tests and
+uploads both channels to R2.
 
 ## Tests
 
-See `tests/README.md` and `third_party_tests/README.md`. In short:
+The suites live in `tests/` (see `tests/README.md`) and `third_party_tests/`
+(see `third_party_tests/README.md`). The cross-platform suites (`cli/`,
+`migration/`) and the Linux suite (`linux/`) run in CI on every PR; the
+`linux/` AT-SPI GUI tests need a display (CI runs them under Xvfb + D-Bus —
+see `linux/README.md`):
 
-```powershell
+```bash
 cd tests
-pip install -r requirements.txt
-pytest -v gui/
+python -m pytest cli -q
+python -m pytest migration -q
+python -m pytest linux -q
 ```
 
-The tests drive the real application UI (FlaUI) and therefore require an
-interactive Windows desktop session — in CI they run on GitHub-hosted runners
-(`windows-latest` and `windows-11-arm`, which provide one) via the
-workflow-dispatch **Tests** workflow, or locally on any Windows desktop.
-Third-party integration tests additionally need an
+The Windows GUI end-to-end tests in `tests/gui/` drive the real application UI
+(FlaUI) and therefore require an interactive Windows desktop session — in CI
+they run on GitHub-hosted runners (`windows-latest` and `windows-11-arm`,
+which provide one) via the workflow-dispatch **Tests** workflow, or locally on
+any Windows desktop. The dispatched Tests workflow also runs the CLI suite on
+Windows. Third-party integration tests additionally need an
 OpenRouter API key (copy `third_party_tests\.env.example` to `.env`).
 
 ## License
