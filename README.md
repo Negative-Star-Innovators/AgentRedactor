@@ -81,7 +81,7 @@ machines — see [docs/cli.md](docs/cli.md).
 | `core/` | OS-agnostic C++ core (HTTP proxy, ONNX NER, regex/redaction engines, CLI) shared by the platform frontends; built by both the Windows and Linux projects |
 | `cloudflare/` | The Cloudflare worker + R2 behind the self-release channel (`/install.ps1`, `/install.sh`, `/updates`, `/models`) |
 | `website/` | The website with the agent integration guides, translated into every supported language |
-| `docs/` | Design and spec documents (Linux implementation spec, port plan) |
+| `docs/` | Additional documentation — currently the [CLI reference](docs/cli.md) |
 | `tests/` | pytest suites: cross-platform `cli/` and `migration/`, Linux GUI tests in `linux/` (AT-SPI), Windows GUI end-to-end tests in `gui/` (FlaUI + mock LLM), self-release install/upgrade E2E |
 | `third_party_tests/` | Integration tests driving real third-party agent CLIs through the proxy |
 | `scripts/` | Build/release helpers and scripts that configure third-party clients for the integration tests |
