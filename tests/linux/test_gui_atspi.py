@@ -479,6 +479,12 @@ async def test_keyword_delete(
     _assert_keyword_redacted(upstream, secret)
 
     gui.app.delete_keyword(secret)
+    # The GUI row can disappear before the engine has applied the delete;
+    # wait for the engine-side list to drop the keyword before sending
+    # traffic (same pattern as test_regex_toggle_and_delete).
+    wait_until("keyword removed from engine",
+               lambda: gui.cli("keywords", "list").stdout,
+               lambda out: secret not in out)
 
     response = await _send_chat(gui, client, f"Mission {secret} today.")
     upstream = mock_llm.last_request
