@@ -107,7 +107,9 @@ From the `windows` folder:
 
 ## Configuration
 
-Settings are stored in `%APPDATA%\AgentRedactor\settings.json`.
+Settings are stored in `%APPDATA%\AgentRedactor\settings.json`. Everything in
+this section can also be driven from the scriptable `agentredactor` CLI —
+see [../docs/cli.md](../docs/cli.md).
 
 ### Default Profile Setup
 

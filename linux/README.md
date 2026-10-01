@@ -1,7 +1,8 @@
 # Agent Redactor — Linux build
 
 For installing and *using* Agent Redactor (end users), see the
-[root README](../README.md) — this document covers building and developing
+[root README](../README.md), and for the scriptable `agentredactor` CLI see
+[docs/cli.md](../docs/cli.md) — this document covers building and developing
 on Linux.
 
 Build the engine/CLI (`agentredactor`) and the Qt GUI (`agentredactor-gui`)

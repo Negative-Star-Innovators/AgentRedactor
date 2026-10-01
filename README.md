@@ -68,6 +68,10 @@ website:
 - [OpenCode](https://agentredactor.negativestarinnovators.com/opencode.html)
 - [Hermes](https://agentredactor.negativestarinnovators.com/hermes.html)
 
+The engine binary also doubles as a scriptable CLI (`agentredactor status`,
+`keywords add`, `profiles add`, …) for terminals, scripts, and headless
+machines — see [docs/cli.md](docs/cli.md).
+
 ## Repository layout
 
 | Path | Contents |
