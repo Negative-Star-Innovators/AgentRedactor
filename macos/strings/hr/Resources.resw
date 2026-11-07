@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for hr. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Engine ne radi — ponovni pokušaj…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Nije moguće pokrenuti engine Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL proxyja kopiran u međuspremnik</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Provjera autentičnosti nije uspjela. Pokušajte ponovno ili izađite iz aplikacije.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Otključajte pomoću Touch ID-a ili lozinke za Mac da biste nastavili.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor je zaključan</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Preuzima se model detekcije PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Preuzima se model detekcije PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Dnevnici su pohranjeni na ovom Macu. Redigirani zapisnici mogu i dalje sadržavati osjetljive podatke koji nisu otkriveni.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI detekcija</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Zaštita je već omogućena. Umjesto toga upotrijebite Promijeni ili Onemogući.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Provjera autentičnosti otkazana.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Od vas će se zatražiti da se potvrdite pomoću Touch ID-a ili lozinke za Mac prije onemogućavanja zaštite.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Onemogući glavnu lozinku</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Omogućavanje zaštite glavnom lozinkom nije uspjelo.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Štiti vaše spremljene API ključeve na ovom Macu. Otključavate pomoću Touch ID-a ili lozinke za Mac. Nije potrebna zasebna lozinka.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Omogući glavnu lozinku</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Dodaj</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Odaberite profil u bočnoj traci ili stvorite novi pomoću gumba + iznad popisa.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Zatvoriti Agent Redactor? Engine nastavlja raditi u pozadini.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Otvori pri prijavi</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Zahtjevi: {0}   PII: {1}   Regex: {2}   Ključne riječi: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Ponovno pokretanje za primjenu još nije dostupno u ovoj verziji. Ponovno preuzmite aplikaciju za ažuriranje.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Prvo omogućite zapisivanje u dnevnik.</value></data>
+</root>

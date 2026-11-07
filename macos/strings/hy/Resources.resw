@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for hy. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Շարժիչը չի աշխատում — կրկնում ենք…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Չհաջողվեց գործարկել Agent Redactor-ի շարժիչը։</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-ի URL-ը պատճենվել է սեղանատար</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Վավերացումը ձախողվեց։ Կրկին փորձեք կամ փակեք հավելվածը։</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Շարունակելու համար բացեք կողպվածքը Touch ID-ով կամ Mac-ի գաղտնաբառով։</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor-ը կողպված է</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII-ի հայտնաբերման մոդելը ներբեռնվում է ({0}%)։</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII-ի հայտնաբերման մոդելը ներբեռնվում է…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Տեղեկամատյանները պահվում են այս Mac-ի վրա: Ռեակտիվացված մատյանները դեռ կարող են պարունակել զգայուն տվյալներ, որոնք հայտնաբերումը բաց է թողել:</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI հայտնաբերում</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Պաշտպանությունը արդեն միացված է։ Փոխարենը օգտագործեք Փոխել կամ Անջատել։</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Վավերացումը չեղարկվեց։</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Պաշտպանությունը անջատելուց առաջ ձեզ կառաջարկվի վավերացվել Touch ID-ով կամ Mac-ի գաղտնաբառով։</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Անջատել հիմնական գաղտնաբառը</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Չհաջողվեց միացնել հիմնական գաղտնաբառի պաշտպանությունը։</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Պաշտպանում է այս Mac-ում պահված API բանալիները։ Կողպվածքը կբացեք Touch ID-ով կամ Mac-ի գաղտնաբառով։ Առանձին գաղտնաբառ պետք չէ։</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Միացնել հիմնական գաղտնաբառը</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Ավելացնել</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Ընտրեք պրոֆիլ կողային վահանակից կամ ստեղծեք նոր՝ ցանկի վերևում գտնվող + կոճակով։</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Պրոֆիլ.</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Դուրս գալ Agent Redactor-ից։ Շարժիչը կշարունակի աշխատել խորքում։</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Բացել միանալիս</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Հարցումներ: {0}   PII: {1}   Regex: {2}   Բանալի բառեր: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Կիրառելու համար վերագործարկումը դեռ հասանելի չէ այս տարբերակում։ Թարմացնելու համար կրկին ներբեռնեք հավելվածը։</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Սկզբում միացրեք մատյանները։</value></data>
+</root>

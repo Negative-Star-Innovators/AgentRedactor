@@ -4,7 +4,8 @@ The Agent Redactor engine binary doubles as a command-line interface. On
 Windows it ships as `agentredactor.exe` next to the GUI (the Microsoft Store
 package also registers an `agentredactor` AppExecutionAlias); on Linux the
 installer symlinks `agentredactor` into `~/.local/bin`, and AppImage
-invocations are forwarded to the same binary.
+invocations are forwarded to the same binary; on macOS it ships inside
+`AgentRedactor.app` at `Contents/Resources/agentredactor`.
 
 Every command talks to the *running* engine over its localhost control API, so
 the CLI and the GUI always agree on state — use either, interchangeably.

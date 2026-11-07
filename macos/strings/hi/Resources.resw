@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for hi. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>इंजन नहीं चल रहा है — पुनः प्रयास…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor इंजन प्रारंभ नहीं किया जा सका।</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>प्रॉक्सी URL क्लिपबोर्ड पर कॉपी किया गया</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>प्रमाणीकरण सफल नहीं हुआ। फिर कोशिश करें, या ऐप से बाहर निकलें।</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>जारी रखने के लिए Touch ID या अपने Mac पासवर्ड से अनलॉक करें।</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor लॉक है</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII पहचान मॉडल डाउनलोड हो रहा है ({0}%)।</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII पहचान मॉडल डाउनलोड हो रहा है…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>लॉग इस Mac पर संग्रहीत हैं. संशोधित लॉग में अभी भी संवेदनशील डेटा हो सकता है जिसका पता नहीं चल पाया है।</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>प्रॉक्सी</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI पहचान</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>सुरक्षा पहले से सक्षम है। इसके बजाय बदलें या अक्षम करें का उपयोग करें।</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>प्रमाणीकरण रद्द किया गया।</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>सुरक्षा अक्षम करने से पहले आपसे Touch ID या अपने Mac पासवर्ड से सत्यापित करने को कहा जाएगा।</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>मास्टर पासवर्ड अक्षम करें</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>मास्टर पासवर्ड सुरक्षा सक्षम करने में विफल।</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>इस Mac पर संग्रहीत आपकी API कुंजियों की सुरक्षा करता है। आप Touch ID या अपने Mac पासवर्ड से अनलॉक करेंगे। कोई अलग पासवर्ड आवश्यक नहीं है।</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>मास्टर पासवर्ड सक्षम करें</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>जोड़ें</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>साइडबार में प्रोफ़ाइल चुनें, या सूची के ऊपर + बटन से नई प्रोफ़ाइल बनाएं।</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>प्रोफ़ाइल:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor से बाहर निकलें? इंजन पृष्ठभूमि में चलता रहेगा।</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>लॉगिन पर खोलें</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>अनुरोध: {0}   PII: {1}   Regex: {2}   कीवर्ड: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>इस बिल्ड में पुनः आरंभ करके लागू करना अभी उपलब्ध नहीं है। अद्यतन के लिए ऐप पुनः डाउनलोड करें।</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>पहले लॉगिंग सक्षम करें।</value></data>
+</root>

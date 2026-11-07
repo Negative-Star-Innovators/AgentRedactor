@@ -1,0 +1,412 @@
+name: Release macOS
+
+# macOS self-release (Velopack) CI: builds the engine/CLI + SwiftUI GUI on an
+# Apple silicon runner (macos-15 is the GitHub-hosted arm64 image), packs the
+# osx-arm64 channel (drag-and-drop DMG + nupkg + feed), runs the cross-platform
+# suites (cli, migration) plus the macOS release E2Es (fresh install, update
+# feed) and publishes to R2 — gated the same way as release-selfrelease.yml
+# and build-linux.yml: only tag pushes (v*) or manual dispatches with publish
+# checked upload (prefix osx-arm64 on the shared agentredactor-releases
+# bucket); PRs run the full build + pack + tests as a dry-run with an unsigned
+# package.
+#
+# Docs-only PRs (markdown, website/, docs/) skip the expensive steps via the
+# `changes` gate job below (see RUN_BUILD in the build job). The gate is on the
+# steps, not the job, so the branch ruleset still sees a successful check.
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.1.0). Must match windows/version.txt.'
+        required: true
+        type: string
+      publish:
+        description: 'Publish to R2 (agentredactor-releases bucket, prefix osx-arm64). Off = dry-run: full build + pack + tests, artifacts only.'
+        required: false
+        type: boolean
+        default: false
+
+# Rapid pushes to the same PR cancel the superseded run. Tag pushes get their
+# own group per ref, so a release in flight is never cancelled.
+concurrency:
+  group: release-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+# Publishing uploads to the R2 bucket (R2 is the only release host; no GitHub
+# release is created).
+permissions:
+  contents: read
+
+jobs:
+  # Gate job: decides whether a pull request contains anything but docs.
+  # Cheap (ubuntu, seconds); the build job below keys off its output.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only "$BASE" HEAD | grep -qvE '\.md$|^website/|^docs/'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: changes
+    # macos-15 is GitHub's hosted Apple silicon (arm64) image — the only arch
+    # this workflow packs (channel osx-arm64).
+    runs-on: macos-15
+    env:
+      # Manual dispatches and code diffs always build; docs-only PRs skip the
+      # steps below (the job still reports success for the ruleset).
+      RUN_BUILD: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.code == 'true' }}
+      # Expected version: tag name on tag pushes, the version input on manual
+      # re-runs. Empty on pull_request — the resolve step falls back to
+      # version.txt (there is no tag to validate against on a PR).
+      EXPECTED_VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+    steps:
+      - name: Checkout
+        if: env.RUN_BUILD == 'true'
+        uses: actions/checkout@v4
+
+      # Fail early if the tag/input version doesn't match version.txt — every
+      # macOS build step (cmake, build-app.sh, vpk pack) reads the version from
+      # that file. On PRs there is no tag/input; instead stamp the build one
+      # patch ABOVE the live osx-arm64 release when version.txt isn't already
+      # ahead (PR artifacts are never published, so the synthetic version is
+      # harmless) by rewriting version.txt in the workspace — the single
+      # version source both cmake and build-app.sh read. The resolved version
+      # is exported for the later steps (artifact names, E2E assertions).
+      - name: Resolve and validate version
+        if: env.RUN_BUILD == 'true'
+        run: |
+          set -e
+          file_version="$(tr -d '[:space:]' < windows/version.txt)"
+          expected="${EXPECTED_VERSION}"
+
+          if [ -z "$expected" ]; then
+            expected="$file_version"
+            feed=$(curl -fsSL 'https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64/releases.osx-arm64.json' 2>/dev/null || true)
+            if [ -n "$feed" ]; then
+              cat > /tmp/resolve_live.py <<'PY'
+          import json, sys
+          def parse(v):
+              return tuple(int(x) for x in v.lstrip('vV').split('-')[0].split('+')[0].split('.'))
+          file_version = sys.argv[1]
+          try:
+              feed = json.load(sys.stdin)
+          except Exception:
+              print('__NOFEED__'); sys.exit(0)
+          assets = [a for a in feed.get('Assets', [])
+                    if a.get('Version') and str(a.get('Type')) in ('1', 'Full')]
+          if not assets:
+              print('__NOFEED__'); sys.exit(0)
+          live = max(assets, key=lambda a: parse(a['Version']))['Version']
+          if parse(file_version) <= parse(live):
+              parts = parse(live)
+              bumped = f"{parts[0]}.{parts[1]}.{parts[2] + 1}"
+              print(f'__BUMP__ {bumped} {live}')
+          else:
+              print('__AHEAD__')
+          PY
+              result="$(printf '%s' "$feed" | python3 /tmp/resolve_live.py "$file_version" || echo __ERR__)"
+              case "$result" in
+                __BUMP__*)
+                  bumped=$(echo "$result" | awk '{print $2}')
+                  live=$(echo "$result" | awk '{print $3}')
+                  echo "PR build: version.txt ($file_version) is not ahead of live ($live); stamping this build as v$bumped so the release E2Es compare cleanly."
+                  printf '%s\n' "$bumped" > windows/version.txt
+                  expected="$bumped"
+                  ;;
+                __ERR__)
+                  echo "::warning::Could not parse the live osx-arm64 feed; building with version.txt as-is."
+                  ;;
+              esac
+            fi
+          fi
+
+          expected="${expected#v}"; expected="${expected#V}"
+          if ! [[ "$expected" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected version '$expected' is not a valid semver (e.g. v1.1.0)." >&2
+            exit 1
+          fi
+          if [ "${{ github.event_name }}" != "pull_request" ] && [ "$file_version" != "$expected" ]; then
+            echo "Version mismatch: tag/input is 'v$expected' but windows/version.txt contains '$file_version'." >&2
+            echo "Bump version.txt to '$expected' and re-tag (see scripts/new-release.ps1)." >&2
+            exit 1
+          fi
+          echo "Version OK: v$expected"
+          echo "EXPECTED_VERSION=$expected" >> "$GITHUB_ENV"
+
+      - name: Install build + test dependencies (brew)
+        if: env.RUN_BUILD == 'true'
+        run: |
+          uname -m | grep -q arm64 || { echo "macos-15 runner is not arm64 — refusing to pack osx-arm64"; exit 1; }
+          brew install cmake ninja nlohmann-json openssl@3 xcodegen
+
+      # Fetches the pinned onnxruntime tarball + checks prerequisites, and the
+      # pinned Velopack C/C++ lib (macos/fetch-velopack.sh).
+      - name: Fetch dependencies
+        if: env.RUN_BUILD == 'true'
+        run: |
+          macos/fetch-deps.sh
+          macos/fetch-velopack.sh
+
+      - name: Set up Python
+        if: env.RUN_BUILD == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        if: env.RUN_BUILD == 'true'
+        run: pip install -r tests/requirements.txt
+
+      # The engine refuses to serve (proxy ports stay closed) until the NER
+      # model weights exist, and the CLI suite spawns the real engine — so the
+      # ~1.6 GB weights must be present. On macOS the fallback model dir is
+      # ~/Library/Application Support/AgentRedactor/models (next to the
+      # settings dir); companions come from the repo checkout (windows/models/,
+      # same files the other platforms ship) and the gitignored weights are
+      # downloaded from the same R2 models endpoint the app itself uses.
+      # Cached across runs.
+      - name: Cache ONNX model weights
+        if: env.RUN_BUILD == 'true'
+        id: model-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Application Support/AgentRedactor/models
+          key: onnx-model-ner-macos-v1
+
+      - name: Stage model files (cache miss only)
+        if: env.RUN_BUILD == 'true' && steps.model-cache.outputs.cache-hit != 'true'
+        run: |
+          dest="$HOME/Library/Application Support/AgentRedactor/models"
+          mkdir -p "$dest/onnx"
+          cp windows/models/config.json windows/models/tokenizer.json \
+            windows/models/viterbi_calibration.json "$dest/"
+          cp windows/models/onnx/model_quantized.onnx "$dest/onnx/"
+          curl -fL --retry 3 -o "$dest/onnx/model_quantized.onnx_data" \
+            https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
+
+      # Release build into the canonical macos/build tree (build-app.sh expects
+      # the engine there). AR_SELFRELEASE=ON mirrors the Linux release build.
+      - name: Build engine (Release)
+        if: env.RUN_BUILD == 'true'
+        run: |
+          cmake -S macos -B macos/build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DAR_SELFRELEASE=ON
+          cmake --build macos/build
+
+      # The two suites must each run in their own pytest process: tests/cli
+      # and tests/migration both ship a top-level conftest.py and a shared
+      # module name breaks a combined run.
+      - name: Run CLI tests
+        if: env.RUN_BUILD == 'true'
+        env:
+          AGENTREDACTOR_ENGINE_BIN: ${{ github.workspace }}/macos/build/engine/agentredactor
+        run: python -m pytest tests/cli -q
+
+      - name: Run migration tests
+        if: env.RUN_BUILD == 'true'
+        env:
+          AGENTREDACTOR_EXE: ${{ github.workspace }}/macos/build/engine/agentredactor
+        run: python -m pytest tests/migration -q
+
+      - name: Set up .NET (for vpk)
+        if: env.RUN_BUILD == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      # Pinned to the Velopack library version vendored by
+      # macos/fetch-velopack.sh — keep the two in sync.
+      - name: Install vpk 1.2.0 (Velopack CLI)
+        if: env.RUN_BUILD == 'true'
+        run: dotnet tool install -g vpk --version 1.2.0
+
+      # Developer ID app/DMG signing + notarization, tags/dispatches only (PRs
+      # pack unsigned — mounting and copying the DMG works without Gatekeeper).
+      # Skipped gracefully when the Apple secrets are not configured yet, in
+      # which case the pack is unsigned (see build-release.sh).
+      - name: Set up signing keychain
+        if: env.RUN_BUILD == 'true' && github.event_name != 'pull_request'
+        env:
+          APPLE_SIGNING_CERT: ${{ secrets.APPLE_SIGNING_CERT }}
+          APPLE_SIGNING_CERT_PASSWORD: ${{ secrets.APPLE_SIGNING_CERT_PASSWORD }}
+          APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -e
+          if [ -z "$APPLE_SIGNING_CERT" ]; then
+            echo "::warning::APPLE_SIGNING_CERT not set; packing UNSIGNED (Gatekeeper will not open the DMG on user machines)."
+            exit 0
+          fi
+          keychain_password="$(openssl rand -hex 32)"
+          echo "$APPLE_SIGNING_CERT" | base64 --decode > /tmp/agentredactor-signing.p12
+          security create-keychain -p "$keychain_password" build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security unlock-keychain -p "$keychain_password" build.keychain
+          security import /tmp/agentredactor-signing.p12 -k build.keychain \
+            -P "$APPLE_SIGNING_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          # codesign/notarytool must be allowed to use the imported key
+          # non-interactively.
+          security set-key-partition-list -S apple-tool:,apple: -s \
+            -k "$keychain_password" build.keychain
+          security list-keychain -d user -s build.keychain login.keychain
+          rm -f /tmp/agentredactor-signing.p12
+          echo "SIGN_APP_IDENTITY=$APPLE_SIGN_IDENTITY" >> "$GITHUB_ENV"
+          echo "SIGN_ENTITLEMENTS=$GITHUB_WORKSPACE/macos/packaging/AgentRedactor.entitlements" >> "$GITHUB_ENV"
+          if [ -n "$APPLE_ID" ] && [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            xcrun notarytool store-credentials "agentredactor-notary" \
+              --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
+              --password "$APPLE_APP_SPECIFIC_PASSWORD" --keychain build.keychain
+            echo "NOTARY_PROFILE=agentredactor-notary" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Apple notary secrets not set; the pack will be signed but NOT notarized."
+          fi
+
+      # build-release.sh derives the channel from the host arch (osx-arm64)
+      # and reads signing from the SIGN_*/NOTARY_PROFILE env vars above.
+      - name: Build and pack (build-release.sh)
+        if: env.RUN_BUILD == 'true'
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            macos/build-release.sh --no-sign
+          else
+            macos/build-release.sh
+          fi
+
+      # Cheap sanity check that vpk produced a usable feed before spending
+      # time on install tests: feed file, full nupkg and DMG must exist.
+      - name: Verify Velopack output
+        if: env.RUN_BUILD == 'true'
+        run: |
+          dir=macos/build-release/velopack
+          channel="osx-arm64"
+          test -f "$dir/releases.${channel}.json" || { echo "missing releases.${channel}.json"; exit 1; }
+          ls "$dir"/*-full.nupkg >/dev/null || { echo "no full nupkg"; exit 1; }
+          test -f "$dir/AgentRedactor-osx-arm64.dmg" || { echo "no DMG"; exit 1; }
+          python3 - "$dir/releases.${channel}.json" <<'PY'
+          import json, sys
+          feed = json.load(open(sys.argv[1]))
+          assets = feed.get('Assets') or []
+          if not assets:
+              sys.exit('feed has no assets')
+          print(f'Velopack output OK: {len(assets)} asset(s) in releases.osx-arm64.json')
+          PY
+
+      # Fresh-install E2E: mount THIS build's DMG, verify its Applications
+      # shortcut, copy the app to /Applications, then verify layout/version/
+      # architecture and run the headless migration hook on the bundled engine.
+      # FEED_DIR points the installed app's own update check at this build's
+      # feed over localhost HTTP. MODEL_SMOKE asserts that the first-run model
+      # download starts fetching from R2.
+      - name: Fresh-install E2E (this build)
+        if: env.RUN_BUILD == 'true'
+        env:
+          AGENTREDACTOR_INSTALL_TEST: "1"
+          AGENTREDACTOR_INSTALL_DIR: /Applications
+          AGENTREDACTOR_DMG: ${{ github.workspace }}/macos/build-release/velopack/AgentRedactor-osx-arm64.dmg
+          AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/macos/build-release/velopack
+          AGENTREDACTOR_CHANNEL: osx-arm64
+          AGENTREDACTOR_MODEL_SMOKE: "1"
+        run: python -m pytest tests/macos/test_selfrelease_install.py -v
+
+      # Full self-update cycle against a loopback vpk feed: the DMG-packed app
+      # must check, download, swap to a synthetic vNext, and relaunch.
+      - name: Run update-feed E2E
+        if: env.RUN_BUILD == 'true'
+        env:
+          AGENTREDACTOR_UPDATE_SWAP_TEST: "1"
+        run: python -m pytest tests/macos/test_update_feed.py -q
+
+      # Keep the raw Velopack output around — the publish job below downloads
+      # it, and it helps debug failed/odd releases. Runs even when an earlier
+      # test step failed, so failed runs still yield their packages (needed to
+      # re-seed R2 from a PR build).
+      - name: Upload Velopack output artifact
+        if: always() && env.RUN_BUILD == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-velopack-osx-arm64
+          path: macos/build-release/velopack
+          retention-days: 30
+
+  # Publish is a single job: the build must pass first, then ONE upload pushes
+  # the osx-arm64 channel to R2 (bucket agentredactor-releases, prefix
+  # osx-arm64/) — same shape as release-selfrelease.yml and build-linux.yml.
+  # R2 is the ONLY update source; vpk upload s3 defaults to path-style URLs,
+  # which R2 expects.
+  publish:
+    needs: build
+    runs-on: macos-15
+    # Tag pushes always publish; manual dispatches only when publish is checked.
+    if: github.event_name == 'push' || inputs.publish
+    steps:
+      - name: Download Velopack output
+        uses: actions/download-artifact@v4
+        with:
+          name: AgentRedactor-velopack-osx-arm64
+          path: velopack-osx
+
+      - name: Set up .NET (for vpk)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install vpk 1.2.0 (Velopack CLI)
+        run: dotnet tool install -g vpk --version 1.2.0
+
+      # vpk's error for empty credentials is cryptic; check up front.
+      - name: Check R2 secrets are configured
+        run: |
+          missing=""
+          if [ -z '${{ secrets.R2_ACCOUNT_ID }}' ]; then missing="$missing R2_ACCOUNT_ID"; fi
+          if [ -z '${{ secrets.R2_ACCESS_KEY_ID }}' ]; then missing="$missing R2_ACCESS_KEY_ID"; fi
+          if [ -z '${{ secrets.R2_SECRET_ACCESS_KEY }}' ]; then missing="$missing R2_SECRET_ACCESS_KEY"; fi
+          if [ -n "$missing" ]; then
+            echo "Missing repo secrets:$missing. Create them under Settings -> Secrets and variables -> Actions" >&2
+            exit 1
+          fi
+
+      # Publishes the osx-arm64 channel (releases.osx-arm64.json + nupkg +
+      # drag-and-drop DMG) to R2 so installed macOS instances can auto-update.
+      # NOTE: vpk rejects --region together with --endpoint (custom S3 endpoint
+      # implies it).
+      - name: Publish osx-arm64 channel to R2
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com --keyId ${{ secrets.R2_ACCESS_KEY_ID }} --secret ${{ secrets.R2_SECRET_ACCESS_KEY }} -c osx-arm64 --prefix osx-arm64 --outputDir velopack-osx
+
+      # vpk uploads everything in the output dir, including files no client
+      # ever downloads (the portable zip, the legacy Squirrel RELEASES file and
+      # vpk's assets.*.json upload manifest). Delete them so the bucket holds
+      # only what clients use: releases.osx-arm64.json and the nupkg/DMG.
+      # aws cli is preinstalled on the macOS runners.
+      - name: Remove non-client files from R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 rm "s3://agentredactor-releases/osx-arm64/" \
+            --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+            --region auto --recursive --exclude "*" \
+            --include "*-Portable.zip" --include "RELEASES*" --include "assets.*.json"

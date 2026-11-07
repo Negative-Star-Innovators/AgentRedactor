@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for he. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>המנוע לא פועל — מנסה שוב…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>לא ניתן היה להתחיל את מנוע Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>כתובת ה-URL של הפרוקסי הועתקה ללוח</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>האימות לא הצליח. נסה שוב, או צא מהאפליקציה.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>בטל את הנעילה באמצעות Touch ID או סיסמת ה-Mac כדי להמשיך.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor נעול</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>מודל זיהוי ה-PII בהורדה ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>מודל זיהוי ה-PII בהורדה…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>היומנים נשמרים על Mac זה. יומנים שעברו עריכה עשויים עדיין להכיל נתונים רגישים שפספס הזיהוי.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>פרוקסי</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>זיהוי AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>ההגנה כבר מופעלת. השתמש בהחלפה או בהשבתה במקום.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>האימות בוטל.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>תתבקש לאמת באמצעות Touch ID או סיסמת ה-Mac לפני השבתת ההגנה.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>השבת סיסמת מנהל</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>הפעלת ההגנה באמצעות סיסמת מנהל נכשלה.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>מגן על מפתחות ה-API השמורים ב-Mac זה. תבטל את הנעילה באמצעות Touch ID או סיסמת ה-Mac. אין צורך בסיסמה נפרדת.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>הפעל סיסמת מנהל</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>הוסף</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>בחר פרופיל בסרגל הצד, או צור פרופיל חדש באמצעות לחצן + מעל הרשימה.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>פרופיל:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>לצאת מ-Agent Redactor? המנוע ימשיך לפעול ברקע.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>פתח בהתחברות</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>בקשות: {0}   PII: {1}   Regex: {2}   מילות מפתח: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>הפעלה מחדש כדי להחיל אינה זמינה עדיין בגרסה זו. הורד מחדש את האפליקציה כדי לעדכן.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>הפעל תחילה רישום ביומן.</value></data>
+</root>

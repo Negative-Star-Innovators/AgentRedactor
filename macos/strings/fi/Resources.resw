@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for fi. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Moottori ei ole käynnissä — yritetään uudelleen…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor -moottoria ei voitu käynnistää.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-URL kopioitu leikepöydälle</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Todentaminen epäonnistui. Yritä uudelleen tai lopeta sovellus.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Jatka avaamalla lukitus Touch ID:llä tai Macisi salasanalla.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor on lukittu</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII-havaintomallia ladataan ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII-havaintomallia ladataan…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Lokit tallennetaan tälle Macille. Muokatut lokit voivat silti sisältää arkaluontoisia tietoja, jotka tunnistus ei havainnut.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Välityspalvelin</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Tekoälyhavainnointi</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Suoja on jo käytössä. Käytä sen sijaan Muuta tai Poista käytöstä.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Todentaminen peruutettu.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Sinua pyydetään todentamaan Touch ID:llä tai Macisi salasanalla ennen suojauksen poistamista käytöstä.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Poista pääsalasana käytöstä</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Pääsalasanan suojauksen käyttöönotto epäonnistui.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Suojaa tallennetut API-avaimesi tässä Macissa. Avaat lukituksen Touch ID:llä tai Macisi salasanalla. Erillistä salasanaa ei tarvita.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Ota pääsalasana käyttöön</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Lisää</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Valitse profiili sivupalkista tai luo uusi painamalla + painiketta luettelon yläpuolella.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profiili:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Lopetetaanko Agent Redactor? Moottori jatkaa toimintaansa taustalla.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Avaa kirjautumisen yhteydessä</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Pyynnöt: {0}   PII: {1}   Regex: {2}   Avainsanat: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Käynnistys uudelleen ottaaksesi käyttöön ei ole vielä saatavilla tässä versiossa. Päivitä lataamalla sovellus uudelleen.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Ota loki ensin käyttöön.</value></data>
+</root>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ar. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>المحرك لا يعمل — جارٍ إعادة المحاولة…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>تعذر بدء محرك Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>تم نسخ عنوان URL للوكيل إلى الحافظة</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>فشلت المصادقة. حاول مرة أخرى، أو أغلق التطبيق.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>افتح القفل باستخدام Touch ID أو كلمة مرور Mac للمتابعة.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor مقفل</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>جارٍ تنزيل نموذج الكشف عن PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>جارٍ تنزيل نموذج الكشف عن PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>يتم تخزين السجلات على هذا Mac. ربما لا تزال السجلات المنقحة تحتوي على بيانات حساسة لم يتم الكشف عنها.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>الوكيل</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>الكشف بالذكاء الاصطناعي</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>الحماية مفعّلة بالفعل. استخدم تغيير أو تعطيل بدلاً من ذلك.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>تم إلغاء المصادقة.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>سيُطلب منك التحقق باستخدام Touch ID أو كلمة مرور Mac قبل تعطيل الحماية.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>تعطيل كلمة المرور الرئيسية</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>فشل في تفعيل الحماية بكلمة المرور الرئيسية.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>يحمي مفاتيح API المخزنة على هذا Mac. ستفتح القفل باستخدام Touch ID أو كلمة مرور Mac. لا حاجة إلى كلمة مرور منفصلة.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>تفعيل كلمة المرور الرئيسية</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>يضيف</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>حدد ملفًا شخصيًا في الشريط الجانبي، أو أنشئ ملفًا باستخدام زر + أعلى القائمة.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>الملف الشخصي:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>إنهاء Agent Redactor؟ سيستمر المحرك في العمل في الخلفية.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>الفتح عند تسجيل الدخول</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>الطلبات: {0}   PII: {1}   Regex: {2}   الكلمات الرئيسية: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>إعادة التشغيل للتطبيق غير متوفرة في هذا الإصدار بعد. أعد تنزيل التطبيق للتحديث.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>فعّل التسجيل أولاً.</value></data>
+</root>

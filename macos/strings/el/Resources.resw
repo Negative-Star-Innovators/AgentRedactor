@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for el. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Η μηχανή δεν εκτελείται — γίνεται νέα προσπάθεια…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Δεν ήταν δυνατή η εκκίνηση της μηχανής του Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Το URL διακομιστή αντιγράφηκε στο πρόχειρο</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Η πιστοποίηση απέτυχε. Δοκιμάστε ξανά ή τερματίστε την εφαρμογή.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Ξεκλειδώστε με Touch ID ή τον κωδικό πρόσβασης του Mac για να συνεχίσετε.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Το Agent Redactor είναι κλειδωμένο</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Το μοντέλο ανίχνευσης PII λαμβάνεται ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Το μοντέλο ανίχνευσης PII λαμβάνεται…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Τα αρχεία καταγραφής αποθηκεύονται σε αυτόν τον Mac. Τα αρχεία καταγραφής που έχουν διορθωθεί ενδέχεται να εξακολουθούν να περιέχουν ευαίσθητα δεδομένα που δεν εντοπίστηκαν.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Ανίχνευση AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Η προστασία είναι ήδη ενεργή. Χρησιμοποιήστε Αλλαγή ή Απενεργοποίηση.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Η πιστοποίηση ακυρώθηκε.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Θα σας ζητηθεί να πιστοποιηθείτε με Touch ID ή τον κωδικό πρόσβασης του Mac πριν απενεργοποιηθεί η προστασία.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Απενεργοποίηση κύριου κωδικού πρόσβασης</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Αποτυχία ενεργοποίησης προστασίας κύριου κωδικού πρόσβασης.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Προστατεύει τα αποθηκευμένα κλειδιά API σε αυτόν τον Mac. Ξεκλειδώνετε με Touch ID ή τον κωδικό πρόσβασης του Mac. Δεν απαιτείται ξεχωριστός κωδικός.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Ενεργοποίηση κύριου κωδικού πρόσβασης</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Προσθήκη</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Επιλέξτε ένα προφίλ στην πλευρική γραμμή ή δημιουργήστε ένα με το κουμπί + επάνω από τη λίστα.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Προφίλ:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Έξοδος από το Agent Redactor; Η μηχανή συνεχίζει να εκτελείται στο παρασκήνιο.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Άνοιγμα κατά τη σύνδεση</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Αιτήματα: {0}   PII: {1}   Regex: {2}   Λέξεις-κλειδιά: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Η επανεκκίνηση για εφαρμογή δεν είναι διαθέσιμη ακόμη σε αυτήν την έκδοση. Κατεβάστε ξανά την εφαρμογή για ενημέρωση.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Ενεργοποιήστε πρώτα την καταγραφή.</value></data>
+</root>

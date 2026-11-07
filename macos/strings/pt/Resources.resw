@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for pt. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>O motor não está em execução — a tentar novamente…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Não foi possível iniciar o motor do Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL do proxy copiado para a área de transferência</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>A autenticação falhou. Tente novamente ou saia da aplicação.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Desbloqueie com Touch ID ou a palavra-passe do seu Mac para continuar.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>O Agent Redactor está bloqueado</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>A transferir o modelo de deteção de PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>A transferir o modelo de deteção de PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Os logs são armazenados neste Mac. Os logs redigidos ainda podem conter dados confidenciais que não foram detectados pela detecção.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Deteção de IA</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>A proteção já está ativada. Utilize antes Alterar ou Desativar.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Autenticação cancelada.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Será solicitado que se verifique com Touch ID ou a palavra-passe do seu Mac antes de a proteção ser desativada.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Desativar palavra-passe mestra</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Falha ao ativar a proteção por palavra-passe mestra.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Protege as suas chaves de API armazenadas neste Mac. Desbloqueia com Touch ID ou a palavra-passe do seu Mac. Não é necessária uma palavra-passe separada.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Ativar palavra-passe mestra</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Adicionar</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Selecione um perfil na barra lateral ou crie um novo com o botão + acima da lista.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Perfil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Sair do Agent Redactor? O motor continua a funcionar em segundo plano.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Abrir ao iniciar sessão</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Pedidos: {0}   PII: {1}   Regex: {2}   Palavras-chave: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Reiniciar para aplicar ainda não está disponível nesta versão. Transfira novamente a aplicação para atualizar.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Ative primeiro o registo.</value></data>
+</root>

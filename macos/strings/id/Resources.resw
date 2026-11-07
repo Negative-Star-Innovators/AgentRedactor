@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for id. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Mesin tidak berjalan — mencoba ulang…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Mesin Agent Redactor tidak dapat dimulai.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL proxy disalin ke papan klip</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Autentikasi gagal. Coba lagi, atau keluar dari aplikasi.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Buka kunci dengan Touch ID atau kata sandi Mac Anda untuk melanjutkan.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor terkunci</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Model deteksi PII sedang diunduh ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Model deteksi PII sedang diunduh…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Log disimpan di Mac ini. Log yang disunting mungkin masih berisi data sensitif yang tidak dapat dideteksi.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proksi</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Deteksi AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Perlindungan sudah aktif. Gunakan Ubah atau Nonaktifkan sebagai gantinya.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Autentikasi dibatalkan.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Anda akan diminta memverifikasi dengan Touch ID atau kata sandi Mac sebelum perlindungan dinonaktifkan.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Nonaktifkan kata sandi utama</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Gagal mengaktifkan perlindungan kata sandi utama.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Melindungi kunci API yang tersimpan di Mac ini. Anda akan membuka kunci dengan Touch ID atau kata sandi Mac. Tidak perlu kata sandi terpisah.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Aktifkan kata sandi utama</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Tambah</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Pilih profil di bilah samping, atau buat profil baru dengan tombol + di atas daftar.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Keluar dari Agent Redactor? Mesin tetap berjalan di latar belakang.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Buka saat Masuk</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Permintaan: {0}   PII: {1}   Regex: {2}   Kata Kunci: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Mulai ulang untuk menerapkan belum tersedia pada versi ini. Unduh ulang aplikasi untuk memperbarui.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Aktifkan pencatatan log terlebih dahulu.</value></data>
+</root>

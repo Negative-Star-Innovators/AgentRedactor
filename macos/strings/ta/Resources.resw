@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ta. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>இன்ஜின் இயங்கவில்லை — மீண்டும் முயற்சிக்கிறது…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor இன்ஜினைத் தொடங்க முடியவில்லை.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>ப்ராக்ஸி URL கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>அங்கீகரிப்பு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும், அல்லது ஆப்ஸிலிருந்து வெளியேறவும்.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>தொடர Touch ID அல்லது உங்கள் Mac கடவுச்சொல்லுடன் திறக்கவும்.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor பூட்டப்பட்டுள்ளது</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII கண்டறிதல் மாதிரி பதிவிறக்கப்படுகிறது ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII கண்டறிதல் மாதிரி பதிவிறக்கப்படுகிறது…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>இந்த Mac இல் பதிவுகள் சேமிக்கப்படுகின்றன. திருத்தப்பட்ட பதிவுகளில், கண்டறிதல் தவறவிட்ட முக்கியமான தரவு இன்னும் இருக்கலாம்.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>ப்ராக்ஸி</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI கண்டறிதல்</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>பாதுகாப்பு ஏற்கனவே இயக்கத்தில் உள்ளது. அதற்கு பதிலாக மாற்று அல்லது முடக்கு பயன்படுத்தவும்.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>அங்கீகரிப்பு ரத்து செய்யப்பட்டது.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>பாதுகாப்பு முடக்கப்படுவதற்கு முன் Touch ID அல்லது உங்கள் Mac கடவுச்சொல்லுடன் உறுதிப்படுத்துமாறு கேட்கப்படுவீர்கள்.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>முதன்மை கடவுச்சொல்லை முடக்கு</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>முதன்மை கடவுச்சொல் பாதுகாப்பை இயக்குவது தோல்வியடைந்தது.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>இந்த Mac-இல் சேமிக்கப்பட்ட உங்கள் API சாவிகளைப் பாதுகாக்கிறது. Touch ID அல்லது உங்கள் Mac கடவுச்சொல்லுடன் திறப்பீர்கள். தனி கடவுச்சொல் தேவையில்லை.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>முதன்மை கடவுச்சொல்லை இயக்கு</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>சேர்</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>பக்கப்பட்டியில் ஒரு சுயவிவரத்தைத் தேர்ந்தெடுக்கவும், அல்லது பட்டியலுக்கு மேல் உள்ள + பட்டனால் புதியதை உருவாக்கவும்.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>சுயவிவரம்:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor-இலிருந்து வெளியேறவா? இன்ஜின் பின்னணியில் இயங்கத் தொடரும்.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>உள்நுழையும்போது திறக்கவும்</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>கோரிக்கைகள்: {0}   PII: {1}   Regex: {2}   முக்கியசொற்கள்: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>இந்த உருவாக்கத்தில் மீண்டும் தொடங்கி அமல்படுத்த இன்னும் கிடைக்காது. புதுப்பிக்க ஆப்ஸை மீண்டும் பதிவிறக்கவும்.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>முதலில் பதிவை இயக்கவும்.</value></data>
+</root>

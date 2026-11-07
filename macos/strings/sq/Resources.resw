@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for sq. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Motori nuk po punon — po provohet sërish…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Motori i Agent Redactor nuk u mund të nisej.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL-ja e proxy-s u kopjua në clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Vërtetimi dështoi. Provo sërish ose dil nga aplikacioni.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Zhblloko me Touch ID ose fjalëkalimin e Mac për të vazhduar.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor është i bllokuar</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Modeli i zbulimit të PII po shkarkohet ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Modeli i zbulimit të PII po shkarkohet…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Regjistrat ruhen në këtë Mac. Regjistrimet e redaktuara mund të përmbajnë ende të dhëna të ndjeshme që zbulimi ka humbur.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Zbulimi AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Mbrojtja është tashmë e aktivizuar. Përdor Ndrysho ose Çaktivizo.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Vërtetimi u anulua.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Do të të kërkohet të vërtetosh me Touch ID ose fjalëkalimin e Mac para se mbrojtja të çaktivizohet.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Çaktivizo fjalëkalimin kryesor</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Aktivizimi i mbrojtjes me fjalëkalim kryesor dështoi.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Mbron çelësat e API të ruajtur në këtë Mac. Do të zhbllokosh me Touch ID ose fjalëkalimin e Mac. Nuk nevojitet fjalëkalim i veçantë.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Aktivizo fjalëkalimin kryesor</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Shto</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Zgjidh një profil në shiritin anësor, ose krijo një të ri me butonin + mbi listën.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profili:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Dil nga Agent Redactor? Motori vazhdon të punojë në sfond.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Hap në Hyrje</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Kërkesat: {0}   PII: {1}   Regex: {2}   Fjalët kyçe: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Rinisja për të aplikuar ende nuk është e disponueshme në këtë ndërtim. Shkarko sërish aplikacionin për përditësim.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Aktivizo së pari regjistrimin.</value></data>
+</root>

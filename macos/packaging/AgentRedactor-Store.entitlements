@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Mac App Store entitlements for Agent Redactor (sandboxed channel).
+     TEAMID is replaced with the Apple Developer Team ID by build-store.sh.
+     Differences from the self-release entitlements:
+     - app sandbox enabled (Store requirement)
+     - network.client/server: the engine binds 127.0.0.1 (loopback proxy) and
+       talks to configured upstream LLM endpoints; localhost listeners are
+       permitted under the sandbox with network.server.
+     - keychain-access-groups: lets the GUI and the bundled engine binary
+       (nested code, same team) share Keychain items under the sandbox.
+     NOTE: disable-library-validation is NOT allowed on the App Store, so
+     build-store.sh re-signs the bundled ONNX Runtime / OpenSSL dylibs with
+     the Apple Distribution certificate. -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.network.server</key>
+	<true/>
+	<key>com.apple.security.keychain-access-groups</key>
+	<array>
+		<string>TEAMID.com.negativestarinnovators.agentredactor</string>
+	</array>
+</dict>
+</plist>

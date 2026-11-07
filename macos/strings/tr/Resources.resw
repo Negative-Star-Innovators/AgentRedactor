@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for tr. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Motor çalışmıyor — yeniden deneniyor…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor motoru başlatılamadı.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy URL'si panoya kopyalandı</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Kimlik doğrulaması başarısız oldu. Tekrar deneyin veya uygulamadan çıkın.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Devam etmek için Touch ID veya Mac parolanızla kilidi açın.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor kilitli</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII algılama modeli indiriliyor ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII algılama modeli indiriliyor…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Günlükler bu Mac'te depolanır. Düzenlenen günlükler hâlâ algılamanın gözden kaçırdığı hassas verileri içerebilir.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI Algılama</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Koruma zaten etkin. Bunun yerine Değiştir veya Devre Dışı Bırak kullanın.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Kimlik doğrulaması iptal edildi.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Koruma devre dışı bırakılmadan önce Touch ID veya Mac parolanızla doğrulamanız istenir.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Ana Parolayı Devre Dışı Bırak</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Ana parola koruması etkinleştirilemedi.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Bu Mac'te saklanan API anahtarlarınızı korur. Touch ID veya Mac parolanızla kilidi açarsınız. Ayrı bir parola gerekmez.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Ana Parolayı Etkinleştir</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Ekle</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Kenar çubuğundan bir profil seçin veya listenin üzerindeki + düğmesiyle yeni bir profil oluşturun.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor'dan çıkılsın mı? Motor arka planda çalışmaya devam eder.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Oturum açıldığında aç</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>İstekler: {0}   PII: {1}   Regex: {2}   Anahtar Kelimeler: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Bu derlemede uygulamak için yeniden başlatma henüz kullanılamıyor. Güncellemek için uygulamayı yeniden indirin.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Önce günlük kaydını etkinleştirin.</value></data>
+</root>

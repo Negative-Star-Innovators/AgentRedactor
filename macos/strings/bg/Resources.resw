@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for bg. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Двигателят не работи — повторен опит…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Не можа да се стартира двигателят на Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL адресът на проксито е копиран в клипборда</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Удостоверяването не бе успешно. Опитайте отново или излезте от приложението.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Отключете с Touch ID или паролата за Mac, за да продължите.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor е заключен</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Моделът за откриване на PII се изтегля ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Моделът за откриване на PII се изтегля…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Регистрационните файлове се съхраняват на този Mac. Редактираните регистрационни файлове може все още да съдържат чувствителни данни, които откриването е пропуснало.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Прокси</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Откриване с ИИ</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Защитата вече е активирана. Използвайте „Промяна“ или „Забраняване“.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Удостоверяването е отменено.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Ще бъдете помолени да се удостоверите с Touch ID или паролата за Mac, преди защитата да бъде забранена.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Забраняване на главната парола</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Неуспешно активиране на защита с главна парола.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Защитава съхранените ви API ключове на този Mac. Ще отключвате с Touch ID или паролата за Mac. Не е нужна отделна парола.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Активиране на главната парола</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Добавяне</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Изберете профил от страничната лента или създайте нов с бутона + над списъка.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Профил:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Изход от Agent Redactor? Двигателят продължава да работи на заден план.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Отваряне при вписване</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Заявки: {0}   PII: {1}   Regex: {2}   Ключови думи: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Рестартирането за прилагане все още не е налично в тази компилация. Изтеглете отново приложението, за да го актуализирате.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Първо активирайте регистрирането.</value></data>
+</root>

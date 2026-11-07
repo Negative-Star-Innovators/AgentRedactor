@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for et. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Mootor ei tööta — proovitakse uuesti…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactori mootorit ei saanud käivitada.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy URL kopeeriti lõikelauale</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Autentimine ebaõnnestus. Proovige uuesti või lõpetage rakendus.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Jätkamiseks avage lukk Touch ID või Maci parooliga.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor on lukustatud</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII tuvastusmudelit laaditakse alla ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII tuvastusmudelit laaditakse alla…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Logid salvestatakse sellesse Maci. Redigeeritud logid võivad endiselt sisaldada tundlikke andmeid, mille tuvastamine ei õnnestunud.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Puhverserver</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI tuvastus</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Kaitse on juba lubatud. Kasutage selle asemel Muuda või Keela.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Autentimine tühistati.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Enne kaitse keelamist palutakse teil autentida Touch ID või Maci parooliga.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Keela peaparool</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Peaparooli kaitse lubamine ebaõnnestus.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Kaitseb selles Macis salvestatud API võtmeid. Lukust avate Touch ID või Maci parooliga. Iseteistlikku parooli pole vaja.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Luba peaparool</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Lisa</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Valige külgribal profiil või looge uus nupuga + loendi kohal.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profiil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Väljuda rakendusest Agent Redactor? Mootor jätkab tööd taustal.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Ava sisselogimisel</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Päringud: {0}   PII: {1}   Regex: {2}   Märksõnad: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Taaskäivitamine rakendamiseks pole selles versioonis veel saadaval. Uuendamiseks laadige rakendus uuesti alla.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Lubage kõigepealt logimine.</value></data>
+</root>

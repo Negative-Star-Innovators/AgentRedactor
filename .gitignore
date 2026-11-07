@@ -6,6 +6,10 @@ linux/**/build*/
 # Vendored prebuilt Velopack C/C++ library (fetched via linux/fetch-velopack.sh)
 linux/third_party/
 
+# macOS build outputs + vendored prebuilt ONNX Runtime (fetched via macos/fetch-deps.sh)
+macos/build/
+macos/third_party/
+
 # Temporary scripts and artifacts
 temp/
 
@@ -32,3 +36,13 @@ windows/store-listing/
 
 # Sparse-attention re-export scratch (cloned source repo, intermediate models)
 _sparse_export/
+
+# XcodeGen output (regenerate with: cd macos/gui && xcodegen)
+macos/gui/AgentRedactor.xcodeproj/
+
+# macOS / Xcode per-user noise (Finder metadata, user settings, SPM scratch)
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.build/

@@ -4,7 +4,7 @@ Worker that fronts update checks and the install bootstrapper for AgentRedactor 
 
 ## Routes
 
-- `GET /updates/:channel/:file` — serves Velopack update assets exclusively from the `RELEASES_BUCKET` R2 bucket at `<channel>/<file>` with HTTP Range support and conditional requests (ETag / 304). R2 is the only update source — there is no GitHub fallback; missing objects return 404. Channels: `win` (Windows x64), `win-arm64` (Windows ARM64), `linux` (Linux x64), and `linux-arm64` (Linux ARM64). Allowlisted files: `releases.<channel>.json`, `*.nupkg`, `*-Setup.exe`, `*-Portable.zip`, `*.AppImage`. Versioned `*.nupkg` files are cached immutably; the fixed-name feed/installer files are `no-store`.
+- `GET /updates/:channel/:file` — serves Velopack update assets exclusively from the `RELEASES_BUCKET` R2 bucket at `<channel>/<file>` with HTTP Range support and conditional requests (ETag / 304). R2 is the only update source — there is no GitHub fallback; missing objects return 404. Channels: `win` (Windows x64), `win-arm64` (Windows ARM64), `linux` (Linux x64), `linux-arm64` (Linux ARM64), and `osx-arm64` (macOS Apple silicon; `osx` is reserved for a future x64/universal channel). Allowlisted files: `releases.<channel>.json`, `*.nupkg`, `*-Setup.exe`, `*-Portable.zip`, `*.AppImage`, `*.dmg` (macOS drag-and-drop installer). Versioned `*.nupkg` files are cached immutably; the fixed-name feed/installer files are `no-store`.
 - `GET /install.ps1` — PowerShell one-line installer (`iex "& { $(irm https://api.agentredactor.negativestarinnovators.com/install.ps1) }"`). Detects CPU architecture (`AMD64` vs `ARM64`) and downloads the matching `*-Setup.exe`; on ARM64 it falls back to the x64 installer (runs under emulation) if no ARM64 build is published yet.
 - `GET /install.sh` — bash one-line installer (`curl -fsSL https://api.agentredactor.negativestarinnovators.com/install.sh | bash`). Detects CPU architecture (`x86_64` vs `aarch64`) and installs the matching AppImage to `~/Applications`; there is no cross-arch fallback, so a missing build is a hard error. Symlinks `agentredactor` (the engine/CLI) into `~/.local/bin` and prints a PATH note when that directory is not on PATH. On first launch it retries with `--appimage-extract-and-run` when the FUSE mount fails. Headless machines (no `DISPLAY`/`WAYLAND_DISPLAY`, e.g. WSL without WSLg, SSH, servers) get a fully automated install: systemd user service + linger when systemd is present (engine starts on boot, survives logout; opt out with `AGENTREDACTOR_NO_SERVICE=1`), a direct engine start otherwise, then the first-run model download with progress and a live `agentredactor status`. The AppImage entrypoint itself dispatches to the engine/CLI when there is no display, and falls back the same way when the xcb platform plugin's host libraries are missing (printing the `apt install` fix).
 - `GET /models/:file` — serves the app's AI model weights from the `MODELS_BUCKET` R2 bucket with HTTP Range support (segmented/resumable downloads) and conditional requests (ETag / 304). Allowlisted files: `model_quantized.onnx_data`. Cached immutably (`Cache-Control: public, max-age=31536000, immutable`) since the model is content-versioned.
@@ -18,11 +18,12 @@ The self-release channel is split per OS and architecture:
 - Windows ARM64 checks `/updates/win-arm64/releases.win-arm64.json`
 - Linux x64 checks `/updates/linux/releases.linux.json`
 - Linux ARM64 checks `/updates/linux-arm64/releases.linux-arm64.json`
+- macOS (Apple silicon) checks `/updates/osx-arm64/releases.osx-arm64.json`
 
-CI publishes all four channels to the `agentredactor-releases` R2 bucket (under
-`win/`, `win-arm64/`, `linux/`, and `linux-arm64/` prefixes) via the
-`release-selfrelease.yml` and `build-linux.yml` publish jobs. R2 is the sole
-host — releases are not published to GitHub.
+CI publishes all five channels to the `agentredactor-releases` R2 bucket (under
+`win/`, `win-arm64/`, `linux/`, `linux-arm64/`, and `osx-arm64/` prefixes) via
+the `release-selfrelease.yml`, `build-linux.yml`, and `release-macos.yml`
+publish jobs. R2 is the sole host — releases are not published to GitHub.
 
 ## Updates hosting (R2)
 
@@ -113,6 +114,24 @@ curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64
 
 Both should return `HTTP 200`.
 
+#### Seeding the first macOS release manually
+
+The macOS workflow artifact is named `AgentRedactor-velopack-osx-arm64`.
+Download it from a successful **Release macOS** run, then upload with the same
+`vpk upload s3` command using prefix/channel `osx-arm64`:
+
+```bash
+vpk upload s3 --bucket agentredactor-releases --endpoint https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com --region auto --keyId <KEY> --secret <SECRET> -c osx-arm64 --prefix osx-arm64 --outputDir seed/velopack-osx-arm64
+```
+
+Verify:
+
+```
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64/releases.osx-arm64.json
+```
+
+Expect `HTTP 200`.
+
 WARNING: this is a *live* publish — every installed self-release instance
 will auto-update to whatever you seed. Only do this pre-launch (or with a
 build you're happy to ship).
@@ -194,6 +213,12 @@ Linux AppImage downloads:
 ```
 curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux/AgentRedactor.AppImage
 curl -I https://api.agentredactor.negativestarinnovators.com/updates/linux-arm64/AgentRedactor-linux-arm64.AppImage
+```
+
+macOS drag-and-drop DMG download:
+
+```
+curl -I https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64/AgentRedactor-osx-arm64.dmg
 ```
 
 ```

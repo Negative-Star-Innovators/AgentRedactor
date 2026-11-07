@@ -529,6 +529,11 @@ std::vector<BYTE> SecureStorage::Base64Decode(const std::string& str) {
     return result;
 }
 
+void SecureStorage::Prewarm() {
+    // No deferred secret-material cache on Linux (libsecret resolves per
+    // call); present so engine startup can call Prewarm unconditionally.
+}
+
 } // namespace AgentRedactor
 
 #endif // !_WIN32

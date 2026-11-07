@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for kk. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Қозғалтқыш жұмыс істемейді — қайталап көру…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor қозғалтқышын іске қосу мүмкін болмады.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy URL мүмкіндіктер тақтасына көшірілді</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Аутентификация сәтсіз аяқталды. Қайталап көріңіз немесе қолданбадан шығыңыз.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Жалғастыру үшін Touch ID немесе Mac құпия сөзімен құлпын ашыңыз.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor құлыпталған</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII анықтау үлгісі жүктелуде ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII анықтау үлгісі жүктелуде…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Журналдар осы Mac-та сақталады. Түзетілген журналдарда әлі де анықталмаған құпия деректер болуы мүмкін.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Прокси</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI анықтау</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Қорғаныс қосылған. Оның орнына Өзгерту немесе Өшіруді пайдаланыңыз.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Аутентификациядан бас тартылды.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Қорғаныс өшірілмес бұрын Touch ID немесе Mac құпия сөзімен растау сұралады.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Негізгі құпия сөзді өшіру</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Негізгі құпия сөз қорғанысын қосу сәтсіз аяқталды.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Осы Mac-та сақталған API кілттерін қорғайды. Touch ID немесе Mac құпия сөзімен құлпын ашасыз. Бөлек құпия сөз қажет емес.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Негізгі құпия сөзді қосу</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>қосу</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Бүйір панелден профильді таңдаңыз немесе тізім үстіндегі + түймесімен жаңасын жасаңыз.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Профиль:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor қолданбасынан шығу керек пе? Қозғалтқыш фонда жұмысын жалғастырады.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Кіру кезінде ашу</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Сұраулар: {0}   PII: {1}   Regex: {2}   Негізгі сөздер: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Осы нұсқада қолдану үшін қайта іске қосу әлі қолжетімді емес. Жаңарту үшін қолданбаны қайта жүктеп алыңыз.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Алдымен журналдауды қосыңыз.</value></data>
+</root>

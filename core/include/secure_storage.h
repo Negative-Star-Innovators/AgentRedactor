@@ -10,6 +10,10 @@
 //            machine-id-derived fallback on headless servers); protection is
 //            a typed master password whose PBKDF2-HMAC-SHA256 key wraps the
 //            AES session key.
+//   macOS:   core/src/secure_storage_mac.cpp — OpenSSL AES-GCM (byte-identical
+//            envelope); unprotected fields use a machine key from the Keychain
+//            (with a host-UUID-derived fallback); typed master password like
+//            Linux.
 // The on-disk envelope (_enc/_mode/_iv/_tag, base64) is identical on both.
 
 #include <string>
@@ -70,6 +74,12 @@ public:
     // succeeds (used after the GUI quits while the engine keeps running, so
     // the next open must re-authenticate).
     void Lock();
+
+    // Warm the platform secret-material caches (macOS: the Keychain-backed
+    // machine key). No-op on platforms without such a cache. The engine calls
+    // this on a background thread at startup so any slow/first access happens
+    // before the control API serves requests.
+    static void Prewarm();
 
 private:
     bool initialized_ = false;

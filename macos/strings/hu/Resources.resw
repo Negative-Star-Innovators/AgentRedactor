@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for hu. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>A motor nem fut — újrapróbálkozás…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Az Agent Redactor motort nem sikerült elindítani.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>A proxy URL a vágólapra másolva</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>A hitelesítés nem sikerült. Próbálja újra, vagy lépjen ki az alkalmazásból.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>A folytatáshoz oldja fel Touch ID-val vagy Mac-jelszavával.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Az Agent Redactor zárolva van</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>A PII-észlelési modell letöltése folyamatban ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>A PII-észlelési modell letöltése folyamatban…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>A naplók ezen a Macen tárolódnak. A módosított naplók továbbra is tartalmazhatnak olyan bizalmas adatokat, amelyek észlelése elmaradt.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI-észlelés</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>A védelem már engedélyezve van. Használja helyette a Módosítás vagy a Letiltás lehetőséget.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>A hitelesítés megszakítva.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>A védelem letiltása előtt Touch ID-val vagy Mac-jelszavával kell hitelesítenie magát.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Mesterjelszó letiltása</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Nem sikerült engedélyezni a mesterjelszó-védelmet.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Védi a Macen tárolt API-kulcsokat. Touch ID-val vagy Mac-jelszavával oldja fel. Külön jelszó nem szükséges.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Mesterjelszó engedélyezése</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Hozzáadás</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Válasszon profilt az oldalsávon, vagy hozzon létre egyet a lista feletti + gombbal.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Kilép az Agent Redactorból? A motor a háttérben tovább fut.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Megnyitás bejelentkezéskor</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Kérések: {0}   PII: {1}   Regex: {2}   Kulcsszavak: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Az újraindítással történő alkalmazás még nem érhető el ebben a változatban. A frissítéshez töltse le újra az alkalmazást.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Először engedélyezze a naplózást.</value></data>
+</root>

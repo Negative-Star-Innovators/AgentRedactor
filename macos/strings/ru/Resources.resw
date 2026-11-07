@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ru. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Движок не работает — повторная попытка…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Не удалось запустить движок Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL прокси скопирован в буфер обмена</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Аутентификация не удалась. Попробуйте снова или выйдите из приложения.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Чтобы продолжить, разблокируйте с помощью Touch ID или пароля Mac.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor заблокирован</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Загрузка модели обнаружения PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Загрузка модели обнаружения PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Журналы хранятся на этом Mac. Отредактированные журналы могут по-прежнему содержать конфиденциальные данные, которые не были обнаружены.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Прокси</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Обнаружение ИИ</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Защита уже включена. Вместо этого используйте «Изменить» или «Отключить».</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Аутентификация отменена.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Перед отключением защиты вам будет предложено подтвердить личность с помощью Touch ID или пароля Mac.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Отключить мастер-пароль</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Не удалось включить защиту мастер-паролем.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Защищает сохранённые ключи API на этом Mac. Разблокировка выполняется с помощью Touch ID или пароля Mac. Отдельный пароль не нужен.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Включить мастер-пароль</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Добавить</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Выберите профиль в боковой панели или создайте новый кнопкой + над списком.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Профиль:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Выйти из Agent Redactor? Движок продолжит работать в фоне.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Открывать при входе</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Запросы: {0}   PII: {1}   Regex: {2}   Ключевые слова: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Перезапуск для применения недоступен в этой сборке. Чтобы обновиться, загрузите приложение заново.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Сначала включите ведение журнала.</value></data>
+</root>

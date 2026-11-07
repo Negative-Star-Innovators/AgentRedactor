@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI). These exist only on macOS, so there
+     is no Windows counterpart in windows/Strings/. Same .resw format and
+     LocFormat placeholder conventions ({0}, {1}, ...). To translate one of
+     these keys into another language, add a Resources.resw for that language
+     in a sibling directory (e.g. macos/strings/de/Resources.resw) with the
+     same key names — resw_to_xcstrings.py merges macos/strings/ overlays on
+     top of the windows/Strings/ catalogs. -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Engine is not running — retrying…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>The Agent Redactor engine could not be started.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy URL copied to clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Authentication did not succeed. Try again, or exit the app.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Unlock with Touch ID or your Mac password to continue.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor is locked</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>The PII detection model is downloading ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>The PII detection model is downloading…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Logs are stored on this Mac. Redacted logs may still contain sensitive data that detection missed.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI Detection</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Protection is already enabled. Use Change or Disable instead.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Authentication canceled.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>You will be asked to verify with Touch ID or your Mac password before protection is disabled.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Disable master password</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Failed to enable master password protection.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Protects your stored API keys on this Mac. You will unlock with Touch ID or your Mac password. No separate password needed.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Enable master password</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Add</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Select a profile in the sidebar, or create one with the + button above the list.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profile:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Quit Agent Redactor? The engine keeps running in the background.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Open at Login</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Requests: {0}   PII: {1}   Regex: {2}   Keywords: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Restart-to-apply is not available in this build yet. Re-download the app to update.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Enable logging first.</value></data>
+</root>

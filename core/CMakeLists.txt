@@ -44,6 +44,19 @@ set(AR_CORE_SOURCES
 if (WIN32)
     # MRT/WinRT-bound localization compiles on Windows only.
     list(APPEND AR_CORE_SOURCES src/localization.cpp)
+elseif (APPLE)
+    # macOS: Keychain-backed secure storage (Security.framework) with the same
+    # OpenSSL AES-GCM envelope as Linux. LocalAuthentication gates native CLI
+    # secret reads; libsecret is Linux-only.
+    enable_language(OBJCXX)
+    find_package(CURL REQUIRED)
+    find_package(OpenSSL REQUIRED)
+    find_library(AR_SECURITY_FRAMEWORK Security REQUIRED)
+    find_library(AR_COREFOUNDATION_FRAMEWORK CoreFoundation REQUIRED)
+    find_library(AR_IOKIT_FRAMEWORK IOKit REQUIRED)
+    find_library(AR_LOCALAUTH_FRAMEWORK LocalAuthentication REQUIRED)
+    list(APPEND AR_CORE_SOURCES src/secure_storage_mac.cpp src/platform_compat.cpp
+         src/cli_native_auth_mac.mm)
 else()
     find_package(CURL REQUIRED)
     find_package(OpenSSL REQUIRED)
@@ -64,7 +77,15 @@ target_link_libraries(agentredactor-core
     PRIVATE ${ONNXRUNTIME_LIB} Threads::Threads
 )
 
-if (NOT WIN32)
+if (APPLE)
+    target_include_directories(agentredactor-core PRIVATE ${CURL_INCLUDE_DIRS})
+    target_link_libraries(agentredactor-core
+        PRIVATE CURL::libcurl OpenSSL::SSL OpenSSL::Crypto
+                ${AR_SECURITY_FRAMEWORK} ${AR_COREFOUNDATION_FRAMEWORK}
+                ${AR_IOKIT_FRAMEWORK} ${AR_LOCALAUTH_FRAMEWORK}
+    )
+    target_compile_options(agentredactor-core PRIVATE -Wall -Wextra)
+elseif (NOT WIN32)
     target_include_directories(agentredactor-core PRIVATE ${CURL_INCLUDE_DIRS})
     target_link_libraries(agentredactor-core
         PRIVATE CURL::libcurl OpenSSL::SSL OpenSSL::Crypto PkgConfig::LIBSECRET

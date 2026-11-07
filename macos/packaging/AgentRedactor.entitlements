@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Hardened-runtime entitlements for the Developer ID / notarized build
+         (release-macos.yml passes this to vpk pack as the signing entitlements).
+         Deliberately NOT sandboxed (the engine needs loopback networking and
+         is spawned as a child process). Library validation is disabled
+         because the bundle ships third-party dylibs (onnxruntime, OpenSSL,
+         and velopack_libc_osx.dylib, which the updater dlopens at runtime)
+         that vpk re-signs alongside the app; the hardened runtime would
+         otherwise refuse to load code signed by a different team. JIT
+         allowances are not needed. -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+</dict>
+</plist>

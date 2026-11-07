@@ -55,16 +55,35 @@ struct CliTransport {
     std::function<bool(const std::wstring& path, const json& body, json* out)> post;
     std::function<bool(const std::wstring& path, const json& body, json* out)> put;
     std::function<bool(const std::wstring& path)> del;
-    // Shows the Windows Hello consent prompt in-process and, on success,
-    // unlocks the engine session (POST /unlock). Falls back to
-    // HelloConsentOutcome::Unavailable on platforms without Windows Hello.
+    // Shows the in-process native consent prompt and, on success, unlocks the
+    // engine session (POST /unlock). Windows: the Hello consent. macOS: the
+    // OS-native user verification (Touch ID / Mac password, wired by the
+    // platform layer). Falls back to HelloConsentOutcome::Unavailable on
+    // platforms without either.
     std::function<HelloConsentOutcome()> consent;
-    // Typed-master-password mode (Linux, where Windows Hello does not exist):
+    // Typed-master-password mode (Linux, and macOS for piped/non-interactive
+    // sessions where the native Touch ID prompt cannot be answered):
     // when set, gated commands prompt for the master password (via
     // CliConsole::readSecret) instead of the Hello consent, and this hook
     // verifies it via POST /unlock {"password": ...}. Null on Windows, where
-    // the Hello consent flow above is used.
+    // the consent flow above is used, and on interactive macOS sessions.
     std::function<bool(const std::wstring& password)> unlockWithPassword;
+    // Name of the native consent mechanism in CLI messages. Defaults to
+    // L"windows hello" (the strings this file has always used); the macOS
+    // layer sets L"touch id".
+    std::wstring nativeConsentName = L"windows hello";
+    // macOS: true when `consent` performs the OS-native verification (Touch ID
+    // / Mac password) instead of Windows Hello; EnsureConsent's helloEnabled
+    // gate accepts it. Always false on Windows and Linux.
+    bool supportsNativeConsent = false;
+    // macOS (supportsNativeConsent only): creates the random protection secret
+    // the native flow stores in the OS key store (Keychain, gated by Touch ID
+    // / Mac password) and returns it for `password enable`. Returns false with
+    // an OS-level error message when the secret could not be stored.
+    std::function<bool(std::wstring& secretOut, std::wstring& errorOut)> createNativeSecret;
+    // macOS (supportsNativeConsent only): removes the stored protection secret
+    // after `password disable`, mirroring the GUI's cleanup. Null elsewhere.
+    std::function<void()> deleteNativeSecret;
 };
 
 struct CliConsole {

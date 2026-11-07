@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for lb. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Den Motor leeft net — nei Versich…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>De Agent Redactor-Motor konnt net gestart ginn.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-URL an d'Tëschtenuecht kopéiert</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>D'Authentifizéierung huet net geklappt. Probéiert nach eng Kéier oder verloosst d'App.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Entsperrt mat Touch ID oder Ärem Mac-Passwuert fir weiderzefueren.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor ass gespaart</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Den PII-Erkennungsmodell gëtt erofgeluede ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Den PII-Erkennungsmodell gëtt erofgeluede…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Logbicher ginn op dësem Mac gespäichert. Redaktéiert Logbicher kënnen nach ëmmer sensibel Donnéeën enthalen déi Detektioun verpasst huet.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>KI-Erkennung</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>De Schutz ass scho aktiv. Benotzt Änneren oder Desaktivéieren.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Authentifizéierung ofgebrach.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Dir gitt gefrot, iech mat Touch ID oder Ärem Mac-Passwuert ze verifizéieren, éier de Schutz desaktivéiert gëtt.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Haaptpasswuert desaktivéieren</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Konnt de Schutz mam Haaptpasswuert net aktivéieren.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Schützt Är gespäichert API-Schlëssel op dësem Mac. Dir entsperrt mat Touch ID oder Ärem Mac-Passwuert. Kee separate Passwuert néideg.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Haaptpasswuert aktivéieren</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Dobäisetzen</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Wielt e Profil an der säitlecher Leescht oder erstellt en neien mat der + Schaltfläch iwwer der Lëscht.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor zoumaachen? De Motor leeft am Hannergrond weider.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Beim Login opmaachen</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Ufroen: {0}   PII: {1}   Regex: {2}   Schlësselwierder: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Neistarten fir unzewenden ass an dësem Build nach net verfügbar. Lued d'App erof fir ze aktualiséieren.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Aktivéiert d'Logbuch fir d'éischt.</value></data>
+</root>

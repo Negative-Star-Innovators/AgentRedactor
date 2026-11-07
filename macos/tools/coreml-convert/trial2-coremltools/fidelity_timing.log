@@ -1,0 +1,7 @@
+=== FIDELITY (K=30 random inputs per length, CoreML fp16 vs ORT CPU) ===
+L=128: {'max_abs': 8.969278335571289, 'mean_abs_over_samples': 5.0041463971138, 'mean_abs': 0.1204371217948695, 'frame_agree_pct': 100.0, 'exact_match_pct': 100.0, 'min_corr': 0.9896812535418548}
+L=2048: {'max_abs': 11.774883270263672, 'mean_abs_over_samples': 8.489856274922689, 'mean_abs': 0.11315257598956426, 'frame_agree_pct': 99.9951171875, 'exact_match_pct': 90.0, 'min_corr': 0.9958028715854756}
+=== TIMING (3 warmup + 20 timed, interleaved ort-cpu / coreml-ALL) ===
+L=128: cpu med/min/max = 243.8/241.1/264.5 ms | coreml(ALL) med/min/max = 322.3/320.5/326.4 ms
+L=2048: cpu med/min/max = 1055.9/1049.5/1062.4 ms | coreml(ALL) med/min/max = 5037.2/5024.0/5146.1 ms
+saved /tmp/coreml-exp/results.json
