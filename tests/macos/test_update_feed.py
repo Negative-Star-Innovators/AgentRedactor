@@ -28,6 +28,7 @@ import os
 import plistlib
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import time
@@ -115,6 +116,24 @@ class _FeedServer:
              "--bind", "127.0.0.1", "--directory", str(serve_dir)],
             stdout=subprocess.DEVNULL, stderr=self._log,
         )
+        deadline = time.monotonic() + 15
+        while True:
+            if self.proc.poll() is not None:
+                break
+            try:
+                with socket.create_connection(("127.0.0.1", self.port), timeout=0.2):
+                    return
+            except OSError:
+                if time.monotonic() >= deadline:
+                    break
+                time.sleep(0.1)
+        self._log.flush()
+        details = self.log_path.read_text(encoding="utf-8", errors="ignore")
+        if self.proc.poll() is None:
+            self.proc.terminate()
+            self.proc.wait(timeout=10)
+        self._log.close()
+        raise RuntimeError(f"loopback feed server did not start: {details or '(empty log)'}")
 
     def stop(self) -> None:
         self.proc.terminate()
