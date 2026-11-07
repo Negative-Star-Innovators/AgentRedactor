@@ -162,6 +162,7 @@ bool PIIDetector::LoadModel() {
                 LOG(L"[PIIDetector] No GPU provider available, using CPU");
             }
 #else
+#ifdef __APPLE__
             // macOS: the official osx-arm64 ONNX Runtime build ships the
             // CoreML execution provider (Neural Engine / GPU). Wired only for
             // an explicit "coreml" preference so the default ("auto") keeps
@@ -197,9 +198,10 @@ bool PIIDetector::LoadModel() {
                 } else {
                     LOG(L"[PIIDetector] CoreML execution provider not available in this ONNX Runtime build, using CPU");
                 }
-            } else {
-                LOG(L"[PIIDetector] GPU providers are not supported in this build, using CPU");
             }
+#else
+            LOG(L"[PIIDetector] GPU providers are not supported in this build, using CPU");
+#endif
 #endif
         }
 
