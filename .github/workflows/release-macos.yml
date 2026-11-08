@@ -76,6 +76,7 @@ jobs:
     # macos-15 is GitHub's hosted Apple silicon (arm64) image — the only arch
     # this workflow packs (channel osx-arm64).
     runs-on: macos-15
+    environment: ${{ inputs.sign && 'macos-selfrelease' || 'macos-pr-unsigned' }}
     env:
       # Reusable calls and code diffs always build; docs-only PRs skip.
       RUN_BUILD: ${{ github.event_name == 'workflow_call' || needs.changes.outputs.code == 'true' }}

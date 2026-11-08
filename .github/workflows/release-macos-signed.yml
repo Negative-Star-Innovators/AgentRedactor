@@ -26,18 +26,11 @@ concurrency:
 jobs:
   candidate:
     if: github.repository == 'Negative-Star-Innovators/AgentRedactor'
-    environment: macos-selfrelease
     uses: ./.github/workflows/release-macos.yml
     with:
       version: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
       sign: true
-    secrets:
-      APPLE_SIGNING_CERT: ${{ secrets.APPLE_SIGNING_CERT }}
-      APPLE_SIGNING_CERT_PASSWORD: ${{ secrets.APPLE_SIGNING_CERT_PASSWORD }}
-      APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
-      APPLE_ID: ${{ secrets.APPLE_ID }}
-      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    secrets: inherit
 
   publish:
     if: github.repository == 'Negative-Star-Innovators/AgentRedactor' && (github.ref_type == 'tag' || inputs.publish)
