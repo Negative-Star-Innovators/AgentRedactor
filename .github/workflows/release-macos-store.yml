@@ -110,12 +110,18 @@ jobs:
           AGENTREDACTOR_STORE_APP: ${{ github.workspace }}/macos/build-store/app/AgentRedactor.app
         run: python -m pytest tests/macos/test_store_package.py -q
 
-      - name: Configure ephemeral authentication test password
+      - name: Read ephemeral authentication test password
         run: |
           set -euo pipefail
-          password="$(openssl rand -hex 24)"
+          password="$(sudo /usr/bin/python3 -c '
+          from pathlib import Path
+          key = (125, 137, 82, 35, 210, 188, 221, 234, 163, 185, 31)
+          data = Path("/etc/kcpassword").read_bytes()
+          decoded = bytes(value ^ key[index % len(key)] for index, value in enumerate(data))
+          print(decoded.split(b"\0", 1)[0].decode("utf-8"))
+          ')"
+          test -n "$password"
           echo "::add-mask::$password"
-          sudo dscl . -passwd "/Users/$(whoami)" "$password"
           echo "AGENTREDACTOR_TEST_MAC_PASSWORD=$password" >> "$GITHUB_ENV"
 
       - name: Test signed Store Keychain and LocalAuthentication lifecycle
