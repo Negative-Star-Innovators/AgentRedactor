@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <thread>
 
-#ifndef _WIN32
+#if defined(__linux__)
 #include <sys/stat.h>
 #include <sys/utsname.h>
 #endif
@@ -87,7 +87,7 @@ std::wstring ValidateUpstreamUrl(const std::wstring& raw, const std::wstring& la
 // Version + update-feed helpers (used by `status` and `update`)
 // ---------------------------------------------------------------------------
 
-#ifndef _WIN32
+#if defined(__linux__)
 // "1.2.13" -> {1,2,13}; anything unparsable -> valid=false.
 struct SemVersion { int parts[3] = {0, 0, 0}; bool valid = false; };
 
@@ -238,12 +238,14 @@ struct Ctx {
     // foreground) and on success unlocks the engine session (POST /unlock),
     // exactly like the GUI after its in-process prompt. On Linux the same
     // gate is a typed master password prompt (no echo) verified through
-    // POST /unlock. `status`/`help` stay open so the CLI remains
-    // introspectable.
+    // POST /unlock. On macOS (interactive terminals) `consent` is wired to
+    // the native Touch ID / Mac password verification over the Keychain-
+    // stored secret (supportsNativeConsent). `status`/`help` stay open so
+    // the CLI remains introspectable.
     bool EnsureConsent(const json& status) const {
         if (!status.value("masterPasswordEnabled", false)) return true;
         if (t.unlockWithPassword) {
-            // Typed-master-password mode (Linux).
+            // Typed-master-password mode (Linux; macOS piped sessions).
             if (!c.readSecret) {
                 Error(L"master password required (no interactive prompt available)");
                 return false;
@@ -257,31 +259,31 @@ struct Ctx {
             Error(L"wrong master password");
             return false;
         }
-        if (!status.value("helloEnabled", false)) {
-            Error(L"windows hello is not configured on this device");
+        if (!status.value("helloEnabled", false) && !t.supportsNativeConsent) {
+            Error(t.nativeConsentName + L" is not configured on this device");
             return false;
         }
         if (!t.consent) {
-            Error(L"windows hello is not available on this device");
+            Error(t.nativeConsentName + L" is not available on this device");
             return false;
         }
         switch (t.consent()) {
         case HelloConsentOutcome::Granted:
             return true;
         case HelloConsentOutcome::Canceled:
-            Error(L"windows hello consent canceled");
+            Error(t.nativeConsentName + L" consent canceled");
             return false;
         case HelloConsentOutcome::RetriesExhausted:
-            Error(L"too many windows hello attempts");
+            Error(L"too many " + t.nativeConsentName + L" attempts");
             return false;
         case HelloConsentOutcome::TimedOut:
-            Error(L"windows hello consent timed out (no answer)");
+            Error(t.nativeConsentName + L" consent timed out (no answer)");
             return false;
         case HelloConsentOutcome::Unavailable:
-            Error(L"windows hello is not available on this device");
+            Error(t.nativeConsentName + L" is not available on this device");
             return false;
         default:
-            Error(L"windows hello consent required");
+            Error(t.nativeConsentName + L" consent required");
             return false;
         }
     }
@@ -391,10 +393,10 @@ int CmdStatus(const Ctx& ctx) {
             ctx.Print(line);
         }
     }
-#ifndef _WIN32
+#if defined(__linux__)
     // On-demand update check (Linux): one feed fetch per `status` call, silent
     // when offline or the feed is unreadable. Windows self-updates through the
-    // GUI's Velopack flow instead.
+    // GUI's Velopack flow instead; the macOS engine has no updater yet.
     {
         std::wstring fileName;
         const std::wstring channel = AppImageChannel(fileName);
@@ -435,7 +437,7 @@ int CmdPassword(const Ctx& ctx) {
         if (status.value("masterPasswordEnabled", false)) {
             ctx.Error(ctx.t.unlockWithPassword
                 ? L"master password protection is already enabled"
-                : L"windows hello protection is already enabled");
+                : ctx.t.nativeConsentName + L" protection is already enabled");
             return 1;
         }
         if (ctx.t.unlockWithPassword) {
@@ -461,6 +463,23 @@ int CmdPassword(const Ctx& ctx) {
             ctx.Print(L"master password protection enabled");
             return 0;
         }
+        if (ctx.t.createNativeSecret) {
+            // macOS native protection: no typed password exists. A random
+            // secret is generated and stored in the OS key store (Keychain,
+            // gated by Touch ID / Mac password) — the same item the GUI
+            // uses, so either surface can unlock what the other enabled.
+            std::wstring secret, nativeError;
+            if (!ctx.t.createNativeSecret(secret, nativeError)) {
+                ctx.Error(nativeError);
+                return 1;
+            }
+            if (!ctx.t.put(L"/settings/enableMasterPassword", json{{"password", Utils::WideToUtf8(secret)}}, nullptr)) {
+                ctx.Error(L"failed to enable " + ctx.t.nativeConsentName + L" protection");
+                return 1;
+            }
+            ctx.Print(ctx.t.nativeConsentName + L" protection enabled");
+            return 0;
+        }
         // Windows-Hello-only protection: no typed password exists. The GUI
         // asks for the consent prompt before enabling; the CLI (a headless
         // tool) enables directly — the locked session still demands the Hello
@@ -474,29 +493,26 @@ int CmdPassword(const Ctx& ctx) {
     }
 
     if (action == L"disable") {
-        const bool passwordMode = ctx.t.unlockWithPassword != nullptr;
+        const std::wstring protection = ctx.t.unlockWithPassword
+            ? L"master password"
+            : ctx.t.nativeConsentName;
         if (!status.value("masterPasswordEnabled", false)) {
-            ctx.Print(passwordMode
-                ? L"master password protection is not enabled"
-                : L"windows hello protection is not enabled");
+            ctx.Print(protection + L" protection is not enabled");
             return 0;
         }
         // Disabling strips ALL protection, so it demands the same fresh
-        // Windows Hello consent as every other gated command; the engine's
-        // disable endpoint only accepts an unlocked session, and the consent
-        // above unlocked it. A raw API caller cannot disable without either a
-        // Hello consent or the trusted /unlock path.
+        // native consent as every other gated command; the engine's disable
+        // endpoint only accepts an unlocked session, and the consent above
+        // unlocked it. A raw API caller cannot disable without either a
+        // consent or the trusted /unlock path.
         if (!ctx.EnsureConsent(status)) return 1;
         json out;
         if (!ctx.t.put(L"/settings/disableMasterPassword", json{{"value", true}}, &out) || !out.value("ok", false)) {
-            ctx.Error(passwordMode
-                ? L"failed to disable master password protection"
-                : L"failed to disable windows hello protection");
+            ctx.Error(L"failed to disable " + protection + L" protection");
             return 1;
         }
-        ctx.Print(passwordMode
-            ? L"master password protection disabled"
-            : L"windows hello protection disabled");
+        if (ctx.t.deleteNativeSecret) ctx.t.deleteNativeSecret();
+        ctx.Print(protection + L" protection disabled");
         return 0;
     }
 
@@ -1274,7 +1290,7 @@ int CmdDownloadModel(const Ctx& ctx) {
     return 1;
 }
 
-#ifndef _WIN32
+#if defined(__linux__)
 // Self-update for AppImage installs: compare the running binary's version
 // against the Velopack channel feed and, when newer, download the fixed-name
 // AppImage and atomically replace $APPIMAGE (rename over a running AppImage
@@ -1376,6 +1392,12 @@ void PrintUsage(const Ctx& ctx) {
         ctx.Print(L"  password disable        disable master password protection");
         ctx.Print(L"  With protection enabled every read/write command prompts for");
         ctx.Print(L"  the master password (status/help stay open).");
+    } else if (ctx.t.supportsNativeConsent) {
+        ctx.Print(L"security (Touch ID / Mac password, no typed password):");
+        ctx.Print(L"  password enable         enable protection");
+        ctx.Print(L"  password disable        disable protection");
+        ctx.Print(L"  With protection enabled every read/write command asks for");
+        ctx.Print(L"  Touch ID or your Mac password (status/help stay open).");
     } else {
         ctx.Print(L"security (Windows Hello only, no typed password):");
         ctx.Print(L"  password enable         enable Windows Hello protection");
@@ -1396,12 +1418,18 @@ void PrintUsage(const Ctx& ctx) {
     ctx.Print(L"  (PowerShell/cmd.exe: use double quotes: \"sk-[a-zA-Z0-9]{20,}\")");
 #ifndef _WIN32
     ctx.Print(L"");
+#if defined(__linux__)
     ctx.Print(L"maintenance (Linux only):");
     ctx.Print(L"  update                               check for and install AppImage");
     ctx.Print(L"                                       updates (restart to apply; 'status'");
     ctx.Print(L"                                       shows when one is available)");
     ctx.Print(L"  uninstall [--yes]                    remove Agent Redactor, settings,");
     ctx.Print(L"                                       icons, and the AppImage");
+#else
+    ctx.Print(L"maintenance:");
+    ctx.Print(L"  uninstall [--yes]                    remove Agent Redactor and its");
+    ctx.Print(L"                                       settings/logs");
+#endif
 #endif
 }
 
@@ -1442,7 +1470,7 @@ int AgentRedactor::RunCli(const std::vector<std::wstring>& args,
     if (cmd == L"keywords") return CmdKeywords(ctx);
     if (cmd == L"pii-types") return CmdPiiTypes(ctx);
     if (cmd == L"download-model") return CmdDownloadModel(ctx);
-#ifndef _WIN32
+#if defined(__linux__)
     if (cmd == L"update") return CmdUpdate(ctx);
 #endif
     // `engine run` / `engine stop` were removed from the CLI surface entirely;

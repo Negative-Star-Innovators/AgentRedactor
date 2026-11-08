@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for zh-CN. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>引擎未在运行 — 正在重试…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>无法启动 Agent Redactor 引擎。</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>代理 URL 已复制到剪贴板</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>认证失败。请重试，或退出应用。</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>使用 Touch ID 或您的 Mac 密码解锁以继续。</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor 已锁定</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>正在下载 PII 检测模型 ({0}%)。</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>正在下载 PII 检测模型…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>日志存储在此 Mac 上。编辑后的日志可能仍包含检测遗漏的敏感数据。</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>代理</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI 检测</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>保护已启用。请改用“更改”或“禁用”。</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>认证已取消。</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>在禁用保护之前，系统会要求您使用 Touch ID 或 Mac 密码进行验证。</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>禁用主密码</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>启用主密码保护失败。</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>保护此 Mac 上存储的 API 密钥。您将使用 Touch ID 或 Mac 密码解锁。无需单独密码。</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>启用主密码</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>添加</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>在边栏中选择一个配置文件，或点击列表上方的 + 按钮新建一个。</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>配置文件:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>退出 Agent Redactor？引擎将在后台继续运行。</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>登录时打开</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>请求: {0}   PII: {1}   Regex: {2}   关键词: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>此版本尚不支持重启以应用更新。请重新下载应用以更新。</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>请先启用日志记录。</value></data>
+</root>

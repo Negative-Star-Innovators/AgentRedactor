@@ -43,6 +43,13 @@ private:
     void StartProxyServers();
     void StopProxyServers();
     void RestartProxyServers();
+    /// Schedules a listener restart on the engine's own run thread. The API
+    /// handlers use this instead of calling RestartProxyServers() inline:
+    /// the restart drains active client connections, so an inline restart
+    /// would block the control response for as long as an in-flight LLM
+    /// stream is open (the GUI then sees request timeouts when changing
+    /// settings mid-stream).
+    void RequestProxyRestart();
     void StartProxyServersLocked();
     void StopProxyServersLocked();
     bool IsProxyRunning(int port) const;
@@ -91,6 +98,7 @@ private:
     std::mutex stopMutex_;
     std::condition_variable stopCv_;
     bool stopRequested_ = false;
+    bool proxyRestartPending_ = false;
 
     // First-run model download state (guarded by stateMutex_)
     mutable std::mutex stateMutex_;

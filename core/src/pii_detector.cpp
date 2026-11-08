@@ -11,11 +11,16 @@
 #endif
 #include <nlohmann/json.hpp>
 #include <cwctype>
+#include <cctype>
+#include <cstdlib>
 #include <future>
 #include <cfloat>
 #include <cmath>
 #include <chrono>
 #include <unordered_set>
+#ifdef __APPLE__
+#include <coreml_provider_factory.h>
+#endif
 
 using json = nlohmann::json;
 
@@ -94,7 +99,21 @@ bool PIIDetector::LoadModel() {
         if (!Utils::FileExists(modelFile)) modelFile = modelPath_ / L"onnx" / L"model.onnx";
 
         if (!g_onnx_env) {
-            g_onnx_env = new Ort::Env(ORT_LOGGING_LEVEL_ERROR, "AgentRedactor");
+            // Default stays ORT_LOGGING_LEVEL_ERROR (unchanged behavior);
+            // AGENTREDACTOR_ORT_LOG_LEVEL (verbose|info|warning) is a
+            // diagnostics escape hatch for provider bring-up work such as the
+            // macos/tools/bench CoreML trial, where ORT/CoreML fallback
+            // warnings are decision-relevant.
+            OrtLoggingLevel logLevel = ORT_LOGGING_LEVEL_ERROR;
+            if (const char* lvl = std::getenv("AGENTREDACTOR_ORT_LOG_LEVEL")) {
+                std::string s(lvl);
+                std::transform(s.begin(), s.end(), s.begin(),
+                    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+                if (s == "verbose") logLevel = ORT_LOGGING_LEVEL_VERBOSE;
+                else if (s == "info") logLevel = ORT_LOGGING_LEVEL_INFO;
+                else if (s == "warning") logLevel = ORT_LOGGING_LEVEL_WARNING;
+            }
+            g_onnx_env = new Ort::Env(logLevel, "AgentRedactor");
         }
 
         Ort::SessionOptions sessionOptions;
@@ -143,7 +162,46 @@ bool PIIDetector::LoadModel() {
                 LOG(L"[PIIDetector] No GPU provider available, using CPU");
             }
 #else
+#ifdef __APPLE__
+            // macOS: the official osx-arm64 ONNX Runtime build ships the
+            // CoreML execution provider (Neural Engine / GPU). Wired only for
+            // an explicit "coreml" preference so the default ("auto") keeps
+            // the exact CPU behavior this build has always had; the benchmark
+            // in macos/tools/bench measures whether that should change.
+            if (preferredProvider_ == L"coreml") {
+                std::vector<std::string> availableProviders = Ort::GetAvailableProviders();
+                auto it = std::find(availableProviders.begin(), availableProviders.end(), "CoreMLExecutionProvider");
+                if (it != availableProviders.end()) {
+                    try {
+                        // Optional cross-process conversion cache for the
+                        // CoreML-compiled subgraphs (ORT otherwise rebuilds
+                        // them into a temp dir deleted at session close).
+                        // Diagnostics knob; unset in normal runs.
+                        const char* cacheDir = std::getenv("AGENTREDACTOR_COREML_CACHE_DIR");
+                        // Optional COREML flags override (bit mask per
+                        // coreml_provider_factory.h, e.g. 16 = MLPROGRAM);
+                        // diagnostics knob for the macos/tools/bench trial.
+                        uint32_t coremlFlags = 0;
+                        if (const char* f = std::getenv("AGENTREDACTOR_COREML_FLAGS")) {
+                            coremlFlags = static_cast<uint32_t>(std::strtoul(f, nullptr, 0));
+                        }
+                        if (cacheDir && cacheDir[0] != '\0') {
+                            sessionOptions.AppendExecutionProvider("CoreML", {{"ModelCacheDirectory", cacheDir}});
+                        } else {
+                            Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_CoreML(sessionOptions, coremlFlags));
+                        }
+                        currentProvider_ = L"CoreML";
+                        LOG(L"[PIIDetector] CoreML execution provider enabled");
+                    } catch (const std::exception& e) {
+                        LOGF(L"[PIIDetector] CoreML append failed, using CPU: %ls", Utils::Utf8ToWide(e.what()).c_str());
+                    }
+                } else {
+                    LOG(L"[PIIDetector] CoreML execution provider not available in this ONNX Runtime build, using CPU");
+                }
+            }
+#else
             LOG(L"[PIIDetector] GPU providers are not supported in this build, using CPU");
+#endif
 #endif
         }
 

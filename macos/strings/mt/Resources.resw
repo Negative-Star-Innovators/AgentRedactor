@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for mt. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Il-magna ma taħdimx — qed tipprova mill-ġdid…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Ma rnexxielniex nħaddem il-magna ta' Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL tal-proxy kkupjat fl-clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>L-awtentikazzjoni ma rnexxietx. Erġa' pprova, jew oħroġ mill-app.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Iftaħ il-lock bil-Touch ID jew il-password tal-Mac biex tkompli.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor huwa lockjat</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Il-mudell ta' detezzjoni PII qed jiġi nnizzlat ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Il-mudell ta' detezzjoni PII qed jiġi nnizzlat…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Iz-zkuk huma maħżuna fuq dan il-Mac. Ir-reġistri skambjati xorta jista' jkun fihom dejta sensittiva li s-sejbien insejt.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Detezzjoni bil-AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Il-protezzjoni hija diġà attivata. Uża Bidla jew Itfi minflok.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>L-awtentikazzjoni ġiet ikkanċellata.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Se titħeġġeġ tivverifika bil-Touch ID jew il-password tal-Mac qabel il-protezzjoni titfi.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Itfi l-Password Prinċipali</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Ma rnexxielniex nattiva l-protezzjoni tal-password prinċipali.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Jipproteġi l-ċwievet API maħżuna fuq dan il-Mac. Se tiftaħ il-lock bil-Touch ID jew il-password tal-Mac. Password separata mhux meħtieġa.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Attiva l-Password Prinċipali</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Żid</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Agħżel profil fis-sidebar, jew oħloq wieħed ġdid bil-buttuna + fuq il-lista.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Oħroġ minn Agent Redactor? Il-magna tibqa' taħdem fl-isfond.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Iftaħ malli tidħol</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Talbiet: {0}   PII: {1}   Regex: {2}   Kelmiet Muftieħa: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Ir-riżartar biex tapplika għadu mhux disponibbli f'din il-verżjoni. Iddownlodja l-app mill-ġdid biex tiġġedded.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Attiva l-logging l-ewwel.</value></data>
+</root>

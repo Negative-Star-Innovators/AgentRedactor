@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for uk. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Рушій не працює — повторна спроба…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Не вдалося запустити рушій Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL-адресу проксі скопійовано в буфер обміну</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Помилка автентифікації. Повторіть спробу або вийдіть із застосунку.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Щоб продовжити, розблокуйте за допомогою Touch ID або пароля Mac.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor заблоковано</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Завантажується модель виявлення PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Завантажується модель виявлення PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Журнали зберігаються на цьому Mac. Відредаговані журнали все ще можуть містити конфіденційні дані, які не були виявлені.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Проксі</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Виявлення ШІ</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Захист увімкнено. Використовуйте Змінити або Вимкнути.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Автентифікацію скасовано.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Перед вимкненням захисту вам буде запропоновано підтвердити особу за допомогою Touch ID або пароля Mac.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Вимкнути головний пароль</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Не вдалося ввімкнути захист головним паролем.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Захищає збережені ключі API на цьому Mac. Розблокування відбувається за допомогою Touch ID або пароля Mac. Окремий пароль не потрібен.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Увімкнути головний пароль</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Додати</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Виберіть профіль у боковій панелі або створіть новий кнопкою + над списком.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Профіль:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Вийти з Agent Redactor? Рушій продовжить працювати у фоні.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Відкривати під час входу</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Запити: {0}   PII: {1}   Regex: {2}   Ключові слова: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Перезапуск для застосування ще недоступний у цій збірці. Щоб оновити, завантажте застосунок повторно.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Спочатку ввімкніть ведення журналу.</value></data>
+</root>

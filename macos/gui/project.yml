@@ -1,0 +1,37 @@
+name: AgentRedactor
+options:
+  bundleIdPrefix: com.negativestarinnovators
+  createIntermediateGroups: true
+  defaultConfig: Release
+
+targets:
+  AgentRedactor:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: AgentRedactor
+        excludes:
+          - installer/**
+          - Info.plist
+          - Localizable.xcstrings
+      # String Catalogs are copied as resources; Swift sources are compiled
+      # by the default build phase.
+      - path: AgentRedactor/Localizable.xcstrings
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.negativestarinnovators.agentredactor
+        PRODUCT_NAME: AgentRedactor
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: AgentRedactor/Info.plist
+        SWIFT_VERSION: "5.0"
+        SWIFT_STRICT_CONCURRENCY: minimal
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        ENABLE_HARDENED_RUNTIME: NO
+        COMBINE_HIDPI_IMAGES: YES
+    scheme:
+      testTargets: []

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ka. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>ძრავა არ მუშაობს — ხელახლა ცდება…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor-ის ძრავის გაშვება ვერ მოხერხდა.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>პროქსის URL კოპირებულია ბუფერში</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>ავთენტიფიკაცია ვერ მოხერხდა. სცადეთ ხელახლა ან დაიხურეთ აპლიკაცია.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>გასაგრძელებლად გახსენით საკეტი Touch ID-ით ან Mac-ის პაროლით.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor დაბლოკილია</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII გამოვლენის მოდელი იტვირთება ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII გამოვლენის მოდელი იტვირთება…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>ჟურნალები ინახება ამ Mac-ზე. რედაქტირებული ჟურნალები შეიძლება კვლავ შეიცავდეს სენსიტიურ მონაცემებს, რომლებიც გამოტოვებულია.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>პროქსი</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI გამოვლენა</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>დაცვა უკვე ჩართულია. სანაცვლოდ გამოიყენეთ შეცვლა ან გამორთვა.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>ავთენტიფიკაცია გაუქმდა.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>დაცვის გამორთვამდე მოგიწევთ დადასტურება Touch ID-ით ან Mac-ის პაროლით.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>მთავარი პაროლის გამორთვა</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>მთავარი პაროლის დაცვის ჩართვა ვერ მოხერხდა.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>იცავს ამ Mac-ზე შენახულ API გასაღებებს. საკეტს გახსნით Touch ID-ით ან Mac-ის პაროლით. ცალკე პაროლი არ არის საჭირო.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>მთავარი პაროლის ჩართვა</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>დამატება</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>აირჩიეთ პროფილი გვერდითა პანელში ან შექმენით ახალი ღილაკით + სიის თავში.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>პროფილი:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>გამოვიდეთ Agent Redactor-იდან? ძრავა ფონზე განაგრძობს მუშაობას.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>გახსნა შესვლისას</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>მოთხოვნები: {0}   PII: {1}   Regex: {2}   საკვანძო სიტყვები: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>გადატვირთვა ცვლილების დასატანად ამ აგებულებაში ჯერ მიუწვდომელია. განახლებისთვის თავიდან ჩამოტვირთეთ აპლიკაცია.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>ჯერ ჩართეთ ჟურნალი.</value></data>
+</root>

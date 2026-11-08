@@ -1,14 +1,16 @@
 // Self-release update channels: x64 builds use the original 'win' / 'linux'
-// channels, ARM64 builds use 'win-arm64' / 'linux-arm64'. Releases are
+// channels, ARM64 builds use 'win-arm64' / 'linux-arm64' / 'osx-arm64'.
+// ('osx' is reserved for a future macOS x64/universal channel.) Releases are
 // served exclusively from the RELEASES_BUCKET R2 binding at <channel>/<file>
 // (R2 is the single host — no GitHub fallback). CI uploads each release via
 // `vpk upload s3`.
-const CHANNEL_PATTERN = /^(win|win-arm64|linux|linux-arm64)$/;
+const CHANNEL_PATTERN = /^(win|win-arm64|linux|linux-arm64|osx-arm64|osx)$/;
 
 // Strict allowlist for files Velopack requests from the update feed:
-//   releases.<channel>.json, *.nupkg, *-Setup.exe, *-Portable.zip, *.AppImage
+//   releases.<channel>.json, *.nupkg, *-Setup.exe, *-Portable.zip, *.AppImage,
+//   *.dmg (macOS drag-and-drop installer)
 // Case-sensitive, matched against the basename only.
-const FILE_PATTERN = /^(releases\.[a-z0-9-]+\.json|[^/\\]+\.nupkg|[^/\\]+-Setup\.exe|[^/\\]+-Portable\.zip|[^/\\]+\.AppImage)$/;
+const FILE_PATTERN = /^(releases\.[a-z0-9-]+\.json|[^/\\]+\.nupkg|[^/\\]+-Setup\.exe|[^/\\]+-Portable\.zip|[^/\\]+\.AppImage|[^/\\]+\.dmg)$/;
 
 // Versioned nupkgs are immutable; the fixed-name feed/installer files
 // (releases.*.json, *-Setup.exe, *-Portable.zip) change every release.

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for vi. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Công cụ không chạy — đang thử lại…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Không thể khởi động công cụ Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Đã sao chép URL proxy vào clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Xác thực không thành công. Thử lại hoặc thoát ứng dụng.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Mở khóa bằng Touch ID hoặc mật khẩu Mac của bạn để tiếp tục.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor đã bị khóa</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Đang tải mô hình phát hiện PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Đang tải mô hình phát hiện PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Nhật ký được lưu trữ trên Mac này. Nhật ký được xử lý lại có thể vẫn chứa dữ liệu nhạy cảm mà việc phát hiện bị bỏ sót.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Phát hiện AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Bảo vệ đã được bật. Sử dụng Thay đổi hoặc Tắt thay thế.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Đã hủy xác thực.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Bạn sẽ được yêu cầu xác thực bằng Touch ID hoặc mật khẩu Mac trước khi bảo vệ bị tắt.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Tắt mật khẩu chính</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Không thể bật bảo vệ mật khẩu chính.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Bảo vệ các khóa API được lưu trên Mac này. Bạn sẽ mở khóa bằng Touch ID hoặc mật khẩu Mac. Không cần mật khẩu riêng.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Bật mật khẩu chính</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Thêm</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Chọn một hồ sơ trong thanh bên hoặc tạo hồ sơ mới bằng nút + phía trên danh sách.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Hồ sơ:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Thoát Agent Redactor? Công cụ vẫn chạy trong nền.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Mở khi đăng nhập</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Yêu cầu: {0}   PII: {1}   Regex: {2}   Từ khóa: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Khởi động lại để áp dụng chưa khả dụng trong bản dựng này. Tải lại ứng dụng để cập nhật.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Bật nhật ký trước.</value></data>
+</root>

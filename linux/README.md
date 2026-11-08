@@ -113,7 +113,8 @@ English-only with a CMake warning). Two scripts maintain them:
 Self-release builds package the app as a Velopack AppImage with an in-app
 updater, mirroring the Windows self-release flow (same R2 bucket, same feed
 worker). Channels are arch-aware, mirroring `win` / `win-arm64`: x64 builds
-use `linux`, ARM64 builds use `linux-arm64`. `build-release.sh` derives the
+use `linux`, ARM64 builds use `linux-arm64` (macOS uses `osx-arm64`, see
+`macos/build-release.sh`). `build-release.sh` derives the
 architecture from the host (`uname -m`); on aarch64 it packs
 `-r linux-arm64 -c linux-arm64` and uses the aarch64 Qt plugin dir. Prereqs:
 the .NET SDK and the pinned Velopack CLI

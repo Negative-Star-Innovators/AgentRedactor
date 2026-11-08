@@ -71,6 +71,14 @@ std::filesystem::path GetFallbackModelDir() {
     }
     return std::filesystem::path(L"C:\\AgentRedactor") / MODEL_DIR;
 #else
+#ifdef __APPLE__
+    // macOS: ~/Library/Application Support/AgentRedactor/models, next to the
+    // settings dir.
+    if (const char* home = std::getenv("HOME"); home && *home) {
+        return std::filesystem::path(home) / "Library" / "Application Support" / "AgentRedactor" / MODEL_DIR;
+    }
+    return std::filesystem::path("/tmp/agentredactor") / MODEL_DIR;
+#else
     // XDG: $XDG_DATA_HOME/agentredactor/models, defaulting to
     // ~/.local/share/agentredactor/models.
     if (const char* xdg = std::getenv("XDG_DATA_HOME"); xdg && *xdg) {
@@ -80,6 +88,7 @@ std::filesystem::path GetFallbackModelDir() {
         return std::filesystem::path(home) / ".local" / "share" / "agentredactor" / "models";
     }
     return std::filesystem::path("/tmp/agentredactor") / "models";
+#endif
 #endif
 }
 

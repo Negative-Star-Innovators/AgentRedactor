@@ -1,0 +1,97 @@
+name: Release macOS Self-Distribution
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release. Must match windows/version.txt.'
+        required: true
+        type: string
+      publish:
+        description: 'Publish the tested, signed candidate to R2.'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-macos-signed-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    if: github.repository == 'Negative-Star-Innovators/AgentRedactor'
+    environment: macos-selfrelease
+    uses: ./.github/workflows/release-macos.yml
+    with:
+      version: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+      sign: true
+    secrets:
+      APPLE_SIGNING_CERT: ${{ secrets.APPLE_SIGNING_CERT }}
+      APPLE_SIGNING_CERT_PASSWORD: ${{ secrets.APPLE_SIGNING_CERT_PASSWORD }}
+      APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+  publish:
+    if: github.repository == 'Negative-Star-Innovators/AgentRedactor' && (github.event_name == 'push' || inputs.publish)
+    needs: candidate
+    runs-on: macos-15
+    environment: macos-selfrelease
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AgentRedactor-velopack-osx-arm64
+          path: velopack-osx
+
+      - name: Verify signed and notarized DMG before upload
+        run: |
+          set -euo pipefail
+          dmg="$PWD/velopack-osx/AgentRedactor-osx-arm64.dmg"
+          codesign --verify --strict "$dmg"
+          xcrun stapler validate "$dmg"
+          spctl -a -t open --context context:primary-signature -v "$dmg"
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install vpk 1.2.0
+        run: dotnet tool install -g vpk --version 1.2.0
+
+      - name: Check R2 credentials
+        run: |
+          set -euo pipefail
+          for name in R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required publish secret $name is not configured"
+              exit 1
+            fi
+          done
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      - name: Publish osx-arm64 channel to R2
+        run: vpk upload s3 --bucket agentredactor-releases --endpoint https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com --keyId "${R2_ACCESS_KEY_ID}" --secret "${R2_SECRET_ACCESS_KEY}" -c osx-arm64 --prefix osx-arm64 --outputDir velopack-osx
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      - name: Remove non-client files from R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 rm "s3://agentredactor-releases/osx-arm64/" \
+            --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+            --region auto --recursive --exclude "*" \
+            --include "*-Portable.zip" --include "RELEASES*" --include "assets.*.json"

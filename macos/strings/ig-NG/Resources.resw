@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ig-NG. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Injin ahụ anaghị arụ ọrụ — na-anwa ọzọ…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Ọ gaghị kwalite Injin Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>E depụtala Proxy URL na clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Nkwenye aghịwo. Nwaa ọzọ, ma ọ bụ pụọ na ngwa ahụ.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Mepee ngbochi site na Touch ID ma ọ bụ passwọọdụ Mac gị ka ị gaa n'ihu.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>A chịjikwuru Agent Redactor</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Nchọpụta PII Model na-abanye ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Nchọpụta PII Model na-abanye…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>A na-echekwa ndekọ na Mac a. Ndekọ ndị emegharịrị ka nwere ike ịnwe data nwere mmetụta nke furu efu.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Nchọpụta AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>A kwadoro nchebe ahụ. Jiri Gbanwee ma ọ bụ Kwụsịi kama.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>A kagbuo nkwenye.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>A ga-akpa gị ka ị kwenye site na Touch ID ma ọ bụ passwọọdụ Mac gị tupu a kwụsị nchebe ahụ.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Kwụsịi Master Password</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Ọ gaghị kwalite nchebe Master Password.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Na-echekwa ebe a na-echekwa ntị API gị na Mac a. ị ga-emeppe ngbochi site na Touch ID ma ọ bụ passwọọdụ Mac gị. Achọghị passwọọdụ ọzọ.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Kwali Master Password</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Tinye</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Họrọ profaịlụ na sidebar, ma ọ bụ mepụta ọhụrụ site na bọtịnụ + n'elu ndepụta ahụ.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profaịlụ:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Pụọ na Agent Redactor? Injin ga-aga n'ihu na-arụ ọrụ n'azụ.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Mepee na Nbanye</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Arịrịọ: {0}   PII: {1}   Regex: {2}   Keywords: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Ị weghachite iji tinye ọzọ adịghị na wụnye a. Biko weghachite ngwa iji melite ya.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Kwali ndekọ akwụkwọ ọzọ.</value></data>
+</root>

@@ -29,7 +29,7 @@ from windows.gui_driver import quit_app
 # bare `pytest tests/` on Linux does not error trying to launch
 # AgentRedactorUI.exe.
 if sys.platform != "win32":
-    collect_ignore_glob = ["*"]
+    collect_ignore_glob = ["test_*.py", "windows/*"]
 
 
 @pytest.fixture

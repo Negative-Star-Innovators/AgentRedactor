@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for cs. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Engine neběží — opakuje se…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Engine Agent Redactor se nepodařilo spustit.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Adresa URL proxy zkopírována do schránky</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Ověření se nezdařilo. Zkuste to znovu nebo aplikaci ukončete.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Pokračujte odemknutím pomocí Touch ID nebo hesla k Macu.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor je uzamčen</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Stahuje se model detekce PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Stahuje se model detekce PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Protokoly jsou uloženy na tomto Macu. Redigované protokoly mohou stále obsahovat citlivá data, která nebyla detekována.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Detekce AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Ochrana je již aktivní. Použijte možnost Změnit nebo Deaktivovat.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Ověření bylo zrušeno.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Před deaktivací ochrany budete vyzváni k ověření pomocí Touch ID nebo hesla k Macu.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Deaktivovat hlavní heslo</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Nepodařilo se aktivovat ochranu hlavním heslem.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Chráni uložené klíče API na tomto Macu. Odemknout budete pomocí Touch ID nebo hesla k Macu. Samostatné heslo není potřeba.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Aktivovat hlavní heslo</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Přidat</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Vyberte profil na postranním panelu nebo vytvořte nový tlačítkem + nad seznamem.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Ukončit Agent Redactor? Engine bude dál běžet na pozadí.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Otevřít při přihlášení</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Požadavky: {0}   PII: {1}   Regex: {2}   Klíčová slova: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Restartování k aplikaci aktualizace zatím v této sestavení není k dispozici. Aktualizujte opětovným stažením aplikace.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Nejprve povolte protokolování.</value></data>
+</root>

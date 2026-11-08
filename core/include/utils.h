@@ -48,7 +48,8 @@ size_t HashWString(const std::wstring& str);
 // System memory report (observability only). Returns the total physical RAM
 // and the bytes currently available to the process, or 0 when the value could
 // not be determined. Linux reads MemTotal/MemAvailable from /proc/meminfo;
-// Windows reads GlobalMemoryStatusEx. Used to size the ONNX Runtime CPU
+// macOS reads hw.memsize + host_statistics64; Windows reads
+// GlobalMemoryStatusEx. Used to size the ONNX Runtime CPU
 // memory arena, which otherwise grows (power-of-two) toward the machine's
 // total RAM and can request ~RAMSIZE in one go that overcommit refuses.
 struct SystemMemory {

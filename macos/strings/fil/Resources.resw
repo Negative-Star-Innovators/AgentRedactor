@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for fil. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Hindi tumatakbo ang engine — sinusubukang muli…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Hindi na-start ang Agent Redactor engine.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Kinopya ang Proxy URL sa clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Nabigo ang pag-authenticate. Subukang muli, o lumabas sa app.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>I-unlock gamit ang Touch ID o iyong Mac password para magpatuloy.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Naka-lock ang Agent Redactor</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Nagdo-download ang PII detection model ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Nagdo-download ang PII detection model…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Ang mga log ay nakaimbak sa Mac na ito. Ang mga na-redact na log ay maaari pa ring maglaman ng sensitibong data na hindi natukoy.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI Detection</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Naka-enable na ang proteksyon. Gamitin ang Baguhin o I-disable sa halip.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Kinansela ang pag-authenticate.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Hihilingin sa iyong i-verify gamit ang Touch ID o iyong Mac password bago i-disable ang proteksyon.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>I-disable ang master password</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Nabigo ang pag-enable ng master password protection.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Pinoprotektahan ang iyong mga naka-store na API key sa Mac na ito. I-unlock gamit ang Touch ID o iyong Mac password. Hindi na kailangan ng hiwalay na password.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>I-enable ang master password</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Idagdag</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Pumili ng profile sa sidebar, o gumawa ng bago gamit ang + button sa itaas ng listahan.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profile:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Isara ang Agent Redactor? Patuloy na tatakbo ang engine sa background.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Buksan sa Pag-login</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Mga Request: {0}   PII: {1}   Regex: {2}   Mga Keyword: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Hindi pa available ang i-restart para mag-apply sa build na ito. I-download ulit ang app para mag-update.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>I-enable muna ang logging.</value></data>
+</root>

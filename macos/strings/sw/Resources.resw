@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for sw. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Injini haifanyi kazi — inajaribu tena…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Injini ya Agent Redactor haikuweza kuanzishwa.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL ya Proxy imenakiliwa kwenye ubao wa kunakili</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Uthibitishaji haukufaulu. Jaribu tena, au ondoka kwenye programu.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Fungua kwa Touch ID au nenosiri lako la Mac kuendelea.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor imefungwa</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Modeli ya utambuzi wa PII inapakuliwa ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Modeli ya utambuzi wa PII inapakuliwa…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Kumbukumbu zimehifadhiwa kwenye Mac hii. Kumbukumbu zilizorekebishwa bado zinaweza kuwa na data nyeti ambayo utambuzi ulikosa.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Utambuzi wa AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Ulinzi tayari umewashwa. Tumia Badilisha au Zima badala yake.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Uthibitishaji umeghairiwa.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Utaomba kuthibitisha kwa Touch ID au nenosiri lako la Mac kabla ya ulinzi kuzimwa.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Zima Nenosiri Kuu</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Kuwasha ulinzi wa Nenosiri Kuu kumeshindwa.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Inalinda funguo za API zilizohifadhiwa kwenye Mac hii. Utafungua kwa Touch ID au nenosiri lako la Mac. Hakuna nenosiri tofauti linalohitajika.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Washa Nenosiri Kuu</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Ongeza</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Chagua wasifu kwenye upau wa kando, au unda mpya kwa kitufe cha + juu ya orodha.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Wasifu:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Acha Agent Redactor? Injini inaendelea kufanya kazi kwa usuli.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Fungua kwa Kuingia</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Maombi: {0}   PII: {1}   Regex: {2}   Maneno Muhimu: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Kuanzisha upya ili kutumia bado haipatikani katika jengo hili. Pakua tena programu kusasisha.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Washa kumbukumbu kwanza.</value></data>
+</root>

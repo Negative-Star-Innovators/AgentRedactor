@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for lt. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Variklis neveikia — kartojama…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Nepavyko paleisti „Agent Redactor“ variklio.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy URL nukopijuotas į iškarpinę</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Autentifikavimas nepavyko. Bandykite dar kartą arba užverkite programą.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Norėdami tęsti, atrakinkite naudodami Touch ID arba „Mac“ slaptažodį.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>„Agent Redactor“ užrakinta</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Atsiunčiamas PII aptikimo modelis ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Atsiunčiamas PII aptikimo modelis…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Žurnalai saugomi šiame Mac kompiuteryje. Redaguotuose žurnaluose vis tiek gali būti neskelbtinų duomenų, kurių aptikti nepavyko.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>DI aptikimas</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Apsauga jau įjungta. Naudokite Keisti arba Išjungti.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Autentifikavimas atšauktas.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Prieš išjungiant apsaugą būsite paprašyti patvirtinti naudojant Touch ID arba „Mac“ slaptažodį.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Išjungti pagrindinį slaptažodį</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Nepavyko įjungti pagrindinio slaptažodžio apsaugos.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Saugo šiame „Mac“ įrašytus API raktus. Atrakinsite naudodami Touch ID arba „Mac“ slaptažodį. Atskiro slaptažodžio nereikia.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Įjungti pagrindinį slaptažodį</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Pridėti</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Pasirinkite profilį šoninėje juostoje arba sukurkite naują mygtuku + virš sąrašo.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profilis:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Išeiti iš „Agent Redactor“? Variklis toliau veikia fone.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Atidaryti prisijungus</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Užklausos: {0}   PII: {1}   Regex: {2}   Raktiniai žodžiai: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Iš naujo paleisti norint pritaikyti šioje versijoje dar negalima. Atnaujinkite iš naujo atsisiųsdami programą.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Pirmiausia įjunkite žurnalų vedimą.</value></data>
+</root>

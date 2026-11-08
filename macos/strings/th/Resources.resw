@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for th. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>เอนจินไม่ทำงาน — กำลังลองใหม่…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>ไม่สามารถเริ่มเอนจิน Agent Redactor ได้</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>คัดลอก URL พร็อกซีไปยังคลิปบอร์ดแล้ว</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>การยืนยันตัวตนล้มเหลว ลองอีกครั้งหรือออกจากแอป</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>ปลดล็อกด้วย Touch ID หรือรหัสผ่าน Mac ของคุณเพื่อดำเนินการต่อ</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor ถูกล็อก</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>กำลังดาวน์โหลดโมเดลตรวจจับ PII ({0}%)</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>กำลังดาวน์โหลดโมเดลตรวจจับ PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>บันทึกจะถูกจัดเก็บไว้ใน Mac เครื่องนี้ บันทึกที่แก้ไขอาจยังคงมีข้อมูลที่ละเอียดอ่อนซึ่งพลาดการตรวจจับ</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>พร็อกซี</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>การตรวจจับ AI</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>เปิดใช้งานการป้องกันแล้ว ใช้ เปลี่ยน หรือ ปิดใช้งาน แทน</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>ยกเลิกการยืนยันตัวตนแล้ว</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>คุณจะถูกขอให้ยืนยันตัวตนด้วย Touch ID หรือรหัสผ่าน Mac ก่อนที่จะปิดใช้งานการป้องกัน</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>ปิดใช้งานรหัสผ่านหลัก</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>เปิดใช้งานการป้องกันด้วยรหัสผ่านหลักไม่สำเร็จ</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>ปกป้องคีย์ API ที่จัดเก็บบน Mac เครื่องนี้ คุณจะปลดล็อกด้วย Touch ID หรือรหัสผ่าน Mac ไม่จำเป็นต้องมีรหัสผ่านแยกต่างหาก</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>เปิดใช้งานรหัสผ่านหลัก</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>เพิ่ม</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>เลือกโปรไฟล์ในแถบด้านข้าง หรือสร้างใหม่ด้วยปุ่ม + เหนือรายการ</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>โปรไฟล์:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>ออกจาก Agent Redactor หรือไม่ เอนจินจะยังคงทำงานในพื้นหลัง</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>เปิดเมื่อเข้าสู่ระบบ</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>คำขอ: {0}   PII: {1}   Regex: {2}   คำสำคัญ: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>การเริ่มระบบใหม่เพื่อนำไปใช้ยังไม่พร้อมใช้งานในเวอร์ชันนี้ ดาวน์โหลดแอปอีกครั้งเพื่ออัปเดต</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>เปิดใช้งานการบันทึกก่อน</value></data>
+</root>

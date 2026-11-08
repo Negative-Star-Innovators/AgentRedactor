@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for lv. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Dzinējs nedarbojas — mēģina vēlreiz…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Neizdevās palaist Agent Redactor dzinēju.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy URL nokopēts starpliktuvē</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Autentifikācija neizdevās. Mēģiniet vēlreiz vai aizveriet lietotni.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Lai turpinātu, atbloķējiet ar Touch ID vai Mac paroli.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor ir bloķēts</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Tiek lejupielādēts PII atklāšanas modelis ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Tiek lejupielādēts PII atklāšanas modelis…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Žurnāli tiek glabāti šajā Mac datorā. Rediģētajos žurnālos joprojām var būt ietverti sensitīvi dati, kas netika atklāti.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Starpniekserveris</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>MI atklāšana</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Aizsardzība jau ir ieslēgta. Tās vietā izmantojiet Mainīt vai Izslēgt.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Autentifikācija atcelta.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Pirms aizsardzības izslēgšanas jums tiks lūgts verificēties ar Touch ID vai Mac paroli.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Izslēgt galveno paroli</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Neizdevās ieslēgt galvenās paroles aizsardzību.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Aizsargā šajā Mac saglabātās API atslēgas. Jūs atbloķējat ar Touch ID vai Mac paroli. Atsevišķa parole nav nepieciešama.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Ieslēgt galveno paroli</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Pievienot</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Atlasiet profilu sānjoslā vai izveidojiet jaunu ar pogas + palīdzību virs saraksta.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profils:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Iziet no Agent Redactor? Dzinējs turpina darboties fonā.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Atvērt pieteikšanās brīdī</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Pieprasījumi: {0}   PII: {1}   Regex: {2}   Atslēgvārdi: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Pārstartēšana, lai lietotu izmaiņas, šajā versijā vēl nav pieejama. Lai atjauninātu, lejupielādējiet lietotni vēlreiz.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Vispirms ieslēdziet žurnālošanu.</value></data>
+</root>

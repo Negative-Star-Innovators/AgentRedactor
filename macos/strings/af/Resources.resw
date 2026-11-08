@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for af. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Enjin loop nie — probeer tans…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Die Agent Redactor-enjin kon nie gestart word nie.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-URL na knipbord gekopieer</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Verifikasie het misluk. Probeer weer, of sluit die program.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Ontsluit met Touch ID of jou Mac-wagwoord om voort te gaan.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor is gesluit</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Die PII-opsporingsmodel word afgelaai ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Die PII-opsporingsmodel word afgelaai…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Logs word op hierdie Mac gestoor. Geredigeerde logs kan steeds sensitiewe data bevat wat opsporing gemis het.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Prossie</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>KI-opsporing</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Beskerming is reeds geaktiveer. Gebruik eerder Verander of Deaktiveer.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Verifikasie gekanselleer.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Jy sal gevra word om met Touch ID of jou Mac-wagwoord te verifieer voordat beskerming gedeaktiveer word.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Deaktiveer meesterwagwoord</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Kon nie meesterwagwoord-beskerming aktiveer nie.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Beskerm jou gestoorde API-sleutels op hierdie Mac. Jy sal met Touch ID of jou Mac-wagwoord ontsluit. Geen aparte wagwoord benodig nie.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Aktiveer meesterwagwoord</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Voeg by</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Kies 'n profiel in die sybalk, of skep een met die +-knop bo die lys.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profiel:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor toemaak? Die enjin hou aan om in die agtergrond te loop.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Maak oop by aanmelding</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Versoeke: {0}   PII: {1}   Regex: {2}   Sleutelwoorde: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Herbegin om toe te pas is nog nie in hierdie bou beskikbaar nie. Laai die program weer af om op te dateer.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Aktiveer eers logboekregistrasie.</value></data>
+</root>

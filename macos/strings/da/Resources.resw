@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for da. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Motoren kører ikke — prøver igen…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor-motoren kunne ikke startes.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-URL kopieret til udklipsholderen</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Godkendelse mislykkedes. Prøv igen, eller afslut appen.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Lås op med Touch ID eller din Mac-adgangskode for at fortsætte.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor er låst</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII-registreringsmodellen downloades ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII-registreringsmodellen downloades…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Logs gemmes på denne Mac. Redakterede logfiler kan stadig indeholde følsomme data, som registreringen er gået glip af.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI-registrering</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Beskyttelsen er allerede aktiveret. Brug i stedet Skift eller Deaktiver.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Godkendelse annulleret.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Du bliver bedt om at godkende med Touch ID eller din Mac-adgangskode, før beskyttelsen deaktiveres.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Deaktiver hovedadgangskode</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Kunne ikke aktivere beskyttelse med hovedadgangskode.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Beskytter dine gemte API-nøgler på denne Mac. Du låser op med Touch ID eller din Mac-adgangskode. Der kræves ingen separat adgangskode.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Aktiver hovedadgangskode</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Tilføj</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Vælg en profil i sidebjælken, eller opret en med +-knappen over listen.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Afslut Agent Redactor? Motoren fortsætter i baggrunden.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Åbn ved login</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Anmodninger: {0}   PII: {1}   Regex: {2}   Nøgleord: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Genstart for at anvende er endnu ikke tilgængelig i denne version. Download appen igen for at opdatere.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Aktivér først logning.</value></data>
+</root>

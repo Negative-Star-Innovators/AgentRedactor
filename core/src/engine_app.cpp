@@ -300,6 +300,16 @@ bool EngineApp::Initialize(const std::filesystem::path& dataDir) {
     settings_ = std::make_unique<SettingsManager>(dataDir);
     logManager_ = std::make_unique<LogManager>();
 
+#ifdef __APPLE__
+    // macOS: resolve the Keychain-backed machine key off the request path.
+    // The first SecItemCopyMatching in a process can block for seconds (an
+    // authorization prompt against a differently-signed build, or a slow
+    // securityd handshake) — if that happened while serving a control-API
+    // request, the GUI would freeze mid-action. Doing it here surfaces any
+    // prompt at launch, before the control API accepts connections.
+    std::thread([] { SecureStorage::Prewarm(); }).detach();
+#endif
+
     // MSIX/Store builds ship the weights next to the exe (identical behavior
     // to before); self-release installs download them on first run into
     // %LOCALAPPDATA%\AgentRedactor\models.
@@ -373,7 +383,25 @@ void EngineApp::Shutdown() {
 void EngineApp::Run() {
     LOG_LIFECYCLE(L"[EngineApp] Engine running");
     std::unique_lock lock(stopMutex_);
-    stopCv_.wait(lock, [this]() { return stopRequested_; });
+    for (;;) {
+        stopCv_.wait(lock, [this]() { return stopRequested_ || proxyRestartPending_; });
+        if (stopRequested_) break;
+        proxyRestartPending_ = false;
+        // Applied on the engine thread, not the request thread: the restart
+        // drains active client connections and can outlast any request
+        // timeout.
+        lock.unlock();
+        RestartProxyServers();
+        lock.lock();
+    }
+}
+
+void EngineApp::RequestProxyRestart() {
+    {
+        std::lock_guard lock(stopMutex_);
+        proxyRestartPending_ = true;
+    }
+    stopCv_.notify_all();
 }
 
 void EngineApp::RequestStop() {
@@ -424,20 +452,22 @@ void EngineApp::StartModelDownloadIfNeeded() {
 
         bool ok = false;
         int attempt = 0;
-        const int maxAttempts = 10;
         int delayMs = 2000;
-        const int maxDelayMs = 60000;
+        const int maxDelayMs = 30000;
 
-        while (!ok && attempt < maxAttempts) {
+        // The model is required before the engine can serve traffic. Keep
+        // retrying through offline periods until it succeeds or the app exits;
+        // EnsureModelFiles retains completed segments across every attempt.
+        while (!ok) {
             ++attempt;
-            LOGF_LIFECYCLE(L"[EngineApp] Model download attempt %d/%d", attempt, maxAttempts);
+            LOGF_LIFECYCLE(L"[EngineApp] Model download attempt %d", attempt);
             try {
                 ok = ModelDownloader::EnsureModelFiles(fallbackDir, progress);
             } catch (...) {
                 ok = false;
             }
 
-            if (!ok && attempt < maxAttempts) {
+            if (!ok) {
                 std::unique_lock retryLock(retryMutex_);
                 retryNowRequested_ = false;
                 {
@@ -491,8 +521,6 @@ void EngineApp::StartModelDownloadIfNeeded() {
                 ? L"[EngineApp] Model downloaded and initialized"
                 : L"[EngineApp] Model downloaded but detector initialization failed");
             ok = initOk;
-        } else {
-            LOGF_LIFECYCLE(L"[EngineApp] Model download failed after %d attempts", maxAttempts);
         }
 
         {
@@ -944,7 +972,7 @@ HttpResponse EngineApp::HandleControlRequest(const HttpRequest& request) {
             return ApiGetLogs(profileParam);
         }
         if (path == L"/engine/restart-listeners" && method == "POST") {
-            RestartProxyServers();
+            RequestProxyRestart();
             return JsonResponse(200, "{\"ok\": true}");
         }
         if (path == L"/engine/download-model" && method == "POST") {
@@ -1121,6 +1149,9 @@ HttpResponse EngineApp::ApiPutSetting(const std::wstring& key, [[maybe_unused]] 
         if (password.empty()) {
             return JsonResponse(400, "{\"error\": \"password required\"}");
         }
+        if (settings_->IsMasterPasswordEnabled()) {
+            return JsonResponse(409, "{\"error\": \"master password already enabled\"}");
+        }
         if (!settings_->EnableMasterPassword(password)) {
             return JsonResponse(500, "{\"error\": \"failed to enable master password\"}");
         }
@@ -1223,7 +1254,7 @@ HttpResponse EngineApp::ApiPostProfile(const std::string& body) {
     ApiKeyProfile profile = ApiKeyProfile::FromJson(j);
     settings_->AddProfile(profile);
     ++profilesRevision_;
-    RestartProxyServers();
+    RequestProxyRestart();
     // The CLI prints the created profile's id on success.
     return JsonResponse(200, "{\"ok\": true, \"id\": \"" + Utils::WideToUtf8(profile.id) + "\"}");
 }
@@ -1249,7 +1280,7 @@ HttpResponse EngineApp::ApiPutProfile(const std::wstring& id, const std::string&
     }
     settings_->UpdateProfile(profile);
     ++profilesRevision_;
-    RestartProxyServers();
+    RequestProxyRestart();
     return JsonResponse(200, "{\"ok\": true}");
 }
 
@@ -1259,7 +1290,7 @@ HttpResponse EngineApp::ApiDeleteProfile(const std::wstring& id) {
     }
     settings_->RemoveProfile(id);
     ++profilesRevision_;
-    RestartProxyServers();
+    RequestProxyRestart();
     return JsonResponse(200, "{\"ok\": true}");
 }
 

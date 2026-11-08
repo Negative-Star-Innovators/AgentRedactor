@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for is. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Vélinn er ekki í gangi — reyni aftur…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Ekki tókst að ræsa Agent Redactor-vélinn.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-URL afritað á klippispjald</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Auðkenning tókst ekki. Reyndu aftur eða hættu í forritinu.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Aflæstu með Touch ID eða lykilorði Mac til að halda áfram.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor er læst</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII-greiningarlíkanið er verið að hlaða niður ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII-greiningarlíkanið er verið að hlaða niður…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Dagskrár eru geymdar á þessum Mac. Ritfærðar annálar gætu enn innihaldið viðkvæm gögn sem ekki var hægt að finna.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Milliþjónn</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI greining</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Vernd er þegar virk. Notaðu Breyta eða Slökkva í staðinn.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Auðkenningu hætt.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Þú verður beðin(n) um að auðkenna þig með Touch ID eða lykilorði Mac áður en vernd er slökkt.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Slökkva á aðallykilorði</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Ekki tókst að virkja vernd með aðallykilorði.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Verndar geymda API-lyklana þína á þessum Mac. Þú aflæsir með Touch ID eða lykilorði Mac. Sérstakt lykilorð er ekki nauðsynlegt.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Virkja aðallykilorð</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Bæta við</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Veldu prófíl í hliðarstikunni eða búðu til nýjan með + hnappnum fyrir ofan listann.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Prófíll:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Hætta í Agent Redactor? Vélinn heldur áfram að keyra í bakgrunni.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Opna við innskráningu</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Beiðnir: {0}   PII: {1}   Regex: {2}   Lykilorð: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Endurræsing til að virkja er ekki tiltæk í þessari útgáfu ennþá. Halaðu forritinu aftur niður til að uppfæra.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Virkjaðu fyrst annálskrifu.</value></data>
+</root>

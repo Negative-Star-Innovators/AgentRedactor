@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ro. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>Motorul nu rulează — se reîncearcă…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Nu s-a putut porni motorul Agent Redactor.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>URL-ul proxy copiat în clipboard</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Autentificarea nu a reușit. Încercați din nou sau ieșiți din aplicație.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Deblocați cu Touch ID sau parola Mac pentru a continua.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor este blocat</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Se descarcă modelul de detectare PII ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Se descarcă modelul de detectare PII…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Jurnalele sunt stocate pe acest Mac. Jurnalele eliminate pot conține în continuare date sensibile pe care le-au ratat detectarea.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>Detectare IA</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>Protecția este deja activată. Utilizați în schimb Modificare sau Dezactivare.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Autentificare anulată.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>Vi se va cere să vă verificați cu Touch ID sau parola Mac înainte ca protecția să fie dezactivată.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Dezactivează parola principală</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Activarea protecției prin parolă principală a eșuat.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Protejează cheile API stocate pe acest Mac. Veți debloca cu Touch ID sau parola Mac. Nu este necesară o parolă separată.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Activează parola principală</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Adaugă</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Selectați un profil din bara laterală sau creați unul nou cu butonul + de deasupra listei.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profil:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Ieșiți din Agent Redactor? Motorul continuă să ruleze în fundal.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Deschide la autentificare</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Cereri: {0}   PII: {1}   Regex: {2}   Cuvinte cheie: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Repornirea pentru aplicare nu este încă disponibilă în această versiune. Re-descărcați aplicația pentru a actualiza.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Activați mai întâi jurnalizarea.</value></data>
+</root>

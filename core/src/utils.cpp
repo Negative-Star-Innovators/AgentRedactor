@@ -9,6 +9,11 @@
 #include <locale>
 #include <random>
 #include <curl/curl.h>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <mach/mach.h>
+#include <sys/sysctl.h>
+#endif
 #endif
 #include <sstream>
 #include <iomanip>
@@ -316,6 +321,29 @@ SystemMemory GetSystemMemory() {
         mem.totalBytes = static_cast<size_t>(m.ullTotalPhys);
         mem.availableBytes = static_cast<size_t>(m.ullAvailPhys);
     }
+#elif defined(__APPLE__)
+    // hw.memsize for the total; host_statistics64(HOST_VM_INFO64) for the
+    // available portion (free + speculative + inactive pages, the macOS
+    // counterpart of Linux MemAvailable).
+    int64_t totalBytes = 0;
+    size_t totalSize = sizeof(totalBytes);
+    if (sysctlbyname("hw.memsize", &totalBytes, &totalSize, nullptr, 0) == 0 && totalBytes > 0) {
+        mem.totalBytes = static_cast<size_t>(totalBytes);
+    }
+    vm_size_t pageSize = 0;
+    mach_port_t host = mach_host_self();
+    host_page_size(host, &pageSize);
+    vm_statistics64_data_t vmStat = {};
+    mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
+    if (pageSize > 0 &&
+        host_statistics64(host, HOST_VM_INFO64,
+            reinterpret_cast<host_info64_t>(&vmStat), &count) == KERN_SUCCESS) {
+        const uint64_t availablePages =
+            static_cast<uint64_t>(vmStat.free_count) +
+            static_cast<uint64_t>(vmStat.speculative_count) +
+            static_cast<uint64_t>(vmStat.inactive_count);
+        mem.availableBytes = static_cast<size_t>(availablePages * pageSize);
+    }
 #else
     // /proc/meminfo: "MemTotal: <n> kB", "MemAvailable: <n> kB", ... The
     // trailing unit token must be consumed so the key/value pairs stay aligned
@@ -342,6 +370,16 @@ size_t GetProcessRssBytes() {
         return static_cast<size_t>(m.ullTotalPhys - m.ullAvailPhys);
     }
     return 0;
+#elif defined(__APPLE__)
+    // TASK_BASIC_INFO_64.resident_size is the process RSS, the macOS
+    // counterpart of /proc/self/status VmRSS.
+    task_basic_info_64_data_t info = {};
+    mach_msg_type_number_t count = TASK_BASIC_INFO_64_COUNT;
+    if (task_info(mach_task_self(), TASK_BASIC_INFO_64,
+            reinterpret_cast<task_info_t>(&info), &count) != KERN_SUCCESS) {
+        return 0;
+    }
+    return static_cast<size_t>(info.resident_size);
 #else
     std::ifstream f(std::filesystem::path(L"/proc/self/status"));
     if (f) {
@@ -409,6 +447,14 @@ std::filesystem::path GetAppDataPath() {
     }
     return std::filesystem::path(L"C:\\AgentRedactor");
 #else
+#ifdef __APPLE__
+    // macOS convention: ~/Library/Application Support/AgentRedactor (same
+    // "AgentRedactor" name as the Windows %APPDATA% dir).
+    if (const char* home = std::getenv("HOME"); home && *home) {
+        return std::filesystem::path(home) / "Library" / "Application Support" / "AgentRedactor";
+    }
+    return std::filesystem::path("/tmp/agentredactor");
+#else
     // XDG: $XDG_CONFIG_HOME/agentredactor, defaulting to ~/.config/agentredactor.
     if (const char* xdg = std::getenv("XDG_CONFIG_HOME"); xdg && *xdg) {
         return std::filesystem::path(xdg) / "agentredactor";
@@ -417,6 +463,7 @@ std::filesystem::path GetAppDataPath() {
         return std::filesystem::path(home) / ".config" / "agentredactor";
     }
     return std::filesystem::path("/tmp/agentredactor");
+#endif
 #endif
 }
 
@@ -463,6 +510,19 @@ std::filesystem::path GetExecutablePath() {
     wchar_t path[MAX_PATH];
     GetModuleFileNameW(nullptr, path, MAX_PATH);
     return std::filesystem::path(path).parent_path();
+#elif defined(__APPLE__)
+    // macOS has no /proc; _NSGetExecutablePath from dyld returns the path of
+    // the main executable (not necessarily symlink-resolved, which is fine —
+    // this is only used to locate sibling files / re-exec ourselves).
+    uint32_t size = 0;
+    _NSGetExecutablePath(nullptr, &size);
+    if (size == 0) return std::filesystem::current_path();
+    std::string buf(size, '\0');
+    if (_NSGetExecutablePath(buf.data(), &size) != 0) return std::filesystem::current_path();
+    buf.resize(std::strlen(buf.c_str()));
+    std::error_code ec;
+    auto resolved = std::filesystem::weakly_canonical(buf, ec);
+    return (ec ? std::filesystem::path(buf) : resolved).parent_path();
 #else
     char path[4096];
     ssize_t len = ::readlink("/proc/self/exe", path, sizeof(path) - 1);
@@ -926,6 +986,7 @@ struct CurlGetContext {
     std::function<HeadersAction(long status, uint64_t contentLength)> onHeaders;
     std::function<bool(const char* data, size_t len)> onData;
     std::string location;
+    curl_off_t contentLengthHeader = -1;
     HeadersAction action = HeadersAction::Proceed;
 };
 
@@ -940,6 +1001,15 @@ size_t CurlHeaderCallback(char* buffer, size_t size, size_t nitems, void* userda
     const size_t len = size * nitems;
     auto* ctx = static_cast<CurlGetContext*>(userdata);
     const std::string line(buffer, len);
+    // Parse Content-Length manually: CURLINFO_CONTENT_LENGTH_DOWNLOAD_T is
+    // unreliable at header time on some builds (observed -1 on macOS system
+    // curl with HTTP/2), which silently downgraded model downloads to the
+    // progress-less single-stream fallback.
+    if (AsciiStartsWithNoCase(line, "Content-Length:")) {
+        std::string value = line.substr(15);
+        value.erase(0, value.find_first_not_of(" \t"));
+        ctx->contentLengthHeader = std::strtoll(value.c_str(), nullptr, 10);
+    }
     if (AsciiStartsWithNoCase(line, "Location:")) {
         std::string value = line.substr(9);
         value.erase(0, value.find_first_not_of(" \t\r\n"));
@@ -955,6 +1025,7 @@ size_t CurlHeaderCallback(char* buffer, size_t size, size_t nitems, void* userda
         curl_easy_getinfo(ctx->curl, CURLINFO_RESPONSE_CODE, &status);
         if (status >= 300 && status < 400) return len;
         curl_easy_getinfo(ctx->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &contentLength);
+        if (ctx->contentLengthHeader >= 0) contentLength = ctx->contentLengthHeader;
         ctx->action = ctx->onHeaders(status, contentLength > 0 ? static_cast<uint64_t>(contentLength) : 0);
         if (ctx->action != HeadersAction::Proceed) return 0; // abort transfer
     }
@@ -987,11 +1058,12 @@ bool CurlGet(const std::wstring& url, const std::wstring& extraHeaders,
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "AgentRedactor/1.0");
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-        // WinHTTP-equivalent timeouts: 30 s connect; abort when the transfer
-        // stalls below 1 byte/s for 300 s (receive timeout for large files).
+        // Abort a stalled transfer after 30 s so the model-download retry loop
+        // can resume promptly after a network change instead of hanging for
+        // five minutes. Completed segments are retained across retries.
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 30000L);
         curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L);
-        curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 300L);
+        curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 30L);
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, CurlHeaderCallback);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, &ctx);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWriteCallback);

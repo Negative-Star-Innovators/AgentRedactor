@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for ja. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>エンジンが実行されていません — 再試行しています…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>Agent Redactor エンジンを開始できませんでした。</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>プロキシ URL をクリップボードにコピーしました</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>認証に失敗しました。もう一度お試しいただくか、アプリを終了してください。</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Touch ID または Mac のパスワードでロックを解除して続行します。</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor はロックされています</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>PII 検出モデルをダウンロードしています ({0}%)。</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>PII 検出モデルをダウンロードしています…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>ログはこの Mac に保存されます。編集されたログには、検出できなかった機密データが含まれている可能性があります。</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>プロキシ</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI 検出</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>保護は既に有効です。「変更」または「無効化」を使用してください。</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>認証がキャンセルされました。</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>保護を無効化する前に Touch ID または Mac のパスワードでの確認が求められます。</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>マスター パスワードを無効化</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>マスター パスワード保護を有効にできませんでした。</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>この Mac に保存された API キーを保護します。Touch ID または Mac のパスワードでロックを解除します。別のパスワードは必要ありません。</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>マスター パスワードを有効化</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>追加</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>サイドバーでプロファイルを選択するか、リストの上にある + ボタンで新規作成してください。</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>プロファイル:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor を終了しますか? エンジンはバックグラウンドで動作し続けます。</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>ログイン時に開く</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>リクエスト: {0}   PII: {1}   Regex: {2}   キーワード: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>このビルドでは再起動による適用はまだ利用できません。アプリを再ダウンロードして更新してください。</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>先にログを有効にしてください。</value></data>
+</root>

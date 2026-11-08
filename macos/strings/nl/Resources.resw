@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS-only UI strings (SwiftUI GUI), translated overlay for nl. Keys mirror macos/strings/en/Resources.resw; merged on top of the windows/Strings/ catalogs by resw_to_xcstrings.py. -->
+<root>
+  <data name="MacEngine_NotRunning" xml:space="preserve"><value>De engine draait niet — opnieuw proberen…</value></data>
+  <data name="MacEngine_StartFailed_Message" xml:space="preserve"><value>De Agent Redactor-engine kon niet worden gestart.</value></data>
+  <data name="MacHome_UrlCopied" xml:space="preserve"><value>Proxy-URL naar het klembord gekopieerd</value></data>
+  <data name="MacLock_AuthenticateFailed" xml:space="preserve"><value>Verificatie is mislukt. Probeer het opnieuw of sluit de app af.</value></data>
+  <data name="MacLock_Subtitle" xml:space="preserve"><value>Ontgrendel met Touch ID of uw Mac-wachtwoord om door te gaan.</value></data>
+  <data name="MacLock_Title" xml:space="preserve"><value>Agent Redactor is vergrendeld</value></data>
+  <data name="MacMatches_LineFormat" xml:space="preserve"><value>[{0}] {1} ({2}): {3}</value></data>
+  <data name="MacModelDownload_Progress" xml:space="preserve"><value>Het PII-detectiemodel wordt gedownload ({0}%).</value></data>
+  <data name="MacModelDownload_ProgressIndeterminate" xml:space="preserve"><value>Het PII-detectiemodel wordt gedownload…</value></data>
+  <data name="MacLogs_Disclaimer" xml:space="preserve"><value>Logboeken worden op deze Mac opgeslagen. Geredigeerde logboeken kunnen nog steeds gevoelige gegevens bevatten die door de detectie zijn gemist.</value></data>
+  <data name="MacNav_Home" xml:space="preserve"><value>Proxy</value></data>
+  <data name="MacNav_Detection" xml:space="preserve"><value>AI-detectie</value></data>
+  <data name="MacPassword_AlreadyEnabled" xml:space="preserve"><value>De beveiliging is al ingeschakeld. Gebruik in plaats daarvan Wijzigen of Uitschakelen.</value></data>
+  <data name="MacPassword_Canceled" xml:space="preserve"><value>Verificatie geannuleerd.</value></data>
+  <data name="MacPassword_DisableMessage" xml:space="preserve"><value>U wordt gevraagd te verifiëren met Touch ID of uw Mac-wachtwoord voordat de beveiliging wordt uitgeschakeld.</value></data>
+  <data name="MacPassword_DisableTitle" xml:space="preserve"><value>Hoofdwachtwoord uitschakelen</value></data>
+  <data name="MacPassword_EnableFailed" xml:space="preserve"><value>Beveiliging met hoofdwachtwoord inschakelen is mislukt.</value></data>
+  <data name="MacPassword_EnableMessage" xml:space="preserve"><value>Beschermt uw opgeslagen API-sleutels op deze Mac. U ontgrendelt met Touch ID of uw Mac-wachtwoord. Geen apart wachtwoord nodig.</value></data>
+  <data name="MacPassword_EnableTitle" xml:space="preserve"><value>Hoofdwachtwoord inschakelen</value></data>
+  <data name="MacProfiles_AddProfile" xml:space="preserve"><value>Toevoegen</value></data>
+  <data name="MacNav_SelectProfileHint" xml:space="preserve"><value>Selecteer een profiel in de zijbalk of maak er een aan met de knop + boven de lijst.</value></data>
+  <data name="MacProfileScope_Label" xml:space="preserve"><value>Profiel:</value></data>
+  <data name="MacQuit_KeepEngine_Message" xml:space="preserve"><value>Agent Redactor afsluiten? De engine blijft op de achtergrond draaien.</value></data>
+  <data name="MacSettings_StartOnLogin" xml:space="preserve"><value>Openen bij inloggen</value></data>
+  <data name="MacStats_Format" xml:space="preserve"><value>Aanvragen: {0}   PII: {1}   Regex: {2}   Trefwoorden: {3}</value></data>
+  <data name="MacUpdate_ApplyUnavailable" xml:space="preserve"><value>Opnieuw opstarten om toe te passen is in deze build nog niet beschikbaar. Download de app opnieuw om bij te werken.</value></data>
+  <data name="MacValidation_EnableLoggingFirst" xml:space="preserve"><value>Schakel eerst logboekregistratie in.</value></data>
+</root>

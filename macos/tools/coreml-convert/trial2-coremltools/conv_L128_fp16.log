@@ -1,0 +1,53 @@
+Torch version 2.14.1 has not been tested with coremltools. You may run into unexpected errors. Torch 2.7.0 is the most recent version that has been tested.
+coremltools 9.0 torch 2.14.1
+/private/tmp/coreml-exp-venv/lib/python3.12/site-packages/torch/jit/_trace.py:1006: FutureWarning: `torch.jit.trace` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/private/tmp/coreml-exp-venv/lib/python3.12/site-packages/torch/jit/_trace.py:1145: FutureWarning: `torch.jit.trace_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+traced OK torch.Size([1, 128, 33]) torch.float16
+freed source weights; entering ct.convert
+int64 dtype input input_ids down casted to int32.
+int64 dtype input attention_mask down casted to int32.
+Converting PyTorch Frontend ==> MIL Ops:   0%|          | 0/2671 [00:00<?, ? ops/s]Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Converting PyTorch Frontend ==> MIL Ops:  28%|██▊       | 736/2671 [00:00<00:00, 7349.51 ops/s]Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Converting PyTorch Frontend ==> MIL Ops:  57%|█████▋    | 1533/2671 [00:00<00:00, 7712.39 ops/s]Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Converting PyTorch Frontend ==> MIL Ops:  86%|████████▋ | 2305/2671 [00:00<00:00, 6112.74 ops/s]Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Saving value type of int64 into a builtin type of int32, might lose precision!
+Converting PyTorch Frontend ==> MIL Ops: 100%|█████████▉| 2670/2671 [00:00<00:00, 6577.51 ops/s]
+Running MIL frontend_pytorch pipeline:   0%|          | 0/5 [00:00<?, ? passes/s]Running MIL frontend_pytorch pipeline:  80%|████████  | 4/5 [00:00<00:00, 36.86 passes/s]Running MIL frontend_pytorch pipeline: 100%|██████████| 5/5 [00:00<00:00, 38.48 passes/s]
+Running MIL default pipeline:   0%|          | 0/94 [00:00<?, ? passes/s]Running MIL default pipeline:   4%|▍         | 4/94 [00:00<00:02, 34.26 passes/s]Running MIL default pipeline:  11%|█         | 10/94 [00:00<00:01, 43.96 passes/s]/private/tmp/coreml-exp-venv/lib/python3.12/site-packages/coremltools/converters/mil/mil/passes/defs/preprocess.py:273: UserWarning: Output, '2855', of the source model, has been renamed to 'var_2855' in the Core ML model.
+  warnings.warn(msg.format(var.name, new_name))
+Running MIL default pipeline:  16%|█▌        | 15/94 [00:00<00:01, 45.51 passes/s]Running MIL default pipeline:  21%|██▏       | 20/94 [00:00<00:02, 30.22 passes/s]Running MIL default pipeline:  27%|██▋       | 25/94 [00:00<00:02, 34.21 passes/s]Running MIL default pipeline:  32%|███▏      | 30/94 [00:00<00:01, 38.10 passes/s]Running MIL default pipeline:  37%|███▋      | 35/94 [00:02<00:08,  7.07 passes/s]Running MIL default pipeline:  41%|████▏     | 39/94 [00:02<00:06,  9.04 passes/s]Running MIL default pipeline:  48%|████▊     | 45/94 [00:02<00:03, 13.00 passes/s]Running MIL default pipeline:  52%|█████▏    | 49/94 [00:03<00:02, 15.56 passes/s]Running MIL default pipeline:  56%|█████▋    | 53/94 [00:03<00:02, 18.27 passes/s]Running MIL default pipeline:  61%|██████    | 57/94 [00:04<00:06,  5.98 passes/s]/private/tmp/coreml-exp-venv/lib/python3.12/site-packages/coremltools/converters/mil/mil/ops/defs/iOS15/elementwise_unary.py:889: RuntimeWarning: overflow encountered in cast
+  return input_var.val.astype(dtype=string_to_nptype(dtype_val))
+Running MIL default pipeline:  64%|██████▍   | 60/94 [00:05<00:06,  5.42 passes/s]Running MIL default pipeline:  66%|██████▌   | 62/94 [00:05<00:05,  6.16 passes/s]/private/tmp/coreml-exp-venv/lib/python3.12/site-packages/coremltools/converters/mil/mil/passes/defs/optimize_repeat_ops.py:433: RuntimeWarning: overflow encountered in cast
+  max(cur_range.low, tmp_range.low), min(cur_range.high, tmp_range.high)
+Running MIL default pipeline:  68%|██████▊   | 64/94 [00:05<00:04,  6.94 passes/s]Running MIL default pipeline:  73%|███████▎  | 69/94 [00:06<00:02, 10.87 passes/s]Running MIL default pipeline:  80%|███████▉  | 75/94 [00:06<00:01, 16.50 passes/s]Running MIL default pipeline:  86%|████████▌ | 81/94 [00:06<00:00, 22.41 passes/s]Running MIL default pipeline:  93%|█████████▎| 87/94 [00:06<00:00, 27.81 passes/s]Running MIL default pipeline:  98%|█████████▊| 92/94 [00:08<00:00,  7.55 passes/s]Running MIL default pipeline: 100%|██████████| 94/94 [00:08<00:00, 11.30 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline:  58%|█████▊    | 7/12 [00:00<00:00, 60.57 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 61.03 passes/s]
+CONVERT_OK L=128 fp16 in 28.8s -> /tmp/coreml-exp/pf_L128_fp16.mlpackage
