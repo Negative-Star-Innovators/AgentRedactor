@@ -76,12 +76,20 @@ open macos/build/AgentRedactor.app
 
 ## Release signing and distribution
 
-- Keep all signing material and credentials local. Certificates and their
-  private keys belong in the login Keychain; notarization credentials are
-  stored through `xcrun notarytool store-credentials`. Never commit private
-  keys (`.p8` / `.p12`), keychain exports, API credentials, or real account,
-  identity, and team details. Committed documentation and examples must use
-  placeholders.
+- Never commit private keys (`.p8` / `.p12`), keychain exports, API
+  credentials, or real account, identity, and team details. Local signing uses
+  the login Keychain and a saved notarytool profile. GitHub signing secrets live
+  only in protected environments; PRs never receive them.
+- `release-macos.yml` is the reusable unsigned PR/signed-candidate build. The
+  protected `macos-selfrelease` environment in `release-macos-signed.yml` gates
+  Developer ID signing, notarization, signed tests, and R2 publication. Missing
+  signing credentials are fatal for a signed run, and publication verifies the
+  stapled DMG again before upload. Tags are the normal release path; manual
+  dispatch supports dry-runs and recovery.
+- `release-macos-store.yml` builds an unsigned sandboxed Store package on PRs.
+  Its separate protected `macos-appstore` environment gates Apple Distribution
+  signing, signed Store tests, and App Store Connect upload. Store publication
+  is never an R2 operation and TestFlight is not a required test step.
 - **Self-distribution:** `build-release.sh` uses a Developer ID Application
   identity (`SIGN_APP_IDENTITY`) for the app, nested code, and DMG,
   `packaging/AgentRedactor.entitlements` through `SIGN_ENTITLEMENTS`, and a
@@ -108,6 +116,6 @@ open macos/build/AgentRedactor.app
   `ditto` and upload through Transporter or the documented `altool` flow.
 - Before publishing, verify the app/DMG signatures, notarization ticket
   (`xcrun stapler validate`), and Gatekeeper assessment (`codesign` and
-  `spctl`), then test the actual artifact on a clean Apple silicon Mac. A
-  successful local build alone does not prove that notarization or Store upload
-  validation passed.
+  `spctl`). Signed authentication coverage is in `tests/macos/test_signed_auth.py`;
+  the unsigned SwiftUI Accessibility smoke test lives in `tests/gui/macos/`.
+  A successful local build alone does not prove release validation passed.

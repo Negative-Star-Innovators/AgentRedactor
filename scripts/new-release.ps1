@@ -6,10 +6,10 @@
     Bumps windows/version.txt to the given version, commits it, creates
     tag v<Version>, and pushes the commit + tag to origin. Pushing the tag
     triggers the release workflows (release-selfrelease.yml for Windows,
-    build-linux.yml for Linux, release-macos.yml for macOS), which build,
+    build-linux.yml for Linux, release-macos-signed.yml for macOS), which build,
     run the full test suite (incl. GUI tests where available) and publish
     all Velopack channels (win, win-arm64, linux, linux-arm64, osx-arm64)
-    to R2 (served via the Cloudflare worker).
+    to R2 (served via the Cloudflare worker) after their release gates pass.
 
     Use -DryRun to see exactly what would happen without changing anything
     (no file edits, no git mutations).

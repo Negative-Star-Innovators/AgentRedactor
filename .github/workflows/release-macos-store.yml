@@ -1,0 +1,172 @@
+name: Release macOS App Store
+
+on:
+  pull_request:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release. Must match windows/version.txt.'
+        required: true
+        type: string
+      upload:
+        description: 'Upload the tested Store candidate to App Store Connect.'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-macos-store-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pr-build:
+    if: github.event_name == 'pull_request'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build and test dependencies
+        run: |
+          brew install cmake ninja nlohmann-json openssl@3 xcodegen
+          python3 -m pip install -r tests/requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: macos/build-store/models-cache
+          key: onnx-model-ner-macos-store-v1
+      - name: Build unsigned sandboxed Store package
+        run: macos/build-store.sh --no-sign
+      - name: Test Store package
+        env:
+          AGENTREDACTOR_STORE_TEST: "1"
+        run: python -m pytest tests/macos/test_store_package.py -q
+
+  candidate:
+    if: github.event_name != 'pull_request' && github.repository == 'Negative-Star-Innovators/AgentRedactor'
+    runs-on: macos-15
+    environment: macos-appstore
+    env:
+      VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate version
+        run: |
+          set -euo pipefail
+          expected="${VERSION#v}"
+          actual="$(tr -d '[:space:]' < windows/version.txt)"
+          [ "$actual" = "$expected" ] || {
+            echo "::error::Release version $expected does not match windows/version.txt ($actual)"
+            exit 1
+          }
+          echo "EXPECTED_VERSION=$expected" >> "$GITHUB_ENV"
+      - name: Install build and test dependencies
+        run: |
+          brew install cmake ninja nlohmann-json openssl@3 xcodegen
+          python3 -m pip install -r tests/requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: macos/build-store/models-cache
+          key: onnx-model-ner-macos-store-v1
+
+      - name: Set up Apple Distribution keychain
+        env:
+          APPLE_DISTRIBUTION_CERT: ${{ secrets.APPLE_DISTRIBUTION_CERT }}
+          APPLE_DISTRIBUTION_CERT_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_CERT_PASSWORD }}
+          APPLE_DISTRIBUTION_IDENTITY: ${{ secrets.APPLE_DISTRIBUTION_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          for name in APPLE_DISTRIBUTION_CERT APPLE_DISTRIBUTION_CERT_PASSWORD APPLE_DISTRIBUTION_IDENTITY APPLE_TEAM_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required Store secret $name is not configured"
+              exit 1
+            fi
+          done
+          keychain_password="$(openssl rand -hex 32)"
+          echo "$APPLE_DISTRIBUTION_CERT" | base64 --decode > /tmp/agentredactor-store-signing.p12
+          security create-keychain -p "$keychain_password" build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security unlock-keychain -p "$keychain_password" build.keychain
+          security import /tmp/agentredactor-store-signing.p12 -k build.keychain \
+            -P "$APPLE_DISTRIBUTION_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s \
+            -k "$keychain_password" build.keychain
+          security list-keychain -d user -s build.keychain login.keychain
+          rm -f /tmp/agentredactor-store-signing.p12
+          echo "SIGN_APP_IDENTITY=$APPLE_DISTRIBUTION_IDENTITY" >> "$GITHUB_ENV"
+
+      - name: Build signed Store candidate
+        run: macos/build-store.sh
+
+      - name: Test signed Store package
+        env:
+          AGENTREDACTOR_STORE_TEST: "1"
+          AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
+          AGENTREDACTOR_STORE_APP: ${{ github.workspace }}/macos/build-store/app/AgentRedactor.app
+        run: python -m pytest tests/macos/test_store_package.py -q
+
+      - name: Configure ephemeral authentication test password
+        run: |
+          set -euo pipefail
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          sudo dscl . -passwd "/Users/$(whoami)" "$password"
+          echo "AGENTREDACTOR_TEST_MAC_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      - name: Test signed Store Keychain and LocalAuthentication lifecycle
+        env:
+          AGENTREDACTOR_SIGNED_AUTH_TEST: "1"
+          AGENTREDACTOR_APP: ${{ github.workspace }}/macos/build-store/app/AgentRedactor.app
+          AGENTREDACTOR_TEST_CONFIG_DIR: /Users/runner/Library/Containers/com.negativestarinnovators.agentredactor/Data/test-config
+        run: python -m pytest tests/macos/test_signed_auth.py -q
+
+      - name: Package Store candidate
+        run: |
+          set -euo pipefail
+          cd macos/build-store
+          ditto -c -k --sequesterRsrc --keepParent \
+            app/AgentRedactor.app AgentRedactor-store.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-store-osx-arm64
+          path: macos/build-store/AgentRedactor-store.zip
+          retention-days: 30
+
+  upload:
+    if: github.event_name != 'pull_request' && github.repository == 'Negative-Star-Innovators/AgentRedactor' && (github.event_name == 'push' || inputs.upload)
+    needs: candidate
+    runs-on: macos-15
+    environment: macos-appstore
+    env:
+      APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AgentRedactor-store-osx-arm64
+          path: store-candidate
+
+      - name: Validate and upload to App Store Connect
+        run: |
+          set -euo pipefail
+          for name in APP_STORE_CONNECT_API_KEY APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_ISSUER_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required App Store Connect secret $name is not configured"
+              exit 1
+            fi
+          done
+          key_dir="$HOME/private_keys"
+          mkdir -p "$key_dir"
+          key_path="$key_dir/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8"
+          echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > "$key_path"
+          trap 'rm -f "$key_path"' EXIT
+          package="$PWD/store-candidate/AgentRedactor-store.zip"
+          xcrun altool --validate-app -f "$package" -t macos \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+          xcrun altool --upload-app -f "$package" -t macos \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"

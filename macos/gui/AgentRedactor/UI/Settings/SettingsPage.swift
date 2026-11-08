@@ -184,12 +184,14 @@ struct MasterPasswordCard: View {
                     } label: {
                         LocText("Dialog_DisableButton")
                     }
+                    .accessibilityIdentifier("settings.master-password.disable")
                 } else {
                     Button {
                         Task { await enable() }
                     } label: {
                         LocText("Dialog_EnableButton")
                     }
+                    .accessibilityIdentifier("settings.master-password.enable")
                 }
             }
             .disabled(busy)

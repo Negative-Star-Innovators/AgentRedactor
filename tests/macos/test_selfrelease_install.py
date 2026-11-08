@@ -53,6 +53,8 @@ from pathlib import Path
 import psutil
 import pytest
 
+from feed_server import FeedServer
+
 pytestmark = [
     pytest.mark.install,
     pytest.mark.skipif(sys.platform != "darwin", reason="macOS DMG install E2E"),
@@ -136,45 +138,6 @@ def _start_model_download(config_dir: Path) -> None:
     pytest.fail("control API did not accept the model-download request")
 
 
-class _FeedServer:
-    """Loopback http.server with its request log captured to a file."""
-
-    def __init__(self, serve_dir: Path, log_path: Path) -> None:
-        import socket
-
-        with socket.socket() as s:
-            s.bind(("127.0.0.1", 0))
-            self.port = s.getsockname()[1]
-        self.log_path = log_path
-        self._log = open(log_path, "w")
-        self.proc = subprocess.Popen(
-            [sys.executable, "-m", "http.server", str(self.port),
-             "--bind", "127.0.0.1", "--directory", str(serve_dir)],
-            stdout=subprocess.DEVNULL, stderr=self._log,
-        )
-
-    def stop(self) -> None:
-        self.proc.terminate()
-        self.proc.wait(timeout=10)
-        self._log.close()
-
-    def requests(self) -> str:
-        self._log.flush()
-        return self.log_path.read_text(encoding="utf-8", errors="ignore")
-
-    def wait_for_feed_request(self, channel: str,
-                              timeout_s: float = FEED_REQUEST_TIMEOUT_S) -> None:
-        deadline = time.monotonic() + timeout_s
-        needle = f"GET /releases.{channel}.json"
-        while time.monotonic() < deadline:
-            if needle in self.requests():
-                return
-            time.sleep(FEED_POLL_S)
-        raise AssertionError(
-            f"installed app never requested {needle} from the loopback feed "
-            f"within {timeout_s}s.\n--- http.server log ---\n{self.requests() or '(empty)'}")
-
-
 def _assert_own_updater_healthy(app: Path, feed_dir: Path, channel: str,
                                 tmp_path: Path) -> None:
     """Run the freshly installed build's OWN update check against its own feed.
@@ -192,7 +155,7 @@ def _assert_own_updater_healthy(app: Path, feed_dir: Path, channel: str,
     config_dir.mkdir()
     home_dir = tmp_path / "updater-home"
     home_dir.mkdir()
-    server = _FeedServer(feed_dir, tmp_path / "updater-http.log")
+    server = FeedServer(feed_dir)
     env = dict(os.environ)
     env.update({
         "AGENTREDACTOR_UPDATE_FEED": f"http://127.0.0.1:{server.port}",

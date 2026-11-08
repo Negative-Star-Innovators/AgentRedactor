@@ -28,7 +28,6 @@ import os
 import plistlib
 import re
 import shutil
-import socket
 import subprocess
 import sys
 import time
@@ -42,7 +41,8 @@ for _p in (str(_tests_root), str(_tests_root / "gui")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from gui_process import _find_free_port, _kill_existing_agent_redactor  # noqa: E402
+from feed_server import FeedServer  # noqa: E402
+from gui_process import _kill_existing_agent_redactor  # noqa: E402
 
 pytestmark = pytest.mark.skipif(sys.platform != "darwin", reason="macOS update E2E")
 
@@ -102,58 +102,6 @@ def _app_processes() -> list[psutil.Process]:
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
     return out
-
-
-class _FeedServer:
-    """Loopback http.server with its request log captured to a file."""
-
-    def __init__(self, serve_dir: Path) -> None:
-        self.port = _find_free_port()
-        self.log_path = serve_dir.parent / f"http-{self.port}.log"
-        self._log = open(self.log_path, "w")
-        self.proc = subprocess.Popen(
-            [sys.executable, "-m", "http.server", str(self.port),
-             "--bind", "127.0.0.1", "--directory", str(serve_dir)],
-            stdout=subprocess.DEVNULL, stderr=self._log,
-        )
-        deadline = time.monotonic() + 15
-        while True:
-            if self.proc.poll() is not None:
-                break
-            try:
-                with socket.create_connection(("127.0.0.1", self.port), timeout=0.2):
-                    return
-            except OSError:
-                if time.monotonic() >= deadline:
-                    break
-                time.sleep(0.1)
-        self._log.flush()
-        details = self.log_path.read_text(encoding="utf-8", errors="ignore")
-        if self.proc.poll() is None:
-            self.proc.terminate()
-            self.proc.wait(timeout=10)
-        self._log.close()
-        raise RuntimeError(f"loopback feed server did not start: {details or '(empty log)'}")
-
-    def stop(self) -> None:
-        self.proc.terminate()
-        self.proc.wait(timeout=10)
-        self._log.close()
-
-    def requests(self) -> str:
-        self._log.flush()
-        return self.log_path.read_text(encoding="utf-8", errors="ignore")
-
-    def wait_for_feed_request(self, timeout_s: float = FEED_REQUEST_TIMEOUT_S) -> None:
-        deadline = time.monotonic() + timeout_s
-        needle = f"GET /releases.{CHANNEL}.json"
-        while time.monotonic() < deadline:
-            if needle in self.requests():
-                return
-            time.sleep(FEED_POLL_S)
-        raise AssertionError(
-            f"packed app never requested {needle} from the loopback feed "
-            f"within {timeout_s}s.\n--- http.server log ---\n{self.requests() or '(empty)'}")
 
 
 def _launch_app(app: Path, config_dir: Path, home_dir: Path,
@@ -237,7 +185,7 @@ def test_packed_app_checks_own_feed(packed_release) -> None:
     """
     tmp_path, app, _vpk_path = packed_release
     config_dir, home_dir = _isolated_dirs(tmp_path)
-    server = _FeedServer(VELOPACK_OUT)
+    server = FeedServer(VELOPACK_OUT)
     proc = _launch_app(app, config_dir, home_dir,
                        feed_url=f"http://127.0.0.1:{server.port}")
     try:
@@ -270,7 +218,7 @@ def test_packed_app_detects_vnext_feed(packed_release) -> None:
     _pack_vnext(vpk, STAGED_APP, feed_dir, _bump_patch(_current_feed_version()))
 
     config_dir, home_dir = _isolated_dirs(tmp_path)
-    server = _FeedServer(feed_dir)
+    server = FeedServer(feed_dir)
     proc = _launch_app(app, config_dir, home_dir,
                        feed_url=f"http://127.0.0.1:{server.port}")
     try:
@@ -308,7 +256,7 @@ def test_app_self_updates_against_local_feed(packed_release) -> None:
     _pack_vnext(vpk, STAGED_APP, feed_dir, next_version)
 
     config_dir, home_dir = _isolated_dirs(tmp_path)
-    server = _FeedServer(feed_dir)
+    server = FeedServer(feed_dir)
     # vpk does not rewrite Info.plist when packing a synthetic vNext from an
     # existing .app; Velopack's own sq.version is the update contract.
     before = _velopack_version(app)

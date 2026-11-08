@@ -16,41 +16,42 @@ struct RootView: View {
     var body: some View {
         NavigationSplitView {
             List {
-                Section {
-                    SidebarProfileList(profilePendingRemoval: $profilePendingRemoval)
-                } header: {
-                    HStack {
-                        LocText("HomePage_ProfilesHeader.Text")
-                        Spacer()
-                        // Visible remove control (the −/+ convention from
-                        // Contacts-style sidebars); right-click on a profile
-                        // offers the same action.
-                        Button {
-                            if let id = appState.selectedProfileID,
-                               let p = appState.profiles.first(where: { $0.id == id }) {
-                                profilePendingRemoval = p
-                            }
-                        } label: {
-                            Image(systemName: "minus")
-                                .font(.system(size: 12, weight: .semibold))
-                                .frame(width: 18, height: 18)
-                                .contentShape(Rectangle())
+                HStack {
+                    LocText("HomePage_ProfilesHeader.Text")
+                    Spacer()
+                    // Visible remove control (the −/+ convention from
+                    // Contacts-style sidebars); right-click on a profile
+                    // offers the same action.
+                    Button {
+                        if let id = appState.selectedProfileID,
+                           let p = appState.profiles.first(where: { $0.id == id }) {
+                            profilePendingRemoval = p
                         }
-                        .buttonStyle(.borderless)
-                        .disabled(appState.selectedProfileID == nil)
-                        .help(LocString("Dialog_RemoveProfile_Title"))
-                        Button {
-                            Task { await appState.addProfile() }
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(.system(size: 12, weight: .semibold))
-                                .frame(width: 18, height: 18)
-                                .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.borderless)
-                        .help(LocString("MacProfiles_AddProfile"))
+                    } label: {
+                        Image(systemName: "minus")
+                            .font(.system(size: 12, weight: .semibold))
+                            .frame(width: 18, height: 18)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(.borderless)
+                    .disabled(appState.selectedProfileID == nil)
+                    .help(LocString("Dialog_RemoveProfile_Title"))
+                    .accessibilityIdentifier("profiles.remove")
+                    Button {
+                        Task { await appState.addProfile() }
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 12, weight: .semibold))
+                            .frame(width: 18, height: 18)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.borderless)
+                    .help(LocString("MacProfiles_AddProfile"))
+                    .accessibilityIdentifier("profiles.add")
                 }
+                .accessibilityElement(children: .contain)
+                .listRowSeparator(.hidden)
+                SidebarProfileList(profilePendingRemoval: $profilePendingRemoval)
             }
             .navigationSplitViewColumnWidth(min: 200, ideal: 220)
         } detail: {

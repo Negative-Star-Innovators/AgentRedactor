@@ -23,6 +23,7 @@ third_party_tests/out.txt
 __pycache__/
 *.pyc
 .pytest_cache/
+tests/gui/macos/AccessibilityHelper/bin/
 
 # Wrangler local state (Cloudflare account cache, local dev)
 cloudflare/.wrangler/
