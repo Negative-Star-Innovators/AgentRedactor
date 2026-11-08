@@ -63,6 +63,8 @@ def test_signed_password_lifecycle(tmp_path: Path) -> None:
         assert gui_driver.auth_count() == 0
 
         gui_driver.close_window(app.pid)
+        gui_driver.wait_until("window hidden", lambda: gui_driver.window_count(app.pid),
+                              lambda count: count == 0)
         wait_unlocked(app, False)
         assert gui_driver.auth_count() == 0
         app.reopen()
