@@ -132,10 +132,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         focusLossLockItem?.cancel()
         NSApp.windows.first?.orderOut(nil)
         // Close-to-tray re-lock (Linux closeEvent parity). Hide first so no
-        // return-to-app prompt can authenticate a window on its way out.
-        if appState.protectionEnabled, appState.status.unlocked {
-            Task { await appState.lockSession() }
-        }
+        // return-to-app prompt can authenticate a window on its way out. Lock
+        // unconditionally: cached state may not yet show a just-enabled password,
+        // and the engine treats locking an unprotected session as a no-op.
+        Task { await appState.lockSession() }
     }
 
     // MARK: - NSWindowDelegate
