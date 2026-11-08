@@ -68,6 +68,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NotificationCenter.default.addObserver(self,
             selector: #selector(handleDidResignActive(_:)),
             name: NSApplication.didResignActiveNotification, object: NSApp)
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(handleWindowDidBecomeMain(_:)),
+            name: NSWindow.didBecomeMainNotification, object: nil)
         // Apply the persisted language override as early as possible.
         LocalizationManager.shared.apply(languageTag: Locale.current.identifier)
 
@@ -86,8 +89,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
 
-    /// Grab the SwiftUI window once it exists and take over its delegate so
-    /// close-to-tray can intercept the close.
+    @objc private func handleWindowDidBecomeMain(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        window.delegate = self
+        window.title = LocString("AppDisplayName")
+    }
+
+    /// Attach to an existing window when showing it; didBecomeMain covers a
+    /// SwiftUI window created after the initial bootstrap completes.
     func attachWindowDelegate() {
         guard let window = NSApp.windows.first(where: { $0.isVisible || $0.title != "" }) else { return }
         window.delegate = self
