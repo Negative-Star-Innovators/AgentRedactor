@@ -35,15 +35,18 @@ struct KeywordsPage: View {
                             TextField(LocString("HomePage_Keywords_Placeholder.PlaceholderText"), text: $newKeyword)
                                 .textFieldStyle(.roundedBorder)
                                 .onSubmit { addKeyword() }
+                                .accessibilityIdentifier("keywords.new.text")
                             Toggle(isOn: $newCaseSensitive) {
                                 LocText("HomePage_Keywords_CaseSensitiveCheck.Content")
                             }
                             .toggleStyle(.checkbox)
+                            .accessibilityIdentifier("keywords.new.case-sensitive")
                             Button {
                                 addKeyword()
                             } label: {
                                 LocText("HomePage_Keywords_AddButton.Content")
                             }
+                            .accessibilityIdentifier("keywords.add")
                         }
                     }
                 }

@@ -3,6 +3,7 @@ name: Release macOS App Store
 on:
   pull_request:
   push:
+    branches: [main]
     tags: ['v*']
   workflow_dispatch:
     inputs:
@@ -47,7 +48,7 @@ jobs:
     runs-on: macos-15
     environment: macos-appstore
     env:
-      VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+      VERSION: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -56,13 +57,13 @@ jobs:
       - name: Validate version
         run: |
           set -euo pipefail
-          expected="${VERSION#v}"
           actual="$(tr -d '[:space:]' < windows/version.txt)"
-          [ "$actual" = "$expected" ] || {
+          expected="${VERSION#v}"
+          if [ -n "$expected" ] && [ "$actual" != "$expected" ]; then
             echo "::error::Release version $expected does not match windows/version.txt ($actual)"
             exit 1
-          }
-          echo "EXPECTED_VERSION=$expected" >> "$GITHUB_ENV"
+          fi
+          echo "EXPECTED_VERSION=$actual" >> "$GITHUB_ENV"
       - name: Install build and test dependencies
         run: |
           brew install cmake ninja nlohmann-json openssl@3 xcodegen

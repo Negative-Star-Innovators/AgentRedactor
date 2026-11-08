@@ -29,6 +29,7 @@ struct DetectionCard: View {
                         LocText("HomePage_Detection_Title.Text")
                     }
                     .toggleStyle(.switch)
+                    .accessibilityIdentifier("detection.ai-enabled")
 
                     HintText(key: "HomePage_Detection_SlowWarning.Text")
 

@@ -118,7 +118,7 @@ func run(_ arguments: [String]) throws {
     try requireAccessibility()
     let command = arguments[1]
     var pid: pid_t = 0
-    if ["wait-window", "window-count", "activate", "click", "click-title", "exists", "close-window", "dump"].contains(command) {
+    if ["wait-window", "window-count", "activate", "click", "click-title", "set-text", "select-popup", "exists", "close-window", "dump"].contains(command) {
         guard arguments.count >= 3, let parsed = Int32(arguments[2]) else {
             throw HelperError.invalidArguments
         }
@@ -160,6 +160,40 @@ func run(_ arguments: [String]) throws {
             throw HelperError.elementNotFound(arguments[3])
         }
         try press(element, arguments[3])
+    case "set-text":
+        guard arguments.count == 5, let element = findIdentifier(pid, arguments[3]) else {
+            throw HelperError.elementNotFound(arguments.count >= 4 ? arguments[3] : "identifier")
+        }
+        try activate(pid)
+        let status = AXUIElementSetAttributeValue(element, kAXFocusedAttribute as CFString, true as CFTypeRef)
+        guard status == .success else { throw HelperError.actionFailed("Focus text field", status) }
+        Thread.sleep(forTimeInterval: 0.1)
+        let source = CGEventSource(stateID: .hidSystemState)
+        for scalar in arguments[4].unicodeScalars {
+            var units = Array(String(scalar).utf16)
+            let down = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)
+            down?.keyboardSetUnicodeString(stringLength: units.count, unicodeString: &units)
+            down?.postToPid(pid)
+            let up = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: false)
+            up?.keyboardSetUnicodeString(stringLength: units.count, unicodeString: &units)
+            up?.postToPid(pid)
+            Thread.sleep(forTimeInterval: 0.01)
+        }
+        Thread.sleep(forTimeInterval: 0.1)
+    case "select-popup":
+        guard arguments.count == 5, let popup = findIdentifier(pid, arguments[3]) else {
+            throw HelperError.elementNotFound(arguments.count >= 4 ? arguments[3] : "identifier")
+        }
+        try press(popup, arguments[3])
+        Thread.sleep(forTimeInterval: 0.3)
+        let app = application(pid: pid)
+        guard let item = find([app], matching: {
+            attribute($0, kAXRoleAttribute) as? String == "AXMenuItem" &&
+                attribute($0, kAXTitleAttribute) as? String == arguments[4]
+        }) else {
+            throw HelperError.elementNotFound(arguments[4])
+        }
+        try press(item, arguments[4])
     case "exists":
         guard arguments.count == 4 else { throw HelperError.invalidArguments }
         print(findIdentifier(pid, arguments[3]) != nil)

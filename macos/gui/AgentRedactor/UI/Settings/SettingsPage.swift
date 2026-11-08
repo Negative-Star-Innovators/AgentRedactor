@@ -58,6 +58,7 @@ private struct LanguageCard: View {
             .labelsHidden()
             .pickerStyle(.menu)
             .frame(maxWidth: 260, alignment: .leading)
+            .accessibilityIdentifier("settings.language")
         }
     }
 }
