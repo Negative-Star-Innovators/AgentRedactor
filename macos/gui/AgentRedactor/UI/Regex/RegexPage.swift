@@ -35,11 +35,13 @@ struct RegexPage: View {
                                 .textFieldStyle(.roundedBorder)
                                 .font(.system(.body, design: .monospaced))
                                 .onSubmit { addRegex() }
+                                .accessibilityIdentifier("regex.new.pattern")
                             Button {
                                 addRegex()
                             } label: {
                                 LocText("HomePage_Regex_AddButton.Content")
                             }
+                            .accessibilityIdentifier("regex.add")
                         }
                     } else {
                         HintText(key: "HomePage_ProfilesHeader.Text")

@@ -84,8 +84,8 @@ open macos/build/AgentRedactor.app
   protected `macos-selfrelease` environment in `release-macos-signed.yml` gates
   Developer ID signing, notarization, signed tests, and R2 publication. Missing
   signing credentials are fatal for a signed run, and publication verifies the
-  stapled DMG again before upload. Tags are the normal release path; manual
-  dispatch supports dry-runs and recovery.
+  stapled DMG again before upload. Merges to main produce signed test candidates;
+  tags are the normal publication path and manual dispatch supports dry-runs/recovery.
 - `release-macos-store.yml` builds an unsigned sandboxed Store package on PRs.
   Its separate protected `macos-appstore` environment gates Apple Distribution
   signing and signed Store tests. The signed candidate is retained for manual
@@ -118,5 +118,5 @@ open macos/build/AgentRedactor.app
 - Before publishing, verify the app/DMG signatures, notarization ticket
   (`xcrun stapler validate`), and Gatekeeper assessment (`codesign` and
   `spctl`). Signed authentication coverage is in `tests/macos/test_signed_auth.py`;
-  the unsigned SwiftUI Accessibility smoke test lives in `tests/gui/macos/`.
+  the unsigned SwiftUI Accessibility GUI tests live in `tests/gui/macos/`.
   A successful local build alone does not prove release validation passed.

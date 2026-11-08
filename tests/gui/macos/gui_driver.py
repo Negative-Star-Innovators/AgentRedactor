@@ -59,6 +59,14 @@ def click_title(pid: int, title: str) -> None:
     _run("click-title", str(pid), title)
 
 
+def set_text(pid: int, identifier: str, text: str) -> None:
+    _run("set-text", str(pid), identifier, text)
+
+
+def select_popup(pid: int, identifier: str, title: str) -> None:
+    _run("select-popup", str(pid), identifier, title)
+
+
 def exists(pid: int, identifier: str) -> bool:
     return _run("exists", str(pid), identifier) == "true"
 

@@ -119,6 +119,7 @@ struct LogsCard: View {
                     LocText("HomePage_Logs_EnableLoggingCheck.Content")
                 }
                 .toggleStyle(.checkbox)
+                .accessibilityIdentifier("logging.enabled")
 
                 Toggle(isOn: Binding(
                     get: { appState.showSensitiveEffective },
@@ -133,6 +134,7 @@ struct LogsCard: View {
                     LocText("HomePage_Logs_SensitiveCheck.Content")
                 }
                 .toggleStyle(.checkbox)
+                .accessibilityIdentifier("logging.show-sensitive")
 
                 HStack(spacing: 12) {
                     Button {
