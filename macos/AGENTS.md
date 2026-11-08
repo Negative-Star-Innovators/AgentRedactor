@@ -88,8 +88,9 @@ open macos/build/AgentRedactor.app
   dispatch supports dry-runs and recovery.
 - `release-macos-store.yml` builds an unsigned sandboxed Store package on PRs.
   Its separate protected `macos-appstore` environment gates Apple Distribution
-  signing, signed Store tests, and App Store Connect upload. Store publication
-  is never an R2 operation and TestFlight is not a required test step.
+  signing and signed Store tests. The signed candidate is retained for manual
+  download/submission through App Store Connect; there is no automatic upload,
+  R2 operation, or required TestFlight step.
 - **Self-distribution:** `build-release.sh` uses a Developer ID Application
   identity (`SIGN_APP_IDENTITY`) for the app, nested code, and DMG,
   `packaging/AgentRedactor.entitlements` through `SIGN_ENTITLEMENTS`, and a

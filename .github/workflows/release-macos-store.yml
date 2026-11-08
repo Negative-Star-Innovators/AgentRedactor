@@ -10,11 +10,6 @@ on:
         description: 'Version to release. Must match windows/version.txt.'
         required: true
         type: string
-      upload:
-        description: 'Upload the tested Store candidate to App Store Connect.'
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -141,38 +136,3 @@ jobs:
           name: AgentRedactor-store-osx-arm64
           path: macos/build-store/AgentRedactor-store.zip
           retention-days: 30
-
-  upload:
-    if: github.event_name != 'pull_request' && github.repository == 'Negative-Star-Innovators/AgentRedactor' && (github.event_name == 'push' || inputs.upload)
-    needs: candidate
-    runs-on: macos-15
-    environment: macos-appstore
-    env:
-      APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-      APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: AgentRedactor-store-osx-arm64
-          path: store-candidate
-
-      - name: Validate and upload to App Store Connect
-        run: |
-          set -euo pipefail
-          for name in APP_STORE_CONNECT_API_KEY APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_ISSUER_ID; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Required App Store Connect secret $name is not configured"
-              exit 1
-            fi
-          done
-          key_dir="$HOME/private_keys"
-          mkdir -p "$key_dir"
-          key_path="$key_dir/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8"
-          echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > "$key_path"
-          trap 'rm -f "$key_path"' EXIT
-          package="$PWD/store-candidate/AgentRedactor-store.zip"
-          xcrun altool --validate-app -f "$package" -t macos \
-            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
-          xcrun altool --upload-app -f "$package" -t macos \
-            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
