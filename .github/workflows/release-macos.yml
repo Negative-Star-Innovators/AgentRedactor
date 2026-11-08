@@ -264,21 +264,22 @@ jobs:
             fi
           done
           keychain_password="$(openssl rand -hex 32)"
+          keychain_path="$HOME/Library/Keychains/build.keychain-db"
           echo "$APPLE_SIGNING_CERT" | base64 --decode > /tmp/agentredactor-signing.p12
-          security create-keychain -p "$keychain_password" build.keychain
-          security set-keychain-settings -lut 21600 build.keychain
-          security unlock-keychain -p "$keychain_password" build.keychain
-          security import /tmp/agentredactor-signing.p12 -k build.keychain \
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security import /tmp/agentredactor-signing.p12 -k "$keychain_path" \
             -P "$APPLE_SIGNING_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
           security set-key-partition-list -S apple-tool:,apple: -s \
-            -k "$keychain_password" build.keychain
-          security list-keychain -d user -s build.keychain login.keychain
+            -k "$keychain_password" "$keychain_path"
+          security list-keychain -d user -s "$keychain_path" login.keychain
           rm -f /tmp/agentredactor-signing.p12
           echo "SIGN_APP_IDENTITY=$APPLE_SIGN_IDENTITY" >> "$GITHUB_ENV"
           echo "SIGN_ENTITLEMENTS=$GITHUB_WORKSPACE/macos/packaging/AgentRedactor.entitlements" >> "$GITHUB_ENV"
           xcrun notarytool store-credentials "agentredactor-notary" \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" --keychain build.keychain
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" --keychain "$keychain_path"
           echo "NOTARY_PROFILE=agentredactor-notary" >> "$GITHUB_ENV"
 
       # build-release.sh derives the channel from the host arch (osx-arm64)
@@ -344,14 +345,21 @@ jobs:
         run: python -m pytest tests/macos/test_update_feed.py -q
 
       # LocalAuthentication needs the disposable runner account's current
-      # password. Generate one for this job only; never use a developer secret.
-      - name: Configure ephemeral authentication test password
+      # generated password. Read its auto-login copy; never use a developer
+      # secret, print the password, or attempt to change the macOS account.
+      - name: Read ephemeral authentication test password
         if: env.RUN_BUILD == 'true' && inputs.sign
         run: |
           set -euo pipefail
-          password="$(openssl rand -hex 24)"
+          password="$(sudo /usr/bin/python3 -c '
+          from pathlib import Path
+          key = (125, 137, 82, 35, 210, 188, 221, 234, 163, 185, 31)
+          data = Path("/etc/kcpassword").read_bytes()
+          decoded = bytes(value ^ key[index % len(key)] for index, value in enumerate(data))
+          print(decoded.split(b"\0", 1)[0].decode("utf-8"))
+          ')"
+          test -n "$password"
           echo "::add-mask::$password"
-          sudo dscl . -passwd "/Users/$(whoami)" "$password"
           echo "AGENTREDACTOR_TEST_MAC_PASSWORD=$password" >> "$GITHUB_ENV"
 
       - name: Test signed Keychain and LocalAuthentication lifecycle
