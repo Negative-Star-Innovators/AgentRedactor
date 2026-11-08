@@ -97,20 +97,26 @@ func submitAuth() throws {
     guard let auth = coreAuthApplication(), let password = readLine(strippingNewline: true) else {
         throw HelperError.elementNotFound("Apple authentication window")
     }
-    let authWindows = windows(auth)
-    guard let field = find(authWindows, matching: {
-        attribute($0, kAXRoleAttribute) as? String == "AXSecureTextField"
-    }) else {
-        throw HelperError.elementNotFound("Apple authentication password field")
+    var pid: pid_t = 0
+    AXUIElementGetPid(auth, &pid)
+    try activate(pid)
+    Thread.sleep(forTimeInterval: 0.1)
+
+    let source = CGEventSource(stateID: .hidSystemState)
+    for scalar in password.unicodeScalars {
+        var units = Array(String(scalar).utf16)
+        let down = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true)
+        down?.keyboardSetUnicodeString(stringLength: units.count, unicodeString: &units)
+        down?.postToPid(pid)
+        let up = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: false)
+        up?.keyboardSetUnicodeString(stringLength: units.count, unicodeString: &units)
+        up?.postToPid(pid)
+        Thread.sleep(forTimeInterval: 0.01)
     }
-    let status = AXUIElementSetAttributeValue(field, kAXValueAttribute as CFString, password as CFTypeRef)
-    guard status == .success else { throw HelperError.actionFailed("Set authentication password", status) }
-    guard let ok = find(authWindows, matching: {
-        attribute($0, kAXTitleAttribute) as? String == "OK"
-    }) else {
-        throw HelperError.elementNotFound("Apple authentication OK button")
-    }
-    try press(ok, "Submit authentication")
+    let returnDown = CGEvent(keyboardEventSource: source, virtualKey: 36, keyDown: true)
+    returnDown?.postToPid(pid)
+    let returnUp = CGEvent(keyboardEventSource: source, virtualKey: 36, keyDown: false)
+    returnUp?.postToPid(pid)
 }
 
 func run(_ arguments: [String]) throws {
