@@ -29,6 +29,9 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Install build and test dependencies
         run: |
           brew install cmake ninja nlohmann-json openssl@3 xcodegen
@@ -52,6 +55,9 @@ jobs:
       VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Validate version
         run: |
           set -euo pipefail
