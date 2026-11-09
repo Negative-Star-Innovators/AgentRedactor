@@ -7,17 +7,22 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release. Must match windows/version.txt.'
+        description: 'Version to build or publish. Must match the candidate version.'
         required: true
         type: string
+      candidate_run_id:
+        description: 'Successful main candidate run to publish (required when publish is checked).'
+        required: false
+        type: string
       publish:
-        description: 'Publish the tested, signed candidate to R2.'
+        description: 'Promote an existing tested candidate to R2 without rebuilding.'
         required: false
         type: boolean
         default: false
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: release-macos-signed-${{ github.ref }}
@@ -25,31 +30,120 @@ concurrency:
 
 jobs:
   candidate:
-    if: github.repository == 'Negative-Star-Innovators/AgentRedactor'
+    if: >-
+      github.repository == 'Negative-Star-Innovators/AgentRedactor' &&
+      ((github.event_name == 'push' && github.ref_type == 'branch') ||
+       (github.event_name == 'workflow_dispatch' && inputs.publish == false))
     uses: ./.github/workflows/release-macos.yml
     with:
-      version: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
+      version: ${{ inputs.version }}
       sign: true
     secrets: inherit
 
   publish:
-    if: github.repository == 'Negative-Star-Innovators/AgentRedactor' && (github.ref_type == 'tag' || inputs.publish)
-    needs: candidate
+    if: >-
+      github.repository == 'Negative-Star-Innovators/AgentRedactor' &&
+      (github.ref_type == 'tag' || inputs.publish == true)
     runs-on: macos-15
     environment: macos-selfrelease
+    env:
+      EXPECTED_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Resolve tested main candidate
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ inputs.candidate_run_id }}
+        run: |
+          set -euo pipefail
+          expected="${EXPECTED_VERSION#v}"
+          if ! [[ "$expected" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Expected version '$expected' is not a valid semver." >&2
+            exit 1
+          fi
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            run_id="$(gh run list --workflow release-macos-signed.yml \
+              --commit "${GITHUB_SHA}" --branch main --event push --status success \
+              --limit 20 --json databaseId | jq -er '.[0].databaseId')"
+          else
+            run_id="${INPUT_RUN_ID}"
+            if ! [[ "$run_id" =~ ^[0-9]+$ ]]; then
+              echo "::error::candidate_run_id is required when publish is checked." >&2
+              exit 1
+            fi
+          fi
+
+          gh run view "$run_id" --json \
+            databaseId,headSha,headBranch,event,status,conclusion,workflowName,url \
+            > candidate-run.json
+          jq -e '
+            .headBranch == "main" and .event == "push" and
+            .status == "completed" and .conclusion == "success" and
+            .workflowName == "Release macOS Self-Distribution"
+          ' candidate-run.json >/dev/null
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            jq -e --arg commit "${GITHUB_SHA}" '.headSha == $commit' candidate-run.json >/dev/null \
+              || { echo "::error::The candidate commit does not match the release tag." >&2; exit 1; }
+          fi
+
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "commit=$(jq -r .headSha candidate-run.json)" >> "$GITHUB_OUTPUT"
+          echo "Promoting tested candidate: $(jq -r .url candidate-run.json)"
+
+      - name: Download tested candidate artifact
+        uses: actions/download-artifact@v4
         with:
           name: AgentRedactor-velopack-osx-arm64
           path: velopack-osx
+          run-id: ${{ steps.candidate.outputs.run_id }}
+          github-token: ${{ github.token }}
 
-      - name: Verify signed and notarized DMG before upload
+      - name: Verify candidate version, signature, and notarization
+        env:
+          EXPECTED: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
         run: |
           set -euo pipefail
+          expected="${EXPECTED#v}"
           dmg="$PWD/velopack-osx/AgentRedactor-osx-arm64.dmg"
+          test -f "$dmg"
+
+          python3 - "$expected" <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          expected = sys.argv[1]
+          feed = json.loads(pathlib.Path(
+              "velopack-osx/releases.osx-arm64.json").read_text())
+          assets = feed.get("Assets") or []
+          full = [a for a in assets if str(a.get("Type")) in ("1", "Full")]
+          if not full:
+              raise SystemExit("No full Velopack package in candidate feed")
+          wrong = [a.get("Version") for a in assets
+                   if str(a.get("Version", "")).lstrip("vV") != expected]
+          if wrong:
+              raise SystemExit(f"Candidate versions {wrong} do not match {expected}")
+          print(f"Candidate feed version: {expected}")
+          PY
+
+          mount_dir="$(mktemp -d)"
+          trap 'hdiutil detach "$mount_dir" -force >/dev/null 2>&1 || true' EXIT
+          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint "$mount_dir"
+          app="$mount_dir/Agent Redactor.app"
+          test -d "$app"
+          actual="$(plutil -extract CFBundleShortVersionString raw -o - "$app/Contents/Info.plist")"
+          test "$actual" = "$expected" \
+            || { echo "::error::DMG app version $actual does not match $expected." >&2; exit 1; }
+          codesign --verify --strict "$app"
+          hdiutil detach "$mount_dir"
+          trap - EXIT
+
           codesign --verify --strict "$dmg"
           xcrun stapler validate "$dmg"
           spctl -a -t open --context context:primary-signature -v "$dmg"
+          shasum -a 256 "$dmg"
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -63,7 +157,7 @@ jobs:
           set -euo pipefail
           for name in R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
             if [ -z "${!name}" ]; then
-              echo "::error::Required publish secret $name is not configured"
+              echo "::error::Required publish secret $name is not configured" >&2
               exit 1
             fi
           done
@@ -89,3 +183,42 @@ jobs:
             --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" \
             --region auto --recursive --exclude "*" \
             --include "*-Portable.zip" --include "RELEASES*" --include "assets.*.json"
+
+      - name: Verify live R2 channel and published DMG
+        env:
+          EXPECTED: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
+        run: |
+          set -euo pipefail
+          expected="${EXPECTED#v}"
+          base="https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64"
+          live_dmg="$PWD/live-AgentRedactor-osx-arm64.dmg"
+
+          for attempt in {1..30}; do
+            if curl -fsSL "$base/releases.osx-arm64.json" -o live-feed.json; then
+              if python3 - "$expected" <<'PY'
+          import json
+          import sys
+          feed = json.load(open("live-feed.json"))
+          full = [a for a in feed.get("Assets", [])
+                  if str(a.get("Type")) in ("1", "Full")]
+          raise SystemExit(0 if full and all(
+              str(a.get("Version", "")).lstrip("vV") == sys.argv[1]
+              for a in full) else 1)
+          PY
+              then
+                break
+              fi
+            fi
+            if [[ "$attempt" == 30 ]]; then
+              echo "::error::Live R2 feed did not reach version $expected." >&2
+              exit 1
+            fi
+            sleep 5
+          done
+
+          curl -fSL --retry 3 "$base/AgentRedactor-osx-arm64.dmg" -o "$live_dmg"
+          cmp "$PWD/velopack-osx/AgentRedactor-osx-arm64.dmg" "$live_dmg"
+          codesign --verify --strict "$live_dmg"
+          xcrun stapler validate "$live_dmg"
+          spctl -a -t open --context context:primary-signature -v "$live_dmg"
+          echo "Verified live macOS $expected DMG is identical to the tested candidate."

@@ -2,9 +2,10 @@ name: Release macOS App Store
 
 on:
   pull_request:
+  # Store releases promote the tested main candidate through manual App Store
+  # Connect submission; version tags must not rebuild or re-sign it.
   push:
     branches: [main]
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       version:
