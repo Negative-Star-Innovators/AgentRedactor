@@ -85,7 +85,8 @@ open macos/build/AgentRedactor.app
   Developer ID signing, notarization, signed tests, and R2 publication. Missing
   signing credentials are fatal for a signed run, and publication verifies the
   stapled DMG again before upload. Merges to main produce signed test candidates;
-  tags are the normal publication path and manual dispatch supports dry-runs/recovery.
+  tags promote the successful candidate at the same commit without rebuilding.
+  Manual dispatch supports candidate dry-runs and publication by candidate run ID.
 - `release-macos-store.yml` builds an unsigned sandboxed Store package on PRs.
   Its separate protected `macos-appstore` environment gates Apple Distribution
   signing and signed Store tests. The signed candidate is retained for manual

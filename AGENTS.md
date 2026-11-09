@@ -8,3 +8,7 @@ Follow the appropriate `AGENTS.md` for the part of the codebase you are changing
 - **macOS work** → follow [`macos/AGENTS.md`](macos/AGENTS.md); engine/CLI build notes live in [`macos/README.md`](macos/README.md); shared-engine changes follow both sets of rules above (keep Windows/Linux behavior identical — additive `#ifdef __APPLE__` only)
 
 If a change touches multiple platforms, follow all applicable sets of instructions.
+
+## Deferred release improvements
+
+See [`docs/release-improvements.md`](docs/release-improvements.md) for proposed release-pipeline improvements. This list is planning only: **ask the user before implementing any item on it**.
