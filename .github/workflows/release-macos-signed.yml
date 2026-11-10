@@ -213,9 +213,12 @@ jobs:
           feed = json.load(open("live-feed.json"))
           full = [a for a in feed.get("Assets", [])
                   if str(a.get("Type")) in ("1", "Full")]
-          raise SystemExit(0 if full and all(
-              str(a.get("Version", "")).lstrip("vV") == sys.argv[1]
-              for a in full) else 1)
+          def version(asset):
+              text = str(asset.get("Version", "")).lstrip("vV")
+              return tuple(int(p) for p in text.split("-")[0].split("+")[0].split("."))
+          expected = tuple(int(p) for p in sys.argv[1].split("."))
+          latest = max(full, key=version) if full else None
+          raise SystemExit(0 if latest and version(latest) == expected else 1)
           PY
               then
                 break
