@@ -78,7 +78,7 @@ jobs:
       ONNXRUNTIME_DIR: ${{ github.workspace }}/onnxruntime
       # Candidate, PR, and dry-run builds only execute for affected platforms.
       # Skipped steps still report success under the per-arch required names.
-      RUN_BUILD: ${{ (github.event_name == 'pull_request' || github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && !inputs.publish)) && needs.changes.outputs.linux == 'true' }}
+      RUN_BUILD: ${{ (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'branch') || (github.event_name == 'workflow_dispatch' && !inputs.publish)) && needs.changes.outputs.linux == 'true' }}
     steps:
       - name: Checkout
         if: env.RUN_BUILD == 'true'

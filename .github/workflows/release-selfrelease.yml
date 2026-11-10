@@ -81,7 +81,7 @@ jobs:
     # x64 on windows-latest, ARM64 on the free ARM64 hosted runner.
     runs-on: ${{ matrix.arch == 'x64' && 'windows-latest' || 'windows-11-arm' }}
     env:
-      RUN_BUILD: ${{ (github.event_name == 'pull_request' || github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && !inputs.publish)) && needs.changes.outputs.windows == 'true' }}
+      RUN_BUILD: ${{ (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'branch') || (github.event_name == 'workflow_dispatch' && !inputs.publish)) && needs.changes.outputs.windows == 'true' }}
       # Tags and dispatches supply a version; main and PR builds use version.txt.
       EXPECTED_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
     steps:
