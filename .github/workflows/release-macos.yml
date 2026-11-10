@@ -104,6 +104,12 @@ jobs:
 
           if [ -z "$expected" ]; then
             expected="$file_version"
+          fi
+
+          # Only PRs use a synthetic live+1 version for upgrade tests. Main
+          # candidates keep version.txt unchanged, including workflow-only
+          # merges after that version has already been published.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             feed=$(curl -fsSL 'https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64/releases.osx-arm64.json' 2>/dev/null || true)
             if [ -n "$feed" ]; then
               cat > /tmp/resolve_live.py <<'PY'
@@ -343,6 +349,73 @@ jobs:
         env:
           AGENTREDACTOR_UPDATE_SWAP_TEST: "1"
         run: python -m pytest tests/macos/test_update_feed.py -q
+
+      # Install the previous live DMG from R2 and upgrade it to this candidate
+      # through a loopback feed. The first release has no older live version,
+      # so the test is skipped until one exists.
+      - name: Download previous live DMG from R2
+        if: env.RUN_BUILD == 'true'
+        id: prevdmg
+        run: |
+          set -euo pipefail
+          base="https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64"
+          feed=$(curl -fsSL "$base/releases.osx-arm64.json" 2>/dev/null || true)
+          if [ -z "$feed" ]; then
+            echo "::warning::No live macOS release yet; skipping previous-release upgrade E2E"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          cat > /tmp/resolve_previous_macos.py <<'PY'
+          import json
+          import sys
+
+          def parse(value):
+              return tuple(int(part) for part in value.lstrip("vV").split("-")[0].split("+")[0].split("."))
+
+          expected = sys.argv[1]
+          assets = [a for a in json.load(sys.stdin).get("Assets", [])
+                    if a.get("Version") and str(a.get("Type")) in ("1", "Full")]
+          if not assets:
+              print("__NO_ASSETS__")
+              raise SystemExit
+          latest = max(assets, key=lambda a: parse(a["Version"]))["Version"]
+          print("__OK__" if parse(expected) > parse(latest) else "__SKIP__", latest)
+          PY
+
+          result="$(printf '%s' "$feed" | python3 /tmp/resolve_previous_macos.py "$EXPECTED_VERSION")"
+          case "$result" in
+            __NO_ASSETS__*)
+              echo "::warning::No live full package; skipping previous-release upgrade E2E"
+              echo "found=false" >> "$GITHUB_OUTPUT"
+              ;;
+            __SKIP__*)
+              echo "::warning::Live version is not older than this build; skipping previous-release upgrade E2E"
+              echo "found=false" >> "$GITHUB_OUTPUT"
+              ;;
+            __OK__*)
+              previous="$(echo "$result" | awk '{print $2}')"
+              echo "Previous live macOS version: $previous; candidate: $EXPECTED_VERSION"
+              mkdir -p previous-release
+              dmg="$PWD/previous-release/AgentRedactor-osx-arm64.dmg"
+              curl -fSL --retry 3 "$base/AgentRedactor-osx-arm64.dmg" -o "$dmg"
+              echo "found=true" >> "$GITHUB_OUTPUT"
+              echo "dmg_path=$dmg" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unexpected previous-release resolver result: $result" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Upgrade E2E (previous live release -> this build)
+        if: env.RUN_BUILD == 'true' && steps.prevdmg.outputs.found == 'true'
+        env:
+          AGENTREDACTOR_UPGRADE_TEST: "1"
+          AGENTREDACTOR_PREV_DMG: ${{ steps.prevdmg.outputs.dmg_path }}
+          AGENTREDACTOR_FEED_DIR: ${{ github.workspace }}/macos/build-release/velopack
+          AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
+        run: python -m pytest tests/macos/test_update_from_live.py -v
 
       # LocalAuthentication needs the disposable runner account's current
       # generated password. Read its auto-login copy; never use a developer
