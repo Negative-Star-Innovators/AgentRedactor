@@ -63,7 +63,8 @@ jobs:
           fi
 
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            run_id="$(gh run list --workflow release-macos-signed.yml \
+            run_id="$(gh run list --repo "${GITHUB_REPOSITORY}" \
+              --workflow release-macos-signed.yml \
               --commit "${GITHUB_SHA}" --branch main --event push --status success \
               --limit 20 --json databaseId | jq -er '.[0].databaseId')"
           else
@@ -74,7 +75,7 @@ jobs:
             fi
           fi
 
-          gh run view "$run_id" --json \
+          gh run view "$run_id" --repo "${GITHUB_REPOSITORY}" --json \
             databaseId,headSha,headBranch,event,status,conclusion,workflowName,url \
             > candidate-run.json
           jq -e '
