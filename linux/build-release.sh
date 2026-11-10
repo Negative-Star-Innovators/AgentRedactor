@@ -173,7 +173,7 @@ if [ "$#" -gt 0 ] && [ "$1" = "--cli" ]; then
 fi
 is_cli_arg() {
     case "$1" in
-        status|languages|get|set|profiles|regex|keywords|password|pii-types|help|uninstall|download-model|update|--help|-h|--console|--selftest-migrate-settings)
+        status|languages|get|set|profiles|regex|keywords|password|pii-types|help|uninstall|download-model|update|--help|-h|--console|--selftest-migrate-settings|--selftest-locked-settings)
             return 0 ;;
     esac
     return 1

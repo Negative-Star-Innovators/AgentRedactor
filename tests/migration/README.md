@@ -28,6 +28,10 @@ exit code, the `SETTINGS_MIGRATION_OK` stdout marker, and the resulting file:
   fills in *missing* keys — it does not re-type existing ones — so the bogus
   value is preserved; the test asserts exit 0, valid JSON, stamped
   `settings_version`, and defaults applied for missing keys.
+- **Locked settings**: `--selftest-locked-settings` creates a profile with an
+  API key, keywords, and regexes; enables protection; locks; saves global
+  settings; unlocks; and restarts. It verifies the protected on-disk fields
+  remain non-empty and every value and entry flag survives.
 
 The exe is resolved from `AGENTREDACTOR_EXE`, falling back to
 `windows/build/x64/Release/AgentRedactorUI.exe`. The module skips with a
@@ -87,7 +91,9 @@ The full self-release upgrade E2E:
 1. Silent-installs the **previous** release (`*-Setup.exe --silent`) and
    verifies the Velopack layout under `%LOCALAPPDATA%\AgentRedactor\`
    (`Update.exe` at the root, app under `current\`).
-2. Seeds a settings.json in a temp config dir.
+2. Seeds a profile with an API key, multiple keywords and regexes (including
+   entry flags), statistics, and global settings in a temp config dir. Runs the
+   upgrade once without protection and once with password protection enabled.
 3. Serves `AGENTREDACTOR_FEED_DIR` (the vNext `vpk pack` output:
    `releases.<channel>.json` + `*-full.nupkg`) over `python -m http.server` on an
    ephemeral localhost port — the feed override requires HTTP/HTTPS. The
@@ -98,7 +104,10 @@ The full self-release upgrade E2E:
    and `AGENTREDACTOR_UPDATE_AUTOAPPLY=1` (apply + restart without prompting).
 5. Polls (up to 5 min) until `current\AgentRedactorUI.exe`'s file version
    equals the expected vNext version.
-6. Runs `--selftest-migrate-settings` on the upgraded install and asserts the
+6. Uses the control API to verify the profile, sensitive values, entry flags,
+   and statistics. The protected case also unlocks, locks, saves a global
+   setting while locked, and unlocks again before checking all fields.
+7. Runs `--selftest-migrate-settings` on the upgraded install and asserts the
    seeded settings survived (`settings_version == 2`, values preserved, no
    `verbose_logging`).
 
@@ -145,21 +154,22 @@ current-schema fixture which is also compared byte-for-byte.
 
 ## CI wiring
 
-- `release-selfrelease.yml` runs on tag pushes (publish), manual dispatch
-  (dry-run unless `publish` is checked) and PRs (dry-run). Per arch, the
-  `build` job runs `test_settings_migration.py` against the just-built
+- `release-selfrelease.yml` builds and tests final-version candidates on
+  `main`, runs dry-runs on PRs and manual dispatches, and promotes an existing
+  successful candidate on version tags or when `publish` is checked. Per arch,
+  the `build` job runs `test_settings_migration.py` against the just-built
   self-release exe, then the fresh-install E2E (`test_selfrelease_install.py`
   on this build's Setup.exe, including the first-run model-download smoke
-  test), then the upgrade E2E — the previous Setup.exe comes from the
+  test), then both upgrade E2E cases — the previous Setup.exe comes from the
   **live R2 channel** (`/updates/<channel>/*-Setup.exe`), not from GitHub
-  releases. On tag pushes and dispatches, the FlaUI GUI suite
-  (`tests-gui.yml`, shared with `tests.yml`) also runs against the
-  SelfRelease binaries on both arches. ALL of these gate `vpk upload`; a
-  failed test blocks the publish. The upgrade E2E skips with a warning when
-  the channel has no live release yet. On PRs the build is stamped one patch
-  above the live version (synthetic, never published) so the upgrade E2E runs
-  there too; when version.txt in the PR is already ahead of live, that
-  version is used as-is.
+  releases. On `main` candidates and dry-run dispatches, the FlaUI GUI suite
+  (`tests-gui.yml`, shared with `tests.yml`) also runs against the SelfRelease
+  binaries on both arches. A candidate is promotable only after the entire
+  run succeeds. The upgrade E2E skips with a warning when the channel has no
+  live release yet. On PRs the build is stamped one patch above the live
+  version (synthetic, never published) so the upgrade E2E runs there too;
+  when version.txt in the PR is already ahead of live, that version is used
+  as-is.
 - After a real publish, the `verify-live` job runs the public one-line
   installer (`irm .../install.ps1 | iex`) on fresh x64 and ARM64 runners and
   asserts the installed app matches the live feed. On PRs it runs against the

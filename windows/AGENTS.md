@@ -363,29 +363,28 @@ Key pieces of the self-release channel:
   `ModelDownloader::ResolveModelDir()` (exe-dir first, fallback second), and
   deletes fallback-dir weights (never MSIX exe-dir weights) when the detector
   fails to initialize right after a successful download.
-- To cut a self-release: carry the version bump IN the release PR (a second
-  commit on the feature branch, `chore: release version X.Y.Z`), merge once,
-  then tag `v<version>` on the merge commit and push the tag. One PR, one
-  merge, one tag — main blocks direct pushes, so the bump cannot be pushed
-  outside a PR, and a separate bump-only PR just burns a CI cycle. The tag's
-  pipeline is the full validation (see below), so nothing is gated twice. The
-  `release-selfrelease.yml` workflow builds and packs both arches, then gates
-  the R2 publish on the settings-migration tests, the fresh-install E2E
-  (incl. a first-run model-download smoke test), the previous-live-release
-  upgrade E2E (`tests/migration/`, per channel; skips with a warning when the
-  channel has no live release yet), and the FlaUI GUI suite on both arches
-  (`tests-gui.yml`, shared with `tests.yml`). After publishing, a
-  `verify-live` job runs the public `install.ps1` one-liner on fresh
-  x64/ARM64 runners as a canary. The workflow also runs on PRs as a dry-run
-  (no publish, no GUI suite — the build is stamped live+1 patch so the
-  upgrade E2E still runs). Local loop: `.\build-selfrelease.ps1` then install
-  `build\velopack\*-Setup.exe`.
+- To cut a self-release: carry the version bump IN the release PR, merge once,
+  and let `release-selfrelease.yml` produce a final-version candidate on
+  `main`. The candidate builds and packs both arches and passes settings/
+  locked-save tests, fresh-install E2E, both previous-live upgrade E2E modes
+  (unprotected and password-enabled), and the FlaUI GUI suite on both arches.
+  Then tag `v<version>` on that exact merge commit, or manually dispatch with
+  `version`, `candidate_run_id`, and `publish=true`. Publication verifies and
+  uploads the existing candidate artifacts instead of rebuilding. After
+  publishing, `verify-live` runs the public `install.ps1` one-liner on fresh
+  x64/ARM64 runners. PRs remain dry-runs (no publish or GUI suite; synthetic
+  live+1 versioning lets the upgrade E2E run). Local loop:
+  `.\build-selfrelease.ps1` then install `build\velopack\*-Setup.exe`.
 - Docs-only changes (root `README.md`, `AGENTS.md` files) need no version bump
   and no release: the README ships in no release artifact (MSIX, AppImage, and
   the Cloudflare worker are all built from `windows/`, `linux/`, and
   `cloudflare/` only), so a docs PR is just a normal merge to main. The
   user-facing website under `website/` deploys separately (wrangler) and is
   likewise independent of the release tagging.
+- Platform-selective CI uses `scripts/ci_platform_changes.py`. Windows-only
+  changes skip Linux/macOS builds; shared code, models, translations, common
+  tests, `version.txt`, and workflow changes build every platform. Main
+  produces MSIX and self-release candidates only when Windows is affected.
 
 ## Common Files to Know
 

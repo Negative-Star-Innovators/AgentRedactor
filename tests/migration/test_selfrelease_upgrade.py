@@ -33,6 +33,15 @@ from pathlib import Path
 import psutil
 import pytest
 
+_tests_root = Path(__file__).resolve().parent.parent
+if str(_tests_root) not in sys.path:
+    sys.path.insert(0, str(_tests_root))
+
+from upgrade_profile import (  # noqa: E402
+    assert_profile, enable_password, exercise_locked_save, seed_settings, wait_for_engine,
+    wait_for_engine_version,
+)
+
 pytestmark = [
     pytest.mark.upgrade,
     pytest.mark.skipif(
@@ -144,7 +153,8 @@ def _debug_log_text() -> str:
     return "\n\n".join(out) if out else "(no debug logs found)"
 
 
-def test_selfrelease_upgrade(tmp_path):
+@pytest.mark.parametrize("protect", [False, True], ids=["unprotected", "password-enabled"])
+def test_selfrelease_upgrade(tmp_path, protect: bool):
     prev_setup = os.environ.get("AGENTREDACTOR_PREV_SETUP")
     if not prev_setup or not Path(prev_setup).is_file():
         pytest.skip("AGENTREDACTOR_PREV_SETUP is not set or does not point at a Setup.exe")
@@ -194,11 +204,8 @@ def test_selfrelease_upgrade(tmp_path):
 
         # 3. Seed a settings file so we can prove settings survive the upgrade.
         config_dir = tmp_path / "config"
-        config_dir.mkdir()
-        (config_dir / "settings.json").write_text(
-            json.dumps({"start_on_boot": False, "app_language": "en"}),
-            encoding="utf-8",
-        )
+        proxy_port = _free_port()
+        seed_settings(config_dir, proxy_port)
 
         # 4. Serve the vNext feed folder over HTTP (the feed override requires
         #    HTTP/HTTPS; a bare folder path is not accepted).
@@ -225,8 +232,19 @@ def test_selfrelease_upgrade(tmp_path):
                 "AGENTREDACTOR_UPDATE_FEED": f"http://127.0.0.1:{port}",
                 "AGENTREDACTOR_UPDATE_AUTOAPPLY": "1",
                 "AGENTREDACTOR_CONFIG_DIR": str(config_dir),
+                "AGENTREDACTOR_HELLO_SUPPRESS_PROMPT": "1",
             }
         )
+        if protect:
+            prepare_env = env.copy()
+            prepare_env.pop("AGENTREDACTOR_UPDATE_FEED")
+            prepare_env.pop("AGENTREDACTOR_UPDATE_AUTOAPPLY")
+            subprocess.Popen([str(installed_exe)], env=prepare_env)
+            try:
+                wait_for_engine(config_dir)
+                enable_password(config_dir)
+            finally:
+                _kill_install_processes(install_root)
         procs_before = set(_process_pids_in_install(install_root))
         subprocess.Popen([str(installed_exe)], env=env)
 
@@ -278,6 +296,11 @@ def test_selfrelease_upgrade(tmp_path):
                 "Restarted app process died shortly after the upgrade\n\n"
                 + _debug_log_text()
             )
+
+        wait_for_engine_version(config_dir, expected)
+        if protect:
+            exercise_locked_save(config_dir)
+        assert_profile(config_dir, proxy_port)
 
         # 7. Settings survived the upgrade and still migrate cleanly on the
         #    new build.

@@ -1,16 +1,12 @@
 name: Build Linux
 
-# Linux port CI: builds the core + engine + Qt GUI on Ubuntu (x64 and arm64,
-# mirroring the win / win-arm64 split in release-selfrelease.yml), runs the
-# cross-platform suites (cli, migration) plus the Linux-only suite, and packs
-# the Velopack AppImage. Publishing is gated the same way as
-# release-selfrelease.yml: only tag pushes (v*) or manual dispatches with
-# publish checked upload to R2 (channels "linux" / "linux-arm64"); PRs get a
-# pack dry-run with the packages as artifacts.
+# Linux CI builds the core + engine + Qt GUI on Ubuntu (x64 and arm64), runs
+# the cross-platform and Linux suites, and packs final-version candidates on
+# main. Tags and manual publish dispatches promote the exact tested candidate
+# to R2 (channels linux/linux-arm64); PRs and non-publish dispatches are dry-runs.
 #
-# Docs-only changes (markdown, website/, docs/) skip the expensive
-# build/test/pack steps via the `changes` gate job below (see RUN_BUILD in the
-# build job) — the same pattern as build-msix.yml and release-selfrelease.yml.
+# The changes job selects affected platforms. Docs-only and unrelated-platform
+# changes skip the expensive build/test/pack steps (see RUN_BUILD below).
 # The gate is deliberately on the STEPS, not the job: a skipped matrix job
 # reports a single "build" check, which does not satisfy the required per-arch
 # checks ("build (x64)"/"build (arm64)") — a job whose steps all skip reports
@@ -23,8 +19,16 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      version:
+        description: 'Version to publish. Defaults to windows/version.txt.'
+        required: false
+        type: string
+      candidate_run_id:
+        description: 'Successful main candidate run to publish (required when publish is checked).'
+        required: false
+        type: string
       publish:
-        description: 'Publish to R2 (agentredactor-releases bucket, prefixes linux/linux-arm64). Off = dry-run.'
+        description: 'Promote an existing tested candidate to R2 without rebuilding. Off = dry-run.'
         required: false
         type: boolean
         default: false
@@ -35,6 +39,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   # Gate job: decides whether the diff contains anything but docs. Cheap
@@ -43,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.diff.outputs.code }}
+      linux: ${{ steps.diff.outputs.linux }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,20 +56,13 @@ jobs:
       - id: diff
         shell: bash
         run: |
+          BASE=""
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE="${{ github.event.pull_request.base.sha }}"
-          elif [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+          elif [ -n "${{ github.event.before }}" ]; then
             BASE="${{ github.event.before }}"
-          else
-            # No parent to diff against (e.g. manual dispatch or first push) — build.
-            echo "code=true" >> "$GITHUB_OUTPUT"
-            exit 0
           fi
-          if git diff --name-only "$BASE" HEAD | grep -qvE '\.md$|^website/|^docs/'; then
-            echo "code=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "code=false" >> "$GITHUB_OUTPUT"
-          fi
+          python3 scripts/ci_platform_changes.py --base "$BASE"
 
   build:
     needs: changes
@@ -77,10 +76,9 @@ jobs:
     runs-on: ${{ matrix.arch == 'x64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     env:
       ONNXRUNTIME_DIR: ${{ github.workspace }}/onnxruntime
-      # Manual dispatches and code diffs always build; docs-only PRs skip the
-      # steps below (the job still reports success under the per-arch check
-      # names, keeping the branch ruleset satisfied).
-      RUN_BUILD: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.code == 'true' }}
+      # Candidate, PR, and dry-run builds only execute for affected platforms.
+      # Skipped steps still report success under the per-arch required names.
+      RUN_BUILD: ${{ (github.event_name == 'pull_request' || github.ref_type == 'branch' || (github.event_name == 'workflow_dispatch' && !inputs.publish)) && needs.changes.outputs.linux == 'true' }}
     steps:
       - name: Checkout
         if: env.RUN_BUILD == 'true'
@@ -339,21 +337,78 @@ jobs:
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.VERSION_FROM_VERSION_TXT }}
         run: python -m pytest tests/linux/test_update_from_live.py -q
 
-  # Publish is deliberately OUT of the matrix: both arch legs must pass first,
-  # then ONE job uploads both channels to R2 — same shape as
-  # release-selfrelease.yml. Tag pushes always publish; manual dispatches only
-  # when publish is checked. Same R2 secrets and bucket as the Windows flow.
+  # Publication reuses one successful main candidate containing both arches.
+  # Tags resolve it by commit; manual publication supplies its run ID.
   publish:
-    needs: build
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || inputs.publish
+    if: github.ref_type == 'tag' || inputs.publish
+    env:
+      EXPECTED_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
     steps:
-      - name: Download Velopack outputs (both arches)
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: ver
+        run: |
+          set -euo pipefail
+          expected="${EXPECTED_VERSION#v}"
+          if [ -z "$expected" ]; then
+            expected="$(tr -d '[:space:]' < windows/version.txt)"
+          fi
+          if ! [[ "$expected" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Expected version '$expected' is not valid semver."
+            exit 1
+          fi
+          echo "version=$expected" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve tested main candidate
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ inputs.candidate_run_id }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            run_id="$(gh run list --repo "${GITHUB_REPOSITORY}" --workflow build-linux.yml --commit "${GITHUB_SHA}" --branch main --event push --status success --limit 20 --json databaseId | jq -er '.[0].databaseId')"
+          else
+            run_id="${INPUT_RUN_ID}"
+          fi
+          if ! [[ "$run_id" =~ ^[0-9]+$ ]]; then
+            echo "::error::A successful main candidate_run_id is required."
+            exit 1
+          fi
+          gh run view "$run_id" --repo "${GITHUB_REPOSITORY}" --json databaseId,headSha,headBranch,event,status,conclusion,workflowName,url > candidate-run.json
+          jq -e '.headBranch == "main" and .event == "push" and .status == "completed" and .conclusion == "success" and .workflowName == "Build Linux"' candidate-run.json >/dev/null
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            jq -e --arg commit "${GITHUB_SHA}" '.headSha == $commit' candidate-run.json >/dev/null
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Promoting tested candidate: $(jq -r .url candidate-run.json)"
+
+      - name: Download tested candidate artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: AgentRedactor-velopack-linux-*
           path: velopack-linux
-      # Lands in velopack-linux/AgentRedactor-velopack-linux-x64 and ...-arm64.
+          run-id: ${{ steps.candidate.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Verify candidate versions and packages
+        run: |
+          set -euo pipefail
+          python3 - "${{ steps.ver.outputs.version }}" <<'PY'
+          import json, pathlib, sys
+          expected = sys.argv[1]
+          for arch, channel in (("x64", "linux"), ("arm64", "linux-arm64")):
+              directory = pathlib.Path(f"velopack-linux/AgentRedactor-velopack-linux-{arch}")
+              feed = json.loads((directory / f"releases.{channel}.json").read_text())
+              full = [a for a in feed.get("Assets", []) if str(a.get("Type")) in ("1", "Full")]
+              versions = [str(a.get("Version", "")).lstrip("vV") for a in full]
+              if expected not in versions:
+                  raise SystemExit(f"Candidate {channel} feed does not contain {expected}")
+              if not list(directory.glob("*.AppImage")):
+                  raise SystemExit(f"Candidate {channel} has no AppImage")
+          PY
 
       - name: Set up .NET (for vpk)
         uses: actions/setup-dotnet@v4

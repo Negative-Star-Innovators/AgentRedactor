@@ -9,6 +9,7 @@
 //   - uninstall [--yes]    -> remove user data
 //   - any other subcommand -> CLI client over the localhost control API
 //   - --selftest-migrate-settings -> headless settings-migration test hook
+//   - --selftest-locked-settings  -> locked-save preservation test hook
 #include "engine_app.h"
 #include "cli.h"
 #include "cli_native_auth.h"
@@ -296,6 +297,11 @@ int main(int argc, char* argv[]) {
                 std::printf("SETTINGS_MIGRATION_FAIL unknown error\n");
                 return 1;
             }
+        }
+        if (arg == L"--selftest-locked-settings") {
+            const bool ok = RunLockedSettingsSelfTest();
+            std::printf(ok ? "LOCKED_SETTINGS_OK\n" : "LOCKED_SETTINGS_FAIL\n");
+            return ok ? 0 : 1;
         }
     }
 

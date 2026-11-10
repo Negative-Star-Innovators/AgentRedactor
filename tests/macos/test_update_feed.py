@@ -42,7 +42,10 @@ for _p in (str(_tests_root), str(_tests_root / "gui")):
         sys.path.insert(0, _p)
 
 from feed_server import FeedServer  # noqa: E402
-from gui_process import _kill_existing_agent_redactor  # noqa: E402
+from gui_process import _find_free_port, _kill_existing_agent_redactor  # noqa: E402
+from upgrade_profile import (  # noqa: E402
+    assert_profile, enable_password, exercise_locked_save, seed_settings, wait_for_engine,
+)
 
 pytestmark = pytest.mark.skipif(sys.platform != "darwin", reason="macOS update E2E")
 
@@ -236,15 +239,9 @@ def test_packed_app_detects_vnext_feed(packed_release) -> None:
                 proc.kill()
 
 
-def test_app_self_updates_against_local_feed(packed_release) -> None:
-    """Full self-update cycle: vNext feed -> download -> .app swap -> relaunch.
-
-    Opt-in (AGENTREDACTOR_UPDATE_SWAP_TEST=1): exercises the Velopack apply
-    path the GUI now wires (check -> download -> WaitExitThenApplyUpdates),
-    which needs the staged release pack + vpk. Enable it in
-    release-macos.yml (drop the env gate there) — the assertion targets
-    below mirror tests/linux/test_update_feed.py.
-    """
+@pytest.mark.parametrize("protect", [False, True], ids=["unprotected", "password-enabled"])
+def test_app_self_updates_against_local_feed(packed_release, protect: bool) -> None:
+    """Full self-update cycle with sensitive-profile preservation checks."""
     if os.environ.get("AGENTREDACTOR_UPDATE_SWAP_TEST") != "1":
         pytest.skip(
             "opt-in: full download-and-swap cycle; enable in release-macos.yml "
@@ -256,9 +253,19 @@ def test_app_self_updates_against_local_feed(packed_release) -> None:
     _pack_vnext(vpk, STAGED_APP, feed_dir, next_version)
 
     config_dir, home_dir = _isolated_dirs(tmp_path)
+    proxy_port = _find_free_port()
+    seed_settings(config_dir, proxy_port)
+    if protect:
+        prepare = _launch_app(app, config_dir, home_dir)
+        try:
+            wait_for_engine(config_dir)
+            enable_password(config_dir)
+        finally:
+            prepare.terminate()
+            prepare.wait(timeout=10)
+            _kill_existing_agent_redactor()
+
     server = FeedServer(feed_dir)
-    # vpk does not rewrite Info.plist when packing a synthetic vNext from an
-    # existing .app; Velopack's own sq.version is the update contract.
     before = _velopack_version(app)
     proc = _launch_app(app, config_dir, home_dir,
                        feed_url=f"http://127.0.0.1:{server.port}")
@@ -275,6 +282,7 @@ def test_app_self_updates_against_local_feed(packed_release) -> None:
             raise AssertionError(
                 f"app bundle was not updated to v{next_version} within 180s\n"
                 f"--- gui.log (tail) ---\n{gui_log}")
+        assert proc.poll() is not None, "the replaced GUI did not exit before the updater applied the package"
     finally:
         server.stop()
         if proc.poll() is None:
@@ -285,14 +293,15 @@ def test_app_self_updates_against_local_feed(packed_release) -> None:
                 proc.kill()
 
     assert _velopack_version(app) == next_version
-    # Velopack may already have relaunched the updated app. In that case a
-    # second direct launch exits 0 through the single-instance guard, which is
-    # success as long as the updated instance is running.
+    for running in _app_processes():
+        running.terminate()
+    _kill_existing_agent_redactor()
     proc2 = _launch_app(app, config_dir, home_dir)
     try:
-        time.sleep(5)
-        assert proc2.poll() is None or _app_processes(), (
-            "updated app failed to relaunch")
+        wait_for_engine(config_dir)
+        if protect:
+            exercise_locked_save(config_dir)
+        assert_profile(config_dir, proxy_port)
     finally:
         proc2.terminate()
         try:

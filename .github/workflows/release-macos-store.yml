@@ -21,8 +21,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      macos: ${{ steps.diff.outputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: |
+          BASE=""
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          elif [ -n "${{ github.event.before }}" ]; then
+            BASE="${{ github.event.before }}"
+          fi
+          python3 scripts/ci_platform_changes.py --base "$BASE"
+
   pr-build:
-    if: github.event_name == 'pull_request'
+    needs: changes
+    if: github.event_name == 'pull_request' && needs.changes.outputs.macos == 'true'
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +64,8 @@ jobs:
         run: python -m pytest tests/macos/test_store_package.py -q
 
   candidate:
-    if: github.event_name != 'pull_request' && github.repository == 'Negative-Star-Innovators/AgentRedactor'
+    needs: changes
+    if: github.event_name != 'pull_request' && github.repository == 'Negative-Star-Innovators/AgentRedactor' && needs.changes.outputs.macos == 'true'
     runs-on: macos-15
     environment: macos-appstore
     env:

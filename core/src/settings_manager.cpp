@@ -239,6 +239,7 @@ bool SettingsManager::UnlockWithPassword(const std::wstring& password) {
 void SettingsManager::Lock() {
     std::unique_lock<std::shared_mutex> lock(mutex_);
     if (!secureStorage_.IsMasterPasswordEnabled()) return;
+    EncryptSensitiveFields();
     secureStorage_.Lock();
 }
 
@@ -303,6 +304,19 @@ void SettingsManager::DecryptSensitiveFields() {
 }
 
 void SettingsManager::SaveSettings() {
+    if (secureStorage_.IsMasterPasswordEnabled() && !secureStorage_.IsInitialized() &&
+        settings_.contains("profiles")) {
+        for (const auto& profile : settings_["profiles"]) {
+            const bool plaintext = (profile.contains("api_key") && profile["api_key"].is_string()) ||
+                (profile.contains("keywords") && profile["keywords"].is_array()) ||
+                (profile.contains("regex_patterns") && profile["regex_patterns"].is_array());
+            if (plaintext) {
+                LOG_LIFECYCLE(L"[SettingsManager] Refusing to save plaintext sensitive fields while locked");
+                return;
+            }
+        }
+    }
+
     struct EncryptionGuard {
         SettingsManager* sm;
         EncryptionGuard(SettingsManager* s) : sm(s) { sm->EncryptSensitiveFields(); }
@@ -380,6 +394,66 @@ void SettingsManager::BackupCorruptSettingsFile() {
         }
     } catch (...) {
         LOG_LIFECYCLE(L"[SettingsManager] FAILED to back up corrupt settings file (unknown error)");
+    }
+}
+
+bool RunLockedSettingsSelfTest() {
+    try {
+        const auto verifyProfiles = [](SettingsManager& manager) {
+            auto profiles = manager.GetProfiles();
+            if (profiles.size() != 1) return false;
+            const auto& profile = profiles[0];
+            return profile.apiKey == L"sk-locked-save-selftest" &&
+                profile.keywords.size() == 1 &&
+                profile.keywords[0].text == L"Locked keyword" &&
+                !profile.keywords[0].caseSensitive && profile.keywords[0].enabled &&
+                profile.regexPatterns.size() == 1 &&
+                profile.regexPatterns[0].pattern == LR"(locked-\d+)" &&
+                !profile.regexPatterns[0].enabled;
+        };
+
+        SettingsManager settings({});
+        ApiKeyProfile profile(L"locked-save");
+        profile.apiKey = L"sk-locked-save-selftest";
+        profile.keywords = {{L"Locked keyword", false, true}};
+        profile.regexPatterns = {{LR"(locked-\d+)", false}};
+        settings.SetProfiles({profile});
+#ifdef _WIN32
+        if (!settings.EnableMasterPassword()) return false;
+#else
+        if (!settings.EnableMasterPassword(L"locked-save-selftest-password")) return false;
+#endif
+        settings.Lock();
+        settings.SetStartOnBoot(false);
+        settings.SetLoggingEnabled(true);
+        settings.SetAppLanguage(L"en");
+
+        json disk;
+        std::ifstream file(settings.GetConfigDir() / SETTINGS_FILE);
+        file >> disk;
+        const auto& saved = disk.at("profiles").at(0);
+        for (const char* field : {"api_key", "keywords", "regex_patterns"}) {
+            const auto& value = saved.at(field);
+            if (!value.is_object() || value.value("_mode", "") != "aes" ||
+                value.value("_enc", "").empty()) return false;
+        }
+#ifdef _WIN32
+        if (!settings.UnlockWithHello()) return false;
+#else
+        if (!settings.UnlockWithPassword(L"locked-save-selftest-password")) return false;
+#endif
+        if (!verifyProfiles(settings)) return false;
+
+        SettingsManager restarted({});
+        if (!restarted.IsMasterPasswordEnabled() || restarted.IsUnlocked()) return false;
+#ifdef _WIN32
+        if (!restarted.UnlockWithHello()) return false;
+#else
+        if (!restarted.UnlockWithPassword(L"locked-save-selftest-password")) return false;
+#endif
+        return verifyProfiles(restarted);
+    } catch (...) {
+        return false;
     }
 }
 

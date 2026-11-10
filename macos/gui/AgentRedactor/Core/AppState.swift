@@ -686,7 +686,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
             return error
         }
         await MainActor.run {
-            (NSApp.delegate as? AppDelegate)?.terminateForUpdateRestart()
+            AppDelegate.current?.terminateForUpdateRestart()
         }
         return nil
     }
