@@ -6,8 +6,8 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Docs-only changes (markdown, website/, docs/) skip the heavy build steps via
-# the `changes` gate job below (see RUN_BUILD in the build job). The job-level
+# Docs-only and unrelated-platform changes skip the heavy build steps via the
+# changes job below (see RUN_BUILD in the build job). The job-level
 # gates are deliberately not used for the matrix build job: a skipped matrix
 # job reports a single "build" check, which does not satisfy the required
 # per-arch checks ("build (x64)"/"build (arm64)") — a job whose steps all skip
@@ -25,12 +25,12 @@ permissions:
   contents: write
 
 jobs:
-  # Gate job: decides whether the diff contains anything but docs. Cheap
-  # (ubuntu, seconds); the Windows build jobs below key off its output.
+  # Cheap platform selector; the Windows build jobs below consume its output.
   changes:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.diff.outputs.code }}
+      windows: ${{ steps.diff.outputs.windows }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,20 +38,13 @@ jobs:
       - id: diff
         shell: bash
         run: |
+          BASE=""
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE="${{ github.event.pull_request.base.sha }}"
           elif [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
             BASE="${{ github.event.before }}"
-          else
-            # No parent to diff against (e.g. first push) — build.
-            echo "code=true" >> "$GITHUB_OUTPUT"
-            exit 0
           fi
-          if git diff --name-only "$BASE" HEAD | grep -qvE '\.md$|^website/|^docs/'; then
-            echo "code=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "code=false" >> "$GITHUB_OUTPUT"
-          fi
+          python3 scripts/ci_platform_changes.py --base "$BASE"
 
   build:
     needs: changes
@@ -60,7 +53,7 @@ jobs:
     # checks ("build (x64)"/"build (arm64)"). Running the job but skipping its
     # steps reports success under the real matrix-leg names in under a minute.
     env:
-      RUN_BUILD: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.code == 'true' }}
+      RUN_BUILD: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.windows == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -160,7 +153,7 @@ jobs:
     # check, and it consumes artifacts the build only uploads when RUN_BUILD
     # was true — running it on a gated build would fail on missing artifacts.
     needs: [changes, build]
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.code == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.windows == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -315,9 +308,9 @@ jobs:
           }
 
   release:
-    needs: [build, test-msix]
+    needs: [changes, build, test-msix]
     runs-on: windows-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.windows == 'true'
     steps:
       - name: Download per-arch MSIX packages
         uses: actions/download-artifact@v4

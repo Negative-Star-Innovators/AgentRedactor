@@ -80,7 +80,10 @@ open macos/build/AgentRedactor.app
   credentials, or real account, identity, and team details. Local signing uses
   the login Keychain and a saved notarytool profile. GitHub signing secrets live
   only in protected environments; PRs never receive them.
-- `release-macos.yml` is the reusable unsigned PR/signed-candidate build. The
+- `release-macos.yml` is the reusable unsigned PR/signed-candidate build.
+  Platform-selective CI uses `scripts/ci_platform_changes.py`; macOS-only
+  changes skip Windows/Linux builds, while shared code, models, translations,
+  common tests, version files, and workflow changes build every platform. The
   protected `macos-selfrelease` environment in `release-macos-signed.yml` gates
   Developer ID signing, notarization, signed tests, and R2 publication. Missing
   signing credentials are fatal for a signed run, and publication verifies the

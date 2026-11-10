@@ -6,6 +6,7 @@ import SwiftUI
 /// 10-minute inactivity re-lock (input while unlocked resets that timer).
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+    static weak var current: AppDelegate?
     let appState = AppState()
     private var statusBar: StatusBarController?
     private var lockFileHandle: FileHandle?
@@ -15,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var terminating = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        Self.current = self
         AppPaths.ensureConfigDir()
 
         #if SELFRELEASE

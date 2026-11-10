@@ -29,9 +29,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      macos: ${{ steps.diff.outputs.macos }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: python3 scripts/ci_platform_changes.py --base "${{ github.event.before }}"
+
   candidate:
+    needs: changes
     if: >-
       github.repository == 'Negative-Star-Innovators/AgentRedactor' &&
+      needs.changes.outputs.macos == 'true' &&
       ((github.event_name == 'push' && github.ref_type == 'branch') ||
        (github.event_name == 'workflow_dispatch' && inputs.publish == false))
     uses: ./.github/workflows/release-macos.yml

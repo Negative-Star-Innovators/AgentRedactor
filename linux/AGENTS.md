@@ -59,3 +59,13 @@ The AT-SPI GUI tests require a display and the AT-SPI bindings; they skip cleanl
 - Keep Linux-specific code in `linux/`; share logic through `core/` when it is not platform-specific.
 - Match the existing code style (no unnecessary comments, clear names).
 - Update this file if the build/test commands or project layout change.
+
+## Release candidates
+
+`build-linux.yml` builds and tests final-version x64/ARM64 candidates on
+`main`. Version tags and manual `publish=true` dispatches promote the existing
+successful candidate (manual publication also takes `candidate_run_id`) rather
+than rebuilding. Both architectures must have passed in that candidate run.
+Platform-selective CI uses `scripts/ci_platform_changes.py`; shared code,
+models, translations, common tests, version files, and workflow changes build
+all platforms, while Linux-only changes do not trigger Windows/macOS builds.

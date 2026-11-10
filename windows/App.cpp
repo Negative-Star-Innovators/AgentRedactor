@@ -253,6 +253,12 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR lpCmdLine, int)
         }
     }
 
+    if (lpCmdLine && wcsstr(lpCmdLine, L"--selftest-locked-settings") != nullptr) {
+        const bool ok = ::AgentRedactor::RunLockedSettingsSelfTest();
+        printf(ok ? "LOCKED_SETTINGS_OK\n" : "LOCKED_SETTINGS_FAIL\n");
+        return ok ? 0 : 1;
+    }
+
     {
         // Keep the previous run's crash details: rotate debug.log ->
         // debug.prev.log instead of deleting it (the "Fatal error" dialog

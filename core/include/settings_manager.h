@@ -74,4 +74,6 @@ private:
     void BackupCorruptSettingsFile();
 };
 
+bool RunLockedSettingsSelfTest();
+
 } // namespace AgentRedactor

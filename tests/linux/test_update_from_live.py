@@ -40,8 +40,11 @@ for _p in (str(_tests_root), str(_tests_root / "gui")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from config_factory import create_settings  # noqa: E402
 from gui_process import _find_free_port, _kill_existing_agent_redactor  # noqa: E402
+from upgrade_profile import (  # noqa: E402
+    assert_profile, enable_password, exercise_locked_save, seed_settings, wait_for_engine,
+    wait_for_engine_version,
+)
 
 pytestmark = [
     pytest.mark.skipif(sys.platform == "win32", reason="Linux upgrade E2E"),
@@ -177,7 +180,8 @@ def _expected_appimage_filename(channel: str) -> str:
     return "AgentRedactor.AppImage"
 
 
-def test_upgrade_from_live_appimage(upgrade_env) -> None:
+@pytest.mark.parametrize("protect", [False, True], ids=["unprotected", "password-enabled"])
+def test_upgrade_from_live_appimage(upgrade_env, protect: bool) -> None:
     tmp_path, prev_appimage, channel, feed_dir = upgrade_env
     expected = os.environ.get("AGENTREDACTOR_EXPECT_VERSION") or _latest_feed_version(
         feed_dir, channel
@@ -195,15 +199,8 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
     config_dir = tmp_path / "config"
     home_dir = tmp_path / "home"
     home_dir.mkdir()
-    create_settings(
-        data_dir=config_dir,
-        upstream_url="http://127.0.0.1:9",
-        api_key="sk-upgrade-e2e",
-        proxy_port=_find_free_port(),
-        logging_enabled=False,
-        keywords=[],
-        regex_patterns=[],
-    )
+    proxy_port = _find_free_port()
+    seed_settings(config_dir, proxy_port)
 
     port = _find_free_port()
     server = subprocess.Popen(
@@ -224,6 +221,19 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
             "XDG_CONFIG_HOME": str(home_dir / ".config"),
             "XDG_DATA_HOME": str(home_dir / ".local" / "share"),
         })
+        if protect:
+            prepare_env = env.copy()
+            prepare_env.pop("AGENTREDACTOR_UPDATE_FEED")
+            prepare_env.pop("AGENTREDACTOR_UPDATE_AUTOAPPLY")
+            proc = subprocess.Popen([str(app)], env=prepare_env,
+                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                wait_for_engine(config_dir)
+                enable_password(config_dir)
+            finally:
+                proc.terminate()
+                _kill_all_gui_processes()
+                _kill_existing_agent_redactor()
         proc = subprocess.Popen([str(app)], env=env,
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         original_pid = proc.pid
@@ -276,6 +286,10 @@ def test_upgrade_from_live_appimage(upgrade_env) -> None:
         assert expected_core.group(0) in version_check.stdout, (
             f"upgraded AppImage does not report expected version {expected_core.group(0)}: "
             f"{version_check.stdout}")
+        wait_for_engine_version(config_dir, expected_core.group(0))
+        if protect:
+            exercise_locked_save(config_dir)
+        assert_profile(config_dir, proxy_port)
     finally:
         server.terminate()
         for p in _gui_processes_for(tmp_path):

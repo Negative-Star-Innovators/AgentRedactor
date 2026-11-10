@@ -10,7 +10,9 @@ the whole module skips when no binary is available. See tests/migration/README.m
 from __future__ import annotations
 
 import json
+import os
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -108,3 +110,19 @@ def test_wrong_typed_values_do_not_crash(run_selftest, tmp_path):
     assert repaired["settings_version"] == 2
     assert repaired["logging_enabled"] is False
     assert repaired["app_language"] == ""
+
+
+def test_locked_settings_survive_global_saves_and_restart(agentredactor_exe, tmp_path):
+    env = os.environ.copy()
+    env["AGENTREDACTOR_CONFIG_DIR"] = str(tmp_path)
+    env["AGENTREDACTOR_DISABLE_KEYRING"] = "1"
+    result = subprocess.run(
+        [str(agentredactor_exe), "--selftest-locked-settings"],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+
+    assert result.returncode == 0, f"selftest failed: {result.stdout} {result.stderr}"
+    assert "LOCKED_SETTINGS_OK" in result.stdout

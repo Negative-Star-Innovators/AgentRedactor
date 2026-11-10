@@ -26,9 +26,12 @@ for _p in (str(_tests_root), str(_tests_root / "gui")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from config_factory import create_settings  # noqa: E402
 from feed_server import FeedServer  # noqa: E402
 from gui_process import _find_free_port, _kill_existing_agent_redactor  # noqa: E402
+from upgrade_profile import (  # noqa: E402
+    assert_profile, enable_password, exercise_locked_save, seed_settings, wait_for_engine,
+    wait_for_engine_version,
+)
 
 pytestmark = [
     pytest.mark.upgrade,
@@ -110,7 +113,8 @@ def _stop_apps(process: subprocess.Popen | None = None) -> None:
     _kill_existing_agent_redactor()
 
 
-def test_upgrade_from_live_dmg(tmp_path: Path) -> None:
+@pytest.mark.parametrize("protect", [False, True], ids=["unprotected", "password-enabled"])
+def test_upgrade_from_live_dmg(tmp_path: Path, protect: bool) -> None:
     previous_dmg = Path(os.environ.get("AGENTREDACTOR_PREV_DMG", ""))
     feed_dir = Path(os.environ.get("AGENTREDACTOR_FEED_DIR", ""))
     if not previous_dmg.is_file():
@@ -165,17 +169,8 @@ def test_upgrade_from_live_dmg(tmp_path: Path) -> None:
         assert _version_key(_velopack_version(app)) == _version_key(previous)
 
         proxy_port = _find_free_port()
-        create_settings(
-            data_dir=config_dir,
-            upstream_url="http://127.0.0.1:9",
-            api_key="sk-upgrade-e2e",
-            proxy_port=proxy_port,
-            logging_enabled=False,
-        )
+        seed_settings(config_dir, proxy_port)
         settings_path = config_dir / "settings.json"
-        settings = json.loads(settings_path.read_text(encoding="utf-8"))
-        settings["profiles"][0]["alias"] = "upgrade-from-live"
-        settings_path.write_text(json.dumps(settings), encoding="utf-8")
 
         models_parent = home_dir / "Library" / "Application Support" / "AgentRedactor"
         models_parent.mkdir(parents=True)
@@ -191,6 +186,20 @@ def test_upgrade_from_live_dmg(tmp_path: Path) -> None:
         })
         config_dir.mkdir(exist_ok=True)
         log_handle = open(config_dir / "upgrade-gui.log", "a")
+        if protect:
+            prepare_env = env.copy()
+            prepare_env.pop("AGENTREDACTOR_UPDATE_FEED")
+            prepare_env.pop("AGENTREDACTOR_UPDATE_AUTOAPPLY")
+            process = subprocess.Popen(
+                [str(app / "Contents" / "MacOS" / "AgentRedactor")],
+                env=prepare_env, stdout=log_handle, stderr=log_handle,
+            )
+            try:
+                wait_for_engine(config_dir)
+                enable_password(config_dir)
+            finally:
+                _stop_apps(process)
+                process = None
         process = subprocess.Popen(
             [str(app / "Contents" / "MacOS" / "AgentRedactor")],
             env=env, stdout=log_handle, stderr=log_handle,
@@ -219,6 +228,8 @@ def test_upgrade_from_live_dmg(tmp_path: Path) -> None:
 
         assert _version_key(_velopack_version(app)) == _version_key(expected)
         assert _bundle_version(app) == expected_core
+        _stop_apps(process)
+        process = None
 
         relaunched = subprocess.Popen(
             [str(app / "Contents" / "MacOS" / "AgentRedactor")],
@@ -228,6 +239,10 @@ def test_upgrade_from_live_dmg(tmp_path: Path) -> None:
         assert relaunched.poll() is None or _gui_processes(), (
             "updated app failed to relaunch"
         )
+        wait_for_engine_version(config_dir, expected_core)
+        if protect:
+            exercise_locked_save(config_dir)
+        assert_profile(config_dir, proxy_port)
 
         _stop_apps(relaunched)
         relaunched = None
