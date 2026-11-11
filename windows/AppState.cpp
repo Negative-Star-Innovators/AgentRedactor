@@ -171,6 +171,13 @@ bool AppState::GetSettingsSnapshot(json& out) const {
     return true;
 }
 
+bool AppState::GetStatusSnapshot(json& out) const {
+    std::lock_guard lock(statusMutex_);
+    if (!statusValid_) return false;
+    out = statusCache_;
+    return true;
+}
+
 // ---------------------------------------------------------------------------
 // First-run model download state: owned by the engine, polled via /status.
 // ---------------------------------------------------------------------------
@@ -337,8 +344,13 @@ void AppState::StatusPollLoop() {
         json j;
         if (engineClient_.Get(L"/status", j)) {
             bool modelChanged = false;
+            bool unlockedChanged = false;
             {
                 std::lock_guard lock(statusMutex_);
+                if (statusValid_ &&
+                    statusCache_.value("unlocked", true) != j.value("unlocked", true)) {
+                    unlockedChanged = true;
+                }
                 if (!statusValid_ ||
                     statusCache_.value("modelDownloadRequired", false) != j.value("modelDownloadRequired", false) ||
                     statusCache_.value("modelDownloadInProgress", false) != j.value("modelDownloadInProgress", false) ||
@@ -352,6 +364,9 @@ void AppState::StatusPollLoop() {
             }
             if (modelChanged) {
                 NotifyModelDownloadStatus();
+            }
+            if (unlockedChanged) {
+                NotifySettingsChanged();
             }
             // 1-second poll replacing the old ProxyEngine onUpdate_ push:
             // HomePage re-reads profiles (stats) through the client.

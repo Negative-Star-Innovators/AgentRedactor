@@ -33,9 +33,15 @@ from mock_llm import MockLLM
 
 from config_factory import create_settings
 from gui_process import GuiAppProcess, _find_free_port
+from upgrade_profile import api
 from windows.gui_driver import (
+    add_keyword,
+    add_regex,
     get_content_dialog_text,
+    get_keywords,
+    get_regexes,
     get_require_password_state,
+    set_pii_master,
     toggle_require_password,
     wait_until,
 )
@@ -222,5 +228,53 @@ async def test_gui_hello_disable_rejected_while_locked(
         r = _run_cli("status")
         assert r.returncode == 0
         assert "password enabled: true" in r.stdout
+    finally:
+        app.stop()
+
+
+@pytest.mark.asyncio
+async def test_gui_unlock_restores_sensitive_fields_before_save(
+    user_data_backup: Path,
+    mock_llm: MockLLM,
+) -> None:
+    port = _find_free_port()
+    app = _start_app(user_data_backup, port, mock_llm)
+    try:
+        add_keyword("Unlock keyword", case_sensitive=False)
+        add_regex(r"\bUNLOCK-\d{5}\b")
+        r = _run_cli("password", "enable")
+        assert r.returncode == 0, r.stdout
+    finally:
+        app.stop()
+
+    app = _start_app(user_data_backup, port, mock_llm, create=False)
+    try:
+        _wait_for_locked_overlay()
+        result = api(user_data_backup, "POST", "/unlock", {})
+        assert result.get("ok") is True
+        wait_until(
+            "keyword restored after unlock",
+            get_keywords,
+            lambda rows: any(row["text"] == "Unlock keyword" for row in rows),
+        )
+        wait_until(
+            "regex restored after unlock",
+            get_regexes,
+            lambda rows: any(row["pattern"] == r"\bUNLOCK-\d{5}\b" for row in rows),
+        )
+
+        set_pii_master(False)
+        wait_until(
+            "post-unlock GUI save",
+            lambda: api(user_data_backup, "GET", "/profiles"),
+            lambda values: values[0]["use_openai_model"] is False,
+        )
+        profiles = api(user_data_backup, "GET", "/profiles")
+        assert len(profiles) == 1
+        assert profiles[0]["use_openai_model"] is False
+        assert profiles[0]["keywords"][0]["text"] == "Unlock keyword"
+        assert profiles[0]["regex_patterns"][0]["pattern"] == r"\bUNLOCK-\d{5}\b"
+        key = api(user_data_backup, "GET", f"/profiles/{profiles[0]['id']}/apikey")
+        assert key["apiKey"] == "test-api-key"
     finally:
         app.stop()

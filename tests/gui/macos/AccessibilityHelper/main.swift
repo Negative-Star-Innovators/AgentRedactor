@@ -124,7 +124,7 @@ func run(_ arguments: [String]) throws {
     try requireAccessibility()
     let command = arguments[1]
     var pid: pid_t = 0
-    if ["wait-window", "window-count", "activate", "click", "click-title", "set-text", "select-popup", "exists", "close-window", "dump"].contains(command) {
+    if ["wait-window", "window-count", "activate", "click", "click-title", "set-text", "get-text", "select-popup", "exists", "close-window", "dump"].contains(command) {
         guard arguments.count >= 3, let parsed = Int32(arguments[2]) else {
             throw HelperError.invalidArguments
         }
@@ -166,6 +166,11 @@ func run(_ arguments: [String]) throws {
             throw HelperError.elementNotFound(arguments[3])
         }
         try press(element, arguments[3])
+    case "get-text":
+        guard arguments.count == 4, let element = findIdentifier(pid, arguments[3]) else {
+            throw HelperError.elementNotFound(arguments.count == 4 ? arguments[3] : "identifier")
+        }
+        print(attribute(element, kAXValueAttribute) as? String ?? "")
     case "set-text":
         guard arguments.count == 5, let element = findIdentifier(pid, arguments[3]) else {
             throw HelperError.elementNotFound(arguments.count >= 4 ? arguments[3] : "identifier")

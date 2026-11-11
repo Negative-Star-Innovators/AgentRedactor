@@ -46,6 +46,12 @@ The shared C++ settings manager encrypts in-memory sensitive fields before locki
 
 Previous-live upgrade tests on macOS, Windows, and Linux seed and verify API-key, keyword, and regex content and entry flags, profile identity, port, and statistics. Each runs unprotected and password-enabled cases. The protected case unlocks, locks, saves a global setting, unlocks again, and verifies every field after the upgrade.
 
+## Post-unlock GUI profile refresh
+
+Status: approved and implemented; cross-platform GUI validation is required before publication.
+
+All three GUIs reload the complete profile after a locked-to-unlocked transition, including external control-API unlocks. This prevents empty locked-session snapshots from being shown or saved over the decrypted API key, keywords, and regexes. GUI regression tests restore populated profiles after a full restart, verify the actual controls contain the values, save an unrelated profile setting, and confirm that no sensitive field is lost.
+
 ## macOS localization completeness
 
 Status: deferred; not implemented.

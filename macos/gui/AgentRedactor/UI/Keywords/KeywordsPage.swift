@@ -125,6 +125,7 @@ private struct KeywordRow: View {
 
             TextField("", text: $text)
                 .textFieldStyle(.roundedBorder)
+                .accessibilityIdentifier("keywords.row.\(index).text")
                 .focused($focused)
                 .onSubmit { commitText() }
 
