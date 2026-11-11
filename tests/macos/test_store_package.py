@@ -43,3 +43,17 @@ def test_store_package_layout_and_entitlements() -> None:
     expected = os.environ.get("AGENTREDACTOR_EXPECT_VERSION")
     if expected:
         assert info["CFBundleShortVersionString"] == expected
+
+    version = Path("windows/version.txt").read_text().strip()
+    package = Path(os.environ.get(
+        "AGENTREDACTOR_STORE_PKG",
+        f"macos/build-store/AgentRedactor-store-{version}.pkg"))
+    assert package.is_file(), f"Store installer package not built: {package}"
+
+    expected_identity = os.environ.get("AGENTREDACTOR_EXPECT_INSTALLER_IDENTITY")
+    if expected_identity:
+        signature = subprocess.run(
+            ["pkgutil", "--check-signature", str(package)],
+            check=True, capture_output=True, text=True, timeout=120).stdout
+        assert "Status: signed" in signature
+        assert expected_identity in signature
