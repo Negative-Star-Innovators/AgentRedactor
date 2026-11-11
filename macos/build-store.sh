@@ -17,25 +17,20 @@
 #   - everything else is identical to the self-release build
 #
 # Signing is driven by env vars:
-#   SIGN_APP_IDENTITY  "Apple Distribution: Name (TEAMID)" — the Mac App Store
-#                      distribution certificate. Without it (or with
-#                      --no-sign) the bundle is ad-hoc signed WITH the store
-#                      entitlements — a sandboxed build you can run locally to
-#                      test sandbox behavior before the $99 account exists.
-#   APPLE_TEAM_ID      10-character Team ID, substituted into the
-#                      keychain-access-groups entitlement (required for the
-#                      sandboxed build to share Keychain items between the GUI
-#                      and the bundled engine binary).
+#   SIGN_APP_IDENTITY        "Apple Distribution: Name (TEAMID)" — signs the
+#                            app and nested code for the Mac App Store.
+#   SIGN_INSTALLER_IDENTITY  "3rd Party Mac Developer Installer: Name (TEAMID)"
+#                            — signs the Transporter-ready installer package.
+#   APPLE_TEAM_ID            10-character Team ID, substituted into the
+#                            keychain-access-groups entitlement (required for
+#                            the sandboxed build to share Keychain items between
+#                            the GUI and bundled engine binary).
+# Without SIGN_APP_IDENTITY (or with --no-sign), the app is locally signed WITH
+# store entitlements and the PKG is unsigned; neither is uploadable.
 #
-# Upload (after the app record exists in App Store Connect):
-#   cd macos/build-store && ditto -c -k --sequesterRsrc --keepParent \
-#     app/AgentRedactor.app AgentRedactor-store.zip
-#   xcrun altool --validate-app -f AgentRedactor-store.zip -t macos \
-#     --apiKey <key> --apiIssuer <issuer>
-#   xcrun altool --upload-app -f AgentRedactor-store.zip -t macos \
-#     --apiKey <key> --apiIssuer <issuer>
-# (or drag the .app into Transporter). Release manually in App Store Connect,
-# like the Windows MSIX flow at Partner Center.
+# Upload macos/build-store/AgentRedactor-store-<version>.pkg through Transporter
+# after the app record exists in App Store Connect. Release manually in App Store
+# Connect, like the Windows MSIX flow at Partner Center.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -201,5 +196,21 @@ codesign -d --entitlements :- "${STAGE_ROOT}/AgentRedactor.app" 2>/dev/null \
 codesign --verify --strict --verbose=2 "${STAGE_ROOT}/AgentRedactor.app" \
     || { echo "ERROR: signature verification failed" >&2; exit 1; }
 
+PKG="${BUILD}/AgentRedactor-store-${VERSION}.pkg"
+rm -f "${PKG}"
+if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
+    if [ -z "${SIGN_INSTALLER_IDENTITY:-}" ]; then
+        echo "ERROR: SIGN_INSTALLER_IDENTITY is required for the App Store PKG" >&2
+        exit 1
+    fi
+    echo "==> Creating signed App Store package with '${SIGN_INSTALLER_IDENTITY}'"
+    productbuild --component "${STAGE_ROOT}/AgentRedactor.app" /Applications \
+        --sign "${SIGN_INSTALLER_IDENTITY}" "${PKG}"
+else
+    echo "==> Creating unsigned App Store package (local validation only)"
+    productbuild --component "${STAGE_ROOT}/AgentRedactor.app" /Applications "${PKG}"
+fi
+
 echo "==> Done. Sandbox-signed app at ${STAGE_ROOT}/AgentRedactor.app"
+echo "    Installer package: ${PKG}"
 ls -la "${STAGE_ROOT}"

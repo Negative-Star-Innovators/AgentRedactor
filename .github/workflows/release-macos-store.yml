@@ -99,10 +99,13 @@ jobs:
           APPLE_DISTRIBUTION_CERT: ${{ secrets.APPLE_DISTRIBUTION_CERT }}
           APPLE_DISTRIBUTION_CERT_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_CERT_PASSWORD }}
           APPLE_DISTRIBUTION_IDENTITY: ${{ secrets.APPLE_DISTRIBUTION_IDENTITY }}
+          APPLE_INSTALLER_CERT: ${{ secrets.APPLE_INSTALLER_CERT }}
+          APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
+          APPLE_INSTALLER_IDENTITY: ${{ secrets.APPLE_INSTALLER_IDENTITY }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           set -euo pipefail
-          for name in APPLE_DISTRIBUTION_CERT APPLE_DISTRIBUTION_CERT_PASSWORD APPLE_DISTRIBUTION_IDENTITY APPLE_TEAM_ID; do
+          for name in APPLE_DISTRIBUTION_CERT APPLE_DISTRIBUTION_CERT_PASSWORD APPLE_DISTRIBUTION_IDENTITY APPLE_INSTALLER_CERT APPLE_INSTALLER_CERT_PASSWORD APPLE_INSTALLER_IDENTITY APPLE_TEAM_ID; do
             if [ -z "${!name}" ]; then
               echo "::error::Required Store secret $name is not configured"
               exit 1
@@ -110,16 +113,20 @@ jobs:
           done
           keychain_password="$(openssl rand -hex 32)"
           echo "$APPLE_DISTRIBUTION_CERT" | base64 --decode > /tmp/agentredactor-store-signing.p12
+          echo "$APPLE_INSTALLER_CERT" | base64 --decode > /tmp/agentredactor-installer-signing.p12
           security create-keychain -p "$keychain_password" build.keychain
           security set-keychain-settings -lut 21600 build.keychain
           security unlock-keychain -p "$keychain_password" build.keychain
           security import /tmp/agentredactor-store-signing.p12 -k build.keychain \
             -P "$APPLE_DISTRIBUTION_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security import /tmp/agentredactor-installer-signing.p12 -k build.keychain \
+            -P "$APPLE_INSTALLER_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
           security set-key-partition-list -S apple-tool:,apple: -s \
             -k "$keychain_password" build.keychain
           security list-keychain -d user -s build.keychain login.keychain
-          rm -f /tmp/agentredactor-store-signing.p12
+          rm -f /tmp/agentredactor-store-signing.p12 /tmp/agentredactor-installer-signing.p12
           echo "SIGN_APP_IDENTITY=$APPLE_DISTRIBUTION_IDENTITY" >> "$GITHUB_ENV"
+          echo "SIGN_INSTALLER_IDENTITY=$APPLE_INSTALLER_IDENTITY" >> "$GITHUB_ENV"
 
       - name: Build signed Store candidate
         run: macos/build-store.sh
@@ -129,6 +136,8 @@ jobs:
           AGENTREDACTOR_STORE_TEST: "1"
           AGENTREDACTOR_EXPECT_VERSION: ${{ env.EXPECTED_VERSION }}
           AGENTREDACTOR_STORE_APP: ${{ github.workspace }}/macos/build-store/app/AgentRedactor.app
+          AGENTREDACTOR_STORE_PKG: ${{ github.workspace }}/macos/build-store/AgentRedactor-store-${{ env.EXPECTED_VERSION }}.pkg
+          AGENTREDACTOR_EXPECT_INSTALLER_IDENTITY: ${{ secrets.APPLE_INSTALLER_IDENTITY }}
         run: python -m pytest tests/macos/test_store_package.py -q
 
       - name: Read ephemeral authentication test password
@@ -163,4 +172,10 @@ jobs:
         with:
           name: AgentRedactor-store-osx-arm64
           path: macos/build-store/AgentRedactor-store.zip
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AgentRedactor-store-pkg-osx-arm64
+          path: macos/build-store/AgentRedactor-store-${{ env.EXPECTED_VERSION }}.pkg
           retention-days: 30

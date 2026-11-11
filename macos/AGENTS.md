@@ -90,11 +90,12 @@ open macos/build/AgentRedactor.app
   stapled DMG again before upload. Merges to main produce signed test candidates;
   tags promote the successful candidate at the same commit without rebuilding.
   Manual dispatch supports candidate dry-runs and publication by candidate run ID.
-- `release-macos-store.yml` builds an unsigned sandboxed Store package on PRs.
-  Its separate protected `macos-appstore` environment gates Apple Distribution
-  signing and signed Store tests. The signed candidate is retained for manual
-  download/submission through App Store Connect; there is no automatic upload,
-  R2 operation, or required TestFlight step.
+- `release-macos-store.yml` builds an unsigned sandboxed Store app and PKG on
+  PRs. Its separate protected `macos-appstore` environment gates Apple
+  Distribution app signing, Mac Installer Distribution PKG signing, and signed
+  Store tests. The signed app ZIP and Transporter-ready PKG are retained for
+  manual download/submission through App Store Connect; there is no automatic
+  upload, R2 operation, or required TestFlight step.
 - **Self-distribution:** `build-release.sh` uses a Developer ID Application
   identity (`SIGN_APP_IDENTITY`) for the app, nested code, and DMG,
   `packaging/AgentRedactor.entitlements` through `SIGN_ENTITLEMENTS`, and a
@@ -117,8 +118,10 @@ open macos/build/AgentRedactor.app
 - **Mac App Store:** `build-store.sh` uses an Apple Distribution identity
   (`SIGN_APP_IDENTITY`) plus `APPLE_TEAM_ID` and the store entitlements. It is
   sandboxed and has no Velopack updater; Developer ID certificates and
-  notarytool are not part of the Store upload flow. Package the staged app with
-  `ditto` and upload through Transporter or the documented `altool` flow.
+  notarytool are not part of the Store upload flow. `SIGN_INSTALLER_IDENTITY`
+  selects the Mac Installer Distribution identity used by `productbuild` to
+  create `AgentRedactor-store-<version>.pkg` for Transporter. Unsigned local
+  builds produce an unsigned PKG for layout validation only.
 - Before publishing, verify the app/DMG signatures, notarization ticket
   (`xcrun stapler validate`), and Gatekeeper assessment (`codesign` and
   `spctl`). Signed authentication coverage is in `tests/macos/test_signed_auth.py`;
