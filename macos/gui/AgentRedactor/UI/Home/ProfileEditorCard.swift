@@ -82,6 +82,7 @@ struct ProfileEditorCard: View {
                         }
                     }
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("profile.api-key")
                     .onChange(of: apiKey) { dirty = true }
                 }
                 Toggle(isOn: $showKey) {
@@ -106,6 +107,13 @@ struct ProfileEditorCard: View {
         }
         .onAppear { loadFromProfile() }
         .onChange(of: profile.id) { loadFromProfile() }
+        .onChange(of: profile.apiKeyMasked) { oldValue, newValue in
+            guard apiKey == oldValue else { return }
+            apiKey = newValue
+            apiKeyLoaded = false
+            lastFetchedKey = nil
+            recomputeDirty()
+        }
         .alert(item: $errorAlert) { alert in
             Alert(
                 title: Text(LocString(alert.titleKey)),

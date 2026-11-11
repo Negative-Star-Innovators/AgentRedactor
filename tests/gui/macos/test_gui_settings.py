@@ -82,18 +82,21 @@ def test_unlock_restores_sensitive_fields_before_gui_save(app: MacAppProcess) ->
     result = app.api("POST", "/unlock", {"password": "unlock-gui-test"})
     assert result.get("ok") is True
 
-    def restored_values() -> tuple[str, str]:
+    def restored_values() -> tuple[str, str, str]:
         try:
             return (
                 gui_driver.get_text(app.pid, "keywords.row.0.text"),
                 gui_driver.get_text(app.pid, "regex.row.0.text"),
+                gui_driver.get_text(app.pid, "profile.api-key"),
             )
         except Exception as error:
-            return (type(error).__name__, str(error))
+            return (type(error).__name__, str(error), "")
 
     gui_driver.wait_until(
         "sensitive fields restored in the GUI", restored_values,
-        lambda values: values == ("Unlock keyword", r"\bUNLOCK-\d{5}\b"))
+        lambda values: values == (
+            "Unlock keyword", r"\bUNLOCK-\d{5}\b",
+            "\uf79a" * len(selected_profile(app)["api_key"])))
 
     gui_driver.click(app.pid, "detection.ai-enabled")
     gui_driver.wait_until(
