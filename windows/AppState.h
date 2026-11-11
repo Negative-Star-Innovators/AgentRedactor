@@ -68,6 +68,7 @@ public:
     // Latest /settings snapshot from the engine (guarded by settingsMutex_);
     // false when no snapshot has been fetched yet.
     bool GetSettingsSnapshot(json& out) const;
+    bool GetStatusSnapshot(json& out) const;
 
     // Services (engine-backed facades; tray remains in-process)
     SettingsFacade* Settings() { return &settingsFacade_; }

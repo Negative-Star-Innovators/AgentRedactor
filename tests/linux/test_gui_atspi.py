@@ -51,6 +51,7 @@ from config_factory import create_settings  # noqa: E402
 from gui_process import _find_free_port, _kill_existing_agent_redactor, _wait_for_port  # noqa: E402
 from gui_atspi import ENGINE_BIN, AtspiGui, require_atspi, wait_until  # noqa: E402
 from mock_llm import MockLLM  # noqa: E402
+from upgrade_profile import api  # noqa: E402
 
 pytestmark = [
     pytest.mark.atspi,
@@ -735,11 +736,13 @@ async def test_statistics_and_clear_buttons(
 
 @pytest.mark.asyncio
 async def test_master_password_lock_overlay_and_unlock(gui: GuiContext) -> None:
-    """With the typed master password enabled, a fresh GUI start shows only the
-    lock overlay; a wrong password is rejected inline; the correct one typed
-    into the overlay unlocks the full UI."""
+    """Unlock restores sensitive fields in the UI before any subsequent save."""
     app = gui.app
     password = "atspi-test-pw"
+    keyword = "Unlock keyword"
+    pattern = r"\bUNLOCK-\d{5}\b"
+    app.add_keyword(keyword)
+    app.add_regex(pattern)
 
     r = gui.cli("password", "enable", input=f"{password}\n{password}\n")
     assert r.returncode == 0, r.stdout + r.stderr
@@ -758,21 +761,34 @@ async def test_master_password_lock_overlay_and_unlock(gui: GuiContext) -> None:
     app.app()
 
     wait_until("lock overlay shown", app.locked, lambda locked: locked, timeout=60)
-    # The content page is hidden while locked (nothing leaks behind it).
     assert not app.find_all("panel", "API Proxy")
     assert not app.find_all("list", "Profiles")
 
-    # Wrong password: inline error, overlay stays.
     app.unlock("wrong-password")
     wait_until("wrong-password error", app.unlock_error,
                lambda err: err is not None)
     assert app.locked()
 
-    # Correct password: overlay lifts, content appears.
     app.unlock(password)
     app.wait_ready()
     assert not app.locked()
     assert "test-profile" in app.profiles()
+    wait_until("keyword restored after unlock", app.keywords,
+               lambda rows: keyword in rows)
+    wait_until("regex restored after unlock", app.regexes,
+               lambda rows: pattern in rows)
+
+    app.set_pii_master(False)
+    wait_until(
+        "post-unlock GUI save",
+        lambda: api(gui.config_dir, "GET", "/profiles"),
+        lambda profiles: profiles[0]["use_openai_model"] is False,
+    )
+    profiles = api(gui.config_dir, "GET", "/profiles")
+    assert profiles[0]["keywords"][0]["text"] == keyword
+    assert profiles[0]["regex_patterns"][0]["pattern"] == pattern
+    key = api(gui.config_dir, "GET", f"/profiles/{profiles[0]['id']}/apikey")
+    assert key["apiKey"] == "test-api-key"
 
 
 # ---------------------------------------------------------------------------

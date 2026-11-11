@@ -63,6 +63,10 @@ def set_text(pid: int, identifier: str, text: str) -> None:
     _run("set-text", str(pid), identifier, text)
 
 
+def get_text(pid: int, identifier: str) -> str:
+    return _run("get-text", str(pid), identifier)
+
+
 def select_popup(pid: int, identifier: str, title: str) -> None:
     _run("select-popup", str(pid), identifier, title)
 

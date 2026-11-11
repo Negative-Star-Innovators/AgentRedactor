@@ -649,6 +649,10 @@ namespace winrt::AgentRedactor::implementation
             LOG(L"[MainWindow] Protection disabled externally: lifting the lock overlay");
             HideLockOverlay();
         }
+        json status;
+        if (lockOverlayShown_ && app->GetStatusSnapshot(status) && status.value("unlocked", true)) {
+            HideLockOverlay();
+        }
 
         // Refresh the settings-driven controls of whichever page is active.
         auto frame = frame_;
@@ -793,9 +797,20 @@ namespace winrt::AgentRedactor::implementation
 
     void MainWindow::HideLockOverlay()
     {
+        const bool wasLocked = lockOverlayShown_;
         lockOverlayShown_ = false;
         LockOverlay().Visibility(Visibility::Collapsed);
         if (frame_) frame_.Visibility(Visibility::Visible);
+        if (wasLocked) {
+            auto frame = frame_;
+            if (frame) {
+                if (auto content = frame.Content()) {
+                    if (auto home = content.try_as<winrt::AgentRedactor::HomePage>()) {
+                        winrt::get_self<winrt::AgentRedactor::implementation::HomePage>(home)->RefreshFromEngine();
+                    }
+                }
+            }
+        }
     }
 
     void MainWindow::ResetActivityTimer()

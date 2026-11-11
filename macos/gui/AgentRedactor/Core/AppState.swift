@@ -145,6 +145,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
     private var stopPolling = false
     private var consecutivePollFailures = 0
     private var profilesRevision = -1
+    private var profileSnapshotWasLocked = false
     private var lastAppliedLanguage: String?
     private var shutdownDone = false
     private var inactivityReset: DispatchWorkItem?
@@ -282,9 +283,14 @@ final class AppState: ObservableObject, @unchecked Sendable {
             let newSettings = EngineSettings.fromJSON(settingsResponse.body)
 
             DispatchQueue.main.async {
+                let wasLocked = self.isLocked
                 self.status = newStatus
                 self.settings = newSettings
                 self.isLocked = newSettings.masterPasswordEnabled && !newStatus.unlocked
+                if (wasLocked || self.profileSnapshotWasLocked) && !self.isLocked {
+                    self.profileSnapshotWasLocked = false
+                    Task { await self.refreshProfilesFull() }
+                }
                 self.connectionLost = false
                 self.applyLanguageIfNeeded(newSettings.appLanguage)
                 // Surrender the optimistic overrides only on engine
@@ -334,6 +340,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
     private func reloadProfilesBlocking() {
         guard let list = try? settingsFacade.getProfiles() else { return }
+        let status = try? EngineStatus.fromJSON(self.client.get("/status").body)
         if list.isEmpty {
             // Seed a default profile on first run (Windows/Linux parity) so the
             // user never lands on an empty form. POST restarts listeners
@@ -355,6 +362,9 @@ final class AppState: ObservableObject, @unchecked Sendable {
             return
         }
         DispatchQueue.main.async {
+            if let status {
+                self.profileSnapshotWasLocked = status.masterPasswordEnabled && !status.unlocked
+            }
             var selected = self.selectedProfileID
             if selected == nil || !list.contains(where: { $0.id == selected }) {
                 selected = list.first?.id
@@ -550,7 +560,11 @@ final class AppState: ObservableObject, @unchecked Sendable {
         case .failure(let error):
             return .failure(error)
         case .success(let password):
-            return await runOnEngineQueueResult { try self.settingsFacade.unlock(password: password) }
+            let result = await runOnEngineQueueResult { try self.settingsFacade.unlock(password: password) }
+            if case .success(let unlock) = result, unlock.ok {
+                await refreshProfilesFull()
+            }
+            return result
         }
     }
 

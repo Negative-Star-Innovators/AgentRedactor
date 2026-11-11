@@ -117,6 +117,7 @@ private struct RegexRow: View {
             TextField("", text: $text)
                 .textFieldStyle(.roundedBorder)
                 .font(.system(.body, design: .monospaced))
+                .accessibilityIdentifier("regex.row.\(index).text")
                 .focused($focused)
                 .onSubmit { commitText() }
 

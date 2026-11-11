@@ -1563,6 +1563,8 @@ void MainWindow::showLockOverlay() {
 }
 
 void MainWindow::hideLockOverlay() {
+    const bool wasLocked = centralStack_->currentIndex() == 1;
+    if (wasLocked) reloadProfiles(true);
     centralStack_->setCurrentIndex(0);
     inactivityTimer_->start();
 }
