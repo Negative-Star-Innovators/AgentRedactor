@@ -120,7 +120,8 @@ jobs:
           security import /tmp/agentredactor-store-signing.p12 -k build.keychain \
             -P "$APPLE_DISTRIBUTION_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
           security import /tmp/agentredactor-installer-signing.p12 -k build.keychain \
-            -P "$APPLE_INSTALLER_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+            -P "$APPLE_INSTALLER_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security \
+            -T /usr/bin/productbuild -T /usr/bin/productsign
           security set-key-partition-list -S apple-tool:,apple: -s \
             -k "$keychain_password" build.keychain
           security list-keychain -d user -s build.keychain login.keychain
@@ -129,6 +130,7 @@ jobs:
           echo "SIGN_INSTALLER_IDENTITY=$APPLE_INSTALLER_IDENTITY" >> "$GITHUB_ENV"
 
       - name: Build signed Store candidate
+        timeout-minutes: 15
         run: macos/build-store.sh
 
       - name: Test signed Store package
