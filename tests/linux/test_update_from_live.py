@@ -278,6 +278,7 @@ def test_upgrade_from_live_appimage(upgrade_env, protect: bool) -> None:
             "XDG_CONFIG_HOME": str(home_dir / ".config"),
             "XDG_DATA_HOME": str(home_dir / ".local" / "share"),
         })
+        wait_for_engine(config_dir)
         version_check = subprocess.run(
             [str(app), "--cli", "status"], env=cli_env,
             capture_output=True, text=True, timeout=60)
