@@ -144,7 +144,7 @@ if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
         exit 1
     fi
 fi
-sed "s/TEAMID\./${TEAM_ID:+$TEAM_ID.}/g; s/TEAMID$/${TEAM_ID}/g" \
+sed "s/TEAMID/${TEAM_ID}/g" \
     "${ROOT}/packaging/AgentRedactor-Store.entitlements" > "${ENTITLEMENTS}"
 
 # Sign innermost-first. The App Store rejects disable-library-validation, so
