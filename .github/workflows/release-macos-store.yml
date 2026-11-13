@@ -134,8 +134,6 @@ jobs:
 
       - name: Build signed Store candidate
         timeout-minutes: 15
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: macos/build-store.sh
 
       - name: Test signed Store package

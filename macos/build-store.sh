@@ -21,14 +21,11 @@
 #                             app and nested code for the Mac App Store.
 #   SIGN_INSTALLER_IDENTITY   "Mac Installer Distribution: Name (TEAMID)" —
 #                             signs the Transporter-ready installer package.
-#   APPLE_TEAM_ID             10-character Team ID, substituted into the
-#                             application/team identifiers and Keychain group.
 #   STORE_PROVISIONING_PROFILE
 #                             Path to the Mac App Store distribution profile for
 #                             this App ID, embedded as embedded.provisionprofile.
 # Without SIGN_APP_IDENTITY (or with --no-sign), the app is locally signed with
-# sandbox entitlements and the PKG is unsigned; neither is uploadable. Restricted
-# application/Keychain entitlements are omitted without a provisioning profile.
+# the same sandbox entitlements and the PKG is unsigned; neither is uploadable.
 #
 # Upload macos/build-store/AgentRedactor-store-<version>.pkg through Transporter
 # after the app record exists in App Store Connect. Release manually in App Store
@@ -130,22 +127,11 @@ for dylib in "${RES}"/*.dylib; do
     bundle_non_system_deps "$dylib"
 done
 
-# Substitute the Team ID into the profile-backed application and Keychain
-# groups. Unsigned local builds omit restricted entitlement claims because an
-# ad-hoc signature has no provisioning profile to authorize them.
-ENTITLEMENTS="${BUILD}/AgentRedactor-Store.entitlements"
+# The Store GUI and helper need only unrestricted sandbox entitlements. The
+# distribution profile is embedded separately for App Store Connect validation.
+ENTITLEMENTS="${ROOT}/packaging/AgentRedactor-Store.entitlements"
 ENGINE_ENTITLEMENTS="${ROOT}/packaging/AgentRedactor-Engine-Store.entitlements"
 mkdir -p "${BUILD}"
-TEAM_ID=""
-if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
-    TEAM_ID="${APPLE_TEAM_ID:-}"
-    if [ -z "${TEAM_ID}" ]; then
-        echo "ERROR: APPLE_TEAM_ID is required for signed Store builds" >&2
-        exit 1
-    fi
-fi
-sed "s/TEAMID/${TEAM_ID}/g" \
-    "${ROOT}/packaging/AgentRedactor-Store.entitlements" > "${ENTITLEMENTS}"
 
 # Sign innermost-first. The App Store rejects disable-library-validation, so
 # the bundled third-party dylibs (ONNX Runtime, OpenSSL) are re-signed with
@@ -172,9 +158,6 @@ if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
         --options runtime --entitlements "${ENTITLEMENTS}" \
         "${STAGE_ROOT}/AgentRedactor.app"
 else
-    /usr/libexec/PlistBuddy -c "Delete :com.apple.application-identifier" "${ENTITLEMENTS}"
-    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.team-identifier" "${ENTITLEMENTS}"
-    /usr/libexec/PlistBuddy -c "Delete :keychain-access-groups" "${ENTITLEMENTS}"
     echo "==> Ad-hoc-equivalent signing WITH sandbox entitlements (local test)"
     echo "    WARNING: this build is NOT uploadable to App Store Connect"
     echo "    (no Apple Distribution identity / provisioning profile)."

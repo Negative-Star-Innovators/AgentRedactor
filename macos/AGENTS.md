@@ -119,17 +119,18 @@ open macos/build/AgentRedactor.app
   intended for users. Output lands in `build-release/velopack/`; do not upload
   it to the live update feed as part of a signing test.
 - **Mac App Store:** `build-store.sh` uses an Apple Distribution identity
-  (`SIGN_APP_IDENTITY`), `APPLE_TEAM_ID`, and `STORE_PROVISIONING_PROFILE` (the
-  local path to the matching Mac App Store distribution profile). It embeds the
-  profile, signs the main app with the profile-backed application/team identifiers
-  and unprefixed `keychain-access-groups`, and signs the engine with
+  (`SIGN_APP_IDENTITY`) and `STORE_PROVISIONING_PROFILE` (the local path to the
+  matching Mac App Store distribution profile). It embeds the profile and signs
+  the main app with sandbox/network entitlements only. The GUI retrieves its own
+  Keychain item and unlocks the engine through the authenticated loopback API;
+  the Store app does not install the CLI, so no restricted Keychain-sharing or
+  application-identifier claims are needed. The engine is signed with
   `packaging/AgentRedactor-Engine-Store.entitlements` (`app-sandbox` + `inherit`).
-  The app is sandboxed and has no Velopack updater; Developer ID certificates and
-  notarytool are not part of the Store upload flow. `SIGN_INSTALLER_IDENTITY`
-  selects the Mac Installer Distribution identity used by `productbuild` to
-  create `AgentRedactor-store-<version>.pkg` for Transporter. Unsigned local
-  builds omit restricted profile-backed claims and produce an unsigned PKG for
-  layout validation only.
+  The app has no Velopack updater; Developer ID certificates and notarytool are
+  not part of the Store upload flow. `SIGN_INSTALLER_IDENTITY` selects the Mac
+  Installer Distribution identity used by `productbuild` to create
+  `AgentRedactor-store-<version>.pkg` for Transporter. Unsigned local builds use
+  the same entitlements and produce an unsigned PKG for layout validation only.
 - Before publishing, verify the app/DMG signatures, notarization ticket
   (`xcrun stapler validate`), and Gatekeeper assessment (`codesign` and
   `spctl`). Signed authentication coverage is in `tests/macos/test_signed_auth.py`;
