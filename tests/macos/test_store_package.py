@@ -60,6 +60,10 @@ def test_store_package_layout_and_entitlements() -> None:
     if expected:
         assert info["CFBundleShortVersionString"] == expected
 
+    assert "com.apple.application-identifier" not in values
+    assert "com.apple.developer.team-identifier" not in values
+    assert "keychain-access-groups" not in values
+
     bundle_id = info["CFBundleIdentifier"]
     expected_identity = os.environ.get("AGENTREDACTOR_EXPECT_INSTALLER_IDENTITY")
     profile = app / "Contents" / "embedded.provisionprofile"
@@ -67,9 +71,6 @@ def test_store_package_layout_and_entitlements() -> None:
         team_id = os.environ.get("AGENTREDACTOR_EXPECT_TEAM_ID")
         assert team_id, "AGENTREDACTOR_EXPECT_TEAM_ID is required for signed Store tests"
         application_identifier = f"{team_id}.{bundle_id}"
-        assert values["com.apple.application-identifier"] == application_identifier
-        assert values["com.apple.developer.team-identifier"] == team_id
-        assert values["keychain-access-groups"] == [application_identifier]
 
         assert profile.is_file(), "Mac App Store provisioning profile is not embedded"
         decoded = subprocess.run(
@@ -88,9 +89,6 @@ def test_store_package_layout_and_entitlements() -> None:
             assert expiration > datetime.now(timezone.utc), "Store provisioning profile has expired"
     else:
         assert not profile.exists()
-        assert "com.apple.application-identifier" not in values
-        assert "com.apple.developer.team-identifier" not in values
-        assert "keychain-access-groups" not in values
 
     version = Path("windows/version.txt").read_text().strip()
     package = Path(os.environ.get(
