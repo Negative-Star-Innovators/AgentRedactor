@@ -17,16 +17,18 @@
 #   - everything else is identical to the self-release build
 #
 # Signing is driven by env vars:
-#   SIGN_APP_IDENTITY        "Apple Distribution: Name (TEAMID)" — signs the
-#                            app and nested code for the Mac App Store.
-#   SIGN_INSTALLER_IDENTITY  "3rd Party Mac Developer Installer: Name (TEAMID)"
-#                            — signs the Transporter-ready installer package.
-#   APPLE_TEAM_ID            10-character Team ID, substituted into the
-#                            keychain-access-groups entitlement (required for
-#                            the sandboxed build to share Keychain items between
-#                            the GUI and bundled engine binary).
-# Without SIGN_APP_IDENTITY (or with --no-sign), the app is locally signed WITH
-# store entitlements and the PKG is unsigned; neither is uploadable.
+#   SIGN_APP_IDENTITY         "Apple Distribution: Name (TEAMID)" — signs the
+#                             app and nested code for the Mac App Store.
+#   SIGN_INSTALLER_IDENTITY   "Mac Installer Distribution: Name (TEAMID)" —
+#                             signs the Transporter-ready installer package.
+#   APPLE_TEAM_ID             10-character Team ID, substituted into the
+#                             application/team identifiers and Keychain group.
+#   STORE_PROVISIONING_PROFILE
+#                             Path to the Mac App Store distribution profile for
+#                             this App ID, embedded as embedded.provisionprofile.
+# Without SIGN_APP_IDENTITY (or with --no-sign), the app is locally signed with
+# sandbox entitlements and the PKG is unsigned; neither is uploadable. Restricted
+# application/Keychain entitlements are omitted without a provisioning profile.
 #
 # Upload macos/build-store/AgentRedactor-store-<version>.pkg through Transporter
 # after the app record exists in App Store Connect. Release manually in App Store
@@ -128,30 +130,36 @@ for dylib in "${RES}"/*.dylib; do
     bundle_non_system_deps "$dylib"
 done
 
-# Entitlements: substitute the Team ID into the keychain access group. Ad-hoc
-# local builds have no Team ID — substitute an EMPTY one so the group becomes
-# the app identifier, which is the sandbox's default keychain access group
-# (a literal "TEAMID." prefix is an invalid entitlement and makes the
-# Keychain reject every write, including access-controlled items).
+# Substitute the Team ID into the profile-backed application and Keychain
+# groups. Unsigned local builds omit restricted entitlement claims because an
+# ad-hoc signature has no provisioning profile to authorize them.
 ENTITLEMENTS="${BUILD}/AgentRedactor-Store.entitlements"
+ENGINE_ENTITLEMENTS="${ROOT}/packaging/AgentRedactor-Engine-Store.entitlements"
 mkdir -p "${BUILD}"
-TEAM_ID="${APPLE_TEAM_ID:-}"
+TEAM_ID=""
+if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
+    TEAM_ID="${APPLE_TEAM_ID:-}"
+    if [ -z "${TEAM_ID}" ]; then
+        echo "ERROR: APPLE_TEAM_ID is required for signed Store builds" >&2
+        exit 1
+    fi
+fi
 sed "s/TEAMID\./${TEAM_ID:+$TEAM_ID.}/g; s/TEAMID$/${TEAM_ID}/g" \
     "${ROOT}/packaging/AgentRedactor-Store.entitlements" > "${ENTITLEMENTS}"
-if [ -z "${TEAM_ID}" ]; then
-    echo "    ad-hoc: keychain access group = app identifier (no Team ID)"
-else
-    echo "    keychain access group = ${TEAM_ID}.com.negativestarinnovators.agentredactor"
-fi
 
 # Sign innermost-first. The App Store rejects disable-library-validation, so
 # the bundled third-party dylibs (ONNX Runtime, OpenSSL) are re-signed with
-# the SAME distribution identity — with ad-hoc they still load under the
-# sandbox locally, but a Distribution-signed build is required for upload.
-# Nested code (the engine) is signed without entitlements: it inherits the
-# sandbox from the GUI process at spawn time.
+# the SAME distribution identity. The engine declares its own sandbox and
+# inherits the GUI's network capabilities when launched as a child process.
 if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
-    echo "==> Signing with '${SIGN_APP_IDENTITY}'"
+    PROFILE="${STORE_PROVISIONING_PROFILE:-}"
+    if [ -z "${PROFILE}" ] || [ ! -f "${PROFILE}" ]; then
+        echo "ERROR: STORE_PROVISIONING_PROFILE must name a Mac App Store" >&2
+        echo "       distribution .provisionprofile for signed Store builds" >&2
+        exit 1
+    fi
+    cp "${PROFILE}" "${STAGE_ROOT}/AgentRedactor.app/Contents/embedded.provisionprofile"
+    echo "==> Signing with '${SIGN_APP_IDENTITY}' and embedded Store profile"
     for dylib in "${RES}"/*.dylib; do
         [ -e "$dylib" ] || continue
         codesign --force --sign "${SIGN_APP_IDENTITY}" --timestamp \
@@ -159,18 +167,20 @@ if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
             || codesign --force --sign "${SIGN_APP_IDENTITY}" "$dylib"
     done
     codesign --force --sign "${SIGN_APP_IDENTITY}" \
-        --options runtime "${ENGINE}"
+        --options runtime --entitlements "${ENGINE_ENTITLEMENTS}" "${ENGINE}"
     codesign --force --sign "${SIGN_APP_IDENTITY}" \
         --options runtime --entitlements "${ENTITLEMENTS}" \
         "${STAGE_ROOT}/AgentRedactor.app"
 else
-    echo "==> Ad-hoc-equivalent signing WITH store entitlements (local sandbox test)"
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.application-identifier" "${ENTITLEMENTS}"
+    /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.team-identifier" "${ENTITLEMENTS}"
+    /usr/libexec/PlistBuddy -c "Delete :keychain-access-groups" "${ENTITLEMENTS}"
+    echo "==> Ad-hoc-equivalent signing WITH sandbox entitlements (local test)"
     echo "    WARNING: this build is NOT uploadable to App Store Connect"
-    echo "    (no Apple Distribution identity / hardened runtime). Uploads need:"
-    echo "      APPLE_TEAM_ID=<TEAMID> SIGN_APP_IDENTITY='Apple Distribution: ...' $0"
+    echo "    (no Apple Distribution identity / provisioning profile)."
     # The sandbox entitlement is mandatory for this flavor; the local dev
     # identity (when present) just keeps the signer stable across rebuilds.
-    # Note: sandboxed Keychain access needs real Apple signing/provisioning;
+    # Sandboxed Keychain sharing needs real Apple signing/provisioning;
     # unsigned local builds cannot enable the native protection flow.
     DEV_IDENTITY="${DEV_SIGN_IDENTITY:-Agent Redactor Dev}"
     if [ "${DEV_IDENTITY}" != "ad-hoc" ] && security find-certificate -c "${DEV_IDENTITY}" >/dev/null 2>&1; then
@@ -182,17 +192,20 @@ else
         [ -e "$dylib" ] || continue
         codesign --force --sign "${SIGNER}" "$dylib" 2>/dev/null || true
     done
-    codesign --force --sign "${SIGNER}" "${ENGINE}" 2>/dev/null || true
-    # --entitlements applies with any signer: the app runs sandboxed.
+    codesign --force --sign "${SIGNER}" \
+        --entitlements "${ENGINE_ENTITLEMENTS}" "${ENGINE}"
     codesign --force --sign "${SIGNER}" --entitlements "${ENTITLEMENTS}" \
         "${STAGE_ROOT}/AgentRedactor.app"
 fi
 
-# Sanity: the sandbox entitlement must be present, and (when signed) the
-# signature must verify.
+# Sanity: both executables must declare the sandbox, and the signature must
+# verify after the profile and all nested code have been sealed.
 codesign -d --entitlements :- "${STAGE_ROOT}/AgentRedactor.app" 2>/dev/null \
     | grep -q "com.apple.security.app-sandbox" \
-    || { echo "ERROR: app-sandbox entitlement missing" >&2; exit 1; }
+    || { echo "ERROR: app-sandbox entitlement missing from GUI" >&2; exit 1; }
+codesign -d --entitlements :- "${ENGINE}" 2>/dev/null \
+    | grep -q "com.apple.security.app-sandbox" \
+    || { echo "ERROR: app-sandbox entitlement missing from engine" >&2; exit 1; }
 codesign --verify --strict --verbose=2 "${STAGE_ROOT}/AgentRedactor.app" \
     || { echo "ERROR: signature verification failed" >&2; exit 1; }
 

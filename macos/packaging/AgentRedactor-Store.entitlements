@@ -7,20 +7,26 @@
      - network.client/server: the engine binds 127.0.0.1 (loopback proxy) and
        talks to configured upstream LLM endpoints; localhost listeners are
        permitted under the sandbox with network.server.
-     - keychain-access-groups: lets the GUI and the bundled engine binary
-       (nested code, same team) share Keychain items under the sandbox.
+     - application/team identifiers and the unprefixed keychain-access-groups
+       key preserve the app's Keychain group. These restricted entitlements
+       require the embedded Mac App Store provisioning profile and are removed
+       from unsigned local builds.
      NOTE: disable-library-validation is NOT allowed on the App Store, so
      build-store.sh re-signs the bundled ONNX Runtime / OpenSSL dylibs with
      the Apple Distribution certificate. -->
 <plist version="1.0">
 <dict>
+	<key>com.apple.application-identifier</key>
+	<string>TEAMID.com.negativestarinnovators.agentredactor</string>
+	<key>com.apple.developer.team-identifier</key>
+	<string>TEAMID</string>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
-	<key>com.apple.security.keychain-access-groups</key>
+	<key>keychain-access-groups</key>
 	<array>
 		<string>TEAMID.com.negativestarinnovators.agentredactor</string>
 	</array>
