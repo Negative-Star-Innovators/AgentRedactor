@@ -93,9 +93,12 @@ open macos/build/AgentRedactor.app
 - `release-macos-store.yml` builds an unsigned sandboxed Store app and PKG on
   PRs. Its separate protected `macos-appstore` environment gates Apple
   Distribution app signing, Mac Installer Distribution PKG signing, and signed
-  Store tests. The signed app ZIP and Transporter-ready PKG are retained for
-  manual download/submission through App Store Connect; there is no automatic
-  upload, R2 operation, or required TestFlight step.
+  Store tests. `APPLE_STORE_PROVISIONING_PROFILE` is the Base64-encoded Mac App
+  Store distribution profile; signed builds embed it at
+  `Contents/embedded.provisionprofile` before sealing the app. The signed app ZIP
+  and Transporter-ready PKG are retained for manual download/submission through
+  App Store Connect; there is no automatic upload, R2 operation, or required
+  TestFlight step.
 - **Self-distribution:** `build-release.sh` uses a Developer ID Application
   identity (`SIGN_APP_IDENTITY`) for the app, nested code, and DMG,
   `packaging/AgentRedactor.entitlements` through `SIGN_ENTITLEMENTS`, and a
@@ -116,12 +119,17 @@ open macos/build/AgentRedactor.app
   intended for users. Output lands in `build-release/velopack/`; do not upload
   it to the live update feed as part of a signing test.
 - **Mac App Store:** `build-store.sh` uses an Apple Distribution identity
-  (`SIGN_APP_IDENTITY`) plus `APPLE_TEAM_ID` and the store entitlements. It is
-  sandboxed and has no Velopack updater; Developer ID certificates and
+  (`SIGN_APP_IDENTITY`), `APPLE_TEAM_ID`, and `STORE_PROVISIONING_PROFILE` (the
+  local path to the matching Mac App Store distribution profile). It embeds the
+  profile, signs the main app with the profile-backed application/team identifiers
+  and unprefixed `keychain-access-groups`, and signs the engine with
+  `packaging/AgentRedactor-Engine-Store.entitlements` (`app-sandbox` + `inherit`).
+  The app is sandboxed and has no Velopack updater; Developer ID certificates and
   notarytool are not part of the Store upload flow. `SIGN_INSTALLER_IDENTITY`
   selects the Mac Installer Distribution identity used by `productbuild` to
   create `AgentRedactor-store-<version>.pkg` for Transporter. Unsigned local
-  builds produce an unsigned PKG for layout validation only.
+  builds omit restricted profile-backed claims and produce an unsigned PKG for
+  layout validation only.
 - Before publishing, verify the app/DMG signatures, notarization ticket
   (`xcrun stapler validate`), and Gatekeeper assessment (`codesign` and
   `spctl`). Signed authentication coverage is in `tests/macos/test_signed_auth.py`;
