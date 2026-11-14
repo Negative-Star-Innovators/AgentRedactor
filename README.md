@@ -1,8 +1,8 @@
 # Agent Redactor
 
-A local privacy proxy for AI coding agents, with a desktop app on Windows and
-Linux. It sits between your agents and their LLM endpoints, redacting PII
-(names, emails, phone numbers, secrets, and more) from outbound requests
+A local privacy proxy for AI coding agents, with a desktop app on Windows,
+macOS, and Linux. It sits between your agents and their LLM endpoints, redacting
+PII (names, emails, phone numbers, secrets, and more) from outbound requests
 before they leave your machine — and un-redacting the responses coming back.
 
 - Local HTTP proxy with an on-device ONNX NER model — no cloud calls for detection
@@ -10,7 +10,7 @@ before they leave your machine — and un-redacting the responses coming back.
 - Works with any agent that can point at a local proxy — Claude Code, Codex, OpenClaw, OpenCode, Hermes (guides below)
 - Localized UI in 53 languages
 - Per-user install — no admin or root required; on headless Linux the installer sets up a systemd user service
-- Auto-updates via the Microsoft Store or the built-in Velopack updater
+- Auto-updates via the Microsoft Store, Mac App Store, or the built-in Velopack updater
 
 **Website:** <https://agentredactor.negativestarinnovators.com/>
 
@@ -31,6 +31,20 @@ The installer picks the native build for your architecture (falling back to
 the x64 build on ARM64 if no native package is published yet) and installs
 per-user under `%LOCALAPPDATA%\AgentRedactor`. Self-release builds are
 unsigned for now — Windows SmartScreen may warn on first run.
+
+### macOS
+
+**Mac App Store** (macOS 14+ on Apple silicon; sandboxed; updates via the Store):
+<https://apps.apple.com/app/id6830907976>
+
+**Self-release** (macOS 14+ on Apple silicon; updates itself via Velopack):
+[download the DMG](https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64/AgentRedactor-osx-arm64.dmg),
+open it, and drag Agent Redactor to Applications.
+
+The self-release downloads the AI model on first run and installs the
+`agentredactor` CLI under `~/.agentredactor/bin` for new terminal sessions. The
+App Store build includes the model, but its sandbox does not permit installing
+the CLI on your PATH.
 
 ### Linux
 
@@ -77,15 +91,16 @@ machines — see [docs/cli.md](docs/cli.md).
 | Path | Contents |
 |---|---|
 | `windows/` | The Windows app (WinUI 3, C++/WinRT), build scripts, models, resources, MSIX packaging |
+| `macos/` | The macOS app (SwiftUI plus engine/CLI build), Velopack DMG and sandboxed App Store packaging |
 | `linux/` | The Linux app (Qt 6 GUI plus engine/CLI build), AppImage packaging, systemd user unit |
-| `core/` | OS-agnostic C++ core (HTTP proxy, ONNX NER, regex/redaction engines, CLI) shared by the platform frontends; built by both the Windows and Linux projects |
+| `core/` | OS-agnostic C++ core (HTTP proxy, ONNX NER, regex/redaction engines, CLI) shared by all three platform frontends |
 | `cloudflare/` | The Cloudflare worker + R2 behind the self-release channel (`/install.ps1`, `/install.sh`, `/updates`, `/models`) |
 | `website/` | The website with the agent integration guides, translated into every supported language |
 | `docs/` | Additional documentation — currently the [CLI reference](docs/cli.md) |
-| `tests/` | pytest suites: cross-platform `cli/` and `migration/`, Linux GUI tests in `linux/` (AT-SPI), Windows GUI end-to-end tests in `gui/` (FlaUI + mock LLM), self-release install/upgrade E2E |
+| `tests/` | pytest suites: cross-platform `cli/` and `migration/`, macOS release/package tests, Linux GUI tests (AT-SPI), Windows GUI end-to-end tests (FlaUI + mock LLM), self-release install/upgrade E2E |
 | `third_party_tests/` | Integration tests driving real third-party agent CLIs through the proxy |
 | `scripts/` | Build/release helpers and scripts that configure third-party clients for the integration tests |
-| `.github/workflows/` | CI: MSIX build + package tests, self-release (Velopack) build/test/publish for Windows and Linux, worker deploy |
+| `.github/workflows/` | CI and release workflows for Windows, macOS, Linux, and the Cloudflare worker |
 
 ## Building
 
@@ -141,6 +156,35 @@ cd windows
 
 Releases are published by pushing a `v*` tag — the Self-Release workflow builds,
 tests and uploads both Windows channels to R2 (see `cloudflare/README.md`).
+
+### macOS
+
+Prerequisites: macOS 14+ on Apple silicon, Xcode, and Homebrew. From the
+repository root, build the engine/CLI and SwiftUI app:
+
+```bash
+brew install cmake ninja nlohmann-json openssl@3 xcodegen
+
+# Fetch the pinned, checksum-verified ONNX Runtime dependency:
+macos/fetch-deps.sh
+
+cmake -B macos/build -G Ninja -S macos
+cmake --build macos/build
+macos/build-app.sh
+open macos/build/AgentRedactor.app
+```
+
+The development app downloads the ~1.6 GB AI model on first run. For a signed,
+notarized self-release DMG and its Velopack update artifacts, use
+`macos/build-release.sh`; output is under `macos/build-release/velopack/`.
+For the sandboxed Mac App Store variant and Transporter-ready PKG, use
+`macos/build-store.sh`. Store builds include the model and require Apple
+Distribution and Mac Installer Distribution signing credentials for a submittable
+package.
+
+See [macos/README.md](macos/README.md) for dependency details, signing,
+notarization, entitlements, CLI installation, release tests, and clean-slate
+testing.
 
 ### Linux
 
