@@ -48,6 +48,8 @@ def test_store_package_layout_and_entitlements() -> None:
     assert engine_values == {
         "com.apple.security.app-sandbox": True,
         "com.apple.security.inherit": True,
+        "com.apple.security.network.client": True,
+        "com.apple.security.network.server": True,
     }
     assert (resources / "models" / "onnx" / "model_quantized.onnx_data").stat().st_size == 1618042064
     assert not (app / "Contents" / "MacOS" / "UpdateMac").exists()

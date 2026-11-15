@@ -125,7 +125,9 @@ open macos/build/AgentRedactor.app
   Keychain item and unlocks the engine through the authenticated loopback API;
   the Store app does not install the CLI, so no restricted Keychain-sharing or
   application-identifier claims are needed. The engine is signed with
-  `packaging/AgentRedactor-Engine-Store.entitlements` (`app-sandbox` + `inherit`).
+  `packaging/AgentRedactor-Engine-Store.entitlements` (`app-sandbox` + `inherit`
+  + `network.client`/`network.server` for upstream requests and its loopback
+  listener); the GUI itself has no `network.server` entitlement.
   The app has no Velopack updater; Developer ID certificates and notarytool are
   not part of the Store upload flow. `SIGN_INSTALLER_IDENTITY` selects the Mac
   Installer Distribution identity used by `productbuild` to create

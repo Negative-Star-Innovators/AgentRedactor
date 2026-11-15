@@ -109,7 +109,9 @@ CLI (`dotnet tool install -g vpk --version 1.2.0` — keep it in sync with
   does not declare `network.server`. The config dir needs no code change:
   sandboxed processes get `HOME` = the app container, so the existing
   `~/Library/Application Support/AgentRedactor` path resolves inside it. The
-  nested engine binary inherits the sandbox at spawn.
+  nested engine binary inherits the sandbox at spawn and separately declares
+  `network.client`/`network.server` for its upstream requests and loopback
+  listener, keeping the listener entitlement off the GUI executable.
 - Signing: `SIGN_APP_IDENTITY` ("Apple Distribution: ...") +
   `APPLE_TEAM_ID`. The bundled ONNX Runtime / OpenSSL dylibs are re-signed
   with the same identity — the App Store rejects
