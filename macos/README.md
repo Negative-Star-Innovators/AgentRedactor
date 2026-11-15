@@ -104,13 +104,12 @@ CLI (`dotnet tool install -g vpk --version 1.2.0` — keep it in sync with
   downloaded once. Weights are fetched from the R2 models endpoint into
   `build-store/models-cache/` when not already present (they are not
   committed, same as the MSIX CI).
-- Entitlements (`packaging/AgentRedactor-Store.entitlements`): app sandbox,
-  `network.client`/`network.server` (the loopback proxy), and a
-  Team-ID-substituted `keychain-access-groups` entry so the GUI and the
-  bundled engine binary share Keychain items. The config dir needs no code
-  change: sandboxed processes get `HOME` = the app container, so the
-  existing `~/Library/Application Support/AgentRedactor` path resolves
-  inside it. The nested engine binary inherits the sandbox at spawn.
+- Entitlements (`packaging/AgentRedactor-Store.entitlements`): app sandbox and
+  `network.client` for outbound upstream and loopback requests. The Store app
+  does not declare `network.server`. The config dir needs no code change:
+  sandboxed processes get `HOME` = the app container, so the existing
+  `~/Library/Application Support/AgentRedactor` path resolves inside it. The
+  nested engine binary inherits the sandbox at spawn.
 - Signing: `SIGN_APP_IDENTITY` ("Apple Distribution: ...") +
   `APPLE_TEAM_ID`. The bundled ONNX Runtime / OpenSSL dylibs are re-signed
   with the same identity — the App Store rejects
