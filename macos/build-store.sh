@@ -135,8 +135,8 @@ mkdir -p "${BUILD}"
 
 # Sign innermost-first. The App Store rejects disable-library-validation, so
 # the bundled third-party dylibs (ONNX Runtime, OpenSSL) are re-signed with
-# the SAME distribution identity. The engine declares its own sandbox and
-# inherits the GUI's network capabilities when launched as a child process.
+# the SAME distribution identity. The engine declares its own sandbox and the
+# network capabilities used by its upstream client and loopback listener.
 if [ "${NO_SIGN}" -eq 0 ] && [ -n "${SIGN_APP_IDENTITY:-}" ]; then
     PROFILE="${STORE_PROVISIONING_PROFILE:-}"
     if [ -z "${PROFILE}" ] || [ ! -f "${PROFILE}" ]; then
