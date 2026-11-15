@@ -3,8 +3,9 @@
 <!-- Mac App Store entitlements for Agent Redactor (sandboxed channel).
      Differences from the self-release entitlements:
      - app sandbox enabled (Store requirement)
-     - network.client: the GUI talks to the engine over loopback and the
-       engine talks to configured upstream LLM endpoints.
+     - network.client/server: the engine binds an authenticated 127.0.0.1
+       control API and talks to configured upstream LLM endpoints. The engine
+       inherits these capabilities from its parent app under the sandbox.
      The GUI retrieves its own Keychain item and unlocks the engine through the
      authenticated loopback API, so no restricted Keychain-sharing entitlement
      is needed. The Store build does not install the standalone CLI.
@@ -16,6 +17,8 @@
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.network.server</key>
 	<true/>
 </dict>
 </plist>
