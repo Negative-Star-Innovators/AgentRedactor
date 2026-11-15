@@ -105,13 +105,12 @@ CLI (`dotnet tool install -g vpk --version 1.2.0` — keep it in sync with
   `build-store/models-cache/` when not already present (they are not
   committed, same as the MSIX CI).
 - Entitlements (`packaging/AgentRedactor-Store.entitlements`): app sandbox and
-  `network.client` for outbound upstream and loopback requests. The Store app
-  does not declare `network.server`. The config dir needs no code change:
+  `network.client`/`network.server`. The bundled engine inherits these
+  capabilities for outbound upstream requests and its authenticated
+  `127.0.0.1` control listener; removing the server entitlement prevents the
+  sandboxed engine from starting. The config dir needs no code change:
   sandboxed processes get `HOME` = the app container, so the existing
-  `~/Library/Application Support/AgentRedactor` path resolves inside it. The
-  nested engine binary inherits the sandbox at spawn and separately declares
-  `network.client`/`network.server` for its upstream requests and loopback
-  listener, keeping the listener entitlement off the GUI executable.
+  `~/Library/Application Support/AgentRedactor` path resolves inside it.
 - Signing: `SIGN_APP_IDENTITY` ("Apple Distribution: ...") +
   `APPLE_TEAM_ID`. The bundled ONNX Runtime / OpenSSL dylibs are re-signed
   with the same identity — the App Store rejects
