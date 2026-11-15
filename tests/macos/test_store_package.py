@@ -35,7 +35,7 @@ def test_store_package_layout_and_entitlements() -> None:
     values = signed_entitlements(app)
     assert values["com.apple.security.app-sandbox"] is True
     assert values["com.apple.security.network.client"] is True
-    assert values["com.apple.security.network.server"] is True
+    assert "com.apple.security.network.server" not in values
     assert "com.apple.security.cs.disable-library-validation" not in values
     assert "com.apple.security.keychain-access-groups" not in values
 
