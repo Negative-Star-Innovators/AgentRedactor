@@ -35,7 +35,7 @@ unsigned for now — Windows SmartScreen may warn on first run.
 ### macOS
 
 **Mac App Store** (macOS 14+ on Apple silicon; sandboxed; updates via the Store):
-<https://apps.apple.com/app/id6830907976>
+submitted and awaiting Apple approval.
 
 **Self-release** (macOS 14+ on Apple silicon; updates itself via Velopack):
 [download the DMG](https://api.agentredactor.negativestarinnovators.com/updates/osx-arm64/AgentRedactor-osx-arm64.dmg),
