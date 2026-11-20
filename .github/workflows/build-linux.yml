@@ -108,7 +108,7 @@ jobs:
       - name: Download onnxruntime
         if: env.RUN_BUILD == 'true'
         run: |
-          mkdir -p "$ONNXRUNTIME_DIR"
+          mkdir -p "$ONNXRUNTIME_DIR/include" "$ONNXRUNTIME_DIR/lib"
           rid="${{ matrix.arch == 'x64' && 'linux-x64' || 'linux-arm64' }}"
           curl -fsSL -o ort.nupkg \
             "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.29.0/microsoft.ml.onnxruntime.1.29.0.nupkg"
