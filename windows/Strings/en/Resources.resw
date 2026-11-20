@@ -598,6 +598,9 @@
   <data name="Validation_InvalidRegexGeneric" xml:space="preserve">
     <value>Invalid regex syntax.</value>
   </data>
+  <data name="Error_SaveProfileFailed" xml:space="preserve">
+    <value>The profile could not be saved because the Agent Redactor engine is not responding. Close and reopen Agent Redactor, then try again.</value>
+  </data>
 
   <!-- Tray menu -->
   <data name="TrayMenu_Open" xml:space="preserve">

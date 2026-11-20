@@ -42,6 +42,10 @@ private:
     HttpResponse HandleRequest(const HttpRequest& request);
     std::wstring GenerateToken() const;
     bool WriteControlFile(const std::filesystem::path& path) const;
+    // Issues one authenticated GET /status against the port we just bound to
+    // prove THIS process serves it (a foreign listener holding the port would
+    // answer 401). Called by Start() before control.json is written.
+    bool VerifySelfServing() const;
 
     HttpServer server_;
     RouteHandler routeHandler_;

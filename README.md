@@ -195,11 +195,19 @@ sudo apt install -y build-essential cmake ninja-build pkg-config \
   libsecret-1-dev libcurl4-openssl-dev libssl-dev nlohmann-json3-dev \
   qt6-base-dev qt6-l10n-tools libgl1-mesa-dev patchelf
 
-# onnxruntime is not packaged in apt; use the official x64 tarball
-# (developed/tested against 1.29.0; on ARM64 use the aarch64 tarball):
+# onnxruntime is not packaged in apt; use the official prebuilt library from
+# the pinned NuGet package (developed/tested against 1.29.0; on ARM64 use the
+# linux-arm64 runtime). Microsoft disabled the onnxruntime GitHub Releases in
+# Nov 2026, so NuGet is the distribution channel:
 mkdir -p ~/onnxruntime
-curl -sL https://github.com/microsoft/onnxruntime/releases/download/v1.29.0/onnxruntime-linux-x64-1.29.0.tgz \
-  | tar xz -C ~/onnxruntime --strip-components=1
+curl -fsSL -o ort.nupkg https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.29.0/microsoft.ml.onnxruntime.1.29.0.nupkg
+unzip -q ort.nupkg -d ort_pkg
+mkdir -p ~/onnxruntime/include ~/onnxruntime/lib
+cp -r ort_pkg/build/native/include/. ~/onnxruntime/include/
+cp ort_pkg/runtimes/linux-x64/native/* ~/onnxruntime/lib/
+# the loader resolves the SONAME (libonnxruntime.so.1), not the file name:
+ln -sf libonnxruntime.so ~/onnxruntime/lib/libonnxruntime.so.1
+rm -rf ort.nupkg ort_pkg
 ```
 
 The engine also needs the NER model files: `config.json`, `tokenizer.json`,

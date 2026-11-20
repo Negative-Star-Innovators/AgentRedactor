@@ -43,14 +43,50 @@ ENGINE_EXE = Path(os.environ.get("AGENTREDACTOR_ENGINE_BIN") or _DEFAULT_ENGINE)
 TEST_API_KEY = "sk-cli-test-key"
 
 
-def _wait_for_control_json(config_dir: Path, timeout: float = 90.0) -> None:
+def _engine_diagnostics(config_dir: Path, process=None) -> str:
+    """Failure context for a control.json wait: engine liveness, config dir
+    contents, and the engine log tail. The log names the exact startup stage
+    (model load, control API, ...) that never finished — without it a CI
+    failure here is just a timeout with no clue."""
+    lines = []
+    if process is not None:
+        rc = process.poll()
+        lines.append(f"engine alive: {rc is None} (rc={rc})")
+    try:
+        entries = sorted(p.name for p in config_dir.iterdir())
+    except (FileNotFoundError, NotADirectoryError):
+        entries = []
+    lines.append(f"config dir contents: {entries}")
+    log = config_dir / "agent_redactor.log"
+    if log.exists():
+        try:
+            tail = log.read_text(encoding="utf-8", errors="replace").splitlines()[-30:]
+            lines.append("engine log tail:\n" + "\n".join(tail))
+        except OSError as exc:
+            lines.append(f"engine log unreadable: {exc}")
+    else:
+        lines.append("engine log: absent (initialize logging writes it before everything else)")
+    return "\n".join(lines)
+
+
+def _wait_for_control_json(config_dir: Path, timeout: float = 180.0, process=None) -> None:
     deadline = time.monotonic() + timeout
     path = config_dir / "control.json"
     while time.monotonic() < deadline:
         if path.exists() and path.stat().st_size > 0:
             return
+        if process is not None and process.poll() is not None:
+            # The engine died early: no point waiting out the timeout. The
+            # caller turns this into a precise "exited with rc=N" error.
+            raise RuntimeError(
+                f"engine exited rc={process.poll()} before writing control.json\n"
+                + _engine_diagnostics(config_dir, process)
+            )
         time.sleep(0.1)
-    raise RuntimeError(f"control.json did not appear in {config_dir}")
+    raise RuntimeError(
+        f"control.json did not appear in {config_dir} within {timeout}s\n"
+        + _engine_diagnostics(config_dir, process)
+    )
 
 
 class CliEngine:
@@ -90,10 +126,13 @@ class CliEngine:
             stderr=subprocess.DEVNULL,
             creationflags=creationflags,
         )
-        _wait_for_control_json(self.config_dir)
+        _wait_for_control_json(self.config_dir, timeout=180.0, process=self.process)
         if not _wait_for_port(self.proxy_port, timeout=90.0):
             self.stop()
-            raise RuntimeError(f"engine did not start listening on port {self.proxy_port}")
+            raise RuntimeError(
+                f"engine did not start listening on port {self.proxy_port}\n"
+                + _engine_diagnostics(self.config_dir, self.process)
+            )
 
     def run_cli(self, *args: str, input: str | None = None) -> subprocess.CompletedProcess:
         # stdin=DEVNULL by default: no interactive console, so a locked engine

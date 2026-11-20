@@ -78,9 +78,12 @@ public:
     explicit SettingsFacade(EngineClient* client) : client_(client) {}
 
     std::vector<ApiKeyProfile> GetProfiles() const;
-    void AddProfile(const ApiKeyProfile& profile);
-    void UpdateProfile(const ApiKeyProfile& profile);
-    void RemoveProfile(const std::wstring& id);
+    // These return false when the engine rejected or could not be reached for
+    // the write. Callers MUST check: reporting success for a write that never
+    // landed is how "saving a profile does nothing" stayed invisible.
+    bool AddProfile(const ApiKeyProfile& profile);
+    bool UpdateProfile(const ApiKeyProfile& profile);
+    bool RemoveProfile(const std::wstring& id);
     std::optional<ApiKeyProfile> GetProfileById(const std::wstring& id) const;
 
     bool IsStartOnBoot() const;

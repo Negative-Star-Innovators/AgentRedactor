@@ -129,7 +129,12 @@
                             <TextBlock x:Name="RegexEnabledHeader" FontWeight="SemiBold" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" x:Name="RegexPatternHeader" FontWeight="SemiBold" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
                         </Grid>
-                        <StackPanel x:Name="RegexListPanel" Spacing="2" MaxHeight="150"/>
+                        <!-- ScrollViewer so entries beyond the visible height stay
+                             reachable: the panel used to CLIP overflow, hiding every
+                             keyword/regex past ~6 rows with no way to scroll. -->
+                        <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalScrollMode="Auto" Padding="0,0,4,0">
+                            <StackPanel x:Name="RegexListPanel" Spacing="2"/>
+                        </ScrollViewer>
                         <Grid Margin="0,12,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -156,7 +161,9 @@
                             <TextBlock Grid.Column="1" x:Name="KeywordsCaseHeader" FontWeight="SemiBold" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="2" x:Name="KeywordsKeywordHeader" FontWeight="SemiBold" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
                         </Grid>
-                        <StackPanel x:Name="KeywordListPanel" Spacing="2" MaxHeight="150"/>
+                        <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalScrollMode="Auto" Padding="0,0,4,0">
+                            <StackPanel x:Name="KeywordListPanel" Spacing="2"/>
+                        </ScrollViewer>
                         <Grid Margin="0,12,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>

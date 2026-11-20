@@ -43,7 +43,8 @@ if (NOT DEFINED OPENSSL_ROOT_DIR AND EXISTS "/opt/homebrew/opt/openssl@3")
 endif()
 
 # onnxruntime has no brew formula; fetch-deps.sh downloads the official
-# osx-arm64 tarball (pinned + sha256-checked) into third_party/ (gitignored).
+# osx-arm64 library from the pinned NuGet package (sha256-checked) into
+# third_party/ (gitignored).
 # Both knobs remain user-overridable like the Linux build's.
 set(AR_ONNXRUNTIME_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/onnxruntime)
 if (NOT DEFINED ONNXRUNTIME_INCLUDE_DIR AND EXISTS ${AR_ONNXRUNTIME_ROOT}/include/onnxruntime_cxx_api.h)

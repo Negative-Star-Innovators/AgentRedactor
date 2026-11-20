@@ -140,6 +140,20 @@ namespace winrt::AgentRedactor::implementation
         // user-input only).
         std::wstring programmaticApiKey_;
 
+        // Set by SaveProfileFromUi() when the ENGINE refused or could not be
+        // reached for the write (as opposed to a local validation failure, which
+        // shows its own dialog). Lets the manual Save button distinguish "you
+        // typed something invalid" from "the save did not reach the engine" so
+        // the second case is no longer silent.
+        bool lastSaveWriteFailed_ = false;
+
+        // Set by AddRegex_Click/AddKeyword_Click and consumed by the next list
+        // rebuild: the lists are inside ScrollViewers now, so a row appended
+        // beyond the visible height would otherwise be added "off-screen" and
+        // the user would have to hunt for it manually.
+        bool revealLastRegexRow_ = false;
+        bool revealLastKeywordRow_ = false;
+
     };
 }
 

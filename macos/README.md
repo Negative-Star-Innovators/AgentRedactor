@@ -11,7 +11,7 @@ Build the engine/CLI (`agentredactor`) on macOS 14+:
 ```bash
 brew install cmake ninja nlohmann-json openssl@3
 
-# Fetches the pinned osx-arm64 onnxruntime tarball (sha256-checked) into
+# Fetches the pinned osx-arm64 onnxruntime (sha256-checked NuGet package) into
 # macos/third_party/ (gitignored) and verifies the prerequisites:
 macos/fetch-deps.sh
 

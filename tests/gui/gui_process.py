@@ -59,14 +59,22 @@ def _kill_existing_agent_redactor(
     if not targets:
         return killed
 
-    # Graceful termination first.
+    # Graceful termination first. A process that cannot even be signalled
+    # (another user's engine under fast user switching / RDP) is dropped
+    # here, BEFORE any wait: wait_procs would raise AccessDenied trying to
+    # open a handle for it. Not ours to kill; per-user test isolation
+    # handles the rest.
+    killable = []
     for proc in targets:
         try:
             proc.terminate()
+            killable.append(proc)
         except psutil.NoSuchProcess:
             pass
+        except psutil.AccessDenied:
+            continue
 
-    gone, alive = psutil.wait_procs(targets, timeout=grace_period)
+    gone, alive = psutil.wait_procs(killable, timeout=grace_period)
 
     # Force-kill anything still alive.
     for proc in alive:
@@ -74,6 +82,8 @@ def _kill_existing_agent_redactor(
             proc.kill()
         except psutil.NoSuchProcess:
             pass
+        except psutil.AccessDenied:
+            continue
 
     gone2, alive2 = psutil.wait_procs(alive, timeout=timeout)
 

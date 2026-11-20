@@ -18,9 +18,6 @@
 #include <cmath>
 #include <chrono>
 #include <unordered_set>
-#ifdef __APPLE__
-#include <coreml_provider_factory.h>
-#endif
 
 using json = nlohmann::json;
 
@@ -178,17 +175,22 @@ bool PIIDetector::LoadModel() {
                         // them into a temp dir deleted at session close).
                         // Diagnostics knob; unset in normal runs.
                         const char* cacheDir = std::getenv("AGENTREDACTOR_COREML_CACHE_DIR");
-                        // Optional COREML flags override (bit mask per
-                        // coreml_provider_factory.h, e.g. 16 = MLPROGRAM);
-                        // diagnostics knob for the macos/tools/bench trial.
+                        // Optional COREML flags override (bit mask, e.g.
+                        // 16 = MLPROGRAM); diagnostics knob for the
+                        // macos/tools/bench trial. Passed through the modern
+                        // provider-options API — the legacy C factory header
+                        // (coreml_provider_factory.h) is not shipped by the
+                        // NuGet-distributed runtime this build links.
                         uint32_t coremlFlags = 0;
                         if (const char* f = std::getenv("AGENTREDACTOR_COREML_FLAGS")) {
                             coremlFlags = static_cast<uint32_t>(std::strtoul(f, nullptr, 0));
                         }
                         if (cacheDir && cacheDir[0] != '\0') {
                             sessionOptions.AppendExecutionProvider("CoreML", {{"ModelCacheDirectory", cacheDir}});
+                        } else if (coremlFlags != 0) {
+                            sessionOptions.AppendExecutionProvider("CoreML", {{"CoreMLFlags", std::to_string(coremlFlags)}});
                         } else {
-                            Ort::ThrowOnError(OrtSessionOptionsAppendExecutionProvider_CoreML(sessionOptions, coremlFlags));
+                            sessionOptions.AppendExecutionProvider("CoreML", {});
                         }
                         currentProvider_ = L"CoreML";
                         LOG(L"[PIIDetector] CoreML execution provider enabled");

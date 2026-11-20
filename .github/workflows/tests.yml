@@ -89,7 +89,12 @@ jobs:
         shell: pwsh
         run: |
           if (-not (Test-Path vcpkg\vcpkg.exe)) { vcpkg\bootstrap-vcpkg.bat -disableMetrics }
-          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
+          # onnxruntime uses an overlay port (windows/vcpkg-overlays/): the
+          # registry port downloads its source from the vanished
+          # microsoft/onnxruntime GitHub repo (404 since Nov 2026); the
+          # overlay repackages the official Microsoft.ML.OnnxRuntime
+          # NuGet native package (same version) instead.
+          vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows --overlay-ports=repo/windows/vcpkg-overlays
 
       - name: Download ONNX model weights
         shell: pwsh
