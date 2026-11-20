@@ -176,23 +176,23 @@ std::vector<ApiKeyProfile> SettingsFacade::GetProfiles() const {
     return profiles;
 }
 
-void SettingsFacade::AddProfile(const ApiKeyProfile& profile) {
-    if (!client_) return;
+bool SettingsFacade::AddProfile(const ApiKeyProfile& profile) {
+    if (!client_) return false;
     json j;
     profile.ToJson(j);
-    client_->Post(L"/profiles", j);
+    return client_->Post(L"/profiles", j);
 }
 
-void SettingsFacade::UpdateProfile(const ApiKeyProfile& profile) {
-    if (!client_ || profile.id.empty()) return;
+bool SettingsFacade::UpdateProfile(const ApiKeyProfile& profile) {
+    if (!client_ || profile.id.empty()) return false;
     json j;
     profile.ToJson(j);
-    client_->Put(L"/profiles/" + profile.id, j);
+    return client_->Put(L"/profiles/" + profile.id, j);
 }
 
-void SettingsFacade::RemoveProfile(const std::wstring& id) {
-    if (!client_) return;
-    client_->Delete(L"/profiles/" + id);
+bool SettingsFacade::RemoveProfile(const std::wstring& id) {
+    if (!client_) return false;
+    return client_->Delete(L"/profiles/" + id);
 }
 
 std::optional<ApiKeyProfile> SettingsFacade::GetProfileById(const std::wstring& id) const {

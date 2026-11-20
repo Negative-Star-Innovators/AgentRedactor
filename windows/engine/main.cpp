@@ -169,9 +169,65 @@ int RunEngine(bool keepConsole) {
     EnsureUserPathContainsExeDir();
 #endif
 
-    HANDLE hMutex = CreateMutexW(nullptr, TRUE, L"AgentRedactor_Engine_Mutex");
-    if (GetLastError() == ERROR_ALREADY_EXISTS) {
-        // Another engine instance is already running; exit quietly.
+    // Single-instance guard, PER USER (Linux/macOS parity: those lock
+    // <configDir>/engine.lock, and configDir is per-user).
+    //
+    // Scope matters here. The engine is a per-USER singleton, because all of its
+    // state (settings.json, the control token, the API keys) lives in the user's
+    // own %APPDATA%\AgentRedactor. Two DIFFERENT users on one machine are
+    // supposed to run two independent engines; only a second engine for the
+    // SAME user is an error.
+    //
+    // The old name was unqualified, so it lived in the caller's session
+    // namespace: an engine in another logon session (fast user switching, an
+    // RDP/console session, a scheduled task) was invisible to this check, and a
+    // second engine started for the same user. On Windows SO_REUSEADDR then let
+    // it bind the SAME 127.0.0.1:8737 the first was already serving; the
+    // newcomer overwrote control.json with its own token while the original
+    // process kept receiving every connection, so the GUI got 401 for every call
+    // and showed an empty profile list with saves that silently did nothing.
+    //
+    // Keying the name on the user's own profile directory makes it per-user
+    // across every session of that user, which is exactly the Linux/macOS
+    // behaviour. A machine-wide (Global\) name would be WRONG: it would stop a
+    // second user's engine from starting at all.
+    //
+    // The key is the user's %APPDATA% path (the same value the engine uses to
+    // find its config dir), so the guard scopes precisely to the state it is
+    // protecting. A deterministic hash keeps the mutex name short and free of
+    // the backslashes/colons a raw path would contain (those are illegal in
+    // object names). If the path cannot be resolved we fall back to the bare
+    // name, which is never machine-wide, so a second user is never blocked. The
+    // control-port exclusivity check in HttpServer is the independent backstop
+    // if a guard is ever bypassed.
+    std::wstring mutexName = L"AgentRedactor_Engine_Mutex";
+    {
+        const std::filesystem::path configDir = Utils::GetAppDataPath();
+        if (!configDir.empty()) {
+            std::wstring userKey = configDir.wstring();
+            for (auto& c : userKey) c = static_cast<wchar_t>(std::towlower(c));
+            // FNV-1a over the lowercased path: same user+dir always maps to the
+            // same name; different users map to different names.
+            uint64_t hash = 1469598103934665603ULL;
+            for (wchar_t c : userKey) {
+                hash ^= static_cast<uint64_t>(c);
+                hash *= 1099511628211ULL;
+            }
+            wchar_t suffix[32] = {};
+            _snwprintf_s(suffix, std::size(suffix), _TRUNCATE, L"_%016llx",
+                static_cast<unsigned long long>(hash));
+            mutexName += suffix;
+        }
+    }
+
+    HANDLE hMutex = CreateMutexW(nullptr, TRUE, mutexName.c_str());
+    // ERROR_ALREADY_EXISTS: this user already has an engine. ERROR_ACCESS_DENIED:
+    // the existing mutex belongs to another user (its DACL does not grant us
+    // access), which means this name is not ours to share — treating that as
+    // "start anyway" is what the per-user naming is designed to avoid, so exit
+    // quietly rather than risk a second engine on the same control port.
+    if (GetLastError() == ERROR_ALREADY_EXISTS || GetLastError() == ERROR_ACCESS_DENIED) {
+        // Another engine instance for this user is already running; exit quietly.
         if (hMutex) { ReleaseMutex(hMutex); CloseHandle(hMutex); }
         return 0;
     }

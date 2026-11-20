@@ -1,6 +1,8 @@
 #include "control_server.h"
 #include "utils.h"
 #include "logging.h"
+#include <chrono>
+#include <thread>
 #ifdef _WIN32
 #include <bcrypt.h>
 #include <sddl.h>
@@ -48,6 +50,35 @@ bool ControlServer::Start(int preferredPort, const std::filesystem::path& config
     }
     port_ = server_.GetPort();
 
+    // Self-check BEFORE advertising the port. Binding can succeed while another
+    // process still owns the address (historically on Windows, where
+    // SO_REUSEADDR allowed a second bind to the same 127.0.0.1:port). If that
+    // happened, connections go to the OTHER process, which does not know our
+    // token, so the GUI would see 401 on everything and present it as "no
+    // profiles / cannot save". Writing control.json in that state is worse than
+    // not starting: it points the GUI at a socket we do not serve.
+    //
+    // A real request to ourselves proves ownership: only our own listener can
+    // answer with our freshly generated token.
+    //
+    // The probe is retried briefly: the listener thread was just spawned, and
+    // on a heavily loaded machine the first connect can complete before the
+    // accept loop has been scheduled. Only a PERSISTENT failure (the signature
+    // of a foreign process serving the port) refuses startup, so a slow start
+    // can never misfire a guarantee this strict.
+    bool selfOk = VerifySelfServing();
+    for (int attempt = 1; !selfOk && attempt < 3; ++attempt) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        selfOk = VerifySelfServing();
+    }
+    if (!selfOk) {
+        LOGF(L"[ControlServer] Control API on 127.0.0.1:%d is not served by this "
+             L"process (another instance owns the port); refusing to advertise it", port_);
+        server_.Stop();
+        port_ = 0;
+        return false;
+    }
+
     if (!WriteControlFile(ControlFilePath(configDir))) {
         LOG(L"[ControlServer] Failed to write control.json");
         server_.Stop();
@@ -57,6 +88,66 @@ bool ControlServer::Start(int preferredPort, const std::filesystem::path& config
 
     LOGF_LIFECYCLE(L"[ControlServer] Control API listening on 127.0.0.1:%d", port_);
     return true;
+}
+
+// Issues one authenticated GET /status against our own bound port and checks
+// that this process answers it. Uses a plain blocking socket with short
+// timeouts so Start() cannot hang; any failure (refused, timeout, 401, or a
+// non-200) means we do not own the advertised port.
+bool ControlServer::VerifySelfServing() const {
+#ifdef _WIN32
+    SOCKET sock = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (sock == INVALID_SOCKET) return false;
+    auto closeSock = [&]() { ::closesocket(sock); };
+    DWORD timeoutMs = 2000;
+    ::setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeoutMs, sizeof(timeoutMs));
+    ::setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeoutMs, sizeof(timeoutMs));
+#else
+    SOCKET sock = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (sock == INVALID_SOCKET) return false;
+    auto closeSock = [&]() { ::closesocket(sock); };
+    timeval tv{};
+    tv.tv_sec = 2;
+    tv.tv_usec = 0;
+    ::setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    ::setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+#endif
+
+    sockaddr_in addr = {};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    addr.sin_port = htons(static_cast<u_short>(port_));
+
+    if (::connect(sock, (sockaddr*)&addr, sizeof(addr)) != 0) {
+        closeSock();
+        return false;
+    }
+
+    std::string token = Utils::WideToUtf8(token_);
+    std::string request =
+        "GET /status HTTP/1.1\r\n"
+        "Host: 127.0.0.1:" + std::to_string(port_) + "\r\n"
+        "Authorization: Bearer " + token + "\r\n"
+        "Connection: close\r\n\r\n";
+    if (::send(sock, request.data(), (int)request.size(), 0) <= 0) {
+        closeSock();
+        return false;
+    }
+
+    std::string response;
+    char buf[512];
+    for (;;) {
+        int received = ::recv(sock, buf, sizeof(buf), 0);
+        if (received <= 0) break;
+        response.append(buf, received);
+        if (response.size() > 8192) break;  // /status is small; do not over-read
+    }
+    closeSock();
+
+    // "HTTP/1.1 200" proves both that someone answered AND that it accepted our
+    // token. A 401 here is the exact stale-engine signature: a foreign process
+    // holds the port and rejects the token we are about to write to disk.
+    return response.rfind("HTTP/1.1 200", 0) == 0;
 }
 
 void ControlServer::Stop() {

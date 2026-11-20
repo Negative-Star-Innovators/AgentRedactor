@@ -486,9 +486,22 @@ namespace winrt::AgentRedactor::implementation
             std::vector<int> emptyPorts;
             int port = ::AgentRedactor::FindAvailablePort(8080, emptyPorts);
             defaultProfile.port = (port > 0) ? port : 8080;
-            app->Settings()->AddProfile(defaultProfile);
+            // The engine is a separate process reached over the control API, so
+            // this write can fail (engine not up yet, or another instance owns
+            // the loopback port). Confirm the profile actually exists instead of
+            // assuming success: a silently dropped seed left first-run users
+            // with an empty profile list and a form that could never save.
+            bool seeded = app->Settings()->AddProfile(defaultProfile);
             profiles_ = app->Settings()->GetProfiles();
-            currentProfileId_ = defaultProfile.id;
+            if (seeded && !profiles_.empty()) {
+                currentProfileId_ = defaultProfile.id;
+            } else {
+                // Keep the id so a later refresh can adopt the profile once the
+                // engine accepts the write; do NOT claim a saved profile.
+                currentProfileId_ = profiles_.empty() ? L"" : profiles_[0].id;
+                LOG_LIFECYCLE(L"[HomePage] Default profile could not be created "
+                              L"(engine write failed); profile list left empty for retry");
+            }
         } else {
             // Keep the current selection (by id) across engine-driven
             // reloads; fall back to the first profile only when the selected
@@ -1192,10 +1205,18 @@ namespace winrt::AgentRedactor::implementation
 
     bool HomePage::SaveProfileFromUi()
     {
+        lastSaveWriteFailed_ = false;
         auto app = ::AgentRedactor::AppState::Instance();
         if (!app) return false;
         auto opt = app->Settings()->GetProfileById(currentProfileId_);
-        if (!opt) return false;
+        if (!opt) {
+            // No profile to update: on a fresh install where the default seed
+            // never landed (engine write refused), the form still has no
+            // backing profile. Treat it as a write failure so the user is told
+            // rather than seeing Save do nothing at all.
+            lastSaveWriteFailed_ = true;
+            return false;
+        }
         auto p = *opt;
         p.alias = ProfileNameBox().Text().c_str();
         p.port = _wtoi(PortBox().Text().c_str());
@@ -1284,7 +1305,15 @@ namespace winrt::AgentRedactor::implementation
             }
         }
 
-        app->Settings()->UpdateProfile(p);
+        if (!app->Settings()->UpdateProfile(p)) {
+            // The engine never accepted the write (unreachable, or a stale
+            // instance owning the loopback port). Reporting success here was
+            // exactly the "nothing can be saved" symptom: the form looked saved
+            // but settings.json was untouched. Surface it instead.
+            LOG_LIFECYCLE(L"[HomePage] Profile save failed: the engine did not accept the update");
+            lastSaveWriteFailed_ = true;
+            return false;
+        }
         app->RestartProxyServers();
 
         // Refresh the cached snapshot so the 1-second poll's diff check sees
@@ -1343,7 +1372,11 @@ namespace winrt::AgentRedactor::implementation
         // Manual Save keeps the current behavior: on validation failure the
         // user keeps every field as typed (the dialog already explained the
         // problem), so they can fix it before the next save.
-        SaveProfileFromUi();
+        if (!SaveProfileFromUi()) {
+            if (lastSaveWriteFailed_) {
+                ShowErrorAsync(::AgentRedactor::LocString(L"Error_SaveProfileFailed"));
+            }
+        }
     }
 
     void HomePage::AddRegex_Click(IInspectable const&, RoutedEventArgs const&)

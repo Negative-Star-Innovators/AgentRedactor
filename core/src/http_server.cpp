@@ -51,8 +51,37 @@ bool HttpServer::Start(int port, std::function<HttpResponse(const HttpRequest&)>
         return false;
     }
 
+    // Address reuse policy.
+    //
+    // The proxy data plane (loopbackOnly == false) wants SO_REUSEADDR so a
+    // restart can rebind immediately while old connections drain.
+    //
+    // The loopback control API must NOT use it on Windows. There, SO_REUSEADDR
+    // lets a SECOND process bind the exact same address:port while the first
+    // keeps receiving every connection. That is how a stale engine from another
+    // logon session (or a crashed run whose process is still alive) could sit on
+    // 127.0.0.1:8737 while a freshly spawned engine "successfully" bound the
+    // same port, overwrote control.json with its own token and pid, and then
+    // never saw a single request — so the GUI read the new token, talked to the
+    // OLD process, and every call came back 401. That presented as "no profiles
+    // on a fresh install and nothing can be saved".
+    //
+    // SO_EXCLUSIVEADDRUSE makes the second bind fail instead, which is what we
+    // want: the caller can then detect the conflict and report it rather than
+    // silently losing the control API.
+#ifdef _WIN32
+    if (loopbackOnly) {
+        int exclusive = 1;
+        setsockopt(listenSocket_, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+            (char*)&exclusive, sizeof(exclusive));
+    } else {
+        int reuse = 1;
+        setsockopt(listenSocket_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
+    }
+#else
     int reuse = 1;
     setsockopt(listenSocket_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
+#endif
 
     if (!loopbackOnly) {
         // Dual-stack: accept both IPv4 and IPv6 connections on one socket
@@ -450,8 +479,25 @@ bool IsPortAvailable(int port) {
         return false;
     }
 
+    // Availability probe. This must agree with what the REAL proxy listener can
+    // bind, and it must never report "free" for a port that another process is
+    // actively listening on.
+    //
+    // On Windows, SO_REUSEADDR lets a bind SUCCEED while another socket already
+    // listens on the same address:port, so a probe with it set reports an
+    // occupied port as available. SO_EXCLUSIVEADDRUSE is the correct test there:
+    // it fails precisely when someone else holds the port. POSIX keeps
+    // SO_REUSEADDR (Linux/macOS still reject a bind over a live listener).
+#ifdef _WIN32
+    {
+        int exclusive = 1;
+        setsockopt(testSocket, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+            (char*)&exclusive, sizeof(exclusive));
+    }
+#else
     int reuse = 1;
     setsockopt(testSocket, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse));
+#endif
 
     // Dual-stack port availability test (must match the real listener)
     int v6only = 0;

@@ -43,12 +43,16 @@ ENGINE_EXE = Path(os.environ.get("AGENTREDACTOR_ENGINE_BIN") or _DEFAULT_ENGINE)
 TEST_API_KEY = "sk-cli-test-key"
 
 
-def _wait_for_control_json(config_dir: Path, timeout: float = 90.0) -> None:
+def _wait_for_control_json(config_dir: Path, timeout: float = 90.0, process=None) -> None:
     deadline = time.monotonic() + timeout
     path = config_dir / "control.json"
     while time.monotonic() < deadline:
         if path.exists() and path.stat().st_size > 0:
             return
+        if process is not None and process.poll() is not None:
+            # The engine died early: no point waiting out the timeout. The
+            # caller turns this into a precise "exited with rc=N" error.
+            raise RuntimeError(f"engine exited rc={process.poll()} before writing control.json")
         time.sleep(0.1)
     raise RuntimeError(f"control.json did not appear in {config_dir}")
 
