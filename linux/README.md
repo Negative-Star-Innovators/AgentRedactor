@@ -24,6 +24,8 @@ unzip -q ort.nupkg -d ort_pkg
 mkdir -p ~/onnxruntime/include ~/onnxruntime/lib
 cp -r ort_pkg/build/native/include/. ~/onnxruntime/include/
 cp ort_pkg/runtimes/linux-x64/native/* ~/onnxruntime/lib/
+# the loader resolves the SONAME (libonnxruntime.so.1), not the file name:
+ln -sf libonnxruntime.so ~/onnxruntime/lib/libonnxruntime.so.1
 rm -rf ort.nupkg ort_pkg
 
 cmake -B build -G Ninja \

@@ -116,6 +116,11 @@ jobs:
           unzip -q ort.nupkg -d ort_pkg
           cp -r ort_pkg/build/native/include/. "$ONNXRUNTIME_DIR/include/"
           cp ort_pkg/runtimes/${rid}/native/* "$ONNXRUNTIME_DIR/lib/"
+          # The NuGet .so is unversioned but its embedded SONAME is
+          # libonnxruntime.so.1 — the loader loads by SONAME, so the engine
+          # cannot find the library without this link (the release tarball
+          # shipped the same symlink chain).
+          ln -sf libonnxruntime.so "$ONNXRUNTIME_DIR/lib/libonnxruntime.so.1"
           rm -rf ort.nupkg ort_pkg
 
       - name: Set up Python
