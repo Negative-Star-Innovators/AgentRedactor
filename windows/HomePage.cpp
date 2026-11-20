@@ -952,6 +952,13 @@ namespace winrt::AgentRedactor::implementation
 
             panel.Children().Append(row);
         }
+
+        // After a user-initiated add, scroll the new (last) row into view so
+        // it is never appended out of sight below the list's viewport.
+        if (revealLastRegexRow_ && panel.Children().Size() > 0) {
+            revealLastRegexRow_ = false;
+            panel.Children().GetAt(panel.Children().Size() - 1).StartBringIntoView();
+        }
     }
 
     void HomePage::LoadKeywordList()
@@ -1095,6 +1102,13 @@ namespace winrt::AgentRedactor::implementation
             row.Children().Append(delBtn);
 
             panel.Children().Append(row);
+        }
+
+        // After a user-initiated add, scroll the new (last) row into view so
+        // it is never appended out of sight below the list's viewport.
+        if (revealLastKeywordRow_ && panel.Children().Size() > 0) {
+            revealLastKeywordRow_ = false;
+            panel.Children().GetAt(panel.Children().Size() - 1).StartBringIntoView();
         }
     }
 
@@ -1406,6 +1420,7 @@ namespace winrt::AgentRedactor::implementation
         // row add as a no-op instead of a change that reloads the form and
         // wipes pending edits in the profile text fields.
         profiles_ = app->Settings()->GetProfiles();
+        revealLastRegexRow_ = true;
         LoadRegexList();
         NewRegexBox().Text(L"");
     }
@@ -1432,6 +1447,7 @@ namespace winrt::AgentRedactor::implementation
         // row add as a no-op instead of a change that reloads the form and
         // wipes pending edits in the profile text fields.
         profiles_ = app->Settings()->GetProfiles();
+        revealLastKeywordRow_ = true;
         LoadKeywordList();
         NewKeywordBox().Text(L"");
     }

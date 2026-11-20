@@ -2,6 +2,15 @@
 # Downloads the pinned ONNX Runtime prebuilt library into macos/third_party/onnxruntime/.
 # The binary blob is gitignored; this script is the source of truth for the version.
 #
+# Source: the official NuGet package (Microsoft.ML.OnnxRuntime), NOT GitHub
+# Releases. Microsoft removed/disabled the microsoft/onnxruntime GitHub
+# repository's releases in Nov 2026 (all release-download URLs 404), while
+# nuget.org keeps hosting the identical prebuilt binaries. The NuGet package
+# ships one dylib per platform whose embedded install name is the same
+# @rpath/libonnxruntime.1.dylib the release tarballs used (verified), so
+# linking, rpaths, and build-release.sh/build-store.sh packaging are unchanged;
+# the script recreates the tarball's versioned symlink names for CMake.
+#
 # Also verifies the other macOS build prerequisites that CMake needs:
 #   - nlohmann-json (header-only; `brew install nlohmann-json`)
 #   - OpenSSL 3 (`brew install openssl@3`) — used for the AES-GCM/PBKDF2 secure-storage
@@ -10,8 +19,9 @@
 set -euo pipefail
 
 ORT_VERSION="1.29.0"
-ORT_SHA256="d0706fc34f315d8c88639d0a8c81f2e09e815f282cabed3493c06a054352cf92"
-URL="https://github.com/microsoft/onnxruntime/releases/download/v${ORT_VERSION}/onnxruntime-osx-arm64-${ORT_VERSION}.tgz"
+NUGET_PACKAGE_ID="microsoft.ml.onnxruntime"
+NUGET_SHA256="4557021fec4da3924e2e12ff44b1cc50b176de0d2c5c7daa89ab11c208b3a454"
+URL="https://api.nuget.org/v3-flatcontainer/${NUGET_PACKAGE_ID}/${ORT_VERSION}/${NUGET_PACKAGE_ID}.${ORT_VERSION}.nupkg"
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 DEST="${ROOT}/third_party/onnxruntime"
@@ -24,21 +34,21 @@ else
     trap 'rm -rf "${TMP}"' EXIT
 
     echo "Downloading ${URL}"
-    curl -fsSL -o "${TMP}/onnxruntime.tgz" "${URL}"
+    curl -fsSL -o "${TMP}/onnxruntime.nupkg" "${URL}"
 
-    echo "${ORT_SHA256}  ${TMP}/onnxruntime.tgz" | shasum -a 256 -c -
+    echo "${NUGET_SHA256}  ${TMP}/onnxruntime.nupkg" | shasum -a 256 -c -
+
+    # A .nupkg IS a zip archive despite the extension.
+    unzip -q "${TMP}/onnxruntime.nupkg" -d "${TMP}/pkg"
 
     rm -rf "${DEST}"
     mkdir -p "${DEST}/include" "${DEST}/lib"
-    # The tarball root is a versioned directory (with a leading ./ that
-    # --strip-components mishandles on bsdtar); extract, then copy the pieces
-    # this project links/ships.
-    tar -xzf "${TMP}/onnxruntime.tgz" -C "${TMP}"
-    INNER="${TMP}/onnxruntime-osx-arm64-${ORT_VERSION}"
-    cp -R "${INNER}/include/." "${DEST}/include/"
-    cp -R "${INNER}/lib/." "${DEST}/lib/"
-    # Debug symbols are ~hundreds of MB and unneeded for linking/running.
-    rm -rf "${DEST}/lib/libonnxruntime.${ORT_VERSION}.dylib.dSYM"
+    cp -R "${TMP}/pkg/build/native/include/." "${DEST}/include/"
+    cp "${TMP}/pkg/runtimes/osx-arm64/native/libonnxruntime.dylib" "${DEST}/lib/"
+    # Recreate the release-tarball layout: CMake links the versioned name and
+    # the packaging scripts copy through libonnxruntime.1.dylib (cp -L).
+    ln -sf libonnxruntime.dylib "${DEST}/lib/libonnxruntime.1.dylib"
+    ln -sf libonnxruntime.dylib "${DEST}/lib/libonnxruntime.${ORT_VERSION}.dylib"
 
     echo "onnxruntime ${ORT_VERSION} extracted to ${DEST}"
 fi

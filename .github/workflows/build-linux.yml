@@ -100,15 +100,23 @@ jobs:
             qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse libfuse2t64 \
             xvfb python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11 patchelf
 
-      # onnxruntime has no apt package; official tarball per arch, same as
-      # linux/README.md documents for local builds.
+      # onnxruntime has no apt package; the official prebuilt per arch comes
+      # from the pinned NuGet package (same libraries the release tarballs
+      # shipped — Microsoft disabled the onnxruntime GitHub Releases in
+      # Nov 2026, so the old tarball URLs 404 for every arch). Same layout as
+      # linux/README.md documents for local builds: include/ + lib/.
       - name: Download onnxruntime
         if: env.RUN_BUILD == 'true'
         run: |
           mkdir -p "$ONNXRUNTIME_DIR"
-          rid="${{ matrix.arch == 'x64' && 'x64' || 'aarch64' }}"
-          curl -sL "https://github.com/microsoft/onnxruntime/releases/download/v1.29.0/onnxruntime-linux-${rid}-1.29.0.tgz" \
-            | tar xz -C "$ONNXRUNTIME_DIR" --strip-components=1
+          rid="${{ matrix.arch == 'x64' && 'linux-x64' || 'linux-arm64' }}"
+          curl -fsSL -o ort.nupkg \
+            "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.29.0/microsoft.ml.onnxruntime.1.29.0.nupkg"
+          echo "4557021fec4da3924e2e12ff44b1cc50b176de0d2c5c7daa89ab11c208b3a454  ort.nupkg" | sha256sum -c -
+          unzip -q ort.nupkg -d ort_pkg
+          cp -r ort_pkg/build/native/include/. "$ONNXRUNTIME_DIR/include/"
+          cp ort_pkg/runtimes/${rid}/native/* "$ONNXRUNTIME_DIR/lib/"
+          rm -rf ort.nupkg ort_pkg
 
       - name: Set up Python
         if: env.RUN_BUILD == 'true'
