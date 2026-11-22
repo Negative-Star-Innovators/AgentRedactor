@@ -81,6 +81,30 @@ namespace FlaUIHelper
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern uint RegisterWindowMessage(string lpString);
 
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindowEx(IntPtr hWndParent, IntPtr hWndChildAfter, string lpszClass, string lpszWindow);
+
+        [DllImport("shell32.dll")]
+        private static extern int Shell_NotifyIconGetRect(ref NotifyIconIdentifier identifier, out TrayRect iconRect);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NotifyIconIdentifier
+        {
+            public int cbSize;
+            public IntPtr hWnd;
+            public uint uID;
+            public Guid guidItem;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct TrayRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
         [DllImport("user32.dll")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
@@ -1873,18 +1897,43 @@ namespace FlaUIHelper
 
         private static int ClickTrayIcon(UIA3Automation automation)
         {
-            var icon = Retry.WhileNull(() =>
-                automation.GetDesktop().FindFirstDescendant(x =>
-                    x.ByAutomationId("NotifyItemIcon").And(x.ByName("Agent Redactor"))),
-                ControlFindTimeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
-            if (icon == null)
+            var process = FindAgentRedactorProcess();
+            var messageWindow = IntPtr.Zero;
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            TrayRect iconRect = new TrayRect();
+            while (DateTime.UtcNow < deadline)
             {
-                throw new InvalidOperationException("Agent Redactor tray icon not found.");
+                messageWindow = FindWindowEx(new IntPtr(3), IntPtr.Zero, "AgentRedactorMsgWindow", null);
+                if (messageWindow != IntPtr.Zero)
+                {
+                    GetWindowThreadProcessId(messageWindow, out uint ownerPid);
+                    if (ownerPid == process.Id)
+                    {
+                        var identifier = new NotifyIconIdentifier
+                        {
+                            cbSize = Marshal.SizeOf<NotifyIconIdentifier>(),
+                            hWnd = messageWindow,
+                            uID = 1,
+                            guidItem = Guid.Empty,
+                        };
+                        if (Shell_NotifyIconGetRect(ref identifier, out iconRect) == 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+                Thread.Sleep(RetryPollIntervalMs);
             }
-            icon.Click();
+            if (messageWindow == IntPtr.Zero || iconRect.Right <= iconRect.Left || iconRect.Bottom <= iconRect.Top)
+            {
+                throw new InvalidOperationException("Agent Redactor tray icon has no shell rectangle.");
+            }
+            Mouse.Click(new System.Drawing.Point(
+                iconRect.Left + (iconRect.Right - iconRect.Left) / 2,
+                iconRect.Top + (iconRect.Bottom - iconRect.Top) / 2));
 
             var hwnd = GetMainWindow(automation).Properties.NativeWindowHandle;
-            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            deadline = DateTime.UtcNow + ControlFindTimeout;
             while (!IsWindowVisible(hwnd))
             {
                 if (DateTime.UtcNow >= deadline)
