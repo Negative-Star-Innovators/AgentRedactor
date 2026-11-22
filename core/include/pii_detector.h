@@ -58,10 +58,10 @@ public:
     void SetConfidenceThreshold(float threshold) { confidenceThreshold_ = threshold; }
     float GetConfidenceThreshold() const { return confidenceThreshold_; }
 
-    // Effective single-chunk token budget this build feeds the model
-    // (MAX_TOKENS_PER_CHUNK). Left constant today; reported so diagnostics can
-    // reason about the largest activation workspace a Run() can request.
-    size_t GetModelChunkTokens() const { return MAX_TOKENS_PER_CHUNK; }
+    // Largest token count fed to the model in one Run() — the chunked
+    // inference window (PII_CHUNK_WINDOW). Reported so diagnostics can reason
+    // about the largest activation workspace a Run() can request.
+    size_t GetModelChunkTokens() const { return PII_CHUNK_WINDOW; }
     // Suggested ONNX Runtime CPU memory-arena cap (bytes) computed from the
     // host's available RAM, for observability only — NOT applied yet. Returning
     // 0 means no suggestion (memory unknown).

@@ -59,6 +59,14 @@ struct SystemMemory {
 SystemMemory GetSystemMemory();
 size_t GetProcessRssBytes();
 
+// Number of physical CPU cores (SMT siblings counted once), or 0 if it
+// cannot be determined. Windows: GetLogicalProcessorInformationEx;
+// macOS: hw.physicalcpu; Linux: unique (physical id, core id) pairs from
+// /proc/cpuinfo. Used to budget inference threads politeness-style (~75% of
+// physical cores) — SMT siblings add almost nothing to the bandwidth-bound
+// inference workload while raising its scratch-memory footprint.
+int GetPhysicalCoreCount();
+
 std::optional<std::wstring> ReadFileAsString(const std::filesystem::path& path);
 bool WriteStringToFile(const std::filesystem::path& path, const std::wstring& content);
 bool FileExists(const std::filesystem::path& path);
