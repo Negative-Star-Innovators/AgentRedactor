@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <fstream>
+#include <set>
 #include <chrono>
 #include <cstdlib>
 #include <mutex>
@@ -359,6 +360,69 @@ SystemMemory GetSystemMemory() {
     }
 #endif
     return mem;
+}
+
+int GetPhysicalCoreCount() {
+#ifdef _WIN32
+    // Each RelationProcessorCore entry is one physical core; SMT siblings
+    // share an entry.
+    DWORD size = 0;
+    if (!GetLogicalProcessorInformationEx(RelationProcessorCore, nullptr, &size)) {
+        const DWORD err = GetLastError();
+        if (err != ERROR_INSUFFICIENT_BUFFER) return 0;
+    } else {
+        return 0;
+    }
+    std::vector<BYTE> buffer(size);
+    auto* info = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(buffer.data());
+    if (!GetLogicalProcessorInformationEx(RelationProcessorCore, info, &size)) return 0;
+    int cores = 0;
+    BYTE* cursor = buffer.data();
+    BYTE* bufferEnd = buffer.data() + size;
+    while (cursor + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) <= bufferEnd) {
+        auto* entry = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(cursor);
+        if (entry->Relationship == RelationProcessorCore) ++cores;
+        if (entry->Size == 0) break;
+        cursor += entry->Size;
+    }
+    return cores;
+#elif defined(__APPLE__)
+    int physical = 0;
+    size_t len = sizeof(physical);
+    if (sysctlbyname("hw.physicalcpu", &physical, &len, nullptr, 0) == 0 && physical > 0)
+        return physical;
+    return 0;
+#else
+    // Linux: count unique (physical id, core id) pairs in /proc/cpuinfo so
+    // SMT siblings are counted once.
+    std::ifstream f(std::filesystem::path(L"/proc/cpuinfo"));
+    if (!f) return 0;
+    std::set<std::pair<std::string, std::string>> cores;
+    std::string line;
+    std::string physicalId;
+    std::string coreId;
+    bool inProcessor = false;
+    while (std::getline(f, line)) {
+        if (line.rfind("processor", 0) == 0 && line.find(':') != std::string::npos) {
+            if (inProcessor && !physicalId.empty() && !coreId.empty())
+                cores.insert({physicalId, coreId});
+            physicalId.clear();
+            coreId.clear();
+            inProcessor = true;
+            continue;
+        }
+        const auto colon = line.find(':');
+        if (colon == std::string::npos) continue;
+        std::string key = line.substr(0, colon);
+        std::string value = line.substr(colon + 1);
+        while (!value.empty() && value.front() == ' ') value.erase(0, 1);
+        if (key == "physical id") physicalId = value;
+        else if (key == "core id") coreId = value;
+    }
+    if (inProcessor && !physicalId.empty() && !coreId.empty())
+        cores.insert({physicalId, coreId});
+    return static_cast<int>(cores.size());
+#endif
 }
 
 size_t GetProcessRssBytes() {

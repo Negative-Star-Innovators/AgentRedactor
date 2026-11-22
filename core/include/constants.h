@@ -22,8 +22,25 @@ constexpr const wchar_t* APP_VERSION = L"1.0.0";
 constexpr UINT WM_TRAYICON = WM_USER + 1;
 #endif
 
-constexpr size_t MAX_TOKENS_PER_CHUNK = 128000;
-constexpr size_t TOKEN_OVERLAP = 128;
+// PII model chunked inference — "prepend" design.
+//
+// The privacy-filter model attends only within a ±128-token sliding window
+// per layer (8 layers → effective receptive field ≈ 1,024 tokens), so long
+// documents are decoded in windows instead of one giant Run:
+//
+//   PII_CHUNK_WINDOW   total input tokens per model Run (owned + both margins)
+//   PII_CHUNK_CONTEXT  real tokens prepended from the previous window (left
+//                      context); decoded, but their labels are discarded
+//   PII_CHUNK_MARGIN   real tokens appended after the owned region (right
+//                      context); decoded, but their labels are discarded
+//
+// Owned (label-kept) tokens per Run = WINDOW − CONTEXT − MARGIN = 7,168.
+// With margins ≥ the ~1,024-token receptive field, every emitted token has
+// full context and chunked decoding matches unchunked inference (validated:
+// label parity, precision/recall identical — see scripts/sparse_attention/).
+constexpr size_t PII_CHUNK_WINDOW = 8192;
+constexpr size_t PII_CHUNK_CONTEXT = 512;
+constexpr size_t PII_CHUNK_MARGIN = 512;
 
 constexpr const wchar_t* MODEL_DIR = L"models";
 constexpr const wchar_t* MODEL_FILENAME = L"model_quantized.onnx";

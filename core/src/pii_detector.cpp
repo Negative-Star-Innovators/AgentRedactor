@@ -66,15 +66,13 @@ bool PIIDetector::Initialize() {
     initialized_ = true;
     LOG_LIFECYCLE(L"[PIIDetector] Initialized successfully");
 
-    // Observability only (no behavior change yet): report what a bounded ONNX
-    // Runtime CPU memory-arena *would* be sized to, given the host's available
-    // RAM. The model's max_position_embeddings is 128K and the engine chunks at
-    // MAX_TOKENS_PER_CHUNK, so a single Run() can request a large activation
-    // workspace; ORT's default cpu arena grows power-of-two and unbounded, and
-    // has been seen to request ~the machine's total RAM in one go (kernel
-    // rejects via __vm_enough_memory -> std::bad_alloc). Log the raw numbers so
-    // the planned arena cap can be validated on real hardware before any config
-    // is applied. Suggested cap: 60% of available RAM, capped at 8 GiB.
+    // Observability: report the host memory and the chunked-inference bounds
+    // of this build. The prepend chunking bounds the activation workspace:
+    // every Run() feeds at most PII_CHUNK_WINDOW tokens (owned + context
+    // margins), so the ORT CPU arena's high-water is bounded by the window,
+    // not by the request size. (ORT's default cpu arena grows power-of-two
+    // and retains its high-water; with the window bounded, that retention is
+    // small and constant. The suggested cap below remains observability-only.)
     {
         const Utils::SystemMemory mem = Utils::GetSystemMemory();
         size_t suggested = 0;
@@ -84,8 +82,11 @@ bool PIIDetector::Initialize() {
             suggested = std::min(frac, cap);
         }
         suggestedArenaBytes_ = suggested;
-        LOGF_LIFECYCLE(L"[PIIDetector] MEM host_total=%zu host_available=%zu suggested_arena_cap=%zu chunk_tokens=%zu",
-            mem.totalBytes, mem.availableBytes, suggested, static_cast<size_t>(MAX_TOKENS_PER_CHUNK));
+        LOGF_LIFECYCLE(L"[PIIDetector] MEM host_total=%zu host_available=%zu suggested_arena_cap=%zu chunk_window=%zu chunk_context=%zu chunk_margin=%zu",
+            mem.totalBytes, mem.availableBytes, suggested,
+            static_cast<size_t>(PII_CHUNK_WINDOW),
+            static_cast<size_t>(PII_CHUNK_CONTEXT),
+            static_cast<size_t>(PII_CHUNK_MARGIN));
     }
     return true;
 }
@@ -115,7 +116,38 @@ bool PIIDetector::LoadModel() {
 
         Ort::SessionOptions sessionOptions;
         sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
-        sessionOptions.SetIntraOpNumThreads(4);
+        // Adaptive intra-op thread budget: ~75% of the machine's physical
+        // cores (leaves the rest for the user's foreground work), clamped to
+        // [2, 12]; reduced on small-RAM machines (per-thread scratch raises
+        // the inference footprint); AGENTREDACTOR_ORT_THREADS overrides
+        // everything (testing / power users). The workload is
+        // memory-bandwidth-bound, so gains beyond ~8-12 threads are marginal
+        // while RAM and contention keep rising (measured).
+        int threads = 4; // legacy default when topology/RAM are unknown
+        const char* envOverride = std::getenv("AGENTREDACTOR_ORT_THREADS");
+        {
+            const int physical = Utils::GetPhysicalCoreCount();
+            if (physical > 0) {
+                threads = std::clamp(
+                    static_cast<int>(std::lround(0.75 * physical)), 2, 12);
+            }
+            const Utils::SystemMemory memNow = Utils::GetSystemMemory();
+            const size_t tenGib = static_cast<size_t>(10) * 1024 * 1024 * 1024;
+            if (memNow.totalBytes > 0 && memNow.totalBytes < tenGib) {
+                threads = std::min(threads, 4); // min-spec machines
+            }
+            if (envOverride) {
+                const long parsed = std::strtol(envOverride, nullptr, 10);
+                if (parsed > 0 && parsed <= 64) threads = static_cast<int>(parsed);
+            }
+            const double totalGib =
+                memNow.totalBytes > 0
+                    ? static_cast<double>(memNow.totalBytes) / (1024.0 * 1024.0 * 1024.0)
+                    : 0.0;
+            LOGF_LIFECYCLE(L"[PIIDetector] Intra-op threads=%d physical_cores=%d total_ram=%.1f GiB env_override=%s",
+                threads, physical, totalGib, envOverride ? L"set" : L"unset");
+        }
+        sessionOptions.SetIntraOpNumThreads(threads);
         currentProvider_ = L"CPU";
 
         if (preferredProvider_ != L"cpu") {
@@ -552,15 +584,26 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
         }
     }
 
-    std::vector<std::vector<int64_t>> chunks;
-    std::vector<std::pair<size_t, size_t>> chunkTokenRanges;
-    const size_t maxTokens = MAX_TOKENS_PER_CHUNK;
-    const size_t overlap = TOKEN_OVERLAP;
-    for (size_t i = 0; i < allTokenIds.size(); i += (maxTokens - overlap)) {
-        size_t end = std::min(i + maxTokens, allTokenIds.size());
-        chunks.push_back(std::vector<int64_t>(allTokenIds.begin() + i, allTokenIds.begin() + end));
-        chunkTokenRanges.push_back({i, end});
-        if (end >= allTokenIds.size()) break;
+    // Prepend chunking: each Run() decodes an input window of at most
+    // PII_CHUNK_WINDOW tokens — [ownedStart − context, ownedEnd + margin) —
+    // but only the OWNED region [ownedStart, ownedEnd) contributes labels.
+    // Owned regions tile the document contiguously with stride
+    // WINDOW − CONTEXT − MARGIN, so every token is decoded exactly once with
+    // full context on both sides.
+    std::vector<std::vector<int64_t>> chunks;           // input windows
+    std::vector<std::pair<size_t, size_t>> ownedRanges; // label-kept ranges
+    std::vector<size_t> chunkInputStarts;               // input window start
+    const size_t stride = PII_CHUNK_WINDOW - PII_CHUNK_CONTEXT - PII_CHUNK_MARGIN;
+    for (size_t ownedStart = 0; ownedStart < allTokenIds.size(); ownedStart += stride) {
+        size_t ownedEnd = std::min(ownedStart + stride, allTokenIds.size());
+        size_t inputStart = (ownedStart >= PII_CHUNK_CONTEXT)
+                                ? ownedStart - PII_CHUNK_CONTEXT : 0;
+        size_t inputEnd = std::min(ownedEnd + PII_CHUNK_MARGIN, allTokenIds.size());
+        chunks.push_back(std::vector<int64_t>(allTokenIds.begin() + inputStart,
+                                              allTokenIds.begin() + inputEnd));
+        ownedRanges.push_back({ownedStart, ownedEnd});
+        chunkInputStarts.push_back(inputStart);
+        if (ownedEnd >= allTokenIds.size()) break;
     }
 
     std::vector<std::vector<int>> allChunkLabels;
@@ -619,8 +662,17 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
             std::copy(logits, logits + outSeqLen * numClasses, logitsVec.begin());
             auto labels = ViterbiDecode(logitsVec, static_cast<int>(outSeqLen), static_cast<int>(numClasses));
             std::vector<float> tokenProbs = ComputeAssignedProbs(logitsVec, static_cast<int>(outSeqLen), static_cast<int>(numClasses), labels);
-            allChunkLabels.push_back(std::move(labels));
-            allChunkProbs.push_back(std::move(tokenProbs));
+            // Keep only the OWNED region's labels/probs; the prepended context
+            // and right margin were decoded for context and are discarded.
+            const size_t ownedStart = ownedRanges[chunkIdx].first;
+            const size_t ownedEnd = ownedRanges[chunkIdx].second;
+            const size_t inputStart = chunkInputStarts[chunkIdx];
+            allChunkLabels.push_back(std::vector<int>(
+                labels.begin() + (ownedStart - inputStart),
+                labels.begin() + (ownedEnd - inputStart)));
+            allChunkProbs.push_back(std::vector<float>(
+                tokenProbs.begin() + (ownedStart - inputStart),
+                tokenProbs.begin() + (ownedEnd - inputStart)));
 
         } catch (const Ort::Exception&) {
             activeInferenceCount_.fetch_sub(1);
@@ -637,16 +689,18 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
     std::vector<PIIEntity> allEntities;
     for (size_t chunkIdx = 0; chunkIdx < allChunkLabels.size(); ++chunkIdx) {
         auto& labels = allChunkLabels[chunkIdx];
-        auto& range = chunkTokenRanges[chunkIdx];
+        auto& range = ownedRanges[chunkIdx];
         std::vector<size_t> chunkCharStarts;
         std::vector<size_t> chunkCharEnds;
         for (size_t i = range.first; i < range.second && i < tokenCharStarts.size(); ++i) {
             chunkCharStarts.push_back(tokenCharStarts[i]);
             chunkCharEnds.push_back(tokenCharEnds[i]);
         }
-        size_t maxValidGlobalTokenEnd = (chunkIdx == allChunkLabels.size() - 1)
-            ? range.second
-            : range.first + (MAX_TOKENS_PER_CHUNK - TOKEN_OVERLAP);
+        // The chunk claims every entity that starts inside its owned region;
+        // owned regions tile the document, so each entity is claimed exactly
+        // once (entities spanning the boundary are decoded with full context
+        // by the chunk that owns their start).
+        size_t maxValidGlobalTokenEnd = range.second;
         auto chunkEntities = LabelsToEntities(labels, text, chunkCharStarts, chunkCharEnds, enabledTypes, allChunkProbs[chunkIdx], range.first, maxValidGlobalTokenEnd);
         allEntities.insert(allEntities.end(), chunkEntities.begin(), chunkEntities.end());
     }
