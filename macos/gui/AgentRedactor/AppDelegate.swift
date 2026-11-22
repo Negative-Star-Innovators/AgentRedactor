@@ -95,6 +95,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard let window = notification.object as? NSWindow else { return }
         window.delegate = self
         window.title = LocString("AppDisplayName")
+        requestUnlockOnReturn()
     }
 
     /// Attach to an existing window when showing it; didBecomeMain covers a
