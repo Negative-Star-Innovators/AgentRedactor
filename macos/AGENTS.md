@@ -138,3 +138,12 @@ open macos/build/AgentRedactor.app
   `spctl`). Signed authentication coverage is in `tests/macos/test_signed_auth.py`;
   the unsigned SwiftUI Accessibility GUI tests live in `tests/gui/macos/`.
   A successful local build alone does not prove release validation passed.
+
+## Cross-platform testing
+
+Validating shared-core changes (chunked PII inference, thread budget,
+arena behaviour) on this machine before merge? Follow
+[docs/testing-cross-platform.md](../docs/testing-cross-platform.md) — build
+checklist, the CLI suite invocation, and the chunking/window regression
+test (	ests/cli/test_pii_chunking.py, ground-truth annotated corpus in
+	ests/cli/fixtures/).

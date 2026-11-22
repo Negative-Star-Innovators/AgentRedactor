@@ -69,3 +69,12 @@ than rebuilding. Both architectures must have passed in that candidate run.
 Platform-selective CI uses `scripts/ci_platform_changes.py`; shared code,
 models, translations, common tests, version files, and workflow changes build
 all platforms, while Linux-only changes do not trigger Windows/macOS builds.
+
+## Cross-platform testing
+
+Validating shared-core changes (chunked PII inference, thread budget,
+arena behaviour) on this machine before merge? Follow
+[docs/testing-cross-platform.md](../docs/testing-cross-platform.md) — build
+checklist, the CLI suite invocation, and the chunking/window regression
+test (	ests/cli/test_pii_chunking.py, ground-truth annotated corpus in
+	ests/cli/fixtures/).
