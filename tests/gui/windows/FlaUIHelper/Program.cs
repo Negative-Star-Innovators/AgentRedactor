@@ -78,6 +78,9 @@ namespace FlaUIHelper
         [DllImport("user32.dll")]
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern uint RegisterWindowMessage(string lpString);
+
         [DllImport("user32.dll")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
@@ -209,6 +212,12 @@ namespace FlaUIHelper
                             return GetContentDialogText(automation);
                         case "dismiss-content-dialog":
                             return DismissContentDialog(automation);
+                        case "close-to-tray":
+                            return CloseToTray(automation);
+                        case "restore-taskbar":
+                            return RestoreTaskbar();
+                        case "click-tray-icon":
+                            return ClickTrayIcon(automation);
                         case "quit":
                             return Quit();
                         default:
@@ -265,6 +274,9 @@ namespace FlaUIHelper
             Console.WriteLine("  FlaUIHelper.exe toggle-require-password");
             Console.WriteLine("  FlaUIHelper.exe get-content-dialog-text");
             Console.WriteLine("  FlaUIHelper.exe dismiss-content-dialog");
+            Console.WriteLine("  FlaUIHelper.exe close-to-tray");
+            Console.WriteLine("  FlaUIHelper.exe restore-taskbar");
+            Console.WriteLine("  FlaUIHelper.exe click-tray-icon");
             Console.WriteLine("  FlaUIHelper.exe quit");
         }
 
@@ -1825,6 +1837,61 @@ namespace FlaUIHelper
             foreach (var item in items)
             {
                 Console.WriteLine(item.Name);
+            }
+            return 0;
+        }
+
+        private static int CloseToTray(UIA3Automation automation)
+        {
+            var hwnd = GetMainWindow(automation).Properties.NativeWindowHandle;
+            if (hwnd == IntPtr.Zero || !PostMessage(hwnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero))
+            {
+                throw new InvalidOperationException("Could not send close-to-tray request.");
+            }
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            while (IsWindowVisible(hwnd))
+            {
+                if (DateTime.UtcNow >= deadline)
+                {
+                    throw new TimeoutException("Agent Redactor window did not hide to the tray.");
+                }
+                Thread.Sleep(RetryPollIntervalMs);
+            }
+            return 0;
+        }
+
+        private static int RestoreTaskbar()
+        {
+            uint message = RegisterWindowMessage("TaskbarCreated");
+            if (message == 0 || !PostMessage(new IntPtr(0xffff), message, IntPtr.Zero, IntPtr.Zero))
+            {
+                throw new InvalidOperationException("Could not broadcast TaskbarCreated.");
+            }
+            Thread.Sleep(SettleDelayMs);
+            return 0;
+        }
+
+        private static int ClickTrayIcon(UIA3Automation automation)
+        {
+            var icon = Retry.WhileNull(() =>
+                automation.GetDesktop().FindFirstDescendant(x =>
+                    x.ByAutomationId("NotifyItemIcon").And(x.ByName("Agent Redactor"))),
+                ControlFindTimeout, TimeSpan.FromMilliseconds(RetryPollIntervalMs)).Result;
+            if (icon == null)
+            {
+                throw new InvalidOperationException("Agent Redactor tray icon not found.");
+            }
+            icon.Click();
+
+            var hwnd = GetMainWindow(automation).Properties.NativeWindowHandle;
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            while (!IsWindowVisible(hwnd))
+            {
+                if (DateTime.UtcNow >= deadline)
+                {
+                    throw new TimeoutException("Clicking the tray icon did not reopen Agent Redactor.");
+                }
+                Thread.Sleep(RetryPollIntervalMs);
             }
             return 0;
         }

@@ -451,6 +451,21 @@ def dismiss_content_dialog() -> None:
     _run_helper("dismiss-content-dialog")
 
 
+def close_to_tray() -> None:
+    """Close the main window to the system tray."""
+    _run_helper("close-to-tray")
+
+
+def restore_taskbar() -> None:
+    """Broadcast Explorer's TaskbarCreated message to top-level windows."""
+    _run_helper("restore-taskbar")
+
+
+def click_tray_icon() -> None:
+    """Click Agent Redactor's tray icon and require the window to reopen."""
+    _run_helper("click-tray-icon")
+
+
 def quit_app() -> None:
     """Terminate the AgentRedactor process."""
     _run_helper("quit")
