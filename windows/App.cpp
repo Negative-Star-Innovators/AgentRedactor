@@ -14,6 +14,7 @@
 #include <filesystem>
 #include <cwchar>
 #include <vector>
+#include <chrono>
 
 using namespace winrt;
 using namespace Microsoft::UI::Xaml;
@@ -84,8 +85,21 @@ namespace winrt::AgentRedactor::implementation
                     DbgLog(L"App: SetMainWindow hwnd");
                     auto appState = ::AgentRedactor::AppState::Instance();
                     appState->SetMainWindow(hwnd);
-                    window.DispatcherQueue().TryEnqueue(Microsoft::UI::Dispatching::DispatcherQueuePriority::Low, [appState, hwnd]() {
+                    window.DispatcherQueue().TryEnqueue(Microsoft::UI::Dispatching::DispatcherQueuePriority::Low, [this, appState, hwnd]() {
                         appState->InitializeTray(hwnd);
+                        if (appState->TrayAvailable()) return;
+                        trayRetryTimer_ = window.DispatcherQueue().CreateTimer();
+                        trayRetryTimer_.Interval(std::chrono::seconds(1));
+                        trayRetryTimer_.IsRepeating(true);
+                        trayRetryTimer_.Tick([this, appState, hwnd, attempts = 0](auto&&, auto&&) mutable {
+                            if (appState->TrayAvailable() || attempts >= 5) {
+                                trayRetryTimer_.Stop();
+                                return;
+                            }
+                            ++attempts;
+                            appState->InitializeTray(hwnd);
+                        });
+                        trayRetryTimer_.Start();
                     });
                 }
             } catch (...) {}

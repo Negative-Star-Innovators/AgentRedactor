@@ -86,7 +86,11 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
 }
 
 void AppState::InitializeTray(HWND hwnd) {
-    if (!hwnd || systemTray_) return;
+    if (!hwnd || trayAvailable_) return;
+    if (systemTray_) {
+        trayAvailable_ = systemTray_->Recreate();
+        return;
+    }
 
     systemTray_ = std::make_unique<SystemTray>(hwnd);
     HICON trayIcon = SystemTray::LoadIconFromFile(L"app.ico", 32);
@@ -499,7 +503,7 @@ void AppState::OpenWindow() {
 }
 
 void AppState::NotifyTaskbarCreated() {
-    if (systemTray_) systemTray_->Recreate();
+    if (systemTray_) trayAvailable_ = systemTray_->Recreate();
 }
 
 void AppState::ToggleStartOnBoot() {

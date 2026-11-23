@@ -56,10 +56,9 @@ public:
 
     bool Create(HICON icon, const std::wstring& tooltip);
     void Destroy();
-    // Re-adds the icon after an Explorer restart (the TaskbarCreated
-    // broadcast): Explorer wipes every tray icon on restart and only apps
-    // that re-register get theirs back. No-op when the tray was never created.
-    void Recreate();
+    // Re-adds with the last icon/tooltip after Explorer restarts or an initial
+    // registration failure. Returns whether the shell accepted the registration.
+    bool Recreate();
     void ShowMenu(const std::vector<MenuItem>& items);
     void SetOnLeftClick(std::function<void()> callback);
     void SetOnRightClick(std::function<void()> callback);

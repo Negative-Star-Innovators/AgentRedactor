@@ -90,16 +90,16 @@ void SystemTray::Destroy() {
     }
 }
 
-void SystemTray::Recreate() {
-    // created_ tracks our intent (Create succeeded); the icon itself is gone
-    // after the Explorer restart, so re-add with the last icon/tooltip.
-    if (!created_ || !notifyIconData_.hIcon) return;
+bool SystemTray::Recreate() {
+    if (!notifyIconData_.hIcon) return false;
     notifyIconData_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     SetLastError(ERROR_SUCCESS);
     const BOOL result = Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
     const DWORD error = result ? ERROR_SUCCESS : GetLastError();
-    LOGF_LIFECYCLE(L"[SystemTray] Explorer restart NIM_ADD result=%d error=%lu hwnd=%p",
+    LOGF_LIFECYCLE(L"[SystemTray] NIM_ADD retry result=%d error=%lu hwnd=%p",
         result, error, hwnd_);
+    created_ = result == TRUE;
+    return created_;
 }
 
 void SystemTray::ShowMenu(const std::vector<MenuItem>& items) {

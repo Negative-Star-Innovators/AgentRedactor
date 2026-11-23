@@ -85,8 +85,8 @@ public:
     // Tray actions
     void ShowTrayMenu();
     void OpenWindow();
-    // Re-adds the tray icon after an Explorer restart (TaskbarCreated). No-op
-    // when the tray was never created.
+    // Re-adds the tray icon after an Explorer restart (TaskbarCreated) and
+    // updates TrayAvailable with the shell result.
     void NotifyTaskbarCreated();
     // False when the tray icon could not be created (no shell tray area):
     // close-to-tray would hide the window with no way back, so callers must
