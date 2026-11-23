@@ -463,7 +463,10 @@ def restore_taskbar() -> None:
 
 def assert_tray_icon() -> None:
     """Require Explorer to expose Agent Redactor's tray icon rectangle."""
-    _run_helper("assert-tray-icon")
+    try:
+        _run_helper("assert-tray-icon")
+    except RuntimeError as exc:
+        raise RuntimeError(f"{exc}\nAgent Redactor log tail:\n{get_log_text()}") from exc
 
 
 def click_tray_icon() -> None:

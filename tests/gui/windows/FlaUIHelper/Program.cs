@@ -1919,8 +1919,6 @@ namespace FlaUIHelper
                 {
                     GetWindowThreadProcessId(hwnd, out uint ownerPid);
                     if (ownerPid != process.Id) return true;
-                    var title = new System.Text.StringBuilder(512);
-                    if (GetWindowText(hwnd, title, title.Capacity) == 0) return true;
                     var identifier = new NotifyIconIdentifier
                     {
                         cbSize = Marshal.SizeOf<NotifyIconIdentifier>(),
