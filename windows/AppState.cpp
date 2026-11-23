@@ -54,14 +54,6 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
         LOG_LIFECYCLE(L"[AppState] Failed to create message window");
     }
 
-    systemTray_ = std::make_unique<SystemTray>(messageHwnd_);
-    HICON trayIcon = SystemTray::LoadIconFromFile(L"app.ico", 32);
-    if (!trayIcon) trayIcon = SystemTray::CreateGradientIcon(32);
-    trayAvailable_ = systemTray_->Create(trayIcon, ::AgentRedactor::LocString(L"AppDisplayName").c_str());
-    if (!trayAvailable_) LOG(L"[AppState] WARNING: system tray icon could not be created; close will exit instead of hiding to tray");
-    systemTray_->SetOnLeftClick([this]() { OpenWindow(); });
-    systemTray_->SetOnRightClick([this]() { ShowTrayMenu(); });
-
     if (Settings()->IsStartOnBoot()) {
         RegisterStartupTask();
     } else {
@@ -91,6 +83,18 @@ bool AppState::Initialize(const std::filesystem::path& dataDir) {
         LOG(L"[AppState] Update apply: engine did not exit within 90 s; proceeding anyway");
     });
     return true;
+}
+
+void AppState::InitializeTray(HWND hwnd) {
+    if (!hwnd || systemTray_) return;
+
+    systemTray_ = std::make_unique<SystemTray>(hwnd);
+    HICON trayIcon = SystemTray::LoadIconFromFile(L"app.ico", 32);
+    if (!trayIcon) trayIcon = SystemTray::CreateGradientIcon(32);
+    trayAvailable_ = systemTray_->Create(trayIcon, ::AgentRedactor::LocString(L"AppDisplayName").c_str());
+    if (!trayAvailable_) LOG(L"[AppState] WARNING: system tray icon could not be created; close will exit instead of hiding to tray");
+    systemTray_->SetOnLeftClick([this]() { OpenWindow(); });
+    systemTray_->SetOnRightClick([this]() { ShowTrayMenu(); });
 }
 
 void AppState::Shutdown() {

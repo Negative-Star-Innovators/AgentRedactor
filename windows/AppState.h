@@ -35,6 +35,7 @@ public:
     void Shutdown();
 
     void SetMainWindow(HWND hwnd) { mainHwnd_ = hwnd; }
+    void InitializeTray(HWND hwnd);
     HWND MainWindow() const { return mainHwnd_; }
 
     // UI callbacks (called on UI thread)

@@ -78,11 +78,19 @@ namespace FlaUIHelper
         [DllImport("user32.dll")]
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern uint RegisterWindowMessage(string lpString);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr FindWindowEx(IntPtr hWndParent, IntPtr hWndChildAfter, string lpszClass, string lpszWindow);
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr lParam);
 
         [DllImport("shell32.dll")]
         private static extern int Shell_NotifyIconGetRect(ref NotifyIconIdentifier identifier, out TrayRect iconRect);
@@ -240,6 +248,8 @@ namespace FlaUIHelper
                             return CloseToTray(automation);
                         case "restore-taskbar":
                             return RestoreTaskbar();
+                        case "assert-tray-icon":
+                            return AssertTrayIcon();
                         case "click-tray-icon":
                             return ClickTrayIcon(automation);
                         case "quit":
@@ -300,6 +310,7 @@ namespace FlaUIHelper
             Console.WriteLine("  FlaUIHelper.exe dismiss-content-dialog");
             Console.WriteLine("  FlaUIHelper.exe close-to-tray");
             Console.WriteLine("  FlaUIHelper.exe restore-taskbar");
+            Console.WriteLine("  FlaUIHelper.exe assert-tray-icon");
             Console.WriteLine("  FlaUIHelper.exe click-tray-icon");
             Console.WriteLine("  FlaUIHelper.exe quit");
         }
@@ -1895,45 +1906,56 @@ namespace FlaUIHelper
             return 0;
         }
 
-        private static int ClickTrayIcon(UIA3Automation automation)
+        private static TrayRect GetTrayIconRect(out IntPtr ownerWindow)
         {
             var process = FindAgentRedactorProcess();
-            var messageWindow = IntPtr.Zero;
             var deadline = DateTime.UtcNow + ControlFindTimeout;
             TrayRect iconRect = new TrayRect();
+            IntPtr foundOwner = IntPtr.Zero;
+            ownerWindow = IntPtr.Zero;
             while (DateTime.UtcNow < deadline)
             {
-                messageWindow = FindWindowEx(new IntPtr(3), IntPtr.Zero, "AgentRedactorMsgWindow", null);
-                if (messageWindow != IntPtr.Zero)
+                EnumWindows((hwnd, _) =>
                 {
-                    GetWindowThreadProcessId(messageWindow, out uint ownerPid);
-                    if (ownerPid == process.Id)
+                    GetWindowThreadProcessId(hwnd, out uint ownerPid);
+                    if (ownerPid != process.Id) return true;
+                    var title = new System.Text.StringBuilder(512);
+                    if (GetWindowText(hwnd, title, title.Capacity) == 0) return true;
+                    var identifier = new NotifyIconIdentifier
                     {
-                        var identifier = new NotifyIconIdentifier
-                        {
-                            cbSize = Marshal.SizeOf<NotifyIconIdentifier>(),
-                            hWnd = messageWindow,
-                            uID = 1,
-                            guidItem = Guid.Empty,
-                        };
-                        if (Shell_NotifyIconGetRect(ref identifier, out iconRect) == 0)
-                        {
-                            break;
-                        }
-                    }
+                        cbSize = Marshal.SizeOf<NotifyIconIdentifier>(),
+                        hWnd = hwnd,
+                        uID = 1,
+                        guidItem = Guid.Empty,
+                    };
+                    if (Shell_NotifyIconGetRect(ref identifier, out iconRect) != 0) return true;
+                    foundOwner = hwnd;
+                    return false;
+                }, IntPtr.Zero);
+                if (foundOwner != IntPtr.Zero && iconRect.Right > iconRect.Left && iconRect.Bottom > iconRect.Top)
+                {
+                    ownerWindow = foundOwner;
+                    Console.WriteLine($"TRAY_RECT:{iconRect.Left},{iconRect.Top},{iconRect.Right},{iconRect.Bottom}");
+                    return iconRect;
                 }
                 Thread.Sleep(RetryPollIntervalMs);
             }
-            if (messageWindow == IntPtr.Zero || iconRect.Right <= iconRect.Left || iconRect.Bottom <= iconRect.Top)
-            {
-                throw new InvalidOperationException("Agent Redactor tray icon has no shell rectangle.");
-            }
-            Mouse.Click(new System.Drawing.Point(
-                iconRect.Left + (iconRect.Right - iconRect.Left) / 2,
-                iconRect.Top + (iconRect.Bottom - iconRect.Top) / 2));
+            throw new InvalidOperationException("Agent Redactor tray icon has no shell rectangle.");
+        }
+
+        private static int AssertTrayIcon()
+        {
+            GetTrayIconRect(out _);
+            return 0;
+        }
+
+        private static int ClickTrayIcon(UIA3Automation automation)
+        {
+            GetTrayIconRect(out var trayWindow);
+            SendMessage(trayWindow, 0x0401, new IntPtr(1), new IntPtr(0x0201));
 
             var hwnd = GetMainWindow(automation).Properties.NativeWindowHandle;
-            deadline = DateTime.UtcNow + ControlFindTimeout;
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
             while (!IsWindowVisible(hwnd))
             {
                 if (DateTime.UtcNow >= deadline)

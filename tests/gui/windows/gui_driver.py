@@ -461,6 +461,11 @@ def restore_taskbar() -> None:
     _run_helper("restore-taskbar")
 
 
+def assert_tray_icon() -> None:
+    """Require Explorer to expose Agent Redactor's tray icon rectangle."""
+    _run_helper("assert-tray-icon")
+
+
 def click_tray_icon() -> None:
     """Click Agent Redactor's tray icon and require the window to reopen."""
     _run_helper("click-tray-icon")

@@ -82,7 +82,11 @@ namespace winrt::AgentRedactor::implementation
                     HWND hwnd = nullptr;
                     windowNative->get_WindowHandle(&hwnd);
                     DbgLog(L"App: SetMainWindow hwnd");
-                    ::AgentRedactor::AppState::Instance()->SetMainWindow(hwnd);
+                    auto appState = ::AgentRedactor::AppState::Instance();
+                    appState->SetMainWindow(hwnd);
+                    window.DispatcherQueue().TryEnqueue(Microsoft::UI::Dispatching::DispatcherQueuePriority::Low, [appState, hwnd]() {
+                        appState->InitializeTray(hwnd);
+                    });
                 }
             } catch (...) {}
         }

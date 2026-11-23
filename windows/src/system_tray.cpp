@@ -68,11 +68,14 @@ bool SystemTray::Create(HICON icon, const std::wstring& tooltip) {
     if (!icon) return false;
     notifyIconData_.hIcon = icon;
     wcsncpy_s(notifyIconData_.szTip, tooltip.c_str(), _TRUNCATE);
+    SetLastError(ERROR_SUCCESS);
     BOOL result = Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
-    if (!result) {
-        LOGF(L"[SystemTray] NIM_ADD failed; error=%lu hwnd=%p", GetLastError(), hwnd_);
-        return false;
-    }
+    const DWORD error = result ? ERROR_SUCCESS : GetLastError();
+    DWORD ownerPid = 0;
+    GetWindowThreadProcessId(hwnd_, &ownerPid);
+    LOGF_LIFECYCLE(L"[SystemTray] NIM_ADD result=%d error=%lu hwnd=%p ownerPid=%lu visible=%d",
+        result, error, hwnd_, ownerPid, IsWindowVisible(hwnd_));
+    if (!result) return false;
     created_ = true;
     return true;
 }
@@ -92,9 +95,11 @@ void SystemTray::Recreate() {
     // after the Explorer restart, so re-add with the last icon/tooltip.
     if (!created_ || !notifyIconData_.hIcon) return;
     notifyIconData_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-    if (!Shell_NotifyIconW(NIM_ADD, &notifyIconData_)) {
-        LOGF(L"[SystemTray] NIM_ADD retry after Explorer restart failed; error=%lu hwnd=%p", GetLastError(), hwnd_);
-    }
+    SetLastError(ERROR_SUCCESS);
+    const BOOL result = Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
+    const DWORD error = result ? ERROR_SUCCESS : GetLastError();
+    LOGF_LIFECYCLE(L"[SystemTray] Explorer restart NIM_ADD result=%d error=%lu hwnd=%p",
+        result, error, hwnd_);
 }
 
 void SystemTray::ShowMenu(const std::vector<MenuItem>& items) {

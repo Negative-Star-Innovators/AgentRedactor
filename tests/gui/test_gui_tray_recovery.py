@@ -11,6 +11,7 @@ import pytest
 
 from gui_process import GuiAppProcess
 from windows.gui_driver import (
+    assert_tray_icon,
     click_tray_icon,
     close_to_tray,
     get_log_text,
@@ -31,6 +32,7 @@ async def test_tray_icon_recovers_after_tooltip_update_and_explorer_restart(
 ) -> None:
     get_pii_master_state()
     time.sleep(2)
+    assert_tray_icon()
 
     result = subprocess.run(
         [str(ENGINE_EXE), "set", "app-language", "de"],
