@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import platform
 import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from windows.gui_driver import (
     click_tray_icon,
     close_to_tray,
     get_log_text,
+    get_pii_master_state,
     restore_taskbar,
     wait_until,
 )
@@ -27,6 +29,9 @@ ENGINE_EXE = PROJECT_ROOT / "windows" / "build" / _BUILD_PLATFORM / "Release" / 
 async def test_tray_icon_recovers_after_tooltip_update_and_explorer_restart(
     gui_app: GuiAppProcess,
 ) -> None:
+    get_pii_master_state()
+    time.sleep(2)
+
     result = subprocess.run(
         [str(ENGINE_EXE), "set", "app-language", "de"],
         capture_output=True,
