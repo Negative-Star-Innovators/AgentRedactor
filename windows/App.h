@@ -10,6 +10,7 @@ namespace winrt::AgentRedactor::implementation
         void OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const& args);
     private:
         Microsoft::UI::Xaml::Window window{ nullptr };
+        Microsoft::UI::Dispatching::DispatcherQueueTimer trayRetryTimer_{ nullptr };
     };
 }
 

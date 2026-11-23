@@ -79,6 +79,41 @@ namespace FlaUIHelper
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern uint RegisterWindowMessage(string lpString);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindowEx(IntPtr hWndParent, IntPtr hWndChildAfter, string lpszClass, string lpszWindow);
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr lParam);
+
+        [DllImport("shell32.dll")]
+        private static extern int Shell_NotifyIconGetRect(ref NotifyIconIdentifier identifier, out TrayRect iconRect);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NotifyIconIdentifier
+        {
+            public int cbSize;
+            public IntPtr hWnd;
+            public uint uID;
+            public Guid guidItem;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct TrayRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [DllImport("user32.dll")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport("user32.dll")]
@@ -209,6 +244,14 @@ namespace FlaUIHelper
                             return GetContentDialogText(automation);
                         case "dismiss-content-dialog":
                             return DismissContentDialog(automation);
+                        case "close-to-tray":
+                            return CloseToTray(automation);
+                        case "restore-taskbar":
+                            return RestoreTaskbar();
+                        case "assert-tray-icon":
+                            return AssertTrayIcon();
+                        case "click-tray-icon":
+                            return ClickTrayIcon(automation);
                         case "quit":
                             return Quit();
                         default:
@@ -265,6 +308,10 @@ namespace FlaUIHelper
             Console.WriteLine("  FlaUIHelper.exe toggle-require-password");
             Console.WriteLine("  FlaUIHelper.exe get-content-dialog-text");
             Console.WriteLine("  FlaUIHelper.exe dismiss-content-dialog");
+            Console.WriteLine("  FlaUIHelper.exe close-to-tray");
+            Console.WriteLine("  FlaUIHelper.exe restore-taskbar");
+            Console.WriteLine("  FlaUIHelper.exe assert-tray-icon");
+            Console.WriteLine("  FlaUIHelper.exe click-tray-icon");
             Console.WriteLine("  FlaUIHelper.exe quit");
         }
 
@@ -1825,6 +1872,95 @@ namespace FlaUIHelper
             foreach (var item in items)
             {
                 Console.WriteLine(item.Name);
+            }
+            return 0;
+        }
+
+        private static int CloseToTray(UIA3Automation automation)
+        {
+            var hwnd = GetMainWindow(automation).Properties.NativeWindowHandle;
+            if (hwnd == IntPtr.Zero || !PostMessage(hwnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero))
+            {
+                throw new InvalidOperationException("Could not send close-to-tray request.");
+            }
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            while (IsWindowVisible(hwnd))
+            {
+                if (DateTime.UtcNow >= deadline)
+                {
+                    throw new TimeoutException("Agent Redactor window did not hide to the tray.");
+                }
+                Thread.Sleep(RetryPollIntervalMs);
+            }
+            return 0;
+        }
+
+        private static int RestoreTaskbar()
+        {
+            uint message = RegisterWindowMessage("TaskbarCreated");
+            if (message == 0 || !PostMessage(new IntPtr(0xffff), message, IntPtr.Zero, IntPtr.Zero))
+            {
+                throw new InvalidOperationException("Could not broadcast TaskbarCreated.");
+            }
+            Thread.Sleep(SettleDelayMs);
+            return 0;
+        }
+
+        private static TrayRect GetTrayIconRect(out IntPtr ownerWindow)
+        {
+            var process = FindAgentRedactorProcess();
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            TrayRect iconRect = new TrayRect();
+            IntPtr foundOwner = IntPtr.Zero;
+            ownerWindow = IntPtr.Zero;
+            while (DateTime.UtcNow < deadline)
+            {
+                EnumWindows((hwnd, _) =>
+                {
+                    GetWindowThreadProcessId(hwnd, out uint ownerPid);
+                    if (ownerPid != process.Id) return true;
+                    var identifier = new NotifyIconIdentifier
+                    {
+                        cbSize = Marshal.SizeOf<NotifyIconIdentifier>(),
+                        hWnd = hwnd,
+                        uID = 1,
+                        guidItem = Guid.Empty,
+                    };
+                    if (Shell_NotifyIconGetRect(ref identifier, out iconRect) != 0) return true;
+                    foundOwner = hwnd;
+                    return false;
+                }, IntPtr.Zero);
+                if (foundOwner != IntPtr.Zero && iconRect.Right > iconRect.Left && iconRect.Bottom > iconRect.Top)
+                {
+                    ownerWindow = foundOwner;
+                    Console.WriteLine($"TRAY_RECT:{iconRect.Left},{iconRect.Top},{iconRect.Right},{iconRect.Bottom}");
+                    return iconRect;
+                }
+                Thread.Sleep(RetryPollIntervalMs);
+            }
+            throw new InvalidOperationException("Agent Redactor tray icon has no shell rectangle.");
+        }
+
+        private static int AssertTrayIcon()
+        {
+            GetTrayIconRect(out _);
+            return 0;
+        }
+
+        private static int ClickTrayIcon(UIA3Automation automation)
+        {
+            GetTrayIconRect(out var trayWindow);
+            SendMessage(trayWindow, 0x0401, new IntPtr(1), new IntPtr(0x0201));
+
+            var hwnd = GetMainWindow(automation).Properties.NativeWindowHandle;
+            var deadline = DateTime.UtcNow + ControlFindTimeout;
+            while (!IsWindowVisible(hwnd))
+            {
+                if (DateTime.UtcNow >= deadline)
+                {
+                    throw new TimeoutException("Clicking the tray icon did not reopen Agent Redactor.");
+                }
+                Thread.Sleep(RetryPollIntervalMs);
             }
             return 0;
         }

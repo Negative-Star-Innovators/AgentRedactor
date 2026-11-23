@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "constants.h"
 #include "resource.h"
+#include "logging.h"
 #include <commctrl.h>
 #include <windows.h>
 #include <shellapi.h>
@@ -67,7 +68,13 @@ bool SystemTray::Create(HICON icon, const std::wstring& tooltip) {
     if (!icon) return false;
     notifyIconData_.hIcon = icon;
     wcsncpy_s(notifyIconData_.szTip, tooltip.c_str(), _TRUNCATE);
+    SetLastError(ERROR_SUCCESS);
     BOOL result = Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
+    const DWORD error = result ? ERROR_SUCCESS : GetLastError();
+    DWORD ownerPid = 0;
+    GetWindowThreadProcessId(hwnd_, &ownerPid);
+    LOGF_LIFECYCLE(L"[SystemTray] NIM_ADD result=%d error=%lu hwnd=%p ownerPid=%lu visible=%d",
+        result, error, hwnd_, ownerPid, IsWindowVisible(hwnd_));
     if (!result) return false;
     created_ = true;
     return true;
@@ -83,11 +90,16 @@ void SystemTray::Destroy() {
     }
 }
 
-void SystemTray::Recreate() {
-    // created_ tracks our intent (Create succeeded); the icon itself is gone
-    // after the Explorer restart, so re-add with the last icon/tooltip.
-    if (!created_ || !notifyIconData_.hIcon) return;
-    Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
+bool SystemTray::Recreate() {
+    if (!notifyIconData_.hIcon) return false;
+    notifyIconData_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    SetLastError(ERROR_SUCCESS);
+    const BOOL result = Shell_NotifyIconW(NIM_ADD, &notifyIconData_);
+    const DWORD error = result ? ERROR_SUCCESS : GetLastError();
+    LOGF_LIFECYCLE(L"[SystemTray] NIM_ADD retry result=%d error=%lu hwnd=%p",
+        result, error, hwnd_);
+    created_ = result == TRUE;
+    return created_;
 }
 
 void SystemTray::ShowMenu(const std::vector<MenuItem>& items) {
@@ -134,15 +146,17 @@ void SystemTray::UpdateIcon(HICON icon) {
     if (!created_) return;
     if (notifyIconData_.hIcon) DestroyIcon(notifyIconData_.hIcon);
     notifyIconData_.hIcon = icon;
-    notifyIconData_.uFlags = NIF_ICON;
-    Shell_NotifyIconW(NIM_MODIFY, &notifyIconData_);
+    NOTIFYICONDATAW nid = notifyIconData_;
+    nid.uFlags = NIF_ICON;
+    Shell_NotifyIconW(NIM_MODIFY, &nid);
 }
 
 void SystemTray::UpdateTooltip(const std::wstring& tooltip) {
     if (!created_) return;
     wcsncpy_s(notifyIconData_.szTip, tooltip.c_str(), _TRUNCATE);
-    notifyIconData_.uFlags = NIF_TIP;
-    Shell_NotifyIconW(NIM_MODIFY, &notifyIconData_);
+    NOTIFYICONDATAW nid = notifyIconData_;
+    nid.uFlags = NIF_TIP;
+    Shell_NotifyIconW(NIM_MODIFY, &nid);
 }
 
 LRESULT SystemTray::HandleTrayMessage(LPARAM lParam) {

@@ -4,6 +4,7 @@
 #include "AppState.h"
 #include "localization.h"
 #include "logging.h"
+#include "constants.h"
 #include "utils.h"
 #include "update_manager.h"
 #include "HomePage.h"
@@ -71,6 +72,12 @@ namespace winrt::AgentRedactor::implementation
             // Explorer restarted and wiped every tray icon - re-add ours so
             // the app does not silently vanish from the tray area.
             if (auto app = ::AgentRedactor::AppState::Instance()) app->NotifyTaskbarCreated();
+            return 0;
+        }
+        if (uMsg == ::AgentRedactor::WM_TRAYICON) {
+            if (auto app = ::AgentRedactor::AppState::Instance()) {
+                if (auto tray = app->Tray()) tray->HandleTrayMessage(lParam);
+            }
             return 0;
         }
         if (uMsg == WM_CLOSE && self && !self->allowClose_) {
