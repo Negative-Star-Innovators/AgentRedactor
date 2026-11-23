@@ -64,6 +64,7 @@ cp "${BUILD}/engine/agentredactor" "${STAGE}/agentredactor"
 cp "${ROOT}/third_party/velopack/lib/velopack_libc_linux_${VP_ARCH}_gnu.so" \
     "${STAGE}/libvelopack_libc_linux_${VP_ARCH}_gnu.so"
 cp "${ONNX_LIB}" "${STAGE}/"
+cp "${ROOT}/../third_party/hf_tokenizer/LICENSE.tokenizers" "${STAGE}/LICENSE.tokenizers.txt"
 
 # Model companions ship in the package next to the exe (same split as the
 # Windows self-release channel, build.ps1 /XF *.onnx_data): the 1.6 GB weights

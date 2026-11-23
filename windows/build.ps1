@@ -197,6 +197,7 @@ if ($SelfRelease) {
 }
 & $msbuild @engineBuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
+Copy-Item "$root\..\third_party\hf_tokenizer\LICENSE.tokenizers" "$outDir\LICENSE.tokenizers.txt" -Force
 
 # ============================================================================
 # VERIFY FRESH OUTPUTS

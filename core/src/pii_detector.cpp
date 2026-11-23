@@ -544,7 +544,12 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
         return {};
     }
 
+    auto tokenizeStart = std::chrono::high_resolution_clock::now();
     auto tokenPieces = tokenizer_->Encode(text);
+    auto tokenizeUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - tokenizeStart).count();
+    LOGF(L"[DetectPII] TOKENIZE chars=%zu tokens=%zu elapsed_us=%lld",
+        text.size(), tokenPieces.size(), tokenizeUs);
     if (tokenPieces.empty()) return {};
 
     std::vector<int64_t> allTokenIds;
@@ -606,6 +611,9 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
         if (ownedEnd >= allTokenIds.size()) break;
     }
 
+    auto inferenceStart = std::chrono::high_resolution_clock::now();
+    long long onnxRunTotalUs = 0;
+    long long viterbiTotalUs = 0;
     std::vector<std::vector<int>> allChunkLabels;
     std::vector<std::vector<float>> allChunkProbs;
     for (size_t chunkIdx = 0; chunkIdx < chunks.size(); ++chunkIdx) {
@@ -639,7 +647,10 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
             }
 
             LOGF(L"[PIIDetector] >>RUN seqlen=%zu rss_before_mb=%zu", seqLen, Utils::GetProcessRssBytes() / (1024 * 1024));
+            auto onnxRunStart = std::chrono::high_resolution_clock::now();
             auto outputTensors = session_->Run(runOptions, inputNames, inputTensors, 2, outputNamesArr, 1);
+            onnxRunTotalUs += std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now() - onnxRunStart).count();
             LOGF(L"[PIIDetector] <<RUN seqlen=%zu rss_after_mb=%zu", seqLen, Utils::GetProcessRssBytes() / (1024 * 1024));
 
             {
@@ -660,8 +671,11 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
 
             std::vector<float> logitsVec(outSeqLen * numClasses);
             std::copy(logits, logits + outSeqLen * numClasses, logitsVec.begin());
+            auto viterbiStart = std::chrono::high_resolution_clock::now();
             auto labels = ViterbiDecode(logitsVec, static_cast<int>(outSeqLen), static_cast<int>(numClasses));
             std::vector<float> tokenProbs = ComputeAssignedProbs(logitsVec, static_cast<int>(outSeqLen), static_cast<int>(numClasses), labels);
+            viterbiTotalUs += std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now() - viterbiStart).count();
             // Keep only the OWNED region's labels/probs; the prepended context
             // and right margin were decoded for context and are discarded.
             const size_t ownedStart = ownedRanges[chunkIdx].first;
@@ -686,6 +700,11 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
         }
     }
 
+    auto inferenceUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - inferenceStart).count();
+    LOGF(L"[DetectPII] INFERENCE chunks=%zu elapsed_us=%lld", chunks.size(), inferenceUs);
+
+    auto entityAssemblyStart = std::chrono::high_resolution_clock::now();
     std::vector<PIIEntity> allEntities;
     for (size_t chunkIdx = 0; chunkIdx < allChunkLabels.size(); ++chunkIdx) {
         auto& labels = allChunkLabels[chunkIdx];
@@ -727,6 +746,10 @@ std::vector<PIIEntity> PIIDetector::DetectPII(
     }
     merged.erase(std::remove_if(merged.begin(), merged.end(),
         [this](const PIIEntity& ent) { return ent.confidence < confidenceThreshold_; }), merged.end());
+    auto entityAssemblyUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - entityAssemblyStart).count();
+    LOGF(L"[DetectPII] STAGES tokenize_us=%lld onnx_run_us=%lld viterbi_us=%lld entity_assembly_us=%lld",
+        tokenizeUs, onnxRunTotalUs, viterbiTotalUs, entityAssemblyUs);
     if (logManager_ && logManager_->IsShowSensitive()) {
         for (const auto& ent : merged) {
             std::wstring logMsg = L"[DetectPII] PII detected: type=" + ent.type

@@ -17,6 +17,14 @@ This folder builds the engine/CLI (`macos/engine/`, CMake — see
   canonical path `macos/build/agentredactor` (the CMake output
   `macos/build/engine/agentredactor` is picked up automatically).
 
+## Native tokenizer dependency
+
+The default Hugging Face tokenizer is statically linked into the engine through ; see README.md for the pinned rustup toolchain setup. Rust/Cargo is needed only to build, not on end-user machines.  selects the old custom-tokenizer fallback. The Hugging Face license is staged in  by .
+
+## Native tokenizer dependency
+
+The default Hugging Face tokenizer is statically linked into the engine through third_party/hf_tokenizer; see README.md for the pinned rustup toolchain setup. Rust/Cargo is needed only to build, not on end-user machines. AGENTREDACTOR_HF_TOKENIZER=OFF selects the old custom-tokenizer fallback. The Hugging Face license is staged in Contents/Resources by build-app.sh.
+
 ## GUI quick build
 
 ```bash

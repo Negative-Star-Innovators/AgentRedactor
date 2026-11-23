@@ -267,6 +267,7 @@ std::wstring ProxyEngine::RedactWithPIIModel(const std::wstring& text,
         LOG(entityDebug);
     }
 
+    auto replacementStart = std::chrono::high_resolution_clock::now();
     std::sort(entities.begin(), entities.end(),
         [](const PIIEntity& a, const PIIEntity& b) { return a.start > b.start; });
 
@@ -286,6 +287,9 @@ std::wstring ProxyEngine::RedactWithPIIModel(const std::wstring& text,
             result.replace(entity.start, entity.end - entity.start, label);
         }
     }
+    auto replacementUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - replacementStart).count();
+    LOGF(L"[RedactWithPIIModel] REPLACE entities=%zu elapsed_us=%lld", entities.size(), replacementUs);
     return result;
 }
 
@@ -825,7 +829,11 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
         auto jsonBody = json::parse(body);
         parsedJson = true;
         RedactJsonStrings(jsonBody, "", kWalkAtRoot, redactTextFragment);
+        auto jsonSerializeStart = std::chrono::high_resolution_clock::now();
         state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
+        auto jsonSerializeUs = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - jsonSerializeStart).count();
+        LOGF(L"[RedactionPipeline] JSON_SERIALIZE elapsed_us=%lld", jsonSerializeUs);
     } catch (const json::exception&) {
         // Not valid JSON — fall through to full-body redaction below.
     }
@@ -1046,6 +1054,7 @@ bool ProxyEngine::ForwardToUpstream(const std::wstring& upstreamUrl, const std::
     std::string& responseBody) {
 
     responseBody.clear();
+    auto upstreamStart = std::chrono::high_resolution_clock::now();
     bool ok = ForwardToUpstreamStreaming(upstreamUrl, apiKey, profileAlias, method, path, headers, body,
         statusCode, responseHeaders,
         [&responseBody](const char* data, size_t len) {
@@ -1053,6 +1062,9 @@ bool ProxyEngine::ForwardToUpstream(const std::wstring& upstreamUrl, const std::
             return true;
         },
         nullptr);
+    auto upstreamUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - upstreamStart).count();
+    LOGF(L"[Upstream] ROUNDTRIP elapsed_us=%lld", upstreamUs);
     if (!ok) return false;
 
     std::wstring upstreamResponsePreview = Utils::Utf8ToWide(responseBody);

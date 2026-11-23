@@ -1,0 +1,16 @@
+[package]
+name = "ar_hf_tokenizer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+tokenizers = "=0.22.2"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1

@@ -52,6 +52,11 @@ jobs:
         run: |
           brew install cmake ninja nlohmann-json openssl@3 xcodegen
           python3 -m pip install -r tests/requirements.txt
+      - name: Install Rust tokenizer toolchain
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup default 1.100.0
+          rustup target add aarch64-apple-darwin
       - uses: actions/cache@v4
         with:
           path: macos/build-store/models-cache
@@ -89,6 +94,11 @@ jobs:
         run: |
           brew install cmake ninja nlohmann-json openssl@3 xcodegen
           python3 -m pip install -r tests/requirements.txt
+      - name: Install Rust tokenizer toolchain
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup default 1.100.0
+          rustup target add aarch64-apple-darwin
       - uses: actions/cache@v4
         with:
           path: macos/build-store/models-cache

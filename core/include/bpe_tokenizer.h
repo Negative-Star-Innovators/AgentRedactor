@@ -6,6 +6,10 @@
 #include <filesystem>
 #include <memory>
 
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+#include "ar_hf_tokenizer.h"
+#endif
+
 namespace AgentRedactor {
 
 struct TokenPiece {
@@ -18,7 +22,7 @@ struct TokenPiece {
 class BPETokenizer {
 public:
     explicit BPETokenizer(const std::filesystem::path& tokenizerPath);
-    ~BPETokenizer() = default;
+    ~BPETokenizer();
     BPETokenizer(const BPETokenizer&) = delete;
     BPETokenizer& operator=(const BPETokenizer&) = delete;
 
@@ -26,7 +30,7 @@ public:
     bool IsInitialized() const { return initialized_; }
     std::vector<TokenPiece> Encode(const std::wstring& text);
     std::wstring Decode(const std::vector<int64_t>& tokenIds);
-    size_t GetVocabSize() const { return tokenToId_.size(); }
+    size_t GetVocabSize() const;
 
 private:
     bool LoadTokenizerJson();
@@ -37,6 +41,9 @@ private:
 
     std::filesystem::path tokenizerPath_;
     bool initialized_ = false;
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+    ArTokenizer* hfTokenizer_ = nullptr;
+#endif
     std::unordered_map<std::string, int64_t> tokenToId_;
     std::unordered_map<int64_t, std::string> idToToken_;
     std::unordered_map<std::string, int> mergeTable_;

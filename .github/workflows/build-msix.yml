@@ -114,6 +114,14 @@ jobs:
         shell: pwsh
         run: curl.exe -L --fail -o repo/windows/models/onnx/model_quantized.onnx_data https://api.agentredactor.negativestarinnovators.com/models/model_quantized.onnx_data
 
+      - name: Install Rust tokenizer toolchain
+        if: env.RUN_BUILD == 'true'
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup default 1.100.0
+          rustup target add ${{ matrix.arch == 'x64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
+
       - name: Build MSIX (build.ps1)
         if: env.RUN_BUILD == 'true'
         shell: pwsh
