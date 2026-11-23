@@ -32,6 +32,22 @@ async def test_tray_icon_recovers_after_tooltip_update_and_explorer_restart(
 ) -> None:
     get_pii_master_state()
     time.sleep(2)
+    if _BUILD_PLATFORM == "ARM64":
+        probe = subprocess.run(
+            [
+                "powershell",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(PROJECT_ROOT / "tests" / "gui" / "windows" / "tray_shell_probe.ps1"),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        print(probe.stdout + probe.stderr)
+        assert probe.returncode == 0
     assert_tray_icon()
 
     result = subprocess.run(
