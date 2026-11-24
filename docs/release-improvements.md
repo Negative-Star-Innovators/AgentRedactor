@@ -135,6 +135,8 @@ Hugging Face `tokenizers` is Apache-2.0-licensed open source. Its reference impl
 
 Keep the existing C++ `BPETokenizer` interface as the integration boundary and implement it with a small project-owned C ABI around a pinned Hugging Face Rust crate. Expose tokenizer creation/destruction, encoding to token IDs and UTF-8 byte offsets, decoding/token lookup needed by diagnostics, and explicit buffer destruction. Convert between UTF-8 offsets and the detector's UTF-16 character offsets in C++. Build the Rust static library for each required Windows, macOS, and Linux architecture, link it into `agentredactor-core`, pin the Rust toolchain and crate versions with a lockfile, and ship the required license and attribution notices. Start with stable version 0.22.2, which was used for the reference benchmark, rather than tracking the changing development branch.
 
+The dependency audit covers 85 desktop packages including `tokenizers`: all declare permissive license options and supply license/notice files. `third_party/hf_tokenizer/generate_notices.py` reproducibly combines the direct Hugging Face license and all 84 transitive desktop package notices into the already staged `LICENSE.tokenizers.txt`; regenerate it whenever `Cargo.lock` changes.
+
 The Apache-2.0 `mlc-ai/tokenizers-cpp` project is a possible build reference, but its public C++ API currently exposes IDs without token offsets. It is therefore not a drop-in replacement; using it would require extending its API or accessing lower-level bindings. Do not add it merely to avoid a small project-owned adapter without first resolving offset support.
 
 Evaluation and implementation sequence:
