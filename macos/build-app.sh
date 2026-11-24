@@ -142,6 +142,7 @@ cp -R "$BUILT_APP" "$APP_BUNDLE"
 
 cp "$ENGINE_SRC" "$APP_BUNDLE/Contents/Resources/agentredactor"
 chmod +x "$APP_BUNDLE/Contents/Resources/agentredactor"
+cp "$REPO_ROOT/third_party/hf_tokenizer/LICENSE.tokenizers" "$APP_BUNDLE/Contents/Resources/LICENSE.tokenizers.txt"
 
 # --- 5. Velopack updater dylib (self-release only) -----------------------------
 # The GUI dlopens this at runtime (it is NOT linked at build time, so dev

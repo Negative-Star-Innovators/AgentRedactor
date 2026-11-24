@@ -293,6 +293,12 @@ This will:
 
 The EXE can be run directly from that folder for rapid iteration.
 
+### Hugging Face tokenizer
+
+Hugging Face tokenization is enabled by default through `../third_party/hf_tokenizer`, a pinned Rust static-library adapter that preserves the C++ `BPETokenizer` interface. MSBuild invokes Cargo automatically for the current architecture (`HFTokenizerRustTarget`); `HFTokenizerLib` can override the static-library path when Cargo uses a separate target directory. Pass `-p:HFTokenizer=false` only for a fallback build using the old custom tokenizer. Linux/macOS use the same adapter through `AGENTREDACTOR_HF_TOKENIZER` in `core/CMakeLists.txt`. Rust/Cargo is a build-time dependency, not a runtime dependency: the adapter and Hugging Face/transitive Rust license notices are linked/staged in the application packages. Regenerate the notices with `python third_party/hf_tokenizer/generate_notices.py` after changing the Cargo dependency lockfile.
+
+`tests/cli/pii_tokenizer_ab.py` runs the real engine against the synthetic 804-entity corpus, clean text, a Unicode/token-offset probe, and long Anthropic signature fields. It records exact and overlap entity metrics, raw leaks, token/reference parity, wall/tokenizer/ONNX/Viterbi/entity-assembly/replacement/JSON/upstream time, and process memory. Set `AGENTREDACTOR_ENGINE_BIN` to the engine under test and use separate output labels for the custom and Hugging Face runs. `--signature-source <log>` replays unique Anthropic signatures from a local log without writing their contents into the result JSON; `--signature-chars` optionally selects lengths, and each real signature is sent twice to verify fragment-cache behavior.
+
 ## Full Release Build (MSI + MSIX)
 
 Run from the `AgentRedactor` folder when you need installer packages:
@@ -423,6 +429,7 @@ is first backed up to `<name>.corrupt-<timestamp>.bak` and only then reset.
 - Visual Studio 2022 Build Tools (or higher) with the **Desktop development with C++** workload
 - Windows SDK 10.0.17763.0 or later (the SDK's `makepri.exe`, `MakeAppx.exe`, `wilangid.vbs`, and `MsiTran.exe` are used for packaging)
 - NuGet packages are already checked in under `packages\`; MSBuild will use them directly
+- Rust/Cargo via rustup (pinned by `third_party/hf_tokenizer/rust-toolchain.toml`) for the default Hugging Face tokenizer build; no Rust runtime is needed on end-user machines
 
 ## End-to-End Tests
 

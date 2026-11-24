@@ -162,6 +162,13 @@ jobs:
           uname -m | grep -q arm64 || { echo "macos-15 runner is not arm64 — refusing to pack osx-arm64"; exit 1; }
           brew install cmake ninja nlohmann-json openssl@3 xcodegen
 
+      - name: Install Rust tokenizer toolchain
+        if: env.RUN_BUILD == 'true'
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup default 1.100.0
+          rustup target add aarch64-apple-darwin
+
       # Fetches the pinned onnxruntime tarball + checks prerequisites, and the
       # pinned Velopack C/C++ lib (macos/fetch-velopack.sh).
       - name: Fetch dependencies

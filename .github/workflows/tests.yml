@@ -102,6 +102,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release download models-v1 -R ${{ github.repository }} --pattern model_quantized.onnx_data --dir repo/windows/models/onnx --clobber
 
+      - name: Install Rust tokenizer toolchain
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup default 1.100.0
+          rustup target add x86_64-pc-windows-msvc
+
       - name: Build app (buildquick.ps1)
         shell: pwsh
         run: repo/windows/buildquick.ps1 -Configuration Release

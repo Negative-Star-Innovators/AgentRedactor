@@ -93,6 +93,24 @@
   <PropertyGroup Condition="'$(SelfRelease)'=='true'">
     <SelfReleaseDefines>AGENTREDACTOR_SELFRELEASE</SelfReleaseDefines>
   </PropertyGroup>
+  <PropertyGroup>
+    <HFTokenizer Condition="'$(HFTokenizer)'==''">true</HFTokenizer>
+    <HFTokenizerRustTarget Condition="'$(HFTokenizerRustTarget)'=='' and '$(Platform)'=='ARM64'">aarch64-pc-windows-msvc</HFTokenizerRustTarget>
+    <HFTokenizerRustTarget Condition="'$(HFTokenizerRustTarget)'==''">x86_64-pc-windows-msvc</HFTokenizerRustTarget>
+    <HFTokenizerLib Condition="'$(HFTokenizerLib)'==''">$(ProjectDir)..\third_party\hf_tokenizer\target\$(HFTokenizerRustTarget)\release\ar_hf_tokenizer.lib</HFTokenizerLib>
+  </PropertyGroup>
+  <Target Name="BuildHFTokenizer" BeforeTargets="ClCompile" Condition="'$(HFTokenizer)'=='true'">
+    <Exec Command="cargo build --manifest-path &quot;$(ProjectDir)..\third_party\hf_tokenizer\Cargo.toml&quot; --release --target $(HFTokenizerRustTarget)" />
+  </Target>
+  <ItemDefinitionGroup Condition="'$(HFTokenizer)'=='true'">
+    <ClCompile>
+      <PreprocessorDefinitions>AGENTREDACTOR_HF_TOKENIZER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\third_party\hf_tokenizer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(HFTokenizerLib);userenv.lib;ntdll.lib;advapi32.lib;dbghelp.lib;synchronization.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>

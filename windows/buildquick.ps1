@@ -4,7 +4,8 @@
 
 param(
     [string]$Configuration = "Release",
-    [string]$Platform = "x64"
+    [string]$Platform = "x64",
+    [string]$VcpkgRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -95,6 +96,7 @@ if (Test-Path $versionFile) {
 $versionCore = ($buildVersion -split '[-+]')[0]
 $appVersionQuad = ($versionCore -replace '\.', ',') + ',0'
 $msbuildArgs = @("$root\AgentRedactor.vcxproj", "-p:Configuration=$Configuration", "-p:Platform=$Platform", "-p:RestorePackages=false", "-p:AppVersion=$buildVersion", "-p:AppVersionQuad=`"$appVersionQuad`"", "-m", "-verbosity:minimal")
+if ($VcpkgRoot) { $msbuildArgs += "-p:VcpkgRoot=$VcpkgRoot" }
 & $msbuild @msbuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
@@ -104,8 +106,11 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Building AgentRedactorEngine ($Configuration|$Platform)..." -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
-& $msbuild "$root\AgentRedactorEngine.vcxproj" "-p:Configuration=$Configuration" "-p:Platform=$Platform" "-p:AppVersion=$buildVersion" "-m" "-verbosity:minimal"
+$engineBuildArgs = @("$root\AgentRedactorEngine.vcxproj", "-p:Configuration=$Configuration", "-p:Platform=$Platform", "-p:AppVersion=$buildVersion", "-m", "-verbosity:minimal")
+if ($VcpkgRoot) { $engineBuildArgs += "-p:VcpkgRoot=$VcpkgRoot" }
+& $msbuild @engineBuildArgs
 if ($LASTEXITCODE -ne 0) { throw "Engine build failed" }
+Copy-Item "$root\..\third_party\hf_tokenizer\LICENSE.tokenizers" "$outDir\LICENSE.tokenizers.txt" -Force
 
 # Copy model files required at runtime
 if (Test-Path "$root\models") {

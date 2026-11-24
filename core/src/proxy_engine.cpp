@@ -150,9 +150,19 @@ bool HasToolNameMember(const json& node) {
     return t == "function" && node.contains("function");
 }
 
+bool IsOpaqueThinkingField(const json& node, const std::string& key) {
+    if (key != "signature" && key != "data") return false;
+    auto typeIt = node.find("type");
+    if (typeIt == node.end() || !typeIt->is_string()) return false;
+    const std::string type = typeIt->get<std::string>();
+    return (type == "thinking" && key == "signature") ||
+        (type == "redacted_thinking" && key == "data");
+}
+
 // Recursive deny-all walk: redact every string value in the tree except
-// structural keys. `key` carries the parent key through arrays so that
-// "stop": ["..."] is honored for its string elements.
+// structural keys and exact Anthropic-compatible opaque thinking fields.
+// `key` carries the parent key through arrays so that "stop": ["..."] is
+// honored for its string elements.
 void RedactJsonStrings(json& node, const std::string& key, unsigned flags,
     const std::function<std::wstring(const std::wstring&)>& redact) {
     if (node.is_string()) {
@@ -179,6 +189,10 @@ void RedactJsonStrings(json& node, const std::string& key, unsigned flags,
         }
         for (auto& el : node.items()) {
             const std::string& k = el.key();
+            // Provider-authenticated opaque values must round-trip byte-exact.
+            // Restrict the exemption to direct string members of the exact
+            // parent type; plaintext thinking and all sibling fields are scanned.
+            if (el.value().is_string() && IsOpaqueThinkingField(node, k)) continue;
             // Tool identifier names are exempt at the object level so the
             // exemption never leaks into sibling data fields.
             if ((self & kWalkNameExempt) && k == "name") continue;
@@ -267,6 +281,7 @@ std::wstring ProxyEngine::RedactWithPIIModel(const std::wstring& text,
         LOG(entityDebug);
     }
 
+    auto replacementStart = std::chrono::high_resolution_clock::now();
     std::sort(entities.begin(), entities.end(),
         [](const PIIEntity& a, const PIIEntity& b) { return a.start > b.start; });
 
@@ -286,6 +301,9 @@ std::wstring ProxyEngine::RedactWithPIIModel(const std::wstring& text,
             result.replace(entity.start, entity.end - entity.start, label);
         }
     }
+    auto replacementUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - replacementStart).count();
+    LOGF(L"[RedactWithPIIModel] REPLACE entities=%zu elapsed_us=%lld", entities.size(), replacementUs);
     return result;
 }
 
@@ -825,7 +843,11 @@ std::string ProxyEngine::ProcessRequest(const ApiKeyProfile& profile, const std:
         auto jsonBody = json::parse(body);
         parsedJson = true;
         RedactJsonStrings(jsonBody, "", kWalkAtRoot, redactTextFragment);
+        auto jsonSerializeStart = std::chrono::high_resolution_clock::now();
         state.redactedText = Utils::Utf8ToWide(jsonBody.dump());
+        auto jsonSerializeUs = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - jsonSerializeStart).count();
+        LOGF(L"[RedactionPipeline] JSON_SERIALIZE elapsed_us=%lld", jsonSerializeUs);
     } catch (const json::exception&) {
         // Not valid JSON — fall through to full-body redaction below.
     }
@@ -1046,6 +1068,7 @@ bool ProxyEngine::ForwardToUpstream(const std::wstring& upstreamUrl, const std::
     std::string& responseBody) {
 
     responseBody.clear();
+    auto upstreamStart = std::chrono::high_resolution_clock::now();
     bool ok = ForwardToUpstreamStreaming(upstreamUrl, apiKey, profileAlias, method, path, headers, body,
         statusCode, responseHeaders,
         [&responseBody](const char* data, size_t len) {
@@ -1053,6 +1076,9 @@ bool ProxyEngine::ForwardToUpstream(const std::wstring& upstreamUrl, const std::
             return true;
         },
         nullptr);
+    auto upstreamUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - upstreamStart).count();
+    LOGF(L"[Upstream] ROUNDTRIP elapsed_us=%lld", upstreamUs);
     if (!ok) return false;
 
     std::wstring upstreamResponsePreview = Utils::Utf8ToWide(responseBody);

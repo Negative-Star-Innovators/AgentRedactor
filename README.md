@@ -118,6 +118,7 @@ Prerequisites:
   ..\vcpkg\bootstrap-vcpkg.bat
   ..\vcpkg\vcpkg install onnxruntime:x64-windows nlohmann-json:x64-windows wil:x64-windows
   ```
+- Rust/Cargo via [rustup](https://rustup.rs/) for the default Hugging Face tokenizer build. The pinned toolchain is selected by `third_party/hf_tokenizer/rust-toolchain.toml`; end users do not need Rust.
 - The ONNX model weights. `model_quantized.onnx_data` (~1.6 GB) is **not in the
   repo**; download it from the
   [Releases](https://github.com/Negative-Star-Innovators/AgentRedactor/releases) page and
@@ -163,7 +164,10 @@ Prerequisites: macOS 14+ on Apple silicon, Xcode, and Homebrew. From the
 repository root, build the engine/CLI and SwiftUI app:
 
 ```bash
-brew install cmake ninja nlohmann-json openssl@3 xcodegen
+brew install cmake ninja nlohmann-json openssl@3 xcodegen rustup
+rustup toolchain install 1.100.0 --profile minimal
+rustup default 1.100.0
+rustup target add aarch64-apple-darwin
 
 # Fetch the pinned, checksum-verified ONNX Runtime dependency:
 macos/fetch-deps.sh
@@ -208,6 +212,11 @@ cp ort_pkg/runtimes/linux-x64/native/* ~/onnxruntime/lib/
 # the loader resolves the SONAME (libonnxruntime.so.1), not the file name:
 ln -sf libonnxruntime.so ~/onnxruntime/lib/libonnxruntime.so.1
 rm -rf ort.nupkg ort_pkg
+
+# Install the pinned Rust tokenizer toolchain (build-time only):
+rustup toolchain install 1.100.0 --profile minimal
+rustup default 1.100.0
+rustup target add x86_64-unknown-linux-gnu  # use aarch64-unknown-linux-gnu on ARM64
 ```
 
 The engine also needs the NER model files: `config.json`, `tokenizer.json`,

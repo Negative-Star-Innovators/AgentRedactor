@@ -100,6 +100,13 @@ jobs:
             qt6-base-dev qt6-l10n-tools libgl1-mesa-dev fuse libfuse2t64 \
             xvfb python3-gi gir1.2-atspi-2.0 at-spi2-core dbus-x11 patchelf
 
+      - name: Install Rust tokenizer toolchain
+        if: env.RUN_BUILD == 'true'
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup default 1.100.0
+          rustup target add ${{ matrix.arch == 'x64' && 'x86_64-unknown-linux-gnu' || 'aarch64-unknown-linux-gnu' }}
+
       # onnxruntime has no apt package; the official prebuilt per arch comes
       # from the pinned NuGet package (same libraries the release tarballs
       # shipped — Microsoft disabled the onnxruntime GitHub Releases in

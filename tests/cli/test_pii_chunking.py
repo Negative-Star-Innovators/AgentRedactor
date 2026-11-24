@@ -159,3 +159,97 @@ def test_chunked_inference_window_and_accuracy(
         f"recall {recall:.2f}% below floor ({caught}/{len(gt)} injected entities caught)")
     assert precision >= PRECISION_FLOOR, (
         f"precision {precision:.2f}% below floor ({labels} redactions, {caught} matched GT)")
+
+
+def test_tokenizer_reference_ids_and_offsets(chunk_engine: CliEngine, mock_upstream: MockLLM):
+    sensitive = chunk_engine.run_cli("set", "show-sensitive", "true")
+    assert sensitive.returncode == 0, sensitive.stdout + sensitive.stderr
+    probe = "é A😀B JohnSmith1234 a+++++b"
+    log_path = chunk_engine.config_dir / "agent_redactor.log"
+    log_offset = log_path.stat().st_size
+    body = json.dumps({
+        "model": "tokenizer-reference",
+        "max_tokens": 16,
+        "messages": [{"role": "user", "content": probe}],
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{chunk_engine.proxy_port}/v1/chat/completions",
+        data=body,
+        headers={"Content-Type": "application/json",
+                 "Authorization": "Bearer sk-chunk-test-key"},
+    )
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        assert resp.status == 200
+        resp.read()
+    with log_path.open("rb") as log_file:
+        log_file.seek(log_offset)
+        log = log_file.read().decode("utf-8", "replace")
+    actual = [
+        (int(match.group(1)), int(match.group(2)), int(match.group(3)))
+        for match in re.finditer(r"id=(\d+) byteStart=(\d+) byteEnd=(\d+)", log)
+    ]
+    expected = [
+        (377, 0, 2), (355, 2, 4), (84083, 4, 8), (33, 8, 9),
+        (5928, 9, 14), (79244, 14, 19), (7633, 19, 22), (19, 22, 23),
+        (261, 23, 25), (20438, 25, 29), (10, 29, 30), (65, 30, 31),
+    ]
+    assert actual == expected
+
+
+def test_anthropic_opaque_fields_preserved_and_siblings_redacted(
+    chunk_engine: CliEngine, mock_upstream: MockLLM
+) -> None:
+    regex = chunk_engine.run_cli("regex", "add", r"sk-[a-z0-9-]+")
+    assert regex.returncode == 0, regex.stdout + regex.stderr
+    keyword = chunk_engine.run_cli("keywords", "add", "Pear")
+    assert keyword.returncode == 0, keyword.stdout + keyword.stderr
+
+    signature = "sig-Pear-sk-opaque123-" + "A" * 10000
+    redacted_data = "data-Pear-sk-opaque456-" + "B" * 10000
+    blocks = [
+        {"type": "thinking", "thinking": "Pear sk-plaintext123", "signature": signature},
+        {"type": "redacted_thinking", "data": redacted_data,
+         "content": "Pear sk-sibling123"},
+        {"type": "text", "signature": "Pear sk-wrongparent123",
+         "data": "Pear sk-wrongparent456"},
+        {"type": "thinking", "data": "Pear sk-wrongkey123"},
+        {"type": "redacted_thinking", "signature": "Pear sk-wrongkey456"},
+        {"type": "thinking", "signature": {"value": "Pear sk-nested123"}},
+    ]
+
+    for path, stream in (
+        ("/v1/messages", False),
+        ("/v1/messages", True),
+        ("/v1/chat/completions", True),
+    ):
+        body = json.dumps({
+            "model": "opaque-field-test",
+            "max_tokens": 16,
+            "stream": stream,
+            "messages": [{"role": "assistant", "content": blocks}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{chunk_engine.proxy_port}{path}",
+            data=body,
+            headers={"Content-Type": "application/json",
+                     "Authorization": "Bearer sk-chunk-test-key"},
+        )
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            assert resp.status == 200
+            resp.read()
+
+        forwarded = mock_upstream.last_request["messages"][-1]["content"]
+        assert forwarded[0]["signature"] == signature
+        assert forwarded[1]["data"] == redacted_data
+        assert "Pear" not in forwarded[0]["thinking"]
+        assert "sk-plaintext123" not in forwarded[0]["thinking"]
+        assert "Pear" not in forwarded[1]["content"]
+        assert "sk-sibling123" not in forwarded[1]["content"]
+
+        for block in forwarded[2:]:
+            assert "Pear" not in json.dumps(block)
+        assert "sk-wrongparent123" not in forwarded[2]["signature"]
+        assert "sk-wrongparent456" not in forwarded[2]["data"]
+        assert "sk-wrongkey123" not in forwarded[3]["data"]
+        assert "sk-wrongkey456" not in forwarded[4]["signature"]
+        assert "sk-nested123" not in forwarded[5]["signature"]["value"]

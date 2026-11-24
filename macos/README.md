@@ -9,7 +9,10 @@ Velopack release packaging).
 Build the engine/CLI (`agentredactor`) on macOS 14+:
 
 ```bash
-brew install cmake ninja nlohmann-json openssl@3
+brew install cmake ninja nlohmann-json openssl@3 rustup
+rustup toolchain install 1.100.0 --profile minimal
+rustup default 1.100.0
+rustup target add aarch64-apple-darwin
 
 # Fetches the pinned osx-arm64 onnxruntime (sha256-checked NuGet package) into
 # macos/third_party/ (gitignored) and verifies the prerequisites:
@@ -18,6 +21,8 @@ macos/fetch-deps.sh
 cmake -B macos/build -G Ninja -S macos
 cmake --build macos/build
 ```
+
+The default tokenizer is Hugging Face's Rust implementation, statically linked into the engine through `third_party/hf_tokenizer`. Rust/Cargo is required only when building; users do not need to install it. Set `AGENTREDACTOR_HF_TOKENIZER=OFF` at CMake configure time only for a fallback build with the old custom tokenizer.
 
 The engine also needs the NER model files. `config.json`, `tokenizer.json`,
 `viterbi_calibration.json` and `onnx/model_quantized.onnx` are staged next to

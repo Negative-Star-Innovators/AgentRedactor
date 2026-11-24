@@ -4,6 +4,8 @@
 
 Run the local build **and** the Linux test suite before pushing. This surfaces compile and runtime failures in seconds instead of waiting for the full GitHub Actions pipeline.
 
+The default Hugging Face tokenizer is linked statically through third_party/hf_tokenizer. Install Rust/Cargo with rustup before building (rustup toolchain install 1.100.0 --profile minimal, then rustup default 1.100.0 and the appropriate rustup target add for the host architecture). This is a build-time-only dependency. Set AGENTREDACTOR_HF_TOKENIZER=OFF at configure time only for the old custom-tokenizer fallback.
+
 1. Build:
 
 ```bash

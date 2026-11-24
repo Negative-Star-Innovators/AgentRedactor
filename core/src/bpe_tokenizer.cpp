@@ -14,7 +14,33 @@ BPETokenizer::BPETokenizer(const std::filesystem::path& tokenizerPath)
     : tokenizerPath_(tokenizerPath) {
 }
 
+BPETokenizer::~BPETokenizer() {
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+    if (hfTokenizer_) ar_tokenizer_destroy(hfTokenizer_);
+#endif
+}
+
+size_t BPETokenizer::GetVocabSize() const {
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+    return hfTokenizer_ ? ar_tokenizer_vocab_size(hfTokenizer_) : 0;
+#else
+    return tokenToId_.size();
+#endif
+}
+
 bool BPETokenizer::Initialize() {
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+    if (initialized_) return true;
+    auto path = tokenizerPath_ / L"tokenizer.json";
+    hfTokenizer_ = ar_tokenizer_create(Utils::WideToUtf8(path.wstring()).c_str());
+    if (!hfTokenizer_) {
+        LOG(L"[BPETokenizer] ERROR: Hugging Face failed to load tokenizer.json");
+        return false;
+    }
+    initialized_ = true;
+    LOGF(L"[BPETokenizer] Hugging Face initialized. Vocab size: %zu", GetVocabSize());
+    return true;
+#else
     if (initialized_) return true;
     LOG(L"[BPETokenizer] Initializing from: " + tokenizerPath_.wstring());
     if (!LoadTokenizerJson()) {
@@ -24,6 +50,7 @@ bool BPETokenizer::Initialize() {
     initialized_ = true;
     LOGF(L"[BPETokenizer] Initialized. Vocab size: %zu", tokenToId_.size());
     return true;
+#endif
 }
 
 bool BPETokenizer::LoadTokenizerJson() {
@@ -168,6 +195,27 @@ std::vector<TokenPiece> BPETokenizer::EncodeSpacesToPieces(int k) {
 }
 
 std::vector<TokenPiece> BPETokenizer::Encode(const std::wstring& text) {
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+    {
+        std::vector<TokenPiece> result;
+        if (text.empty() || !hfTokenizer_) return result;
+        std::string utf8Text = Utils::WideToUtf8(text);
+        ArEncoding* encoding = nullptr;
+        if (ar_tokenizer_encode(hfTokenizer_,
+                reinterpret_cast<const uint8_t*>(utf8Text.data()), utf8Text.size(), &encoding) != 0) {
+            return result;
+        }
+        result.reserve(encoding->len);
+        for (size_t i = 0; i < encoding->len; ++i) {
+            const char* tokenStart = reinterpret_cast<const char*>(encoding->tokenText) + encoding->tokenOffsets[i];
+            size_t tokenLen = encoding->tokenOffsets[i + 1] - encoding->tokenOffsets[i];
+            result.push_back({encoding->ids[i], std::string(tokenStart, tokenLen),
+                encoding->starts[i], encoding->ends[i]});
+        }
+        ar_encoding_free(encoding);
+        return result;
+    }
+#endif
     std::vector<TokenPiece> result;
     if (text.empty()) return result;
 
@@ -261,6 +309,16 @@ std::vector<TokenPiece> BPETokenizer::Encode(const std::wstring& text) {
 }
 
 std::wstring BPETokenizer::Decode(const std::vector<int64_t>& tokenIds) {
+#ifdef AGENTREDACTOR_HF_TOKENIZER
+    {
+        if (!hfTokenizer_ || tokenIds.empty()) return {};
+        ArBuffer decoded{nullptr, 0};
+        if (ar_tokenizer_decode(hfTokenizer_, tokenIds.data(), tokenIds.size(), &decoded) != 0) return {};
+        std::string utf8(reinterpret_cast<const char*>(decoded.data), decoded.len);
+        ar_buffer_free(&decoded);
+        return Utils::Utf8ToWide(utf8);
+    }
+#endif
     std::string result;
     for (int64_t id : tokenIds) {
         auto it = idToToken_.find(id);
