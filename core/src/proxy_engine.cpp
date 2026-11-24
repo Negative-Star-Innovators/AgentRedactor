@@ -150,9 +150,19 @@ bool HasToolNameMember(const json& node) {
     return t == "function" && node.contains("function");
 }
 
+bool IsOpaqueThinkingField(const json& node, const std::string& key) {
+    if (key != "signature" && key != "data") return false;
+    auto typeIt = node.find("type");
+    if (typeIt == node.end() || !typeIt->is_string()) return false;
+    const std::string type = typeIt->get<std::string>();
+    return (type == "thinking" && key == "signature") ||
+        (type == "redacted_thinking" && key == "data");
+}
+
 // Recursive deny-all walk: redact every string value in the tree except
-// structural keys. `key` carries the parent key through arrays so that
-// "stop": ["..."] is honored for its string elements.
+// structural keys and exact Anthropic-compatible opaque thinking fields.
+// `key` carries the parent key through arrays so that "stop": ["..."] is
+// honored for its string elements.
 void RedactJsonStrings(json& node, const std::string& key, unsigned flags,
     const std::function<std::wstring(const std::wstring&)>& redact) {
     if (node.is_string()) {
@@ -179,6 +189,10 @@ void RedactJsonStrings(json& node, const std::string& key, unsigned flags,
         }
         for (auto& el : node.items()) {
             const std::string& k = el.key();
+            // Provider-authenticated opaque values must round-trip byte-exact.
+            // Restrict the exemption to direct string members of the exact
+            // parent type; plaintext thinking and all sibling fields are scanned.
+            if (el.value().is_string() && IsOpaqueThinkingField(node, k)) continue;
             // Tool identifier names are exempt at the object level so the
             // exemption never leaks into sibling data fields.
             if ((self & kWalkNameExempt) && k == "name") continue;
